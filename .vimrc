@@ -46,23 +46,25 @@ if has("gui_win32")
     let g:fontsize_large = ":h11:cANSI:qDRAFT" 
     let g:shell = "powershell"
     let g:dotvim = $HOME."\\vimfiles"
+    let g:conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
+    " Open gvim in full-screen
+    au GUIEnter * simalt ~x
     " The following is very slow
     "set shell="C:\\\\link\\\\to\\\\Anaconda\\\\powershell.exe"
     "set shellcmdflag=-command
-elseif has("gui_mac")
-    let g:fontface = "FiraCode_NFM"
+elseif has("mac")
+    let g:fontface = "Fira\ Code"
     let g:fontsize_small = ":h8"
-    let g:fontsize_large = ":h11"
+    let g:fontsize_large = ":h14"
     let g:shell = "bash"
     let g:dotvim = $HOME."/.vim"
+    let g:conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
 endif
 " guifont is reserved word (aka 'option')
 let &guifont=g:fontface.g:fontsize_large
 
 set completeopt-=preview
 
-" Open gvim in full-screen
-au GUIEnter * simalt ~x
 " Terminal not in the buffer list
 " autocmd TerminalOpen * if bufwinnr('') > 0 | setlocal nobuflisted | endif
 "
@@ -75,8 +77,8 @@ noremap <C-PageDown> :bprev<CR>
 noremap <C-PageUp> :bnext<CR>
 nnoremap <C-left> <C-w>h
 nnoremap <C-right> <C-w>l
-nnoremap <C-up> <C-w>k
-nnoremap <C-down> <C-w>j
+nnoremap <C-down> <C-w>k
+nnoremap <C-up> <C-w>j
 " Enable folding with the spacebar
 nnoremap <space> za
 "Zoom in and out"
@@ -275,13 +277,13 @@ let g:airline#extensions#tabline#ignore_bufadd_pat = 'defx|gundo|nerd_tree|start
 " 
 " 
 " If mode()==t then change the statusline 
-au User AirlineAfterInit  :let g:airline_section_a = airline#section#create([' %{b:git_branch}'])
+au User AirlineAfterInit  :let g:airline_section_a = airline#section#create([' %{b:git_branch}'])
 au User AirlineAfterInit  :let g:airline_section_b = airline#section#create(['%f']) 
 au User AirlineAfterInit  :let g:airline_section_c =
             \  airline#section#create([':%{NearestMethodOrFunction()}'])  
 au User AirlineAfterInit  :let g:airline_section_z = airline#section#create(['col: %v'])
 "au User AirlineAfterInit  :let g:airline_section_x = airline#section#create(['(%{g:conda_env})
-au User AirlineAfterInit  :let g:airline_section_x = airline#section#create([trim(system("echo %CONDA_DEFAULT_ENV%"))])
+au User AirlineAfterInit  :let g:airline_section_x = airline#section#create([g:conda_env])
 let g:airline_extensions = ['ale','tabline']
 
 
@@ -338,9 +340,9 @@ let g:ale_python_black_options = '--line-length=80'
 let g:ale_fix_on_save = 1
 
 " Source additional files
-source $HOME/PE.vim
-source $HOME/VAS.vim
-source $HOME/dymoval.vim
+" source $HOME/PE.vim
+" source $HOME/VAS.vim
+" source $HOME/dymoval.vim
 
 syntax on
 
@@ -360,3 +362,4 @@ hi PmenuSel ctermbg=darkgray ctermfg=gray
 function! GitCommit()
     call system("git add -u && call git commit -m '.'") 
 endfunction
+
