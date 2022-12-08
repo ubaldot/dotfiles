@@ -5,6 +5,10 @@
 if has("gui_win32")
     set pythonthreehome=$HOME."\\Miniconda3"
     set pythonthreedll=$HOME."\\Miniconda3\\python39.dll"
+    let g:filename = $TMP . "\\my_cell.tmp"
+elseif has("mac")
+    let g:filename = expand("~/my_cell.tmp")
+    " let g:filename = expand("~/Library/Caches/TemporaryItems/my_cell.tmp")
 endif
 "
 "" My python custom shit. 
@@ -40,7 +44,6 @@ func! SendCell(delim,env,ipy_term,ipy_profile)
                    \ {'term_name': a:ipy_term, 'vertical': v:true} )
     endif
     " a:var is the syntax for using a variable in a function
-    let l:filename = $TMP . "\\my_cell.tmp"
     " In Normal mode, go to the next line
     norm! j
     " echo a:delim
@@ -56,12 +59,12 @@ func! SendCell(delim,env,ipy_term,ipy_profile)
     endif
     " For debugging
     " echo [l:line_in, l:line_out]
-    call delete(fnameescape(l:filename))
+    call delete(fnameescape(g:filename))
     " getline() returns a list of lines
-    call writefile(getline(l:line_in+1,l:line_out), l:filename,"a")
-    "call term_sendkeys(term_list()[0],"run -i ". l:filename . "\n")
+    call writefile(getline(l:line_in+1,l:line_out), g:filename,"a")
+    "call term_sendkeys(term_list()[0],"run -i ". g:filename . "\n")
     " At startup, it is always terminal 2 or the name is hard-coded IPYTHON
-    call term_sendkeys(a:ipy_term,"run -i ". l:filename . "\n")
+    call term_sendkeys(a:ipy_term,"run -i ". g:filename . "\n")
 endfunc
 
 
