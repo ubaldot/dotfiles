@@ -3,8 +3,11 @@
 " This file is sourced AFTER .vimrc
 " ==========================
 
-call system('source ~/.zshrc')
+" The following does not work
+" !echo $CONDA_DEFAULT_ENV won't show anything
+" call system('source ~/.zshrc')
 " call system('conda activate myenv')
+
 
 " Set terminal with 256 colors
 set termguicolors
