@@ -13,27 +13,9 @@
 " can open gvim fron the shell of that virtual environment. 
 " If you open gvim and then you activate an environment,
 " then things won't work!
-" ==========================" Some good VIM notes
-" ======================
-" "." used for concatenating 
-" au = autocmd. au! clean up the command list connected to an event
-" function! override if a function name is already defined. 
-" a:variable used inside functions
-" :h whatever is your friend
-" Learn Vim the hard way is a great book
-"
-"=====================
-" OBS! If using Python, you first need to 
-" activate a virtual environment and then you 
-" can open gvim fron the shell of that virtual environment. 
-" If you open gvim and then you activate an environment,
-" then things won't work!
 " ==========================
 
-" augroup CONDA
-"     au!
-"     autocmd VimEnter * :exe "!source ~/.zshrc && conda activate myenv && echo $CONDA_DEFAULT_ENV"
-" augroup END
+echo system("source ~/.zshrc")
 
 set encoding=utf-8
 set autoread
@@ -176,7 +158,7 @@ function! ChangeTerminalDir()
     endfor
 endfunction
 
-source $HOME/helpme.vim 
+source $HOME/.vim/helpme.vim 
 
 " Vista! Current function
 function! NearestMethodOrFunction() abort
@@ -312,4 +294,5 @@ endfunction
 function! Manim(scene)
     exe "silent !manim ".shellescape(expand("%:t"))." ".a:scene." -pql"
 endfunction
+
 
