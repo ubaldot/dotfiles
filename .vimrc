@@ -15,7 +15,7 @@
 " then things won't work!
 " ==========================
 
-echo system("source ~/.zshrc")
+call system("source ~/.zshrc")
 
 set encoding=utf-8
 set autoread
