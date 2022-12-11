@@ -15,7 +15,9 @@
 " then things won't work!
 " ==========================
 
-call system("source ~/.zshrc")
+if has("mac")
+    call system("source ~/.zshrc")
+end
 
 set encoding=utf-8
 set autoread
