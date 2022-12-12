@@ -123,6 +123,16 @@ tnoremap <c-PageUp> <c-w>:bnext<CR>
 exe "cabbrev bter bo terminal ". g:shell
 exe "cabbrev vter vert botright terminal ". g:shell
 
+" netrw setting to be similar to NERDTree
+" gh to toggle hidden files view
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+let g:netrw_hide = 1
+noremap <silent> <F2> :Lexplore<cr>
+
 " Stuff to be run before loading plugins
 " Use the internal autocompletion (no deoplete, no asyncomplete plugins)
 let g:ale_completion_enabled = 1
@@ -144,7 +154,6 @@ exe 'set rtp+=' . g:dotvim."/bundle/Vundle.vim"
 call vundle#begin(g:dotvim."/bundle")
 Plugin 'gmarik/Vundle.vim'
 Plugin 'sainnhe/everforest'
-Plugin 'preservim/nerdtree'
 Plugin 'dense-analysis/ale'
 " Plugin 'ludovicchabant/vim-gutentags'
 Plugin 'liuchengxu/vista.vim'
@@ -170,14 +179,14 @@ endif
 colorscheme everforest
 
 " NERDTree 
-map <F1> :NERDTreeToggle<CR>
-augroup DIRCHANGE
-    au!
-    autocmd DirChanged global :NERDTreeCWD
-    autocmd DirChanged global :call ChangeTerminalDir()
-augroup END
-" Close NERDTree when opening a file"
-let g:NERDTreeQuitOnOpen = 1
+"map <F1> :NERDTreeToggle<CR>
+"augroup DIRCHANGE
+"    au!
+"    autocmd DirChanged global :NERDTreeCWD
+"    autocmd DirChanged global :call ChangeTerminalDir()
+"augroup END
+"" Close NERDTree when opening a file"
+"let g:NERDTreeQuitOnOpen = 1
 
 
 " Vista! 
@@ -351,10 +360,12 @@ func! SendCell(repl_type,repl_name,delim)
     "call term_sendkeys(term_list()[0],"run -i ". g:filename . "\n")
     " At startup, it is always terminal 2 or the name is hard-coded IPYTHON
     call term_sendkeys(a:repl_name,"run -i ". g:filename . "\n")
-    echo "Code cell sent."
 endfunc
 "
 "" Defaults for the REPL
+" To add another language define the following b: 
+" variables in such a language file in the ftplugin
+" folder
 let g:repl_type_default = 'terminal'
 let g:repl_name_default = "TERMINAL"
 let g:cell_delimiter_default = "None"
@@ -375,7 +386,8 @@ command REPL :call Repl(get(b:,'repl_type',g:repl_type_default),get(b:,'repl_nam
 "" Some key-bindings for the REPL
 nnoremap <F9> yy \| :call term_sendkeys(get(b:,'repl_name',g:repl_name_default),@")<cr>j0
 vnoremap <F9> y \| :call term_sendkeys(get(b:,'repl_name',g:repl_name_default),@")<cr>j0
-nnoremap <C-enter> :call SendCell(get(b:,'repl_type',g:repl_type_default),get(b:,'repl_name',g:repl_name_default),get(b:,'cell_delimiter',g:cell_delimiter_default))<cr><cr>
+nnoremap <C-enter> :call 
+            \SendCell(get(b:,'repl_type',g:repl_type_default),get(b:,'repl_name',g:repl_name_default),get(b:,'cell_delimiter',g:cell_delimiter_default))<cr><cr>
 "" Clear REPL
 nnoremap <c-c> :call term_sendkeys(get(b:,'repl_name',g:repl_name_default),"\<c-l>")<cr>
 
@@ -397,5 +409,4 @@ endfunction
 "     autocmd!
 "     autocmd VimEnter * let g:conda_env = Condaenv(g:conda_activate)
 " augroup END
-
 
