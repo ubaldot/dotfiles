@@ -70,12 +70,14 @@ endif
 " Terminal not in the buffer list
 " autocmd TerminalOpen * if bufwinnr('') > 0 | setlocal nobuflisted | endif
 "
+" =====================================================
 " Some key bindings
+" =====================================================
 " Remap <leader> key
 let mapleader = ","
 nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
-nnoremap <leader>d :bp<cr>:bd #<cr> " Add a condition that if you are in a terminal, then you must run <c-w>N first
+nnoremap <leader>d :bp<cr>:bd #<cr> 
 noremap <c-left> :bprev<CR>
 noremap <c-right> :bnext<CR>
 noremap <c-PageDown> :bprev<CR>
@@ -114,7 +116,6 @@ tnoremap <c-h> <c-w>h
 tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
-" I have to find some good key-bindings here...
 tnoremap <c-PageDown> <c-w>:bprev<CR>
 tnoremap <c-PageUp> <c-w>:bnext<CR>
 
@@ -123,16 +124,19 @@ tnoremap <c-PageUp> <c-w>:bnext<CR>
 exe "cabbrev bter bo terminal ". g:shell
 exe "cabbrev vter vert botright terminal ". g:shell
 
-" netrw setting to be similar to NERDTree
-" gh to toggle hidden files view
-let g:netrw_banner = 0
-let g:netrw_liststyle = 3
-let g:netrw_browse_split = 4
-let g:netrw_altv = 1
-let g:netrw_winsize = 25
-let g:netrw_hide = 1
-noremap <silent> <F2> :Lexplore<cr>
 
+" =====================================================
+" netrw setting to be similar to NERDTree
+" =====================================================
+" " gh to toggle hidden files view
+" let g:netrw_banner = 0
+" let g:netrw_liststyle = 3
+" let g:netrw_browse_split = 4
+" let g:netrw_altv = 1
+" let g:netrw_winsize = 25
+" let g:netrw_hide = 1
+" noremap <silent> <F2> :Lexplore<cr>
+" 
 " Stuff to be run before loading plugins
 " Use the internal autocompletion (no deoplete, no asyncomplete plugins)
 let g:ale_completion_enabled = 1
@@ -155,6 +159,7 @@ call vundle#begin(g:dotvim."/bundle")
 Plugin 'gmarik/Vundle.vim'
 Plugin 'sainnhe/everforest'
 Plugin 'dense-analysis/ale'
+Plugin 'preservim/nerdtree'
 " Plugin 'ludovicchabant/vim-gutentags'
 Plugin 'liuchengxu/vista.vim'
 Plugin 'vim-airline/vim-airline'
@@ -178,20 +183,20 @@ else
 endif 
 colorscheme everforest
 
-" NERDTree 
-"map <F1> :NERDTreeToggle<CR>
-"augroup DIRCHANGE
-"    au!
-"    autocmd DirChanged global :NERDTreeCWD
-"    autocmd DirChanged global :call ChangeTerminalDir()
-"augroup END
-"" Close NERDTree when opening a file"
-"let g:NERDTreeQuitOnOpen = 1
+ NERDTree 
+map <F1> :NERDTreeToggle<CR>
+augroup DIRCHANGE
+    au!
+    autocmd DirChanged global :NERDTreeCWD
+    autocmd DirChanged global :call ChangeTerminalDir()
+augroup END
+" Close NERDTree when opening a file"
+let g:NERDTreeQuitOnOpen = 1
 
 
 " Vista! 
 let g:vista_close_on_jump = 1
-let g:vista_default_executive = 'ctags'
+let g:vista_default_executive = 'ale'
 function! NearestMethodOrFunction() abort
     return get(b:, 'vista_nearest_method_or_function', '')
 endfunction
@@ -298,6 +303,7 @@ noremap <silent> <c-2> :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/'
 " Get git branch name for airline. OBS !It may need to be changed for other OS.
 function! Gitbranch()
     let l:current_branch = trim(system("git -C " . expand("%:h") . " branch --show-current"))
+    " Not very robust though
     if l:current_branch =~ "not a git repository"
         return "(no repo)"
     else
@@ -323,7 +329,9 @@ function! GitCommit()
     exe "silent !git add -u && call git commit -m '.'"
 endfunction
 
-"" This is my own REPL
+" =====================================================
+" My own REPL
+" =====================================================
 func! Repl(repl_type,repl_name)
     echo a:repl_name
     if a:repl_type == "terminal"
@@ -380,7 +388,6 @@ elseif has("mac")
 endif
 "
 "# Define my own command
-echo get(b:,'repl_type','repl_type_default')
 command REPL :call Repl(get(b:,'repl_type',g:repl_type_default),get(b:,'repl_name',g:repl_name_default))
 "
 "" Some key-bindings for the REPL
