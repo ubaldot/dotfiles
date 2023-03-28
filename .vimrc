@@ -1,10 +1,10 @@
 vim9script
 # Some good VIM notes
 # ======================
-# #.# used for concatenating 
+# .. used for concatenating 
 # au = autocmd. au! clean up the command list connected to an event
 # def! override if a function name is already defined. 
-# :h whatever is your friend
+# :h list-functions whatever is your friend
 # Learn Vim the hard way is a great book
 #
 # Variables in namespace (i.e. starting with g:, b:, etc.)
@@ -37,6 +37,7 @@ else
      g:current_terminal = 'powershell'
 endif
 
+# Internal vim variables
 set encoding=utf-8
 set autoread
 set nu
@@ -87,16 +88,12 @@ nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
 # nnoremap <leader>d :bp<cr>:bd #<cr> 
 nnoremap <leader>c :close<cr>
-noremap <c-left> :bprev<CR>
-noremap <c-right> :bnext<CR>
 noremap <c-PageDown> :bprev<CR>
 noremap <c-PageUp> :bnext<CR>
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
-# Enable folding with the spacebar
-nnoremap <space> za
 
 # Open and close brackets automatically. OBS! set paste must not be set.
 #"inoremap ( ()h
@@ -111,8 +108,11 @@ inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
 # Automatically surround highlighted selection
 xnoremap ( <ESC>`>a)<ESC>`<i(<ESC>
+xnoremap ) <ESC>`>a)<ESC>`<i(<ESC>
 xnoremap [ <ESC>`>a]<ESC>`<i[<ESC>
+xnoremap ] <ESC>`>a]<ESC>`<i[<ESC>
 xnoremap { <ESC>`>a}<ESC>`<i{<ESC>
+xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
 # xnoremap " <ESC>`>a"<ESC>`<i"<ESC>
 # Indent without leaving the cursor position 
 nnoremap g= :var b:PlugView=winsaveview()<CR>gg=G: winrestview(b:PlugView) <CR>:echo "file indented"<CR>
@@ -134,18 +134,6 @@ exe "cabbrev bter bo terminal " .. g:shell
 exe "cabbrev vter vert botright terminal " .. g:shell
 
 
-# =====================================================
-# netrw setting to be similar to NERDTree
-# =====================================================
-# " gh to toggle hidden files view
-# var g:netrw_banner = 0
-# var g:netrw_liststyle = 3
-# var g:netrw_browse_split = 4
-# var g:netrw_altv = 1
-# var g:netrw_winsize = 25
-# var g:netrw_hide = 1
-# noremap <silent> <F2> :Lexplore<cr>
-# 
 # Stuff to be run before loading plugins
 # Use the internal autocompletion (no deoplete, no asyncomplete plugins)
 g:ale_completion_enabled = 1
@@ -172,22 +160,23 @@ Plugin 'preservim/nerdtree'
 Plugin 'machakann/vim-highlightedyank'
 # Plugin 'ludovicchabant/vim-gutentags'
 Plugin 'liuchengxu/vista.vim'
+Plugin 'ubaldot/helpme-vim'
 Plugin 'vim-airline/vim-airline'
-Plugin 'leftbones/helpme-vim'
+# Plugin 'ubaldot/helpme-vim'
 vundle#end()            # required
 filetype plugin indent on    # required for Vundle
 
+# Load some stuff
+source $HOME/.vim/helpme.vim 
+# source $HOME/.vim/redir.vim 
 # ============================================
 # Plugins settings
 # ============================================
-# Helpme
-source $HOME/.vim/helpme.vim 
-source $HOME/.vim/redir.vim 
 
 # everforest colorscheme
 colorscheme everforest
 var hour = str2nr(strftime("%H"))
-if hour < 6 || 15 < hour 
+if hour < 6 || 19 < hour 
     set background=dark
     g:airline_theme = 'dark'
 endif 
@@ -226,20 +215,25 @@ au User AirlineAfterInit g:airline_section_a = airline#section#create([' %{b:
 au User AirlineAfterInit g:airline_section_b = airline#section#create(['%f']) 
 au User AirlineAfterInit g:airline_section_c = airline#section#create(['f:%{NearestMethodOrFunction()}'])  
 au User AirlineAfterInit g:airline_section_z = airline#section#create(['col: %v'])
-au User AirlineAfterInit #:g:airline_section_x = airline#section#create(['(%{g:conda_env})
 au User AirlineAfterInit g:airline_section_x = airline#section#create([g:conda_env])
 g:airline_extensions = ['ale', 'tabline']
 
 
 # ALE 
 # If you want clangd as LSP add it to the linter list.
+g:ale_completion_max_suggestions = 1000
+g:ale_floating_preview = 1
 nnoremap <silent> <leader>k <Plug>(ale_previous_wrap)
 nnoremap <silent> <leader>j <Plug>(ale_next_wrap)
 nnoremap <silent> <leader>h <Plug>(ale_hover)
 nnoremap <c-]> :ALEGoToDefinition<cr>
 g:ale_linters = {
             'c': ['clangd', 'cppcheck', 'gcc'],
-            'python': ['flake8', 'pylsp', 'mypy']} 
+            'python': ['flake8', 'pylsp', 'mypy'],
+            'tex': ['texlab']}
+# You must change the following line if you change LaTeX project folder
+g:ale_lsp_root = {'texlab': '~'}
+
 g:ale_echo_msg_error_str = 'E'
 g:ale_echo_msg_warning_str = 'W'
 g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
@@ -275,6 +269,8 @@ g:ale_python_autoflake_options = '--in-place --remove-unused-variables --remove-
 g:ale_python_black_options = '--line-length=80'
 g:ale_fix_on_save = 1
 
+
+
 # Source additional files
 # source $HOME/PE.vim
 # source $HOME/VAS.vim
@@ -282,25 +278,47 @@ g:ale_fix_on_save = 1
 
 syntax on
 
-
-# Commenting blocks of code.
-# augroup commenting_blocks_of_code
-#     autocmd!
-#     autocmd FileType c,cpp,java,scala var b:comment_leader = '// '
-#     autocmd FileType sh,ruby,python   var b:comment_leader = '# '
-#     autocmd FileType conf,fstab       var b:comment_leader = '# '
-#     autocmd FileType tex              var b:comment_leader = '% '
-#     autocmd FileType mail             var b:comment_leader = '> '
-#     autocmd FileType vim              var b:comment_leader = '" '
-# augroup END
-# # To be modified
-# noremap <silent> <c-1> :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
-# nemap <silent> <c-2> :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
-#
-
 # ============================================
 # Self-defined functions
 # ============================================
+augroup commenting_blocks_of_code
+    autocmd!
+    autocmd FileType c,cpp,java       b:comment_symbol = "// "
+    autocmd FileType sh,vim,python    b:comment_symbol = '# '
+    autocmd FileType tex              b:comment_symbol = '% '
+augroup END
+# # To be modified
+# noremap <silent> <c-1> :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_symbol,'\/')<CR>/<CR>:nohlsearch<CR>
+# nemap <silent> <c-2> :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_symbol,'\/')<CR>//e<CR>:nohlsearch<CR>
+#
+def g:MyComment(firstline: number, lastline: number, comment_symbol: string)
+    var pos = getpos(".")
+    var win = winsaveview()
+    var num_chars = strcharlen(comment_symbol)
+    for ii in range(firstline, lastline)
+        cursor(ii, 0)
+        # if current line is not blank 
+        if getline(ii) !~ '^\s*$'
+            if trim(getline(ii))[0 : num_chars - 1] == comment_symbol
+                # Remove comment symbol
+                execute "normal! ^" .. num_chars .. "x"
+            else 
+                # Add comment symbol
+                execute "normal! I" .. comment_symbol .. "\<Esc>"
+            endif
+        endif
+    endfor
+    winrestview(win)
+    setpos(".", pos)
+enddef
+ 
+nnoremap <silent> <c-c> :call MyComment(line("."), line("."), b:comment_symbol)<cr>
+# The <c-u> is used to avoid vim calling the function for each line of the
+# selection
+xnoremap <silent> <c-c> :<c-u>call MyComment(line("'<"),line("'>"),b:comment_symbol)<cr>
+
+command! -range Comment :<line1>,<line2>MyComment(<line1>, <line2>, b:comment_symbol)
+
 # Remove trailing white spaces
 autocmd! BufWritePre * :%s/\s+$//e
 # Get git branch name for airline. OBS !It may need to be changed for other OS.
@@ -367,7 +385,6 @@ def g:SendCell(repl_type: string, repl_name: string, delim: string)
     # For debugging
     # echo [line_in, line_out]
      delete(fnameescape(g:filename))
-    # getline() returns a list of lines
     writefile(getline(line_in + 1, line_out), g:filename, "a")
     #call term_sendkeys(term_list()[0],"run -i ". g:filename . "\n")
     # At startup, it is always terminal 2 or the name is hard-coded IPYTHON
@@ -378,9 +395,9 @@ enddef
 # To add another language define the following b: 
 # variables in such a language file in the ftplugin
 # folder
-g:repl_type_default = 'terminal'
-g:repl_name_default = "TERMINAL"
-g:cell_delimiter_default = "None"
+g:repl_type_default = 'ipython'
+g:repl_name_default = "IPYTHON"
+g:cell_delimiter_default = "# %%"
 
 ##
 if has("gui_win32")
@@ -390,44 +407,55 @@ elseif has("mac")
 endif
 
 # Define my own command
-command REPL g:Repl(get(b:, 'repl_type', g:repl_type_default), get(b:, 'repl_name', g:repl_name_default))
+command IPYTHON silent g:Repl(get(b:, 'repl_type', g:repl_type_default), get(b:, 'repl_name', g:repl_name_default))
 
 # Some key-bindings for the REPL
-nnoremap <F9> yy \| :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
-vnoremap <F9> y \| :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
-nnoremap <c-enter> \| :call g:SendCell(get(b:, 'repl_type', g:repl_type_default),get(b:, 'repl_name', g:repl_name_default), get(b:, 'cell_delimiter', g:cell_delimiter_default))<cr><cr>
+nnoremap <silent> <F9> yy \| :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
+xnoremap <silent> <F9> y \| :<c-u>call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
+nnoremap <silent> <c-enter> \| :call g:SendCell(get(b:, 'repl_type', g:repl_type_default),get(b:, 'repl_name', g:repl_name_default), get(b:, 'cell_delimiter', g:cell_delimiter_default))<cr><cr>
 # Clear REPL
-nnoremap <c-c> :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),"\<c-l>")<cr>
+# nnoremap <c-c> :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),"\<c-l>")<cr>
 
-# manim render
-def g:Manim(scene: string)
-    exe "silent !manim " .. shellescape(expand("%:t")) .. " " .. scene .. " -pql"
+def g:Manim(scene: string, dryrun: bool)
+    var flags = ""
+    if dryrun
+        flags = " --dry_run"
+    else
+        flags = " -pql"
+    endif
+    var closeQT = "osascript ~/QuickTimeClose.scpt"
+    var cmd = "manim " .. shellescape(expand("%:t")) .. " " .. scene .. flags .. " --disable_caching -v WARNING"
+    exe "!" .. closeQT .. " && " .. cmd 
 enddef
 
 
-def g:ManimTerminal(scene: string)
-    var cmd = "manim " .. expand("%:t") .. " " .. scene .. " -pql --disable_caching"
+def g:ManimTerminal(scene: string, dryrun: bool)
+    var flags = ""
+    if dryrun
+        flags = " --dry_run"
+    else
+        flags = " -pql"
+    endif
+    var closeQT = "osascript ~/QuickTimeClose.scpt"
+    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --disable_caching -v WARNING"
     var terms_name = []
     for ii in term_list()
         add(terms_name, bufname(ii))
     endfor
     echo terms_name
     if term_list() == [] || index(terms_name, 'MANIM') == -1
-        botright term_start(g:current_terminal, {'term_name':
-        'MANIM', 'term_rows': 10})
+        vert term_start(g:current_terminal, {'term_name': 'MANIM' })
+        set nowrap
     endif
-    term_sendkeys('MANIM', "\n" .. cmd .. "\n")
+    term_sendkeys('MANIM', "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
 enddef
     
-
-#     term_list() ..  
-#     exe "vert terminal manim " .. expand("%:t") .. " " .. scene .. " -pql --disable_caching"
-# enddef
-
-command! -nargs=1 -complete=command Manim silent call Manim(<f-args>)
-# command! -nargs=1 -complete=command ManimVerbose silent call ManimVerbose(<f-args>)
-command! -nargs=1 -complete=command ManimTerminal silent call ManimTerminal(<f-args>)
-
+# Manim user-defined commands
+command -nargs=+ -complete=command Manim silent call Manim(<f-args>, false)
+command -nargs=+ -complete=command ManimDry silent call Manim(<f-args>, true)
+command -nargs=+ -complete=command ManimTerminal silent call ManimTerminal(<f-args>, false)
+command -nargs=+ -complete=command ManimTerminalDry silent call ManimTerminal(<f-args>, true)
+command ManimDocs silent :!open -a safari.app ~/Documents/github/manim/docs/build/html/index.html
 # The following was a nice exercise but it may not be needed as we for the statusline we are
 # just using trim(system("echo \%CONDA_DEFAULT_ENV\%").  
 # Get conda virtual environment
@@ -441,3 +469,4 @@ command! -nargs=1 -complete=command ManimTerminal silent call ManimTerminal(<f-a
 #     autocmd!
 #     autocmd VimEnter * g:conda_env = Condaenv(g:conda_activate)
 # augroup END
+#
