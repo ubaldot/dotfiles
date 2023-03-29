@@ -1,32 +1,22 @@
 vim9script
-# Some good VIM notes
-# ======================
-# .. used for concatenating 
-# au = autocmd. au! clean up the command list connected to an event
-# def! override if a function name is already defined. 
-# :h list-functions whatever is your friend
-# Learn Vim the hard way is a great book
-#
-# Variables in namespace (i.e. starting with g:, b:, etc.)
-# should not be declared (i.e. no var b:git_branch, but b:git_branch) 
 #=====================
-# OBS! If using Python, you first need to 
-# activate a virtual environment and then you 
-# can open gvim from the shell of that virtual environment. 
+# OBS! If using Python, you first need to
+# activate a virtual environment and then you
+# can open gvim from the shell of that virtual environment.
 # If you open gvim and then you activate an environment,
 # then things won't work!
 # ==========================
 #
-# 
+#
 # For auto-completion, jumps to definitions, etc
-# you can either use ctags or LSP. 
+# you can either use ctags or LSP.
 # gutentags automatically creates ctags as you open files
 # so you don't need to create them manually.
 # You need to activate vim omnicomplete though, which is disables
-# by default and you should disable LSP 
+# by default and you should disable LSP
 # Uncomment set omnifunc=... few lines below#
 #
-# :h user-manual is king. 
+# :h user-manual is king.
 
 
 # To activate myenv conda environment for MacVim
@@ -49,7 +39,7 @@ set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
 set clipboard=unnamed
-set splitright 
+set splitright
 set laststatus=2
 set incsearch # for displaying while searching
 set smartcase
@@ -61,6 +51,7 @@ set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
 set completeopt-=preview
+set textwidth=180
 
 if has("gui_win32")
     g:shell = "powershell"
@@ -75,10 +66,8 @@ elseif has("mac")
     g:dotvim = $HOME .. "/.vim"
     g:conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
 endif
-#
-# Terminal not in the buffer list
-# autocmd TerminalOpen * if bufwinnr('') > 0 | setlocal nobuflisted | endif
-#
+
+
 # =====================================================
 # Some key bindings
 # =====================================================
@@ -86,7 +75,7 @@ endif
 g:mapleader = ","
 nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
-# nnoremap <leader>d :bp<cr>:bd #<cr> 
+# nnoremap <leader>d :bp<cr>:bd #<cr>
 nnoremap <leader>c :close<cr>
 noremap <c-PageDown> :bprev<CR>
 noremap <c-PageUp> :bnext<CR>
@@ -95,14 +84,6 @@ nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
-# Open and close brackets automatically. OBS! set paste must not be set.
-#"inoremap ( ()h
-#"inoremap [ []h
-#"inoremap { {}h
-#"inoremap {<CR> {<CR>}<ESC>O
-#"inoremap {;<CR> {<CR>};<ESC>O
-#"inoremap " ""h
-#"inoremap ' ''h
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
@@ -113,14 +94,15 @@ xnoremap [ <ESC>`>a]<ESC>`<i[<ESC>
 xnoremap ] <ESC>`>a]<ESC>`<i[<ESC>
 xnoremap { <ESC>`>a}<ESC>`<i{<ESC>
 xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
+# Don't use the following otherwise you lose registers function!
 # xnoremap " <ESC>`>a"<ESC>`<i"<ESC>
-# Indent without leaving the cursor position 
+# Indent without leaving the cursor position
 nnoremap g= :var b:PlugView=winsaveview()<CR>gg=G: winrestview(b:PlugView) <CR>:echo "file indented"<CR>
 
 # Some terminal remapping
 # When using iPython to avoid that shift space gives 32;2u
 tnoremap <S-space> <space>
-tnoremap <ESC> <c-w>N 
+tnoremap <ESC> <c-w>N
 tnoremap <c-h> <c-w>h
 tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
@@ -160,15 +142,12 @@ Plugin 'preservim/nerdtree'
 Plugin 'machakann/vim-highlightedyank'
 # Plugin 'ludovicchabant/vim-gutentags'
 Plugin 'liuchengxu/vista.vim'
+Plugin 'tpope/vim-commentary'
 Plugin 'ubaldot/helpme-vim'
 Plugin 'vim-airline/vim-airline'
-# Plugin 'ubaldot/helpme-vim'
 vundle#end()            # required
 filetype plugin indent on    # required for Vundle
 
-# Load some stuff
-source $HOME/.vim/helpme.vim 
-# source $HOME/.vim/redir.vim 
 # ============================================
 # Plugins settings
 # ============================================
@@ -176,10 +155,10 @@ source $HOME/.vim/helpme.vim
 # everforest colorscheme
 colorscheme everforest
 var hour = str2nr(strftime("%H"))
-if hour < 6 || 19 < hour 
+if hour < 6 || 19 < hour
     set background=dark
     g:airline_theme = 'dark'
-endif 
+endif
 
 nnoremap <F1> :NERDTreeToggle<cr>
 augroup DIRCHANGE
@@ -191,7 +170,7 @@ augroup END
 g:NERDTreeQuitOnOpen = 1
 
 
-# Vista! 
+# Vista!
 g:vista_close_on_jump = 1
 g:vista_default_executive = 'ale'
 def! g:NearestMethodOrFunction(): string
@@ -203,23 +182,23 @@ augroup FuncNameGet
     autocmd VimEnter *  vista#RunForNearestMethodOrFunction()
 augroup END
 
-# Vista for showing outline 
+# Vista for showing outline
 silent! map <F8> :Vista!!<CR>
 
 # vim-airline show buffers
 g:airline#extensions#tabline#enabled = 1
 g:airline#extensions#tabline#formatter = 'unique_tail'
 g:airline#extensions#tabline#ignore_bufadd_pat = 'defx|gundo|nerd_tree|startify|tagbar|undotree|vimfiler'
-# If mode()==t then change the statusline 
+# If mode()==t then change the statusline
 au User AirlineAfterInit g:airline_section_a = airline#section#create([' %{b:git_branch}'])
-au User AirlineAfterInit g:airline_section_b = airline#section#create(['%f']) 
-au User AirlineAfterInit g:airline_section_c = airline#section#create(['f:%{NearestMethodOrFunction()}'])  
+au User AirlineAfterInit g:airline_section_b = airline#section#create(['%f'])
+au User AirlineAfterInit g:airline_section_c = airline#section#create(['f:%{NearestMethodOrFunction()}'])
 au User AirlineAfterInit g:airline_section_z = airline#section#create(['col: %v'])
 au User AirlineAfterInit g:airline_section_x = airline#section#create([g:conda_env])
 g:airline_extensions = ['ale', 'tabline']
 
 
-# ALE 
+# ALE
 # If you want clangd as LSP add it to the linter list.
 g:ale_completion_max_suggestions = 1000
 g:ale_floating_preview = 1
@@ -261,7 +240,7 @@ g:ale_python_pylsp_config = {
 
 # ALE Fixers
 g:ale_fixers = {
-             'c': ['clang-format', 'remove_trailing_lines', 'trim_whitespace'], 
+             'c': ['clang-format', 'remove_trailing_lines', 'trim_whitespace'],
              'cpp': ['clang-format'],
              'python': ['remove_trailing_lines', 'trim_whitespace', 'autoflake', 'black']}
 
@@ -270,6 +249,11 @@ g:ale_python_black_options = '--line-length=80'
 g:ale_fix_on_save = 1
 
 
+# HelpMe
+exe "command! HelpMeVim :HelpMe ~/.vim/vim_basic.txt"
+exe "command! HelpMeVimGlobal :HelpMe ~/.vim/vim_global.txt"
+exe "command! HelpMeVimExCommands :HelpMe ~/.vim/vim_excommands.txt"
+exe "command! HelpMeVimSubstitute :HelpMe ~/.vim/vim_substitute.txt"
 
 # Source additional files
 # source $HOME/PE.vim
@@ -281,46 +265,22 @@ syntax on
 # ============================================
 # Self-defined functions
 # ============================================
-augroup commenting_blocks_of_code
-    autocmd!
-    autocmd FileType c,cpp,java       b:comment_symbol = "// "
-    autocmd FileType sh,vim,python    b:comment_symbol = '# '
-    autocmd FileType tex              b:comment_symbol = '% '
-augroup END
-# # To be modified
-# noremap <silent> <c-1> :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_symbol,'\/')<CR>/<CR>:nohlsearch<CR>
-# nemap <silent> <c-2> :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_symbol,'\/')<CR>//e<CR>:nohlsearch<CR>
-#
-def g:MyComment(firstline: number, lastline: number, comment_symbol: string)
-    var pos = getpos(".")
-    var win = winsaveview()
-    var num_chars = strcharlen(comment_symbol)
-    for ii in range(firstline, lastline)
-        cursor(ii, 0)
-        # if current line is not blank 
-        if getline(ii) !~ '^\s*$'
-            if trim(getline(ii))[0 : num_chars - 1] == comment_symbol
-                # Remove comment symbol
-                execute "normal! ^" .. num_chars .. "x"
-            else 
-                # Add comment symbol
-                execute "normal! I" .. comment_symbol .. "\<Esc>"
-            endif
-        endif
-    endfor
-    winrestview(win)
-    setpos(".", pos)
+# Remove trailing white spaces at the end of each line and at the end of the file
+def! g:TrimWhitespace()
+    var currwin = winsaveview()
+    var save_cursor = getpos(".")
+    silent! :keeppatterns :%s/\s\+$//e
+    silent! :%s/\($\n\s*\)\+\%$//
+    winrestview(currwin)
+    setpos('.', save_cursor)
 enddef
- 
-nnoremap <silent> <c-c> :call MyComment(line("."), line("."), b:comment_symbol)<cr>
-# The <c-u> is used to avoid vim calling the function for each line of the
-# selection
-xnoremap <silent> <c-c> :<c-u>call MyComment(line("'<"),line("'>"),b:comment_symbol)<cr>
 
-command! -range Comment :<line1>,<line2>MyComment(<line1>, <line2>, b:comment_symbol)
+augroup remove_trailing_whitespaces
+    autocmd!
+    autocmd BufWritePre * if !&binary | :call g:TrimWhitespace() | endif
+augroup END
 
-# Remove trailing white spaces
-autocmd! BufWritePre * :%s/\s+$//e
+
 # Get git branch name for airline. OBS !It may need to be changed for other OS.
 def Gitbranch(): string
     var current_branch = trim(system("git -C " .. expand("%:h") .. " branch --show-current"))
@@ -329,7 +289,7 @@ def Gitbranch(): string
         return "(no repo)"
     else
         return current_branch
-    endif 
+    endif
 enddef
 
 augroup Gitget
@@ -339,7 +299,7 @@ augroup END
 
 
 # Some useful functions
-# change all the terminal directories when you change vim directory 
+# change all the terminal directories when you change vim directory
 def ChangeTerminalDir()
     for ii in term_list()
          term_sendkeys(ii, "cd " .. getcwd() .. "\n")
@@ -368,14 +328,13 @@ def g:SendCell(repl_type: string, repl_name: string, delim: string)
          g:Repl(repl_type, repl_name)
         wincmd h
     endif
-    # var is the syntax for using a variable in a function
     # In Normal mode, go to the next line
     norm! j
     # echo delim
     # In search n is for don't move the cursor, b is backwards and W to don't wrap
     # around
     var line_in = search(delim, 'nbW')
-    # We use -1 because we want right-open intervals, i.e. [a,b). 
+    # We use -1 because we want right-open intervals, i.e. [a,b).
     # Note that here we want the cursor to move to the next cell!
     norm! k
     var line_out = search(delim, 'W') - 1
@@ -392,7 +351,7 @@ def g:SendCell(repl_type: string, repl_name: string, delim: string)
 enddef
 #
 # Defaults for the REPL
-# To add another language define the following b: 
+# To add another language define the following b:
 # variables in such a language file in the ftplugin
 # folder
 g:repl_type_default = 'ipython'
@@ -425,7 +384,7 @@ def g:Manim(scene: string, dryrun: bool)
     endif
     var closeQT = "osascript ~/QuickTimeClose.scpt"
     var cmd = "manim " .. shellescape(expand("%:t")) .. " " .. scene .. flags .. " --disable_caching -v WARNING"
-    exe "!" .. closeQT .. " && " .. cmd 
+    exe "!" .. closeQT .. " && " .. cmd
 enddef
 
 
@@ -449,24 +408,10 @@ def g:ManimTerminal(scene: string, dryrun: bool)
     endif
     term_sendkeys('MANIM', "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
 enddef
-    
+
 # Manim user-defined commands
 command -nargs=+ -complete=command Manim silent call Manim(<f-args>, false)
 command -nargs=+ -complete=command ManimDry silent call Manim(<f-args>, true)
 command -nargs=+ -complete=command ManimTerminal silent call ManimTerminal(<f-args>, false)
 command -nargs=+ -complete=command ManimTerminalDry silent call ManimTerminal(<f-args>, true)
 command ManimDocs silent :!open -a safari.app ~/Documents/github/manim/docs/build/html/index.html
-# The following was a nice exercise but it may not be needed as we for the statusline we are
-# just using trim(system("echo \%CONDA_DEFAULT_ENV\%").  
-# Get conda virtual environment
-# def Condaenv(env)
-#    " You use 'call' in MS-DOS to delay a bit
-#    return trim(system("conda activate ". env. " &&  echo %CONDA_DEFAULT_ENV%"))
-# enddef
-# 
-# " Someone said that this def is called very often. 
-# augroup Condaenvget
-#     autocmd!
-#     autocmd VimEnter * g:conda_env = Condaenv(g:conda_activate)
-# augroup END
-#
