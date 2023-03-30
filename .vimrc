@@ -18,7 +18,6 @@ vim9script
 #
 # :h user-manual is king.
 
-
 # To activate myenv conda environment for MacVim
 if has("mac")
      system("source ~/.zshrc")
@@ -76,14 +75,15 @@ g:mapleader = ","
 nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
 # nnoremap <leader>d :bp<cr>:bd #<cr>
-nnoremap <leader>c :close<cr>
+nnoremap <leader>d :close<cr>
 noremap <c-PageDown> :bprev<CR>
 noremap <c-PageUp> :bnext<CR>
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
-
+# super quick search and replace:
+nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<CR>\>/
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
@@ -97,7 +97,7 @@ xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
 # Don't use the following otherwise you lose registers function!
 # xnoremap " <ESC>`>a"<ESC>`<i"<ESC>
 # Indent without leaving the cursor position
-nnoremap g= :var b:PlugView=winsaveview()<CR>gg=G: winrestview(b:PlugView) <CR>:echo "file indented"<CR>
+nnoremap <leader>= :var b:PlugView=winsaveview()<CR>gg=G: winrestview(b:PlugView) <CR>:echo "file indented"<CR>
 
 # Some terminal remapping
 # When using iPython to avoid that shift space gives 32;2u
@@ -131,10 +131,10 @@ g:ale_completion_autoimport = 1
 # Plugins  manager
 # ============================================
 filetype off                  # required
-# Vundle plugin manager
+# !Vundle plugin manager
 #set the runtime path to include Vundle and initialize
-exe 'set rtp+=' .. g:dotvim .. "/bundle/Vundle.vim"
-vundle#begin(g:dotvim .. "/bundle")
+exe 'set rtp+=' .. g:dotvim .. "/pack/bundle/start/Vundle.vim"
+vundle#begin(g:dotvim .. "/pack/bundle/start")
 Plugin 'gmarik/Vundle.vim'
 Plugin 'sainnhe/everforest'
 Plugin 'dense-analysis/ale'
@@ -155,7 +155,7 @@ filetype plugin indent on    # required for Vundle
 # everforest colorscheme
 colorscheme everforest
 var hour = str2nr(strftime("%H"))
-if hour < 6 || 19 < hour
+if hour < 6 || 18 < hour
     set background=dark
     g:airline_theme = 'dark'
 endif
@@ -202,10 +202,11 @@ g:airline_extensions = ['ale', 'tabline']
 # If you want clangd as LSP add it to the linter list.
 g:ale_completion_max_suggestions = 1000
 g:ale_floating_preview = 1
-nnoremap <silent> <leader>k <Plug>(ale_previous_wrap)
-nnoremap <silent> <leader>j <Plug>(ale_next_wrap)
+nnoremap <silent> <leader>p <Plug>(ale_previous_wrap)
+nnoremap <silent> <leader>n <Plug>(ale_next_wrap)
 nnoremap <silent> <leader>h <Plug>(ale_hover)
 nnoremap <c-]> :ALEGoToDefinition<cr>
+nnoremap <leader>r :ALEFindReferences<cr>
 g:ale_linters = {
             'c': ['clangd', 'cppcheck', 'gcc'],
             'python': ['flake8', 'pylsp', 'mypy'],
@@ -248,12 +249,20 @@ g:ale_python_autoflake_options = '--in-place --remove-unused-variables --remove-
 g:ale_python_black_options = '--line-length=80'
 g:ale_fix_on_save = 1
 
+# Commentary
+xmap <leader>c  <Plug>Commentary
+nmap <leader>c  <Plug>Commentary
+omap <leader>c  <Plug>Commentary
+nmap <leader>cc <Plug>CommentaryLine
+nmap <leader>cu <Plug>Commentary<Plug>Commentary
 
 # HelpMe
-exe "command! HelpMeVim :HelpMe ~/.vim/vim_basic.txt"
-exe "command! HelpMeVimGlobal :HelpMe ~/.vim/vim_global.txt"
-exe "command! HelpMeVimExCommands :HelpMe ~/.vim/vim_excommands.txt"
-exe "command! HelpMeVimSubstitute :HelpMe ~/.vim/vim_substitute.txt"
+command! VimHelpBasic :HelpMe ~/.vim/helpme_files/vim_basic.txt
+command! VimHelpCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
+command! VimHelpVimGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
+command! VimHelpExCommands :HelpMe ~/.vim/helpme_files/vim_excommands.txt
+command! VimHelpSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
+command! VimHelpAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
 
 # Source additional files
 # source $HOME/PE.vim
@@ -282,7 +291,7 @@ augroup END
 
 
 # Get git branch name for airline. OBS !It may need to be changed for other OS.
-def Gitbranch(): string
+def Get_gitbranch(): string
     var current_branch = trim(system("git -C " .. expand("%:h") .. " branch --show-current"))
     # Not very robust though
     if current_branch =~ "not a git repository"
@@ -294,38 +303,47 @@ enddef
 
 augroup Gitget
     autocmd!
-    autocmd BufEnter * b:git_branch = Gitbranch()
+    autocmd BufEnter * b:git_branch = Get_gitbranch()
 augroup END
 
+def! g:CommitDot()
+    # curr_dir = pwd
+    cd %:p:h
+    exe "!git add -u && git commit -m '.'"
+    # cd curr_dir
+enddef
+
+command! GitCommitDot :call g:CommitDot()
 
 # Some useful functions
 # change all the terminal directories when you change vim directory
 def ChangeTerminalDir()
     for ii in term_list()
-         term_sendkeys(ii, "cd " .. getcwd() .. "\n")
+        if bufname(ii) == "JULIA"
+           term_sendkeys(ii, 'cd("' .. getcwd() .. '")' .. "\n")
+        else
+           term_sendkeys(ii, "cd " .. getcwd() .. "\n")
+        endif
     endfor
-enddef
-
-# Commit dot message
-def GitCommit()
-    exe "silent !git add -u &&  git commit -m '.'"
 enddef
 
 # =====================================================
 # My own REPL
 # =====================================================
-def g:Repl(repl_type: string, repl_name: string)
+# DON'T TOUCH!
+def! g:Repl(kernel_name: string, repl_name: string)
     echo repl_name
-    if repl_type == "terminal"
+    if kernel_name == "terminal"
         exe "botright terminal " .. g:shell
     else
-         term_start(repl_type, {'term_name': repl_name, 'vertical': v:true} )
+         # term_start(kernel_name, {'term_name': repl_name, 'vertical': v:true} )
+         term_start("jupyter-console --kernel=" .. kernel_name, {'term_name': repl_name, 'vertical': v:true} )
     endif
 enddef
 #
-def g:SendCell(repl_type: string, repl_name: string, delim: string)
+def! g:SendCell(kernel_name: string, repl_name: string, delim: string, run_command: string)
     if !bufexists(repl_name)
-         g:Repl(repl_type, repl_name)
+         g:Repl(kernel_name, repl_name)
         wincmd h
     endif
     # In Normal mode, go to the next line
@@ -343,20 +361,27 @@ def g:SendCell(repl_type: string, repl_name: string, delim: string)
     endif
     # For debugging
     # echo [line_in, line_out]
-     delete(fnameescape(g:filename))
+    delete(fnameescape(g:filename))
     writefile(getline(line_in + 1, line_out), g:filename, "a")
     #call term_sendkeys(term_list()[0],"run -i ". g:filename . "\n")
     # At startup, it is always terminal 2 or the name is hard-coded IPYTHON
-    call term_sendkeys(repl_name, "run -i " .. g:filename .. "\n")
+    call term_sendkeys(repl_name, run_command .. "\n")
 enddef
 #
 # Defaults for the REPL
-# To add another language define the following b:
-# variables in such a language file in the ftplugin
-# folder
-g:repl_type_default = 'ipython'
+# To add another language define
+#
+# b:kernel_name
+# b:repl_name
+# b:cell_delimiter
+#
+# in the ~/.vim/ftplugin folder by creating e.g. julia.vim file.
+#
+# To see all the kernel installed use jupyter kernelspec list
+g:kernel_name_default = 'python3'
 g:repl_name_default = "IPYTHON"
 g:cell_delimiter_default = "# %%"
+g:run_command_default = "run -i"
 
 ##
 if has("gui_win32")
@@ -366,16 +391,16 @@ elseif has("mac")
 endif
 
 # Define my own command
-command IPYTHON silent g:Repl(get(b:, 'repl_type', g:repl_type_default), get(b:, 'repl_name', g:repl_name_default))
+command! REPL silent g:Repl(get(b:, 'kernel_name', g:kernel_name_default), get(b:, 'repl_name', g:repl_name_default))
 
 # Some key-bindings for the REPL
 nnoremap <silent> <F9> yy \| :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
 xnoremap <silent> <F9> y \| :<c-u>call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
-nnoremap <silent> <c-enter> \| :call g:SendCell(get(b:, 'repl_type', g:repl_type_default),get(b:, 'repl_name', g:repl_name_default), get(b:, 'cell_delimiter', g:cell_delimiter_default))<cr><cr>
+nnoremap <silent> <c-enter> \| :call g:SendCell(get(b:, 'kernel_name', g:kernel_name_default), get(b:, 'repl_name', g:repl_name_default), get(b:, 'cell_delimiter', g:cell_delimiter_default), get(b:, 'run_command', g:run_command_default))<cr><cr>
 # Clear REPL
 # nnoremap <c-c> :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),"\<c-l>")<cr>
 
-def g:Manim(scene: string, dryrun: bool)
+def! g:Manim(scene: string, dryrun: bool)
     var flags = ""
     if dryrun
         flags = " --dry_run"
@@ -388,7 +413,7 @@ def g:Manim(scene: string, dryrun: bool)
 enddef
 
 
-def g:ManimTerminal(scene: string, dryrun: bool)
+def! g:ManimTerminal(scene: string, dryrun: bool)
     var flags = ""
     if dryrun
         flags = " --dry_run"
@@ -409,9 +434,16 @@ def g:ManimTerminal(scene: string, dryrun: bool)
     term_sendkeys('MANIM', "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
 enddef
 
+
+command! -nargs=? -complete=file HelpMe call <sid>HelpMePopup(<f-args>)
 # Manim user-defined commands
-command -nargs=+ -complete=command Manim silent call Manim(<f-args>, false)
-command -nargs=+ -complete=command ManimDry silent call Manim(<f-args>, true)
-command -nargs=+ -complete=command ManimTerminal silent call ManimTerminal(<f-args>, false)
-command -nargs=+ -complete=command ManimTerminalDry silent call ManimTerminal(<f-args>, true)
-command ManimDocs silent :!open -a safari.app ~/Documents/github/manim/docs/build/html/index.html
+command! -nargs=+ -complete=command Manim silent call Manim(<f-args>, false)
+command! -nargs=+ -complete=command ManimDry silent call Manim(<f-args>, true)
+command! -nargs=+ -complete=command ManimTerminal silent call ManimTerminal(<f-args>, false)
+command! -nargs=+ -complete=command ManimTerminalDry silent call ManimTerminal(<f-args>, true)
+command! ManimDocs silent :!open -a safari.app ~/Documents/github/manim/docs/build/html/index.html
+command! ManimNew :enew | :0read ~/.manim/new_manim.txt
+command! ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
+command! ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
+command! ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
+command! ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
