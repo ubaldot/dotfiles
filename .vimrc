@@ -274,19 +274,10 @@ syntax on
 # ============================================
 # Self-defined functions
 # ============================================
-# Remove trailing white spaces at the end of each line and at the end of the file
-def! g:TrimWhitespace()
-    var currwin = winsaveview()
-    var save_cursor = getpos(".")
-    silent! :keeppatterns :%s/\s\+$//e
-    silent! :%s/\($\n\s*\)\+\%$//
-    winrestview(currwin)
-    setpos('.', save_cursor)
-enddef
 
 augroup remove_trailing_whitespaces
     autocmd!
-    autocmd BufWritePre * if !&binary | :call g:TrimWhitespace() | endif
+    autocmd BufWritePre * if !&binary | :call myfunctions#TrimWhitespace() | endif
 augroup END
 
 
@@ -306,14 +297,7 @@ augroup Gitget
     autocmd BufEnter * b:git_branch = Get_gitbranch()
 augroup END
 
-def! g:CommitDot()
-    # curr_dir = pwd
-    cd %:p:h
-    exe "!git add -u && git commit -m '.'"
-    # cd curr_dir
-enddef
-
-command! GitCommitDot :call g:CommitDot()
+command! GitCommitDot :call myfunctions#CommitDot()
 
 # Some useful functions
 # change all the terminal directories when you change vim directory
@@ -400,47 +384,13 @@ nnoremap <silent> <c-enter> \| :call g:SendCell(get(b:, 'kernel_name', g:kernel_
 # Clear REPL
 # nnoremap <c-c> :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),"\<c-l>")<cr>
 
-def! g:Manim(scene: string, dryrun: bool)
-    var flags = ""
-    if dryrun
-        flags = " --dry_run"
-    else
-        flags = " -pql"
-    endif
-    var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. shellescape(expand("%:t")) .. " " .. scene .. flags .. " --disable_caching -v WARNING"
-    exe "!" .. closeQT .. " && " .. cmd
-enddef
-
-
-def! g:ManimTerminal(scene: string, dryrun: bool)
-    var flags = ""
-    if dryrun
-        flags = " --dry_run"
-    else
-        flags = " -pql"
-    endif
-    var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --disable_caching -v WARNING"
-    var terms_name = []
-    for ii in term_list()
-        add(terms_name, bufname(ii))
-    endfor
-    echo terms_name
-    if term_list() == [] || index(terms_name, 'MANIM') == -1
-        vert term_start(g:current_terminal, {'term_name': 'MANIM' })
-        set nowrap
-    endif
-    term_sendkeys('MANIM', "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
-enddef
-
 
 command! -nargs=? -complete=file HelpMe call <sid>HelpMePopup(<f-args>)
 # Manim user-defined commands
-command! -nargs=+ -complete=command Manim silent call Manim(<f-args>, false)
-command! -nargs=+ -complete=command ManimDry silent call Manim(<f-args>, true)
-command! -nargs=+ -complete=command ManimTerminal silent call ManimTerminal(<f-args>, false)
-command! -nargs=+ -complete=command ManimTerminalDry silent call ManimTerminal(<f-args>, true)
+command! -nargs=+ -complete=command Manim silent call myfunctions#Manim(<f-args>, false)
+command! -nargs=+ -complete=command ManimDry silent call myfunctions#Manim(<f-args>, true)
+command! -nargs=+ -complete=command ManimTerminal silent call myfunctions#ManimTerminal(<f-args>, false)
+command! -nargs=+ -complete=command ManimTerminalDry silent call myfunctions#ManimTerminal(<f-args>, true)
 command! ManimDocs silent :!open -a safari.app ~/Documents/github/manim/docs/build/html/index.html
 command! ManimNew :enew | :0read ~/.manim/new_manim.txt
 command! ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
