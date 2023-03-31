@@ -53,7 +53,6 @@ set completeopt-=preview
 set textwidth=180
 
 if has("gui_win32")
-    g:shell = "powershell"
     g:dotvim = $HOME."\\vimfiles"
     g:conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
     # The following is very slow
@@ -61,7 +60,6 @@ if has("gui_win32")
     #set shellcmdflag=-command
 elseif has("mac")
     set shell=zsh # to be able to source ~/.zshrc (conda init)
-    g:shell = "zsh"
     g:dotvim = $HOME .. "/.vim"
     g:conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
 endif
@@ -111,20 +109,20 @@ tnoremap <c-PageDown> <c-w>:bprev<CR>
 tnoremap <c-PageUp> <c-w>:bnext<CR>
 
 
-#Open terminal below all splits
-exe "cabbrev bter bo terminal " .. g:shell
-exe "cabbrev vter vert botright terminal " .. g:shell
+# Open terminal below all windows
+exe "cabbrev bter bo terminal " .. g:current_terminal
+exe "cabbrev vter vert botright terminal " .. g:current_terminal
 
 
 # Stuff to be run before loading plugins
 # Use the internal autocompletion (no deoplete, no asyncomplete plugins)
 g:ale_completion_enabled = 1
 g:ale_completion_autoimport = 1
-#Omnifunc is kinda disabled so I don't have to hit <c-x><c-o> for getting
-#suggestions
+# Omnifunc is kinda disabled so I don't have to hit <c-x><c-o> for getting
+# suggestions
 # set omnifunc=ale#completion#OmniFunc
-#set omnifunc=syntaxcomplete#Complete
-#let g:ale_disable_lsp = 1
+# set omnifunc=syntaxcomplete#Complete
+# let g:ale_disable_lsp = 1
 
 
 # ============================================
@@ -132,7 +130,7 @@ g:ale_completion_autoimport = 1
 # ============================================
 filetype off                  # required
 # !Vundle plugin manager
-#set the runtime path to include Vundle and initialize
+# set the runtime path to include Vundle and initialize
 exe 'set rtp+=' .. g:dotvim .. "/pack/bundle/start/Vundle.vim"
 vundle#begin(g:dotvim .. "/pack/bundle/start")
 Plugin 'gmarik/Vundle.vim'
@@ -144,6 +142,7 @@ Plugin 'machakann/vim-highlightedyank'
 Plugin 'liuchengxu/vista.vim'
 Plugin 'tpope/vim-commentary'
 Plugin 'ubaldot/helpme-vim'
+Plugin 'ubaldot/ugly-vim-repl'
 Plugin 'vim-airline/vim-airline'
 vundle#end()            # required
 filetype plugin indent on    # required for Vundle
@@ -166,7 +165,7 @@ augroup DIRCHANGE
     autocmd DirChanged global NERDTreeCWD
     autocmd DirChanged global ChangeTerminalDir()
 augroup END
-# Close NERDTree when opening a file#
+# Close NERDTree when opening a file
 g:NERDTreeQuitOnOpen = 1
 
 
@@ -256,7 +255,7 @@ omap <leader>c  <Plug>Commentary
 nmap <leader>cc <Plug>CommentaryLine
 nmap <leader>cu <Plug>Commentary<Plug>Commentary
 
-# HelpMe
+# HelpMe files for my poor memory
 command! VimHelpBasic :HelpMe ~/.vim/helpme_files/vim_basic.txt
 command! VimHelpCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
 command! VimHelpVimGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
@@ -297,10 +296,10 @@ augroup Gitget
     autocmd BufEnter * b:git_branch = Get_gitbranch()
 augroup END
 
+# git add -u && git commit -m "."
 command! GitCommitDot :call myfunctions#CommitDot()
 
-# Some useful functions
-# change all the terminal directories when you change vim directory
+# Change all the terminal directories when you change vim directory
 def ChangeTerminalDir()
     for ii in term_list()
         if bufname(ii) == "JULIA"
@@ -311,81 +310,10 @@ def ChangeTerminalDir()
     endfor
 enddef
 
-# =====================================================
-# My own REPL
-# =====================================================
-# DON'T TOUCH!
-def! g:Repl(kernel_name: string, repl_name: string)
-    echo repl_name
-    if kernel_name == "terminal"
-        exe "botright terminal " .. g:shell
-    else
-         # term_start(kernel_name, {'term_name': repl_name, 'vertical': v:true} )
-         term_start("jupyter-console --kernel=" .. kernel_name, {'term_name': repl_name, 'vertical': v:true} )
-    endif
-enddef
-#
-def! g:SendCell(kernel_name: string, repl_name: string, delim: string, run_command: string)
-    if !bufexists(repl_name)
-         g:Repl(kernel_name, repl_name)
-        wincmd h
-    endif
-    # In Normal mode, go to the next line
-    norm! j
-    # echo delim
-    # In search n is for don't move the cursor, b is backwards and W to don't wrap
-    # around
-    var line_in = search(delim, 'nbW')
-    # We use -1 because we want right-open intervals, i.e. [a,b).
-    # Note that here we want the cursor to move to the next cell!
-    norm! k
-    var line_out = search(delim, 'W') - 1
-    if line_out == - 1
-        line_out = line("$")
-    endif
-    # For debugging
-    # echo [line_in, line_out]
-    delete(fnameescape(g:filename))
-    writefile(getline(line_in + 1, line_out), g:filename, "a")
-    #call term_sendkeys(term_list()[0],"run -i ". g:filename . "\n")
-    # At startup, it is always terminal 2 or the name is hard-coded IPYTHON
-    call term_sendkeys(repl_name, run_command .. "\n")
-enddef
-#
-# Defaults for the REPL
-# To add another language define
-#
-# b:kernel_name
-# b:repl_name
-# b:cell_delimiter
-#
-# in the ~/.vim/ftplugin folder by creating e.g. julia.vim file.
-#
-# To see all the kernel installed use jupyter kernelspec list
-g:kernel_name_default = 'python3'
-g:repl_name_default = "IPYTHON"
-g:cell_delimiter_default = "# %%"
-g:run_command_default = "run -i"
 
-##
-if has("gui_win32")
-    g:filename = $TMP .. "\\my_cell.tmp"
-elseif has("mac")
-    g:filename = expand("~/my_cell.tmp")
-endif
-
-# Define my own command
-command! REPL silent g:Repl(get(b:, 'kernel_name', g:kernel_name_default), get(b:, 'repl_name', g:repl_name_default))
-
-# Some key-bindings for the REPL
-nnoremap <silent> <F9> yy \| :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
-xnoremap <silent> <F9> y \| :<c-u>call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),@")<cr>j0
-nnoremap <silent> <c-enter> \| :call g:SendCell(get(b:, 'kernel_name', g:kernel_name_default), get(b:, 'repl_name', g:repl_name_default), get(b:, 'cell_delimiter', g:cell_delimiter_default), get(b:, 'run_command', g:run_command_default))<cr><cr>
-# Clear REPL
-# nnoremap <c-c> :call term_sendkeys(get(b:, 'repl_name', g:repl_name_default),"\<c-l>")<cr>
-
-
+# HelpMe! basic
 command! -nargs=? -complete=file HelpMe call <sid>HelpMePopup(<f-args>)
+
 # Manim user-defined commands
 command! -nargs=+ -complete=command Manim silent call myfunctions#Manim(<f-args>, false)
 command! -nargs=+ -complete=command ManimDry silent call myfunctions#Manim(<f-args>, true)
