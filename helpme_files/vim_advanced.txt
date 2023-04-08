@@ -1,0 +1,51 @@
+BASICS
+------
+* options are builtin variables (you use set for setting them. e.g. set foldmethod = ...).
+To see their value you use ?, e.g. :set foldmethod? or :verbose set foldmethod?
+To access their value in a script you do e.g. &commentstrings
+
+* To see all the options :options
+
+* ! overwrite any existing, e.g. def! foo() overwrite any other definition of foo() or command! Bar overwrite any other Bar names
+* At startup vim silently load defaults.vim
+
+* Place custom functions in
+
+~/.vim/autoload/myfunctions.vim
+call myfunctions#foo()
+
+* Place filetype specific stuff in ftplugin
+* Plugins shall be placed in
+
+$HOME/.vim/pack/bundle/start/ # Automatically started plugins
+$HOME/.vim/pack/bundle/opt/ # Manually started plugins
+
+to start a plugin in opt just run :packadd foo (lazy load)
+
+* Plugin folder is started at vim start
+* autoload starts when something inside there is called
+
+VIM9SCRIPT
+----------
+* variables have scope. In reality think as g:, b: and w: as global variables that you can access wherever you are.
+Script variables have script scope.
+
+# Won't work
+if a > 0
+    var x =3
+else
+    var x =4
+echo x # Won't work
+
+# Will work
+var x = 0  # Defined a variable in this scope
+if a > 0
+    var x =3
+else
+    var x =4
+echo x
+
+Note how var x is called and manipulated by other functions written inside the script.
+
+* :h list-functions to search for some specific functions
+* :h autocommand-events

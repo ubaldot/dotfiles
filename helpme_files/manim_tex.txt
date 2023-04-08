@@ -1,0 +1,21 @@
+TEX
+.get_parts_by_text(A) # returns a list
+.tex_strings # Return a list that shows how the equation has been partitioned
+
+print(mob.tex_strings)
+
+
+# Classic: separate pieces by comma
+ t0 = mn.MathTex(
+     rf"(y-{ii})",
+     r"^2+",
+     f"(y-{ii})",
+     r"+1 = 0,",
+     r"{{(y-a)}}^3-3{{(y-a)}}=1",
+ )
+
+self.add(
+            t0.copy()
+            .get_parts_by_tex(f"(y-{ii})")
+            .next_to(t0, mn.DOWN, aligned_edge=mn.LEFT)
+        )

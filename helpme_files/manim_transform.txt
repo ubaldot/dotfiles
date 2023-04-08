@@ -1,0 +1,12 @@
+TRANSFORM VS REPLACEMENT TRANSFORM
+----------------------------------
+=> In both cases mob1 <- mob2.
+=> In Transform we always refer always to the first object that just changed shape.
+=> In ReplacementTransform we must refer to the second object that overwrite the first object.
+
+Example
+self.play(mn.Transform(c, s))  # c takes the shape of s, we continue with c
+self.remove(s)
+
+self.play(mn.ReplacementTransform(c, t))  # t completely replace c, we continue with t
+self.remove(c)

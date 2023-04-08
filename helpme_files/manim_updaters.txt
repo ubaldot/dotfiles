@@ -1,0 +1,24 @@
+GENERAL STRUCTURE
+
+def get_next_shape(vt, ...):
+    # Create the new object based on vt
+    return mobj # usually a vgrp
+
+# Initialization
+vt0 = 0
+vt = mn.ValueTracker(vt0) # This is the independent object
+mob =get_next_shape(vt, ...)
+self.add(mob)
+
+# Step function
+def myupdater(vgrp):
+    vgrp_next = get_next_mobj(vt)
+    vgrp.become(vgrp_next)
+
+mob.add_updater(myupdater)
+
+# Iterations
+self.play(vt.animate.set_value(5))
+self.wait()
+self.play(vt.animate.set_value(-2.3))
+self.wait()

@@ -1,0 +1,12 @@
+CODING:
+-------------------------
+ALE key-bindings
+error prev, next    <leader>p, <leader>n
+hover               <leader>h
+find references     <leader>r
+go to definition    <leader>d (<c-i> or <c-t> to go back)
+
+COMMENTARY
+comment line        gcc
+comment block       gc
+undo comment        gcu
