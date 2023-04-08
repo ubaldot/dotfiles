@@ -1,0 +1,40 @@
+SUBSTITUTE
+----------
+
+:[range]s[ubstitute]/pattern/new/[gci]
+
+replace "pattern" with "new" for all the lines in range. 
+gci = global, ask for confirmation, case sensitive.
+
+OBS: Instead of using the delimiter / you can use the delimiter : so you avoid 
+things like this -> \\/\//\/\\/
+
+Example:
+:10,29s:foo:bar:g
+
+EXAMPLES
+--------
+:10,15s:foo:bar:g   Replace foo with bar in lines 10--15
+:%s/./bar/g         Replace all characters of non-empty lines with bar in the whole file
+:%s/.\w*/bar/g      Replace all the words of non-empty lines with bar in the whole file
+:%s:\s*$::g         Remove all the blanks at the end of the line in the whole file 
+:.,$/"//g           Remove all the " from the current line to the end of the file
+:%s:^\s*$:bar:g     Replace all the blank lines with bar in the whole file
+:%s/foo/<c-r>a/g    Replace foo with the content of register a in the whole file
+
+
+RANGES
+------
+:13,15          from line 13 to line 15
+:13,+3          from line 13 to line 13+3
+:'t,$           from marker t to the end of file
+:.,+5           from current line to current line+5
+:.,$            from current line to the end
+
+For custom ranges, use :g (global)
+
+PATTERNS
+--------
+foo         foo
+\<foo\>     foo (match case)
+^\s*$       empty-lines
