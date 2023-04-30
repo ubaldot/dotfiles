@@ -19,38 +19,24 @@ export def g:CommitDot()
     # cd curr_dir
 enddef
 
-# Manim stuff
-# Render with bang.
-export def g:Manim(scene: string, dryrun: bool)
-    var flags = ""
-    if dryrun
-        flags = " --dry_run"
-    else
-        flags = " -pql"
-    endif
-    var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. shellescape(expand("%:t")) .. " " .. scene .. flags .. " --disable_caching -v WARNING"
-    exe "!" .. closeQT .. " && " .. cmd
-enddef
 
-# Render in a terminal buffer
-export def g:ManimTerminal(scene: string, dryrun: bool)
-    var flags = ""
-    if dryrun
-        flags = " --dry_run"
-    else
-        flags = " -pql"
+
+
+export def g:Diff(spec: string)
+    vertical new
+    setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile
+    var cmd = bufname('#')
+    if !empty(spec)
+        cmd = "!git -C " .. shellescape(fnamemodify(finddir('.git', '.;'), ':p:h:h')) .. " show " .. spec .. ":#"
     endif
-    var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --disable_caching -v WARNING"
-    var terms_name = []
-    for ii in term_list()
-        add(terms_name, bufname(ii))
-    endfor
-    echo terms_name
-    if term_list() == [] || index(terms_name, 'MANIM') == -1
-        vert term_start(g:current_terminal, {'term_name': 'MANIM' })
-        set nowrap
-    endif
-    term_sendkeys('MANIM', "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
+    execute "read " .. cmd
+    silent :0d _
+    &filetype = getbufvar('#', '&filetype')
+    augroup Diff
+      autocmd!
+      autocmd BufWipeout <buffer> diffoff!
+    augroup END
+    diffthis
+    wincmd p
+    diffthis
 enddef
