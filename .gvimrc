@@ -1,41 +1,56 @@
-" Some good VIM notes
-" ======================
-" This file is sourced AFTER .vimrc
-" ==========================
+vim9script
 
-" The following does not work
-" !echo $CONDA_DEFAULT_ENV won't show anything
-" call system('source ~/.zshrc')
-" call system('conda activate myenv')
+# Some good VIM notes
+# ======================
+# This file is sourced AFTER .vimrc
+# ==========================
 
+# The following does not work
+# !echo $CONDA_DEFAULT_ENV won't show anything
+# call system('source ~/.zshrc')
+# call system('conda activate myenv')
 
-" Set terminal with 256 colors
+# Set terminal with 256 colors
 set termguicolors
-" Set fonts for gvim
+set mousehide
+
+# Set fonts for gvim
+# In this way with the 14'' MacBook you have exactly two columns
+# with textwidth = 78
+g:fontsize = 13
 if has("gui_win32")
-    let g:fontface = "FiraCode_NFM"
-    let g:fontsize_small = ":h8:cANSI:qDRAFT" 
-    let g:fontsize_large = ":h11:cANSI:qDRAFT" 
-    " Open gvim in full-screen
+     g:fontface = "FiraCode_NFM"
+     g:fontsize_small = ":h8:cANSI:qDRAFT"
+     g:fontsize_large = ":h11:cANSI:qDRAFT"
+     set guioption-=T
+    # Open gvim in full-screen
     au GUIEnter * simalt ~x
 elseif has("gui_macvim")
-    set shell=zsh " to be able to source ~/.zshrc (conda init)
-    let g:fontface = "Fira\ Code"
-    let g:fontsize_small = ":h8"
-    let g:fontsize_large = ":h14"
+    # set shell=zsh # to be able to source ~/.zshrc (conda init)
+     # g:fontsize_small = ":h8"
+     # g:fontsize_large = ":h14"
+     g:fontface = "Fira\ Code:h"
 endif
-" guifont is reserved word (aka 'option')
-let &guifont=g:fontface.g:fontsize_large
+# guifont is reserved word (aka 'option')
+&guifont = g:fontface .. string(g:fontsize)
 
+def g:ChangeFontsize(n: number)
+    g:fontsize = g:fontsize + n
+    &guifont = g:fontface .. string(g:fontsize)
+    echo "Fontsize: " .. string(g:fontsize)
+enddef
 
-" Some key bindings
-"Zoom in and out"
-nnoremap <silent> <c-z><c-o> :let &guifont=g:fontface . g:fontsize_small<cr>
-nnoremap <silent> <c-z><c-i> :let &guifont=g:fontface . g:fontsize_large<cr>
+# Some key bindings
+nnoremap  <c-c><c-i> :call g:ChangeFontsize(1)<cr>
+nnoremap  <c-c><c-o> :call g:ChangeFontsize(-1)<cr>
 
-
-" To have nice colors during autocompletion
-hi Pmenu guibg=lightgray guifg=black
-hi PmenuSel guibg=darkgray guifg=gray
-
-
+# nnoremap <C-c><c-i> :silent! let &guifont = substitute(
+#  \ &guifont,
+#  \ ':h\zs\d\+',
+#  \ '\=eval(submatch(0)+1)',
+#  \ '')<CR>
+# nnoremap <C-c><c-o> :silent! let &guifont = substitute(
+#  \ &guifont,
+#  \ ':h\zs\d\+',
+#  \ '\=eval(submatch(0)-1)',
+#  \ '')<CR>
