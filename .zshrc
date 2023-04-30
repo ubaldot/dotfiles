@@ -17,7 +17,6 @@ unset __conda_setup
 #
 conda activate myenv
 #
-alias mvim="/Applications/MacVim.app/Contents/bin/mvim"
 
 
 
