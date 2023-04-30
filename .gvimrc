@@ -19,25 +19,23 @@ set mousehide
 # with textwidth = 78
 g:fontsize = 13
 if has("gui_win32")
-     g:fontface = "FiraCode_NFM"
-     g:fontsize_small = ":h8:cANSI:qDRAFT"
-     g:fontsize_large = ":h11:cANSI:qDRAFT"
-     set guioption-=T
+     g:fontsize = 11
+     g:fontface = "FiraCode_NFM:h"
+     g:fontsize_tail = ":cANSI:qDRAFT"
+     set guioptions-=T
     # Open gvim in full-screen
     au GUIEnter * simalt ~x
 elseif has("gui_macvim")
     # set shell=zsh # to be able to source ~/.zshrc (conda init)
-     # g:fontsize_small = ":h8"
-     # g:fontsize_large = ":h14"
+     g:fontsize_tail = ""
      g:fontface = "Fira\ Code:h"
 endif
 # guifont is reserved word (aka 'option')
-&guifont = g:fontface .. string(g:fontsize)
+&guifont = g:fontface .. string(g:fontsize) .. g:fontsize_tail
 
 def g:ChangeFontsize(n: number)
     g:fontsize = g:fontsize + n
-    &guifont = g:fontface .. string(g:fontsize)
-    echo "Fontsize: " .. string(g:fontsize)
+    &guifont = g:fontface .. string(g:fontsize) .. g:fontsize_tail
 enddef
 
 # Some key bindings
