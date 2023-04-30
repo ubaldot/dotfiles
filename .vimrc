@@ -17,19 +17,29 @@ vim9script
 # Uncomment set omnifunc=... few lines below#
 #
 # :h user-manual is king.
-
+#
 # To activate myenv conda environment for MacVim
 if has("mac")
-     system("source ~/.zshrc")
-     g:current_terminal = 'zsh'
-else
-     g:current_terminal = 'powershell'
+    system("source ~/.zshrc")
 endif
+
+# if has('termguicolors')
+#   set termguicolors
+# endif
+
+augroup ReloadVimScripts
+    autocmd!
+    # autocmd BufWritePost $MYVIMRC source $MYVIMRC | echo ".vimrc reloaded"
+    autocmd BufWritePost *.vim,*.vimrc,*.gvimrc exe "source %" # | echo
+                \ expand('%:t') .. " reloaded."
+augroup END
 
 # Internal vim variables
 set encoding=utf-8
 set autoread
-set nu
+set number
+# set relativenumber
+set nowrap
 set tabstop=4 softtabstop=4
 set shiftwidth=4
 set expandtab
@@ -39,6 +49,7 @@ set backspace=indent,eol,start
 set nocompatible              # required
 set clipboard=unnamed
 set splitright
+set splitbelow
 set laststatus=2
 set incsearch # for displaying while searching
 set smartcase
@@ -50,16 +61,19 @@ set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
 set completeopt-=preview
-set textwidth=180
+set textwidth=78
+set iskeyword+="-"
+set formatoptions+=w,n,p
+set diffopt+=vertical
+# set autoshelldir
 
-if has("gui_win32")
-    g:dotvim = $HOME."\\vimfiles"
+if has("gui_win32") || has("win32")
+    g:dotvim = $HOME .. "\\vimfiles"
     g:conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
-    # The following is very slow
-    #set shell="C:\\\\link\\\\to\\\\Anaconda\\\\powershell.exe"
-    #set shellcmdflag=-command
-elseif has("mac")
-    set shell=zsh # to be able to source ~/.zshrc (conda init)
+# The following is very slow
+#set shell="C:\\\\link\\\\to\\\\Anaconda\\\\powershell.exe"
+#set shellcmdflag=-command
+else
     g:dotvim = $HOME .. "/.vim"
     g:conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
 endif
@@ -68,18 +82,34 @@ endif
 # =====================================================
 # Some key bindings
 # =====================================================
+# noremap <Up> <Nop>
+# noremap <Down> <Nop>
+# noremap <Left> <Nop>
+# noremap <Right> <Nop>
 # Remap <leader> key
 g:mapleader = ","
+map <leader>vr :source $MYVIMRC<CR> \| :echo ".vimrc reloaded."
+map <leader>vv :e $MYVIMRC<CR>
+# nnoremap d "_d
 nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
+nnoremap <C-Tab> :bnext<CR>
+nnoremap <S-C-Tab> :bprevious<CR>
+# nnoremap <leader>x :bnext<cr>
+# nnoremap <leader>z :bprev<cr>
 # nnoremap <leader>d :bp<cr>:bd #<cr>
-nnoremap <leader>d :close<cr>
+nnoremap <leader>c :close<cr>
 noremap <c-PageDown> :bprev<CR>
 noremap <c-PageUp> :bnext<CR>
+# Switch window
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
+# Switch window with arrows
+nnoremap <c-Left> :wincmd h<cr>
+nnoremap <c-Right> :wincmd l<cr>
+
 # super quick search and replace:
 nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<CR>\>/
 # to be able to undo accidental c-w"
@@ -95,7 +125,19 @@ xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
 # Don't use the following otherwise you lose registers function!
 # xnoremap " <ESC>`>a"<ESC>`<i"<ESC>
 # Indent without leaving the cursor position
-nnoremap <leader>= :var b:PlugView=winsaveview()<CR>gg=G: winrestview(b:PlugView) <CR>:echo "file indented"<CR>
+nnoremap g= :vim9cmd b:temp = winsaveview()<CR>gg=G
+            \ :vim9cmd winrestview(b:temp)<cr>
+            \ :vim9cmd unlet b:temp<cr>
+            \ :echo "file indented"<CR>
+
+# Format text
+# nnoremap g- :execute 'g/^.\{' .. &textwidth ..'\}/normal gqq'<cr>:echo "file
+#             \ formatted, textwidth: " .. &textwidth .. " cols."<cr>
+nnoremap g- :vim9cmd b:temp = winsaveview()<CR>gggqG
+            \ :vim9cmd winrestview(b:temp)<cr>
+            \ :vim9cmd unlet b:temp<cr>
+            \ :echo "file formatted, textwidth: "
+            \ .. &textwidth .. " cols."<cr>
 
 # Some terminal remapping
 # When using iPython to avoid that shift space gives 32;2u
@@ -105,13 +147,18 @@ tnoremap <c-h> <c-w>h
 tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
-tnoremap <c-PageDown> <c-w>:bprev<CR>
-tnoremap <c-PageUp> <c-w>:bnext<CR>
-
+# tnoremap <c-PageDown> <c-w>:bprev<CR>
+# tnoremap <c-PageUp> <c-w>:bnext<CR>
 
 # Open terminal below all windows
-exe "cabbrev bter bo terminal " .. g:current_terminal
-exe "cabbrev vter vert botright terminal " .. g:current_terminal
+exe "cabbrev bter bo terminal " .. &shell
+exe "cabbrev vter vert botright terminal " .. &shell
+
+# ============================
+# PLUGIN STUFF
+# ============================
+# Select which plugin to not load
+# g:replica_loaded = 1
 
 
 # Stuff to be run before loading plugins
@@ -128,40 +175,39 @@ g:ale_completion_autoimport = 1
 # ============================================
 # Plugins  manager
 # ============================================
-filetype off                  # required
-# !Vundle plugin manager
-# set the runtime path to include Vundle and initialize
-exe 'set rtp+=' .. g:dotvim .. "/pack/bundle/start/Vundle.vim"
-vundle#begin(g:dotvim .. "/pack/bundle/start")
-Plugin 'gmarik/Vundle.vim'
-Plugin 'sainnhe/everforest'
-Plugin 'dense-analysis/ale'
-Plugin 'preservim/nerdtree'
-Plugin 'machakann/vim-highlightedyank'
-# Plugin 'ludovicchabant/vim-gutentags'
-Plugin 'liuchengxu/vista.vim'
-Plugin 'tpope/vim-commentary'
-Plugin 'ubaldot/helpme-vim'
-Plugin 'ubaldot/ugly-vim-repl'
-Plugin 'vim-airline/vim-airline'
-vundle#end()            # required
-filetype plugin indent on    # required for Vundle
-
+plug#begin(g:dotvim .. "/plugins/")
+Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
+Plug 'sainnhe/everforest'
+Plug 'dense-analysis/ale'
+Plug 'preservim/nerdtree'
+Plug 'machakann/vim-highlightedyank'
+# Plug 'ludovicchabant/vim-gutentags'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-scriptease'
+Plug 'ubaldot/helpme-vim'
+Plug 'ubaldot/vim-outline'
+Plug 'ubaldot/vim-replica'
+Plug 'vim-airline/vim-airline'
+# Plug 'ryanoasis/vim-devicons'
+plug#end()
+# filetype plugin indent on
+autocmd FileType nerdtree setlocal nolist
 # ============================================
 # Plugins settings
 # ============================================
 
 # everforest colorscheme
-colorscheme everforest
 var hour = str2nr(strftime("%H"))
-if hour < 6 || 18 < hour
+if hour < 6 || 21 < hour
     set background=dark
-    g:airline_theme = 'dark'
+    # g:airline_theme = 'dark'
 endif
+colorscheme everforest
+g:airline_theme = 'everforest'
 
 nnoremap <F1> :NERDTreeToggle<cr>
 augroup DIRCHANGE
-    au!
+    autocmd!
     autocmd DirChanged global NERDTreeCWD
     autocmd DirChanged global ChangeTerminalDir()
 augroup END
@@ -170,30 +216,44 @@ g:NERDTreeQuitOnOpen = 1
 
 
 # Vista!
-g:vista_close_on_jump = 1
-g:vista_default_executive = 'ale'
-def! g:NearestMethodOrFunction(): string
-    return get(b:, 'vista_nearest_method_or_def', '')
-enddef
+# g:vista_close_on_jump = 1
+# g:vista_default_executive = 'ale'
+# def! g:NearestMethodOrFunction(): string
+#     return get(b:, 'vista_nearest_method_or_def', '')
+# enddef
 
-augroup FuncNameGet
-    autocmd!
-    autocmd VimEnter *  vista#RunForNearestMethodOrFunction()
-augroup END
+# augroup FuncNameGet
+#     autocmd!
+#     autocmd VimEnter *  vista#RunForNearestMethodOrFunction()
+# augroup END
 
-# Vista for showing outline
-silent! map <F8> :Vista!!<CR>
+# TODO: the following won't work
+# import autoload g:dotvim .. "/plugins/vim-outline/lib/outline.vim"
+# augroup OUTLINE
+#     autocmd!
+#     autocmd VimEnter * :call outline.RefreshWindow()
+# augroup END
+# # # import g:dotvim .. "/plugins/vim-outline/lib/outline.vim"
+# # echo outline.RefreshWindow()
+# call airline#parts#define_function('outl', 'RefreshWindow')
 
 # vim-airline show buffers
 g:airline#extensions#tabline#enabled = 1
 g:airline#extensions#tabline#formatter = 'unique_tail'
-g:airline#extensions#tabline#ignore_bufadd_pat = 'defx|gundo|nerd_tree|startify|tagbar|undotree|vimfiler'
+g:airline#extensions#tabline#ignore_bufadd_pat =
+    'defx|gundo|nerd_tree|startify|tagbar|undotree|vimfiler'
 # If mode()==t then change the statusline
-au User AirlineAfterInit g:airline_section_a = airline#section#create([' %{b:git_branch}'])
+au User AirlineAfterInit g:airline_section_a = airline#section#create(['
+            \ %{b:git_branch}'])
 au User AirlineAfterInit g:airline_section_b = airline#section#create(['%f'])
-au User AirlineAfterInit g:airline_section_c = airline#section#create(['f:%{NearestMethodOrFunction()}'])
-au User AirlineAfterInit g:airline_section_z = airline#section#create(['col: %v'])
-au User AirlineAfterInit g:airline_section_x = airline#section#create([g:conda_env])
+# au User AirlineAfterInit g:airline_section_c =
+# airline#section#create(['f:%{NearestMethodOrFunction()}'])
+# au User AirlineAfterInit g:airline_section_c =
+# airline#section#create(['outl'])
+au User AirlineAfterInit g:airline_section_z = airline#section#create(['col:
+            \ %v'])
+au User AirlineAfterInit g:airline_section_x =
+            \ airline#section#create([g:conda_env])
 g:airline_extensions = ['ale', 'tabline']
 
 
@@ -203,13 +263,16 @@ g:ale_completion_max_suggestions = 1000
 g:ale_floating_preview = 1
 nnoremap <silent> <leader>p <Plug>(ale_previous_wrap)
 nnoremap <silent> <leader>n <Plug>(ale_next_wrap)
-nnoremap <silent> <leader>h <Plug>(ale_hover)
-nnoremap <c-]> :ALEGoToDefinition<cr>
-nnoremap <leader>r :ALEFindReferences<cr>
+nnoremap <silent> <leader>k <Plug>(ale_hover)
+nnoremap <silent> <leader>r :ALEFindReferences<cr>
+nnoremap <silent> <leader>g :ALEGoToDefinition<cr>
+
+
 g:ale_linters = {
-            'c': ['clangd', 'cppcheck', 'gcc'],
-            'python': ['flake8', 'pylsp', 'mypy'],
-            'tex': ['texlab']}
+    'c': ['clangd', 'cppcheck', 'gcc'],
+    'python': ['flake8', 'pylsp', 'mypy'],
+    'tex': ['texlab', 'writegood'],
+    'text': ['writegood']}
 # You must change the following line if you change LaTeX project folder
 g:ale_lsp_root = {'texlab': '~'}
 
@@ -226,49 +289,53 @@ g:ale_python_flake8_options = '--ignore=E501,W503'
 
 # I don't remember how to set the following
 g:ale_python_pylsp_config = {
-               'pylsp': {
-                 'plugins': {
-                   'pycodestyle': {
-                     'enabled': v:false},
-                   'pyflakes': {
-                     'enabled': v:false},
-                   'pydocstyle': {
-                     'enabled': v:false},
-                     'autopep8': {
-                     'enabled': v:false}, }, }, }
+    'pylsp': {
+        'plugins': {
+            'pycodestyle': {
+                'enabled': v:false},
+            'pyflakes': {
+                'enabled': v:false},
+            'pydocstyle': {
+                'enabled': v:false},
+            'autopep8': {
+                'enabled': v:false}, }, }, }
 
 
 # ALE Fixers
 g:ale_fixers = {
-             'c': ['clang-format', 'remove_trailing_lines', 'trim_whitespace'],
-             'cpp': ['clang-format'],
-             'python': ['remove_trailing_lines', 'trim_whitespace', 'autoflake', 'black']}
+    'c': ['clang-format', 'remove_trailing_lines',
+        'trim_whitespace'],
+    'cpp': ['clang-format'],
+    'python': ['remove_trailing_lines', 'trim_whitespace',
+        'autoflake', 'black']}
 
-g:ale_python_autoflake_options = '--in-place --remove-unused-variables --remove-all-unused-imports'
-g:ale_python_black_options = '--line-length=80'
+g:ale_python_autoflake_options = '--in-place --remove-unused-variables
+            \ --remove-all-unused-imports'
+g:ale_python_black_options = '--line-length=120'
 g:ale_fix_on_save = 1
 
-# Commentary
-xmap <leader>c  <Plug>Commentary
-nmap <leader>c  <Plug>Commentary
-omap <leader>c  <Plug>Commentary
-nmap <leader>cc <Plug>CommentaryLine
-nmap <leader>cu <Plug>Commentary<Plug>Commentary
 
 # HelpMe files for my poor memory
 command! VimHelpBasic :HelpMe ~/.vim/helpme_files/vim_basic.txt
+command! VimHelpScript :HelpMe ~/.vim/helpme_files/vim_scripting.txt
 command! VimHelpCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
-command! VimHelpVimGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
+command! VimHelpGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
 command! VimHelpExCommands :HelpMe ~/.vim/helpme_files/vim_excommands.txt
 command! VimHelpSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
 command! VimHelpAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
+command! VimHelpNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
+command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 
 # Source additional files
 # source $HOME/PE.vim
 # source $HOME/VAS.vim
 # source $HOME/dymoval.vim
 
+# sci-vim-repl stuff
+# g:replica_console_position = "R"
+
 syntax on
+
 
 # ============================================
 # Self-defined functions
@@ -276,52 +343,56 @@ syntax on
 
 augroup remove_trailing_whitespaces
     autocmd!
-    autocmd BufWritePre * if !&binary | :call myfunctions#TrimWhitespace() | endif
+    autocmd BufWritePre * if !&binary
+                \ | :call myfunctions#TrimWhitespace() |
+                \ endif
 augroup END
 
 
-# Get git branch name for airline. OBS !It may need to be changed for other OS.
+# Get git branch name for airline. OBS !It may need to be changed for other
+# OS.
 def Get_gitbranch(): string
-    var current_branch = trim(system("git -C " .. expand("%:h") .. " branch --show-current"))
-    # Not very robust though
-    if current_branch =~ "not a git repository"
-        return "(no repo)"
-    else
-        return current_branch
+    var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
+                \ --show-current"))
+    # strdix(A,B) >=0 check if B is in A.
+    if stridx(current_branch, "not a git repository") >= 0
+        current_branch = "(no repo)"
     endif
+    return current_branch
 enddef
 
+# TODO: test with two files on different repo on different branches
 augroup Gitget
     autocmd!
-    autocmd BufEnter * b:git_branch = Get_gitbranch()
+    autocmd BufEnter,BufWinEnter * b:git_branch = Get_gitbranch()
 augroup END
 
 # git add -u && git commit -m "."
 command! GitCommitDot :call myfunctions#CommitDot()
+# Merge and diff
+command! -nargs=? Diff :call myfunctions#Diff(<q-args>)
+nnoremap dn ]c
+nnoremap dN [c
+
 
 # Change all the terminal directories when you change vim directory
 def ChangeTerminalDir()
     for ii in term_list()
         if bufname(ii) == "JULIA"
-           term_sendkeys(ii, 'cd("' .. getcwd() .. '")' .. "\n")
+            term_sendkeys(ii, 'cd("' .. getcwd() .. '")' .. "\n")
         else
-           term_sendkeys(ii, "cd " .. getcwd() .. "\n")
+            term_sendkeys(ii, "cd " .. getcwd() .. "\n")
         endif
     endfor
 enddef
 
 
-# HelpMe! basic
-command! -nargs=? -complete=file HelpMe call <sid>HelpMePopup(<f-args>)
 
-# Manim user-defined commands
-command! -nargs=+ -complete=command Manim silent call myfunctions#Manim(<f-args>, false)
-command! -nargs=+ -complete=command ManimDry silent call myfunctions#Manim(<f-args>, true)
-command! -nargs=+ -complete=command ManimTerminal silent call myfunctions#ManimTerminal(<f-args>, false)
-command! -nargs=+ -complete=command ManimTerminalDry silent call myfunctions#ManimTerminal(<f-args>, true)
-command! ManimDocs silent :!open -a safari.app ~/Documents/github/manim/docs/build/html/index.html
-command! ManimNew :enew | :0read ~/.manim/new_manim.txt
-command! ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
-command! ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
-command! ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
-command! ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
+# Manim commands
+command ManimDocs silent :!open -a safari.app
+            \ ~/Documents/github/manim/docs/build/html/index.html
+command ManimNew :enew | :0read ~/.manim/new_manim.txt
+command ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
+command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
+command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
+command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
