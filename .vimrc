@@ -23,9 +23,10 @@ if has("mac")
     system("source ~/.zshrc")
 endif
 
-# if has('termguicolors')
-#   set termguicolors
-# endif
+# Set python stuff
+&pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+&pythonthreedll = trim(system("which python"))
+
 
 augroup ReloadVimScripts
     autocmd!
@@ -33,8 +34,7 @@ augroup ReloadVimScripts
     autocmd BufWritePost *.vim,*.vimrc,*.gvimrc exe "source %" # | echo
                 \ expand('%:t') .. " reloaded."
 augroup END
-
-# Internal vim variables
+# Internal vim variables aka 'options'
 set encoding=utf-8
 set autoread
 set number
@@ -93,8 +93,9 @@ map <leader>vv :e $MYVIMRC<CR>
 # nnoremap d "_d
 nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
-nnoremap <C-Tab> :bnext<CR>
-nnoremap <S-C-Tab> :bprevious<CR>
+nnoremap <S-Tab> <Plug>Bufselect_Toggle
+nnoremap <C-Tab> <Plug>(FileselectToggle)
+# nnoremap <S-C-Tab> :bprevious<CR>
 # nnoremap <leader>x :bnext<cr>
 # nnoremap <leader>z :bprev<cr>
 # nnoremap <leader>d :bp<cr>:bd #<cr>
@@ -181,10 +182,12 @@ Plug 'sainnhe/everforest'
 Plug 'dense-analysis/ale'
 Plug 'preservim/nerdtree'
 Plug 'machakann/vim-highlightedyank'
+Plug 'yegappan/bufselect'
+Plug 'yegappan/fileselect'
 # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-scriptease'
-Plug 'ubaldot/helpme-vim'
+Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'vim-airline/vim-airline'
@@ -311,7 +314,7 @@ g:ale_fixers = {
 
 g:ale_python_autoflake_options = '--in-place --remove-unused-variables
             \ --remove-all-unused-imports'
-g:ale_python_black_options = '--line-length=120'
+g:ale_python_black_options = '--line-length=80'
 g:ale_fix_on_save = 1
 
 
@@ -326,6 +329,16 @@ command! VimHelpAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
 command! VimHelpNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
 command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 
+# Utils commands
+
+# This command definition includes -bar, so that it is possible to "chain" Vim commands.
+# Side effect: double quotes can't be used in external commands
+command! -nargs=1 -complete=command -bar -range Redir silent call Redir(<q-args>, <range>, <line1>, <line2>)
+
+# This command definition doesn't include -bar, so that it is possible to use double quotes in external commands.
+# Side effect: Vim commands can't be "chained".
+command! -nargs=1 -complete=command -range Redir silent call Redir(<q-args>, <range>, <line1>, <line2>)
+
 # Source additional files
 # source $HOME/PE.vim
 # source $HOME/VAS.vim
@@ -333,6 +346,8 @@ command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 
 # sci-vim-repl stuff
 # g:replica_console_position = "R"
+# g:replica_console_width = 30
+# g:outline_autoclose = false
 
 syntax on
 
@@ -369,6 +384,7 @@ augroup END
 
 # git add -u && git commit -m "."
 command! GitCommitDot :call myfunctions#CommitDot()
+command! GitPushDot :call myfunctions#PushDot()
 # Merge and diff
 command! -nargs=? Diff :call myfunctions#Diff(<q-args>)
 nnoremap dn ]c
