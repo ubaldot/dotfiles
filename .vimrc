@@ -23,9 +23,14 @@ if has("mac")
     system("source ~/.zshrc")
 endif
 
-# Set python stuff
-&pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-&pythonthreedll = trim(system("which python"))
+if has("win32")
+    set pythonthreehome=$HOME."\\Miniconda3"
+    set pythonthreedll=$HOME."\\Miniconda3\\python39.dll"
+elseif has("mac")
+    &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+    &pythonthreedll = trim(system("which python"))
+endif
+
 
 
 augroup ReloadVimScripts
