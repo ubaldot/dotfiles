@@ -19,23 +19,26 @@ vim9script
 # :h user-manual is king.
 #
 # To activate myenv conda environment for MacVim
+
+import "./.vim/lib/myfunctions.vim"
+
 if has("mac")
     system("source ~/.zshrc")
 endif
 
-if has("win32")
+if has("gui_win32") || has("win32")
+    g:dotvim = $HOME .. "\\vimfiles"
     set pythonthreehome=$HOME."\\Miniconda3"
     set pythonthreedll=$HOME."\\Miniconda3\\python39.dll"
 elseif has("mac")
+    g:dotvim = $HOME .. "/.vim"
     &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     &pythonthreedll = trim(system("which python"))
 endif
 
 
-
 augroup ReloadVimScripts
     autocmd!
-    # autocmd BufWritePost $MYVIMRC source $MYVIMRC | echo ".vimrc reloaded"
     autocmd BufWritePost *.vim,*.vimrc,*.gvimrc exe "source %" # | echo
                 \ expand('%:t') .. " reloaded."
 augroup END
@@ -72,38 +75,18 @@ set formatoptions+=w,n,p
 set diffopt+=vertical
 # set autoshelldir
 
-if has("gui_win32") || has("win32")
-    g:dotvim = $HOME .. "\\vimfiles"
-    g:conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
-# The following is very slow
-#set shell="C:\\\\link\\\\to\\\\Anaconda\\\\powershell.exe"
-#set shellcmdflag=-command
-else
-    g:dotvim = $HOME .. "/.vim"
-    g:conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
-endif
-
-
 # =====================================================
 # Some key bindings
 # =====================================================
-# noremap <Up> <Nop>
-# noremap <Down> <Nop>
-# noremap <Left> <Nop>
-# noremap <Right> <Nop>
-# Remap <leader> key
 g:mapleader = ","
 map <leader>vr :source $MYVIMRC<CR> \| :echo ".vimrc reloaded."
 map <leader>vv :e $MYVIMRC<CR>
-# nnoremap d "_d
+nnoremap x "_x
 nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
-nnoremap <S-Tab> <Plug>Bufselect_Toggle
-nnoremap <C-Tab> <Plug>(FileselectToggle)
-# nnoremap <S-C-Tab> :bprevious<CR>
-# nnoremap <leader>x :bnext<cr>
-# nnoremap <leader>z :bprev<cr>
-# nnoremap <leader>d :bp<cr>:bd #<cr>
+# nnoremap <S-Tab> <Plug>Bufselect_Toggle
+# nnoremap <C-Tab> <Plug>(FileselectToggle)
+nnoremap <S-Tab> :bnext<CR>
 nnoremap <leader>c :close<cr>
 noremap <c-PageDown> :bprev<CR>
 noremap <c-PageUp> :bnext<CR>
@@ -137,8 +120,6 @@ nnoremap g= :vim9cmd b:temp = winsaveview()<CR>gg=G
             \ :echo "file indented"<CR>
 
 # Format text
-# nnoremap g- :execute 'g/^.\{' .. &textwidth ..'\}/normal gqq'<cr>:echo "file
-#             \ formatted, textwidth: " .. &textwidth .. " cols."<cr>
 nnoremap g- :vim9cmd b:temp = winsaveview()<CR>gggqG
             \ :vim9cmd winrestview(b:temp)<cr>
             \ :vim9cmd unlet b:temp<cr>
@@ -163,9 +144,6 @@ exe "cabbrev vter vert botright terminal " .. &shell
 # ============================
 # PLUGIN STUFF
 # ============================
-# Select which plugin to not load
-# g:replica_loaded = 1
-
 
 # Stuff to be run before loading plugins
 # Use the internal autocompletion (no deoplete, no asyncomplete plugins)
@@ -187,11 +165,13 @@ Plug 'sainnhe/everforest'
 Plug 'dense-analysis/ale'
 Plug 'preservim/nerdtree'
 Plug 'machakann/vim-highlightedyank'
-Plug 'yegappan/bufselect'
-Plug 'yegappan/fileselect'
+Plug 'cjrh/vim-conda'
+# Plug 'ubaldot/vim-conda'
+# Plug 'yegappan/bufselect'
+# Plug 'yegappan/fileselect'
 # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-scriptease'
+# Plug 'tpope/vim-scriptease'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
@@ -223,18 +203,6 @@ augroup END
 g:NERDTreeQuitOnOpen = 1
 
 
-# Vista!
-# g:vista_close_on_jump = 1
-# g:vista_default_executive = 'ale'
-# def! g:NearestMethodOrFunction(): string
-#     return get(b:, 'vista_nearest_method_or_def', '')
-# enddef
-
-# augroup FuncNameGet
-#     autocmd!
-#     autocmd VimEnter *  vista#RunForNearestMethodOrFunction()
-# augroup END
-
 # TODO: the following won't work
 # import autoload g:dotvim .. "/plugins/vim-outline/lib/outline.vim"
 # augroup OUTLINE
@@ -245,12 +213,27 @@ g:NERDTreeQuitOnOpen = 1
 # # echo outline.RefreshWindow()
 # call airline#parts#define_function('outl', 'RefreshWindow')
 
+def Conda_env(): string
+    var conda_env = "base"
+    if has("gui_win32") || has("win32")
+        conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
+    elseif has("mac")
+        conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
+    endif
+    return conda_env
+enddef
+
+augroup CONDA_ENV
+    autocmd!
+    autocmd BufEnter,BufWinEnter * b:conda_env = Conda_env()
+augroup END
+
+
 # vim-airline show buffers
 g:airline#extensions#tabline#enabled = 1
 g:airline#extensions#tabline#formatter = 'unique_tail'
 g:airline#extensions#tabline#ignore_bufadd_pat =
     'defx|gundo|nerd_tree|startify|tagbar|undotree|vimfiler'
-# If mode()==t then change the statusline
 au User AirlineAfterInit g:airline_section_a = airline#section#create(['
             \ %{b:git_branch}'])
 au User AirlineAfterInit g:airline_section_b = airline#section#create(['%f'])
@@ -261,7 +244,7 @@ au User AirlineAfterInit g:airline_section_b = airline#section#create(['%f'])
 au User AirlineAfterInit g:airline_section_z = airline#section#create(['col:
             \ %v'])
 au User AirlineAfterInit g:airline_section_x =
-            \ airline#section#create([g:conda_env])
+            \ airline#section#create(['%{b:conda_env}'])
 g:airline_extensions = ['ale', 'tabline']
 
 
@@ -338,11 +321,11 @@ command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 
 # This command definition includes -bar, so that it is possible to "chain" Vim commands.
 # Side effect: double quotes can't be used in external commands
-command! -nargs=1 -complete=command -bar -range Redir silent call Redir(<q-args>, <range>, <line1>, <line2>)
+# command! -nargs=1 -complete=command -bar -range Redir silent call myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
 # This command definition doesn't include -bar, so that it is possible to use double quotes in external commands.
 # Side effect: Vim commands can't be "chained".
-command! -nargs=1 -complete=command -range Redir silent call Redir(<q-args>, <range>, <line1>, <line2>)
+command! -nargs=1 -complete=command -range Redir silent call myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
 # Source additional files
 # source $HOME/PE.vim
@@ -353,6 +336,7 @@ command! -nargs=1 -complete=command -range Redir silent call Redir(<q-args>, <ra
 # g:replica_console_position = "R"
 # g:replica_console_width = 30
 # g:outline_autoclose = false
+g:replica_jupyter_console_options = "--config ~/.jupyter/jupyter_console_config.py"
 
 syntax on
 
@@ -364,7 +348,7 @@ syntax on
 augroup remove_trailing_whitespaces
     autocmd!
     autocmd BufWritePre * if !&binary
-                \ | :call myfunctions#TrimWhitespace() |
+                \ | :call myfunctions.TrimWhitespace() |
                 \ endif
 augroup END
 
@@ -388,10 +372,10 @@ augroup Gitget
 augroup END
 
 # git add -u && git commit -m "."
-command! GitCommitDot :call myfunctions#CommitDot()
-command! GitPushDot :call myfunctions#PushDot()
+command! GitCommitDot :call myfunctions.CommitDot()
+command! GitPushDot :call myfunctions.PushDot()
 # Merge and diff
-command! -nargs=? Diff :call myfunctions#Diff(<q-args>)
+command! -nargs=? Diff :call myfunctions.Diff(<q-args>)
 nnoremap dn ]c
 nnoremap dN [c
 
