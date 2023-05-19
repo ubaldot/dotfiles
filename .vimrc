@@ -149,46 +149,26 @@ exe "cabbrev vter vert botright terminal " .. &shell
 # PLUGIN STUFF
 # ============================
 
-# Stuff to be run before loading plugins
-# Use the internal autocompletion (no deoplete, no asyncomplete plugins)
-var ale = false
-if ale
-    g:ale_completion_enabled = 1
-    g:ale_completion_autoimport = 1
-endif
-# Omnifunc is kinda disabled so I don't have to hit <c-x><c-o> for getting
-# suggestions
-# set omnifunc=ale#completion#OmniFunc
-# set omnifunc=syntaxcomplete#Complete
-# let g:ale_disable_lsp = 1
-
-
-# ============================================
-# Plugins  manager
-# ============================================
+# -------------------------------------
+# vim-plug
+# -------------------------------------
 plug#begin(g:dotvim .. "/plugins/")
-# Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
+Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-if ale
-   Plug 'dense-analysis/ale'
-endif
 Plug 'preservim/nerdtree'
 Plug 'machakann/vim-highlightedyank'
 # Plug 'cjrh/vim-conda'
-# Plug 'ap/vim-buftabline'
 Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
-# # Plug 'yegappan/fileselect'
 # # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
 # # Plug 'tpope/vim-scriptease'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
-# Plug 'vim-airline/vim-airline'
 plug#end()
 # filetype plugin indent on
-autocmd FileType nerdtree setlocal nolist
+syntax on
 # ============================================
 # Plugins settings
 # ============================================
@@ -247,7 +227,7 @@ augroup CONDA_ENV
     autocmd BufEnter,BufWinEnter * g:conda_env = Conda_env()
 augroup END
 
-augroup UpdateDiag
+augroup LSP_DIAG
     autocmd!
     autocmd BufEnter *  b:num_warnings = 0 | b:num_errors = 0
     autocmd User LspDiagsUpdated b:num_warnings = lsp#lsp#ErrorCount()['Warn']
@@ -272,6 +252,7 @@ set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
 
 
 # NERDTree
+autocmd FileType nerdtree setlocal nolist
 nnoremap <F1> :NERDTreeToggle<cr>
 augroup DIRCHANGE
     autocmd!
@@ -284,84 +265,55 @@ g:NERDTreeQuitOnOpen = 1
 
 # LSP
 # TODO: Change with change conda environment
+
+command MyCommand :echom 'bar' | doautocmd User MyCommand
+
+augroup TEST
+    autocmd!
+    autocmd User MyCommand :echom 'foo'
+augroup END
+
+augroup TEST
+    autocmd!
+    autocmd User MyCommand :echom 'baz'
+augroup END
+
+
+# This json-like style to encode configs like
+# pylsp.plugins.pycodestyle.enabled = true
+var pylsp_config = {
+    'pylsp': {
+        'plugins': {
+            'pycodestyle': {
+                'enabled': v:false},
+            'pyflakes': {
+                'enabled': v:false},
+            'pydocstyle': {
+                'enabled': v:false},
+            'autopep8': {
+                'enabled': v:false}, }, }, }
+
+
 var lspServers = [
-	\     {
-	\	 'name': 'pylsp',
-	\	 'filetype': ['python'],
-	\	 'path': trim(system('where pylsp')),
-	\      }
-	\   ]
+            \     {
+            \	 'name': 'pylsp',
+            \	 'filetype': ['python'],
+            \	 'path': trim(system('where pylsp')),
+            \    'workspaceConfig': pylsp_config,
+            \      }
+            \   ]
 autocmd VimEnter * :call LspAddServer(lspServers)
 
 # let lspOpts = {'autoHighlightDiags': v:true}
 # autocmd VimEnter * call LspOptionsSet(lspOpts)
 
-# ALE
-# If you want clangd as LSP add it to the linter list.
-if ale
-    g:ale_completion_max_suggestions = 1000
-    g:ale_floating_preview = 1
-    g:ale_virtualtext_cursor = 0
-    nnoremap <silent> <leader>p <Plug>(ale_previous_wrap)
-    nnoremap <silent> <leader>n <Plug>(ale_next_wrap)
-    nnoremap <silent> <leader>k <Plug>(ale_hover)
-    nnoremap <silent> <leader>f :ALEFindReferences<cr>
-    nnoremap <silent> <leader>g :ALEGoToDefinition<cr>
-
-    g:ale_linters = {
-        'c': ['clangd', 'cppcheck', 'gcc'],
-        'python': ['flake8', 'pylsp', 'mypy'],
-        'tex': ['texlab', 'writegood'],
-        'text': ['writegood']}
-# You must change the following line if you change LaTeX project folder
-    g:ale_lsp_root = {'texlab': '~'}
-
-    g:ale_echo_msg_error_str = 'E'
-    g:ale_echo_msg_warning_str = 'W'
-    g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-    g:ale_c_clangtidy_checks = ['*']
-    g:ale_python_flake8_options = '--ignore=E501,W503'
-# g:ale_python_pyright_config = {
-#             .. 'pyright': {
-#             ..   "extraPaths": "C:/VAS/github/dymoval",
-#             .. },
-#             .. }
-
-# I don't remember how to set the following
-    g:ale_python_pylsp_config = {
-        'pylsp': {
-            'plugins': {
-                'pycodestyle': {
-                    'enabled': v:false},
-                'pyflakes': {
-                    'enabled': v:false},
-                'pydocstyle': {
-                    'enabled': v:false},
-                'autopep8': {
-                    'enabled': v:false}, }, }, }
-
-
-# ALE Fixers
-    g:ale_fixers = {
-        'c': ['clang-format', 'remove_trailing_lines',
-            'trim_whitespace'],
-        'cpp': ['clang-format'],
-        'python': ['remove_trailing_lines', 'trim_whitespace',
-            'autoflake', 'black']}
-
-    g:ale_python_autoflake_options = '--in-place --remove-unused-variables
-                \ --remove-all-unused-imports'
-    g:ale_python_black_options = '--line-length=80'
-    g:ale_fix_on_save = 1
-else
-    nnoremap <silent> <leader>N :LspDiagPrev<cr>
-    nnoremap <silent> <leader>n :LspDiagNext<cr>
-    nnoremap <silent> <leader>i :LspGotoImpl<cr>
-    nnoremap <silent> <leader>d :LspGotoDefinition<cr>
-    nnoremap <silent> <leader>h :LspDiagCurrent<cr>
-    nnoremap <silent> <leader>k :LspHover<cr>
-    nnoremap <silent> <leader>r :LspPeekReferences<cr>
-endif
+nnoremap <silent> <leader>N :LspDiagPrev<cr>
+nnoremap <silent> <leader>n :LspDiagNext<cr>
+nnoremap <silent> <leader>i :LspGotoImpl<cr>
+nnoremap <silent> <leader>g :LspGotoDefinition<cr>
+nnoremap <silent> <leader>d :LspDiagCurrent<cr>
+nnoremap <silent> <leader>k :LspHover<cr>
+nnoremap <silent> <leader>r :LspPeekReferences<cr>
 
 
 # HelpMe files for my poor memory
@@ -377,13 +329,17 @@ command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 
 # Utils commands
 
-# This command definition includes -bar, so that it is possible to "chain" Vim commands.
+# This command definition includes -bar, so that it is possible to "chain" Vim
+# commands.
 # Side effect: double quotes can't be used in external commands
-# command! -nargs=1 -complete=command -bar -range Redir silent call myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
+# command! -nargs=1 -complete=command -bar -range Redir silent call
+# myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
-# This command definition doesn't include -bar, so that it is possible to use double quotes in external commands.
+# This command definition doesn't include -bar, so that it is possible to use
+# double quotes in external commands.
 # Side effect: Vim commands can't be "chained".
-command! -nargs=1 -complete=command -range Redir silent call myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
+command! -nargs=1 -complete=command -range Redir
+            \ silent call myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
 # Source additional files
 # source $HOME/PE.vim
@@ -394,9 +350,10 @@ command! -nargs=1 -complete=command -range Redir silent call myfunctions.Redir(<
 # g:replica_console_position = "R"
 # g:replica_console_width = 30
 # g:outline_autoclose = false
-g:replica_jupyter_console_options = "--config ~/.jupyter/jupyter_console_config.py"
+g:replica_python_options = "-Xfrozen_modules=off"
+g:replica_jupyter_console_options = {"python":
+            \ " --config ~/.jupyter/jupyter_console_config.py"}
 
-syntax on
 
 
 # ============================================
@@ -446,6 +403,7 @@ command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
 # -----------------------------------------------
 #  Buftabline
 # -----------------------------------------------
+# OBS you need to remove :set guioptions-=e
 # set showtabline=2
 
 # def g:SpawnBufferLine(): string
@@ -467,7 +425,8 @@ command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
 #       # If the buffer is modified, add + and separator. Else, add separator
 #       s ..= (getbufvar(i, "&modified")) ? (' [+] | ') : (' | ')
 #     else
-#       s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only flag
+#       s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only
+#       flag
 #     endif
 #   endfor
 #   s = $'{s}%#TabLineFill#%T'  # Reset highlight
