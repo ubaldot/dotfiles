@@ -44,6 +44,8 @@ augroup ReloadVimScripts
 augroup END
 # Internal vim variables aka 'options'
 set encoding=utf-8
+# Set terminal with 256 colors
+set termguicolors
 set autoread
 set number
 # set relativenumber
@@ -56,7 +58,7 @@ set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
 set clipboard=unnamed
-set splitright
+# set splitright
 set splitbelow
 set laststatus=2
 set incsearch # for displaying while searching
@@ -84,13 +86,14 @@ map <leader>vv :e $MYVIMRC<CR>
 nnoremap x "_x
 nnoremap <leader>w :bp<cr>:bw! #<cr>
 nnoremap <leader>b :ls!<CR>:b
-# nnoremap <S-Tab> <Plug>Bufselect_Toggle
+nnoremap <C-Tab> <Plug>Bufselect_Toggle
 # nnoremap <C-Tab> <Plug>(FileselectToggle)
 nnoremap <S-Tab> :bnext<CR>
 nnoremap <leader>c :close<cr>
 noremap <c-PageDown> :bprev<CR>
 noremap <c-PageUp> :bnext<CR>
 # Switch window
+# nnoremap <C-w>w :bp<cr>:bw! #<cr>
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
@@ -135,7 +138,8 @@ tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
 # tnoremap <c-PageDown> <c-w>:bprev<CR>
-# tnoremap <c-PageUp> <c-w>:bnext<CR>
+tnoremap <S-tab> <c-w>:bnext<CR>
+tnoremap <C-Tab> <Plug>Bufselect_Toggle
 
 # Open terminal below all windows
 exe "cabbrev bter bo terminal " .. &shell
@@ -147,8 +151,11 @@ exe "cabbrev vter vert botright terminal " .. &shell
 
 # Stuff to be run before loading plugins
 # Use the internal autocompletion (no deoplete, no asyncomplete plugins)
-g:ale_completion_enabled = 1
-g:ale_completion_autoimport = 1
+var ale = false
+if ale
+    g:ale_completion_enabled = 1
+    g:ale_completion_autoimport = 1
+endif
 # Omnifunc is kinda disabled so I don't have to hit <c-x><c-o> for getting
 # suggestions
 # set omnifunc=ale#completion#OmniFunc
@@ -160,23 +167,25 @@ g:ale_completion_autoimport = 1
 # Plugins  manager
 # ============================================
 plug#begin(g:dotvim .. "/plugins/")
-Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
+# Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-Plug 'dense-analysis/ale'
+if ale
+   Plug 'dense-analysis/ale'
+endif
 Plug 'preservim/nerdtree'
 Plug 'machakann/vim-highlightedyank'
-Plug 'cjrh/vim-conda'
-# Plug 'ubaldot/vim-conda'
-# Plug 'yegappan/bufselect'
-# Plug 'yegappan/fileselect'
-# Plug 'ludovicchabant/vim-gutentags'
+# Plug 'cjrh/vim-conda'
+# Plug 'ap/vim-buftabline'
+Plug 'yegappan/bufselect'
+Plug 'yegappan/lsp'
+# # Plug 'yegappan/fileselect'
+# # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
-# Plug 'tpope/vim-scriptease'
+# # Plug 'tpope/vim-scriptease'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
-Plug 'vim-airline/vim-airline'
-# Plug 'ryanoasis/vim-devicons'
+# Plug 'vim-airline/vim-airline'
 plug#end()
 # filetype plugin indent on
 autocmd FileType nerdtree setlocal nolist
@@ -186,13 +195,83 @@ autocmd FileType nerdtree setlocal nolist
 
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 6 || 21 < hour
+if hour < 6 || 12 < hour
     set background=dark
-    # g:airline_theme = 'dark'
 endif
 colorscheme everforest
 g:airline_theme = 'everforest'
 
+# -----------------------------------------------
+# statusline
+# -----------------------------------------------
+# var palette = everforest#get_palette(&background, {})
+# echom palette
+
+set laststatus=2
+set statusline=
+
+# Get git branch name for statusline.
+# OBS !It may need to be changed for other OS.
+def Get_gitbranch(): string
+    var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
+                \ --show-current"))
+    # strdix(A,B) >=0 check if B is in A.
+    if stridx(current_branch, "not a git repository") >= 0
+        current_branch = "(no repo)"
+    endif
+    return current_branch
+enddef
+
+# TODO: test with two files on different repo on different branches
+augroup Gitget
+    autocmd!
+    autocmd BufEnter,BufWinEnter * b:gitbranch = Get_gitbranch()
+    # autocmd VimEnter * b:gitbranch = "(no repo)"
+augroup END
+
+
+def Conda_env(): string
+    var conda_env = "base"
+    if has("gui_win32") || has("win32")
+        conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
+    elseif has("mac") && exists("$CONDA_DEFAULT_ENV")
+        conda_env = $CONDA_DEFAULT_ENV
+        # system() open a new shell and by default is 'base'.
+        # conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
+    endif
+    return conda_env
+enddef
+
+augroup CONDA_ENV
+    autocmd!
+    autocmd BufEnter,BufWinEnter * g:conda_env = Conda_env()
+augroup END
+
+augroup UpdateDiag
+    autocmd!
+    autocmd BufEnter *  b:num_warnings = 0 | b:num_errors = 0
+    autocmd User LspDiagsUpdated b:num_warnings = lsp#lsp#ErrorCount()['Warn']
+                \ | b:num_errors = lsp#lsp#ErrorCount()['Error']
+augroup END
+
+# Anatomy of the statusline:
+# Start of highlighting	- Dynamic content - End of highlighting
+# %#IsModified#	- %{&mod?expand('%'):''} - %*
+
+# Left side
+set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
+set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
+set statusline+=%#StatusLine#\ %t(%n)%m\ %*
+# Right side
+set statusline+=%=
+set statusline+=%#StatusLine#\ %y\ %*
+set statusline+=%#StatusLineNC#\ col:%c\ %*
+# Add some conditionals here bitch!
+set statusline+=%#Visual#\ W:\ %{b:num_warnings}\ %*
+set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
+
+
+# NERDTree
 nnoremap <F1> :NERDTreeToggle<cr>
 augroup DIRCHANGE
     autocmd!
@@ -203,75 +282,45 @@ augroup END
 g:NERDTreeQuitOnOpen = 1
 
 
-# TODO: the following won't work
-# import autoload g:dotvim .. "/plugins/vim-outline/lib/outline.vim"
-# augroup OUTLINE
-#     autocmd!
-#     autocmd VimEnter * :call outline.RefreshWindow()
-# augroup END
-# # # import g:dotvim .. "/plugins/vim-outline/lib/outline.vim"
-# # echo outline.RefreshWindow()
-# call airline#parts#define_function('outl', 'RefreshWindow')
+# LSP
+# TODO: Change with change conda environment
+var lspServers = [
+	\     {
+	\	 'name': 'pylsp',
+	\	 'filetype': ['python'],
+	\	 'path': trim(system('where pylsp')),
+	\      }
+	\   ]
+autocmd VimEnter * :call LspAddServer(lspServers)
 
-def Conda_env(): string
-    var conda_env = "base"
-    if has("gui_win32") || has("win32")
-        conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
-    elseif has("mac")
-        conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
-    endif
-    return conda_env
-enddef
-
-augroup CONDA_ENV
-    autocmd!
-    autocmd BufEnter,BufWinEnter * b:conda_env = Conda_env()
-augroup END
-
-
-# vim-airline show buffers
-g:airline#extensions#tabline#enabled = 1
-g:airline#extensions#tabline#formatter = 'unique_tail'
-g:airline#extensions#tabline#ignore_bufadd_pat =
-    'defx|gundo|nerd_tree|startify|tagbar|undotree|vimfiler'
-au User AirlineAfterInit g:airline_section_a = airline#section#create(['
-            \ %{b:git_branch}'])
-au User AirlineAfterInit g:airline_section_b = airline#section#create(['%f'])
-# au User AirlineAfterInit g:airline_section_c =
-# airline#section#create(['f:%{NearestMethodOrFunction()}'])
-# au User AirlineAfterInit g:airline_section_c =
-# airline#section#create(['outl'])
-au User AirlineAfterInit g:airline_section_z = airline#section#create(['col:
-            \ %v'])
-au User AirlineAfterInit g:airline_section_x =
-            \ airline#section#create(['%{b:conda_env}'])
-g:airline_extensions = ['ale', 'tabline']
-
+# let lspOpts = {'autoHighlightDiags': v:true}
+# autocmd VimEnter * call LspOptionsSet(lspOpts)
 
 # ALE
 # If you want clangd as LSP add it to the linter list.
-g:ale_completion_max_suggestions = 1000
-g:ale_floating_preview = 1
-nnoremap <silent> <leader>p <Plug>(ale_previous_wrap)
-nnoremap <silent> <leader>n <Plug>(ale_next_wrap)
-nnoremap <silent> <leader>k <Plug>(ale_hover)
-nnoremap <silent> <leader>r :ALEFindReferences<cr>
-nnoremap <silent> <leader>g :ALEGoToDefinition<cr>
+if ale
+    g:ale_completion_max_suggestions = 1000
+    g:ale_floating_preview = 1
+    g:ale_virtualtext_cursor = 0
+    nnoremap <silent> <leader>p <Plug>(ale_previous_wrap)
+    nnoremap <silent> <leader>n <Plug>(ale_next_wrap)
+    nnoremap <silent> <leader>k <Plug>(ale_hover)
+    nnoremap <silent> <leader>f :ALEFindReferences<cr>
+    nnoremap <silent> <leader>g :ALEGoToDefinition<cr>
 
-
-g:ale_linters = {
-    'c': ['clangd', 'cppcheck', 'gcc'],
-    'python': ['flake8', 'pylsp', 'mypy'],
-    'tex': ['texlab', 'writegood'],
-    'text': ['writegood']}
+    g:ale_linters = {
+        'c': ['clangd', 'cppcheck', 'gcc'],
+        'python': ['flake8', 'pylsp', 'mypy'],
+        'tex': ['texlab', 'writegood'],
+        'text': ['writegood']}
 # You must change the following line if you change LaTeX project folder
-g:ale_lsp_root = {'texlab': '~'}
+    g:ale_lsp_root = {'texlab': '~'}
 
-g:ale_echo_msg_error_str = 'E'
-g:ale_echo_msg_warning_str = 'W'
-g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-g:ale_c_clangtidy_checks = ['*']
-g:ale_python_flake8_options = '--ignore=E501,W503'
+    g:ale_echo_msg_error_str = 'E'
+    g:ale_echo_msg_warning_str = 'W'
+    g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+    g:ale_c_clangtidy_checks = ['*']
+    g:ale_python_flake8_options = '--ignore=E501,W503'
 # g:ale_python_pyright_config = {
 #             .. 'pyright': {
 #             ..   "extraPaths": "C:/VAS/github/dymoval",
@@ -279,31 +328,40 @@ g:ale_python_flake8_options = '--ignore=E501,W503'
 #             .. }
 
 # I don't remember how to set the following
-g:ale_python_pylsp_config = {
-    'pylsp': {
-        'plugins': {
-            'pycodestyle': {
-                'enabled': v:false},
-            'pyflakes': {
-                'enabled': v:false},
-            'pydocstyle': {
-                'enabled': v:false},
-            'autopep8': {
-                'enabled': v:false}, }, }, }
+    g:ale_python_pylsp_config = {
+        'pylsp': {
+            'plugins': {
+                'pycodestyle': {
+                    'enabled': v:false},
+                'pyflakes': {
+                    'enabled': v:false},
+                'pydocstyle': {
+                    'enabled': v:false},
+                'autopep8': {
+                    'enabled': v:false}, }, }, }
 
 
 # ALE Fixers
-g:ale_fixers = {
-    'c': ['clang-format', 'remove_trailing_lines',
-        'trim_whitespace'],
-    'cpp': ['clang-format'],
-    'python': ['remove_trailing_lines', 'trim_whitespace',
-        'autoflake', 'black']}
+    g:ale_fixers = {
+        'c': ['clang-format', 'remove_trailing_lines',
+            'trim_whitespace'],
+        'cpp': ['clang-format'],
+        'python': ['remove_trailing_lines', 'trim_whitespace',
+            'autoflake', 'black']}
 
-g:ale_python_autoflake_options = '--in-place --remove-unused-variables
-            \ --remove-all-unused-imports'
-g:ale_python_black_options = '--line-length=80'
-g:ale_fix_on_save = 1
+    g:ale_python_autoflake_options = '--in-place --remove-unused-variables
+                \ --remove-all-unused-imports'
+    g:ale_python_black_options = '--line-length=80'
+    g:ale_fix_on_save = 1
+else
+    nnoremap <silent> <leader>N :LspDiagPrev<cr>
+    nnoremap <silent> <leader>n :LspDiagNext<cr>
+    nnoremap <silent> <leader>i :LspGotoImpl<cr>
+    nnoremap <silent> <leader>d :LspGotoDefinition<cr>
+    nnoremap <silent> <leader>h :LspDiagCurrent<cr>
+    nnoremap <silent> <leader>k :LspHover<cr>
+    nnoremap <silent> <leader>r :LspPeekReferences<cr>
+endif
 
 
 # HelpMe files for my poor memory
@@ -353,23 +411,6 @@ augroup remove_trailing_whitespaces
 augroup END
 
 
-# Get git branch name for airline. OBS !It may need to be changed for other
-# OS.
-def Get_gitbranch(): string
-    var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
-                \ --show-current"))
-    # strdix(A,B) >=0 check if B is in A.
-    if stridx(current_branch, "not a git repository") >= 0
-        current_branch = "(no repo)"
-    endif
-    return current_branch
-enddef
-
-# TODO: test with two files on different repo on different branches
-augroup Gitget
-    autocmd!
-    autocmd BufEnter,BufWinEnter * b:git_branch = Get_gitbranch()
-augroup END
 
 # git add -u && git commit -m "."
 command! GitCommitDot :call myfunctions.CommitDot()
@@ -401,3 +442,85 @@ command ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
 command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
 command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
 command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
+
+# -----------------------------------------------
+#  Buftabline
+# -----------------------------------------------
+# set showtabline=2
+
+# def g:SpawnBufferLine(): string
+#   var s = ' hello r/vim | '
+
+#   # Get the list of buffers. Use bufexists() to include hidden buffers
+#   var bufferNums = filter(range(1, bufnr('$')), 'buflisted(v:val)')
+#   # Making a buffer list on the left side
+#   for i in bufferNums
+#     # Highlight with yellow if it's the current buffer
+#     s ..= (i == bufnr()) ? ('%#TabLineSel#') : ('%#TabLine#')
+#     s = $'{s}{i} '		# Append the buffer number
+#     if bufname(i) == ''
+#       s = $'{s}[NEW]'		# Give a name to a new buffer
+#     endif
+#     if getbufvar(i, '&modifiable')
+#       s ..= fnamemodify(bufname(i), ':t')	# Append the file name
+#       # s ..= pathshorten(bufname(i))  # Use this if you want a trimmed path
+#       # If the buffer is modified, add + and separator. Else, add separator
+#       s ..= (getbufvar(i, "&modified")) ? (' [+] | ') : (' | ')
+#     else
+#       s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only flag
+#     endif
+#   endfor
+#   s = $'{s}%#TabLineFill#%T'  # Reset highlight
+
+#   s = $'{s}%='			# Spacer
+#   echom "s: " .. s
+
+# #   # Making a tab list on the right side
+# #   for i in range(1, tabpagenr('$'))  # Loop through the number of tabs
+# #     # Highlight with yellow if it's the current tab
+# #     s ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
+# #     s = $'{s}%{i}T '		# set the tab page number (for mouse clicks)
+# #     s = $'{s}{i}'		# set page number string
+# #   endfor
+# #   s = $'{s}%#TabLineFill#%T'	# Reset highlight
+
+# #   # Close button on the right if there are multiple tabs
+# #   if tabpagenr('$') > 1
+# #     s = $'{s}%999X X'
+# #   endif
+
+#   return s
+# enddef
+
+# # set tabline=%!SpawnBufferLine()  # Assign the tabline
+# set guitablabel=%!SpawnBufferLine()  # Assign the tabline
+# -----------------------------------------------
+
+# def g:GuiTabLabel(): string
+#   var label = ''
+#   var bufnrlist = tabpagebuflist(v:lnum)
+#   echom "bufnrlist: " .. string(bufnrlist)
+
+#   # Add '+' if one of the buffers in the tab page is modified
+#   for bufnr in bufnrlist
+#     if getbufvar(bufnr, "&modified")
+#       label = '+'
+#       break
+#     endif
+#   endfor
+
+#   # Append the number of windows in the tab page if more than one
+#   var wincount = tabpagewinnr(v:lnum, '$')
+#   if wincount > 1
+#     label ..= wincount
+#   endif
+#   if label != ''
+#     label ..= ' '
+#   endif
+
+#   # Append the buffer name
+#   return label .. bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
+# enddef
+
+# set guitablabel=%{GuiTabLabel()}
+# -----------------------------------------------
