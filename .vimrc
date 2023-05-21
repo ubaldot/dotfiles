@@ -42,6 +42,11 @@ augroup ReloadVimScripts
     autocmd BufWritePost *.vim,*.vimrc,*.gvimrc exe "source %" # | echo
                 \ expand('%:t') .. " reloaded."
 augroup END
+
+augroup vimrc_help
+  autocmd!
+  autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
+augroup END
 # Internal vim variables aka 'options'
 set encoding=utf-8
 # Set terminal with 256 colors
@@ -81,17 +86,17 @@ set diffopt+=vertical
 # Some key bindings
 # =====================================================
 g:mapleader = ","
-map <leader>vr :source $MYVIMRC<CR> \| :echo ".vimrc reloaded."
-map <leader>vv :e $MYVIMRC<CR>
+map <leader>vr <Cmd>source $MYVIMRC<CR> \| <Cmd>echo ".vimrc reloaded."
+map <leader>vv <Cmd>e $MYVIMRC<CR>
 nnoremap x "_x
-nnoremap <leader>w :bp<cr>:bw! #<cr>
-nnoremap <leader>b :ls!<CR>:b
+nnoremap <leader>w <Cmd>bp<cr><Cmd>bw! #<cr>
+nnoremap <leader>b <Cmd>ls!<CR><Cmd>b
 nnoremap <C-Tab> <Plug>Bufselect_Toggle
 # nnoremap <C-Tab> <Plug>(FileselectToggle)
-nnoremap <S-Tab> :bnext<CR>
-nnoremap <leader>c :close<cr>
-noremap <c-PageDown> :bprev<CR>
-noremap <c-PageUp> :bnext<CR>
+nnoremap <S-Tab> <Cmd>bnext<CR>
+nnoremap <leader>c <Cmd>close<cr>
+noremap <c-PageDown> <Cmd>bprev<CR>
+noremap <c-PageUp> <Cmd>bnext<CR>
 # Switch window
 # nnoremap <C-w>w :bp<cr>:bw! #<cr>
 nnoremap <c-h> <c-w>h
@@ -99,8 +104,8 @@ nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 # Switch window with arrows
-nnoremap <c-Left> :wincmd h<cr>
-nnoremap <c-Right> :wincmd l<cr>
+nnoremap <c-Left> <Cmd>wincmd h<cr>
+nnoremap <c-Right> <Cmd>wincmd l<cr>
 
 # super quick search and replace:
 nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<CR>\>/
@@ -157,15 +162,17 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'preservim/nerdtree'
 Plug 'machakann/vim-highlightedyank'
-# Plug 'cjrh/vim-conda'
+Plug 'cjrh/vim-conda'
 Plug 'yegappan/bufselect'
-Plug 'yegappan/lsp'
+# Plug 'yegappan/lsp'
+Plug 'ubaldot/lsp'
 # # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
 # # Plug 'tpope/vim-scriptease'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
+Plug 'ubaldot/vim-writegood'
 plug#end()
 # filetype plugin indent on
 syntax on
@@ -175,8 +182,10 @@ syntax on
 
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 6 || 12 < hour
+if hour < 12 || 19 < hour
     set background=dark
+else
+    set background=light
 endif
 colorscheme everforest
 g:airline_theme = 'everforest'
@@ -295,25 +304,28 @@ var pylsp_config = {
 
 
 var lspServers = [
-            \     {
-            \	 'name': 'pylsp',
-            \	 'filetype': ['python'],
-            \	 'path': trim(system('where pylsp')),
-            \    'workspaceConfig': pylsp_config,
-            \      }
-            \   ]
+                 {
+            	 name: 'pylsp',
+            	 filetype: ['python'],
+            	 path: trim(system('where pylsp')),
+                 workspaceConfig: pylsp_config,
+                  },
+               ]
 autocmd VimEnter * :call LspAddServer(lspServers)
 
-# let lspOpts = {'autoHighlightDiags': v:true}
-# autocmd VimEnter * call LspOptionsSet(lspOpts)
+var lspOpts = {'showDiagOnStatusLine': v:true}
+autocmd VimEnter * call LspOptionsSet(lspOpts)
+highlight link LspDiagLine NONE
 
-nnoremap <silent> <leader>N :LspDiagPrev<cr>
-nnoremap <silent> <leader>n :LspDiagNext<cr>
-nnoremap <silent> <leader>i :LspGotoImpl<cr>
-nnoremap <silent> <leader>g :LspGotoDefinition<cr>
-nnoremap <silent> <leader>d :LspDiagCurrent<cr>
-nnoremap <silent> <leader>k :LspHover<cr>
-nnoremap <silent> <leader>r :LspPeekReferences<cr>
+# hlset([{name: 'LspDiagLine', linksto: 'None'}])
+
+nnoremap <silent> <buffer> <leader>N <Cmd>LspDiagPrev<cr>
+nnoremap <silent> <buffer> <leader>n <Cmd>LspDiagNext<cr>
+nnoremap <silent> <buffer> <leader>i <Cmd>LspGotoImpl<cr>
+nnoremap <silent> <buffer> <leader>g <Cmd>LspGotoDefinition<cr>
+nnoremap <silent> <buffer> <leader>d <Cmd>LspDiagCurrent<cr>
+nnoremap <silent> <buffer> <leader>k <Cmd>LspHover<cr>
+nnoremap <silent> <buffer> <leader>r <Cmd>LspPeekReferences<cr>
 
 
 # HelpMe files for my poor memory
@@ -341,14 +353,17 @@ command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 command! -nargs=1 -complete=command -range Redir
             \ silent call myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
+# command! WriteGood :Redir exe "!write-good " .. expand('%')
+# echo system("write-good " .. expand('%'))
+
 # Source additional files
 # source $HOME/PE.vim
 # source $HOME/VAS.vim
 # source $HOME/dymoval.vim
 
-# sci-vim-repl stuff
-# g:replica_console_position = "R"
-# g:replica_console_width = 30
+# vim-replica stuff
+g:replica_console_position = "J"
+g:replica_console_height = 10
 # g:outline_autoclose = false
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
