@@ -1,15 +1,8 @@
 vim9script
 
-# Some good VIM notes
-# ======================
+# -----------------------------------
 # This file is sourced AFTER .vimrc
-# ==========================
-
-# The following does not work
-# !echo $CONDA_DEFAULT_ENV won't show anything
-# call system('source ~/.zshrc')
-# call system('conda activate myenv')
-
+# -----------------------------------
 set mousehide
 
 # Set fonts for gvim
@@ -39,14 +32,3 @@ enddef
 # Some key bindings
 nnoremap  <c-c><c-i> :call g:ChangeFontsize(1)<cr>
 nnoremap  <c-c><c-o> :call g:ChangeFontsize(-1)<cr>
-
-# nnoremap <C-c><c-i> :silent! let &guifont = substitute(
-#  \ &guifont,
-#  \ ':h\zs\d\+',
-#  \ '\=eval(submatch(0)+1)',
-#  \ '')<CR>
-# nnoremap <C-c><c-o> :silent! let &guifont = substitute(
-#  \ &guifont,
-#  \ ':h\zs\d\+',
-#  \ '\=eval(submatch(0)-1)',
-#  \ '')<CR>
