@@ -5,6 +5,8 @@ vim9script
 # can open gvim from the shell of that virtual environment.
 # If you open gvim and then you activate an environment,
 # then things won't work!
+#
+# Otherwise use CondaChangeEnv or write your own plugin.
 # ==========================
 #
 #
@@ -12,11 +14,6 @@ vim9script
 # you can either use ctags or LSP.
 # gutentags automatically creates ctags as you open files
 # so you don't need to create them manually.
-# You need to activate vim omnicomplete though, which is disables
-# by default and you should disable LSP
-# Uncomment set omnifunc=... few lines below#
-#
-# :h user-manual is king.
 #
 # To activate myenv conda environment for MacVim
 
@@ -53,7 +50,6 @@ set encoding=utf-8
 set termguicolors
 set autoread
 set number
-# set relativenumber
 set nowrap
 set tabstop=4 softtabstop=4
 set shiftwidth=4
@@ -63,7 +59,6 @@ set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
 set clipboard=unnamed
-# set splitright
 set splitbelow
 set laststatus=2
 set incsearch # for displaying while searching
@@ -80,7 +75,6 @@ set textwidth=78
 set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
-# set autoshelldir
 
 # =====================================================
 # Some key bindings
@@ -90,11 +84,11 @@ map <leader>vr <Cmd>source $MYVIMRC<CR> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<CR>
 nnoremap x "_x
 nnoremap <leader>w <Cmd>bp<cr><Cmd>bw! #<cr>
-nnoremap <leader>b <Cmd>ls!<CR><Cmd>b
+nnoremap <leader>b <Cmd>ls!<CR>:b
 nnoremap <C-Tab> <Plug>Bufselect_Toggle
 # nnoremap <C-Tab> <Plug>(FileselectToggle)
 nnoremap <S-Tab> <Cmd>bnext<CR>
-nnoremap <leader>c <Cmd>close<cr>
+nnoremap <leader>c <C-w>c<cr>
 noremap <c-PageDown> <Cmd>bprev<CR>
 noremap <c-PageUp> <Cmd>bnext<CR>
 # Switch window
@@ -104,8 +98,8 @@ nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 # Switch window with arrows
-nnoremap <c-Left> <Cmd>wincmd h<cr>
-nnoremap <c-Right> <Cmd>wincmd l<cr>
+# nnoremap <c-Left> <C-w>h<cr>
+# nnoremap <c-Right> <C-w>l<cr>
 
 # super quick search and replace:
 nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<CR>\>/
@@ -120,18 +114,17 @@ xnoremap ] <ESC>`>a]<ESC>`<i[<ESC>
 xnoremap { <ESC>`>a}<ESC>`<i{<ESC>
 xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
 # Don't use the following otherwise you lose registers function!
-# xnoremap " <ESC>`>a"<ESC>`<i"<ESC>
 # Indent without leaving the cursor position
-nnoremap g= :vim9cmd b:temp = winsaveview()<CR>gg=G
-            \ :vim9cmd winrestview(b:temp)<cr>
-            \ :vim9cmd unlet b:temp<cr>
-            \ :echo "file indented"<CR>
+nnoremap g= <Cmd>vim9cmd b:temp = winsaveview()<CR>gg=G
+            \ <Cmd>vim9cmd winrestview(b:temp)<cr>
+            \ <Cmd>vim9cmd unlet b:temp<cr>
+            \ <Cmd>echo "file indented"<CR>
 
 # Format text
-nnoremap g- :vim9cmd b:temp = winsaveview()<CR>gggqG
-            \ :vim9cmd winrestview(b:temp)<cr>
-            \ :vim9cmd unlet b:temp<cr>
-            \ :echo "file formatted, textwidth: "
+nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<CR>gggqG
+            \ <Cmd>vim9cmd winrestview(b:temp)<cr>
+            \ <Cmd>vim9cmd unlet b:temp<cr>
+            \ <Cmd>echo "file formatted, textwidth: "
             \ .. &textwidth .. " cols."<cr>
 
 # Some terminal remapping
@@ -151,7 +144,7 @@ exe "cabbrev bter bo terminal " .. &shell
 exe "cabbrev vter vert botright terminal " .. &shell
 
 # ============================
-# PLUGIN STUFF
+# PLUGINS
 # ============================
 
 # -------------------------------------
@@ -164,8 +157,7 @@ Plug 'preservim/nerdtree'
 Plug 'machakann/vim-highlightedyank'
 Plug 'cjrh/vim-conda'
 Plug 'yegappan/bufselect'
-# Plug 'yegappan/lsp'
-Plug 'ubaldot/lsp'
+Plug 'yegappan/lsp'
 # # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
 # # Plug 'tpope/vim-scriptease'
@@ -182,7 +174,7 @@ syntax on
 
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 12 || 19 < hour
+if hour < 7 || 19 < hour
     set background=dark
 else
     set background=light
@@ -211,11 +203,9 @@ def Get_gitbranch(): string
     return current_branch
 enddef
 
-# TODO: test with two files on different repo on different branches
 augroup Gitget
     autocmd!
     autocmd BufEnter,BufWinEnter * b:gitbranch = Get_gitbranch()
-    # autocmd VimEnter * b:gitbranch = "(no repo)"
 augroup END
 
 
@@ -311,13 +301,11 @@ var lspServers = [
                  workspaceConfig: pylsp_config,
                   },
                ]
-autocmd VimEnter * :call LspAddServer(lspServers)
+autocmd VimEnter * g:LspAddServer(lspServers)
 
 var lspOpts = {'showDiagOnStatusLine': v:true}
-autocmd VimEnter * call LspOptionsSet(lspOpts)
+autocmd VimEnter * g:LspOptionsSet(lspOpts)
 highlight link LspDiagLine NONE
-
-# hlset([{name: 'LspDiagLine', linksto: 'None'}])
 
 nnoremap <silent> <buffer> <leader>N <Cmd>LspDiagPrev<cr>
 nnoremap <silent> <buffer> <leader>n <Cmd>LspDiagNext<cr>
@@ -340,21 +328,8 @@ command! VimHelpNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
 command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 
 # Utils commands
-
-# This command definition includes -bar, so that it is possible to "chain" Vim
-# commands.
-# Side effect: double quotes can't be used in external commands
-# command! -nargs=1 -complete=command -bar -range Redir silent call
-# myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
-
-# This command definition doesn't include -bar, so that it is possible to use
-# double quotes in external commands.
-# Side effect: Vim commands can't be "chained".
 command! -nargs=1 -complete=command -range Redir
-            \ silent call myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
-
-# command! WriteGood :Redir exe "!write-good " .. expand('%')
-# echo system("write-good " .. expand('%'))
+            \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
 # Source additional files
 # source $HOME/PE.vim
@@ -364,7 +339,6 @@ command! -nargs=1 -complete=command -range Redir
 # vim-replica stuff
 g:replica_console_position = "J"
 g:replica_console_height = 10
-# g:outline_autoclose = false
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
             \ " --config ~/.jupyter/jupyter_console_config.py"}
@@ -378,17 +352,17 @@ g:replica_jupyter_console_options = {"python":
 augroup remove_trailing_whitespaces
     autocmd!
     autocmd BufWritePre * if !&binary
-                \ | :call myfunctions.TrimWhitespace() |
+                \ | myfunctions.TrimWhitespace() |
                 \ endif
 augroup END
 
 
 
 # git add -u && git commit -m "."
-command! GitCommitDot :call myfunctions.CommitDot()
-command! GitPushDot :call myfunctions.PushDot()
+command! GitCommitDot myfunctions.CommitDot()
+command! GitPushDot myfunctions.PushDot()
 # Merge and diff
-command! -nargs=? Diff :call myfunctions.Diff(<q-args>)
+command! -nargs=? Diff myfunctions.Diff(<q-args>)
 nnoremap dn ]c
 nnoremap dN [c
 
