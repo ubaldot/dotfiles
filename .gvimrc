@@ -10,8 +10,6 @@ vim9script
 # call system('source ~/.zshrc')
 # call system('conda activate myenv')
 
-# Set terminal with 256 colors
-set termguicolors
 set mousehide
 
 # Set fonts for gvim
