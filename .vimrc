@@ -262,21 +262,6 @@ augroup END
 g:NERDTreeQuitOnOpen = 1
 
 
-# LSP
-# TODO: Change with change conda environment
-
-command MyCommand :echom 'bar' | doautocmd User MyCommand
-
-augroup TEST
-    autocmd!
-    autocmd User MyCommand :echom 'foo'
-augroup END
-
-augroup TEST
-    autocmd!
-    autocmd User MyCommand :echom 'baz'
-augroup END
-
 
 # This json-like style to encode configs like
 # pylsp.plugins.pycodestyle.enabled = true
@@ -326,6 +311,8 @@ command! VimHelpSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
 command! VimHelpAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
 command! VimHelpNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
 command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
+
+command! ColorToggle myfunctions.ColorsToggle()
 
 # Utils commands
 command! -nargs=1 -complete=command -range Redir
