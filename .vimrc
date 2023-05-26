@@ -1,38 +1,22 @@
 vim9script
 #=====================
-# OBS! If using Python, you first need to
-# activate a virtual environment and then you
-# can open gvim from the shell of that virtual environment.
-# If you open gvim and then you activate an environment,
-# then things won't work!
-#
-# Otherwise use CondaChangeEnv or write your own plugin.
-# ==========================
-#
-#
 # For auto-completion, jumps to definitions, etc
 # you can either use ctags or LSP.
 # gutentags automatically creates ctags as you open files
 # so you don't need to create them manually.
 #
-# To activate myenv conda environment for MacVim
 
 import "./.vim/lib/myfunctions.vim"
 
-if has("mac")
-    system("source ~/.zshrc")
-endif
-
 if has("gui_win32") || has("win32")
     g:dotvim = $HOME .. "\\vimfiles"
-    set pythonthreehome=$HOME."\\Miniconda3"
-    set pythonthreedll=$HOME."\\Miniconda3\\python39.dll"
+    set pythonthreehome=$HOME .. "\\Miniconda3"
+    set pythonthreedll=$HOME.. "\\Miniconda3\\python39.dll"
 elseif has("mac")
     g:dotvim = $HOME .. "/.vim"
     &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     &pythonthreedll = trim(system("which python"))
 endif
-
 
 augroup ReloadVimScripts
     autocmd!
@@ -40,10 +24,18 @@ augroup ReloadVimScripts
                 \ expand('%:t') .. " reloaded."
 augroup END
 
+# augroup CommandWindowOpen
+#     autocmd!
+#     autocmd CmdwinEnter * map <buffer> <CR> <CR>q:
+# augroup END
+
+
+# Open help pages in vertical split
 augroup vimrc_help
-  autocmd!
-  autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
+    autocmd!
+    autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
 augroup END
+
 # Internal vim variables aka 'options'
 set encoding=utf-8
 # Set terminal with 256 colors
@@ -76,9 +68,8 @@ set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
 
-# =====================================================
 # Some key bindings
-# =====================================================
+# ----------------------
 g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<CR> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<CR>
@@ -143,24 +134,21 @@ tnoremap <C-Tab> <Plug>Bufselect_Toggle
 exe "cabbrev bter bo terminal " .. &shell
 exe "cabbrev vter vert botright terminal " .. &shell
 
-# ============================
-# PLUGINS
-# ============================
 
-# -------------------------------------
 # vim-plug
-# -------------------------------------
+# ----------------
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'preservim/nerdtree'
 Plug 'machakann/vim-highlightedyank'
-Plug 'cjrh/vim-conda'
+# Plug 'cjrh/vim-conda'
 Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
 # # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
 # # Plug 'tpope/vim-scriptease'
+Plug 'ubaldot/vim-conda-activate'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
@@ -168,10 +156,10 @@ Plug 'ubaldot/vim-writegood'
 plug#end()
 # filetype plugin indent on
 syntax on
-# ============================================
-# Plugins settings
-# ============================================
 
+
+# Plugins settings
+# -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
 if hour < 7 || 19 < hour
@@ -182,9 +170,8 @@ endif
 colorscheme everforest
 g:airline_theme = 'everforest'
 
-# -----------------------------------------------
 # statusline
-# -----------------------------------------------
+# ---------------
 # var palette = everforest#get_palette(&background, {})
 # echom palette
 
@@ -251,6 +238,7 @@ set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
 
 
 # NERDTree
+# ----------------
 autocmd FileType nerdtree setlocal nolist
 nnoremap <F1> :NERDTreeToggle<cr>
 augroup DIRCHANGE
@@ -279,13 +267,13 @@ var pylsp_config = {
 
 
 var lspServers = [
-                 {
-            	 name: 'pylsp',
-            	 filetype: ['python'],
-            	 path: trim(system('where pylsp')),
-                 workspaceConfig: pylsp_config,
-                  },
-               ]
+    {
+        name: 'pylsp',
+        filetype: ['python'],
+        path: trim(system('where pylsp')),
+        workspaceConfig: pylsp_config,
+    },
+]
 autocmd VimEnter * g:LspAddServer(lspServers)
 
 var lspOpts = {'showDiagOnStatusLine': v:true}
@@ -332,10 +320,8 @@ g:replica_jupyter_console_options = {"python":
 
 
 
-# ============================================
 # Self-defined functions
-# ============================================
-
+# -----------------------
 augroup remove_trailing_whitespaces
     autocmd!
     autocmd BufWritePre * if !&binary
@@ -366,7 +352,6 @@ def ChangeTerminalDir()
 enddef
 
 
-
 # Manim commands
 command ManimDocs silent :!open -a safari.app
             \ ~/Documents/github/manim/docs/build/html/index.html
@@ -375,87 +360,3 @@ command ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
 command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
 command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
 command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
-
-# -----------------------------------------------
-#  Buftabline
-# -----------------------------------------------
-# OBS you need to remove :set guioptions-=e
-# set showtabline=2
-
-# def g:SpawnBufferLine(): string
-#   var s = ' hello r/vim | '
-
-#   # Get the list of buffers. Use bufexists() to include hidden buffers
-#   var bufferNums = filter(range(1, bufnr('$')), 'buflisted(v:val)')
-#   # Making a buffer list on the left side
-#   for i in bufferNums
-#     # Highlight with yellow if it's the current buffer
-#     s ..= (i == bufnr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-#     s = $'{s}{i} '		# Append the buffer number
-#     if bufname(i) == ''
-#       s = $'{s}[NEW]'		# Give a name to a new buffer
-#     endif
-#     if getbufvar(i, '&modifiable')
-#       s ..= fnamemodify(bufname(i), ':t')	# Append the file name
-#       # s ..= pathshorten(bufname(i))  # Use this if you want a trimmed path
-#       # If the buffer is modified, add + and separator. Else, add separator
-#       s ..= (getbufvar(i, "&modified")) ? (' [+] | ') : (' | ')
-#     else
-#       s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only
-#       flag
-#     endif
-#   endfor
-#   s = $'{s}%#TabLineFill#%T'  # Reset highlight
-
-#   s = $'{s}%='			# Spacer
-#   echom "s: " .. s
-
-# #   # Making a tab list on the right side
-# #   for i in range(1, tabpagenr('$'))  # Loop through the number of tabs
-# #     # Highlight with yellow if it's the current tab
-# #     s ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-# #     s = $'{s}%{i}T '		# set the tab page number (for mouse clicks)
-# #     s = $'{s}{i}'		# set page number string
-# #   endfor
-# #   s = $'{s}%#TabLineFill#%T'	# Reset highlight
-
-# #   # Close button on the right if there are multiple tabs
-# #   if tabpagenr('$') > 1
-# #     s = $'{s}%999X X'
-# #   endif
-
-#   return s
-# enddef
-
-# # set tabline=%!SpawnBufferLine()  # Assign the tabline
-# set guitablabel=%!SpawnBufferLine()  # Assign the tabline
-# -----------------------------------------------
-
-# def g:GuiTabLabel(): string
-#   var label = ''
-#   var bufnrlist = tabpagebuflist(v:lnum)
-#   echom "bufnrlist: " .. string(bufnrlist)
-
-#   # Add '+' if one of the buffers in the tab page is modified
-#   for bufnr in bufnrlist
-#     if getbufvar(bufnr, "&modified")
-#       label = '+'
-#       break
-#     endif
-#   endfor
-
-#   # Append the number of windows in the tab page if more than one
-#   var wincount = tabpagewinnr(v:lnum, '$')
-#   if wincount > 1
-#     label ..= wincount
-#   endif
-#   if label != ''
-#     label ..= ' '
-#   endif
-
-#   # Append the buffer name
-#   return label .. bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
-# enddef
-
-# set guitablabel=%{GuiTabLabel()}
-# -----------------------------------------------
