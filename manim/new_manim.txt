@@ -1,0 +1,17 @@
+import manim as mn # type:ignore
+import numpy as np # type:ignore
+import sys
+
+
+sys.path.append("/users/ubaldot/.manim")
+import myconfig as mycfg  # type:ignore
+
+class MyScene(mn.Scene):
+    def setup(self):
+        self.add(mycfg.imageBG)
+
+    def construct(self):
+        self.next_section("TESTS", skip_animations=True)
+
+
+# vim: set textwidth=120:
