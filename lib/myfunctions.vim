@@ -10,6 +10,7 @@ export def TrimWhitespace()
     setpos('.', save_cursor)
 enddef
 
+
 # Commit a dot.
 # It is related to the opened buffer not to pwd!
 export def CommitDot()
@@ -43,6 +44,8 @@ export def Diff(spec: string)
     wincmd p
     diffthis
 enddef
+
+
 
 export def Redir(cmd: string, rng: number, start: number, end: number)
 	for win in range(1, winnr('$'))
@@ -108,3 +111,39 @@ export def ColorsToggle(): void
 	endfor
     color_is_shown = true
 enddef
+
+# Highlight toggle
+# TODO:
+# 1) Three different highlights
+# 2) Normal mode highlight current line
+# 3) Set operation on selection.
+export def Highlight()
+    if !exists('b:prop_id')
+        b:prop_id = 0
+    endif
+    if prop_type_get('my_hl') == {}
+        prop_type_add('my_hl', {'highlight': 'DiffDelete'})
+    endif
+
+    var start_line = line("'<")
+    var end_line = line("'>")
+    var start_col = col("'<")
+    var end_col = col("'>")
+    # echom prop_list(line('.'), {'types':$ ['my_hl']})
+    # echom prop_list(start_line, {'types': ['my_hl']})
+
+
+    # If there are no prop under the cursor position, then add, otherwise if a
+    # prop is detected remove it.
+    var no_prop = empty(prop_list(start_line, {'types': ['my_hl']}))
+    if no_prop
+        prop_add(start_line, start_col, {'end_lnum': end_line, 'end_col': end_col, 'type': 'my_hl', 'id': b:prop_id})
+        b:prop_id = b:prop_id + 1
+    else
+        var id = prop_list(start_line, {'types': ['my_hl']})[0]['id']
+        prop_remove({'id': id})
+    endif
+enddef
+
+noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
+# noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
