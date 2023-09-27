@@ -6,34 +6,35 @@ setlocal foldmethod=indent
 
 augroup BLACK
     autocmd!
-    autocmd BufWritePost <buffer> silent exe "!black " .. expand('<afile>') | edit!
-                # \ | echo expand('%:t') .. " formatted."
+    autocmd BufWritePost <buffer> {
+        if g:use_black
+            b:win_view = winsaveview()
+            silent exe "!black --line-length " .. &l:textwidth .. " " .. expand('<afile>')
+            edit!
+            winrestview(b:win_view)
+        endif
+    }
 augroup END
 
 # Manim stuff
-# Render with bang.
-def Manim(scene: string, dryrun: bool)
-    var flags = ""
-    if dryrun
-        flags = " --dry_run"
-    else
-        flags = " -pql"
-    endif
-    var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. shellescape(expand("%:t")) .. " " .. scene .. flags .. " --disable_caching -v WARNING"
-    exe "!" .. closeQT .. " && " .. cmd
-enddef
 
 # Render in a terminal buffer
-def ManimTerminal(scene: string, dryrun: bool)
+def Manim(scene: string="",  hq: bool=false, transparent: bool=false, dryrun: bool=false)
     var flags = ""
     if dryrun
         flags = " --dry_run"
+    elseif hq
+        flags = " -pqh --media_dir ./output"
     else
         flags = " -pql"
     endif
+
+    if transparent
+        flags = flags .. " --transparent"
+    endif
+
     var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --disable_caching -v WARNING"
+    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --fps 30 --disable_caching -v WARNING"
     var terms_name = []
     for ii in term_list()
         add(terms_name, bufname(ii))
@@ -46,12 +47,33 @@ def ManimTerminal(scene: string, dryrun: bool)
     term_sendkeys(bufnr('MANIM'), "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
 enddef
 
+
+
+export def ManimComplete(arglead: string, cmdline: string, cursorPos: number): list<string>
+    var class_names = []
+    var class_name = ""
+
+    # Iterate through each line of the Python file
+    for line in getline(1, line('$'))
+        # Check if the line defines a class (a simple check for 'class <class_name>:')
+        if line =~# '^\s*class\s\+\(\w\+\)'
+            # Extract the class name and append it to the list
+            class_name = matchstr(line, '\s\+\(\w\+\)')
+            add(class_names, class_name)
+        endif
+    endfor
+    return class_names
+enddef
+
 # Manim user-defined commands
-command -nargs=+ -complete=command Manim silent call
-            \ Manim(<f-args>, false)
-command -nargs=+ -complete=command ManimDry silent call
-            \ Manim(<f-args>, true)
-command -nargs=+ -complete=command ManimTerminal silent call
-            \ ManimTerminal(<f-args>, false)
-command -nargs=+ -complete=command ManimTerminalDry silent call
-            \ ManimTerminal(<f-args>, true)
+command -nargs=? -complete=customlist,ManimComplete Manim silent call
+            \ Manim(<q-args>)
+command -nargs=? -complete=customlist,ManimComplete ManimHQ silent call
+            \ Manim(<q-args>, true)
+command -nargs=? -complete=customlist,ManimComplete ManimHQAlpha silent call
+            \ Manim(<q-args>, true, true)
+command -nargs=? -complete=customlist,ManimComplete ManimDry silent call
+            \ Manim(<q-args>, false, false, true)
+
+# Black
+command! Black120 :exe "!black --line-length 120 " .. expand('%')
