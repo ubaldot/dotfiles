@@ -1,27 +1,32 @@
 vim9script
-#=====================
+
 # For auto-completion, jumps to definitions, etc
 # you can either use ctags or LSP.
 # gutentags automatically creates ctags as you open files
 # so you don't need to create them manually.
-#
 
 import "./.vim/lib/myfunctions.vim"
 
 if has("gui_win32") || has("win32")
     g:dotvim = $HOME .. "\\vimfiles"
     set pythonthreehome=$HOME .. "\\Miniconda3"
-    set pythonthreedll=$HOME.. "\\Miniconda3\\python39.dll"
+    set pythonthreedll=$HOME .. "\\Miniconda3\\python39.dll"
 elseif has("mac")
     g:dotvim = $HOME .. "/.vim"
     &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     &pythonthreedll = trim(system("which python"))
 endif
 
+# Set cursor
+&t_SI = "\e[6 q"
+&t_EI = "\e[2 q"
+
 augroup ReloadVimScripts
     autocmd!
-    autocmd BufWritePost *.vim,*.vimrc,*.gvimrc exe "source %" # | echo
-                \ expand('%:t') .. " reloaded."
+    autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
+        exe "source %"
+        echo expand('%:t') .. " reloaded."
+    }
 augroup END
 
 # augroup CommandWindowOpen
@@ -37,8 +42,8 @@ augroup vimrc_help
 augroup END
 
 # Internal vim variables aka 'options'
-set encoding=utf-8
 # Set terminal with 256 colors
+set encoding=utf-8
 set termguicolors
 set autoread
 set number
@@ -50,7 +55,7 @@ set smartindent
 set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
-set clipboard=unnamed
+# set clipboard=unnamed
 set splitbelow
 set laststatus=2
 set incsearch # for displaying while searching
@@ -73,7 +78,27 @@ set diffopt+=vertical
 g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<CR> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<CR>
+
+def QuitWindow()
+    # Close window and wipe buffer but it prevent to quit Vim if one window is
+    # left.
+   if winnr('$') != 1
+      quit
+   endif
+enddef
+
+# For using up and down in popup menu
+# inoremap <expr><Down> pumvisible() ? "\<C-n>" : "\<Down>"
+# inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
+
+# Avoid polluting registers
 nnoremap x "_x
+# nnoremap <c-w>q <c-w>c
+# nnoremap <c-w><c-q> <c-w>c
+# <ScriptCmd> allows remapping to functions without the need of defining
+# them as g:.
+nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
+nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
 nnoremap <leader>w <Cmd>bp<cr><Cmd>bw! #<cr>
 nnoremap <leader>b <Cmd>ls!<CR>:b
 nnoremap <C-Tab> <Plug>Bufselect_Toggle
@@ -98,12 +123,12 @@ nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<CR>\>/
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
 # Automatically surround highlighted selection
-xnoremap ( <ESC>`>a)<ESC>`<i(<ESC>
-xnoremap ) <ESC>`>a)<ESC>`<i(<ESC>
-xnoremap [ <ESC>`>a]<ESC>`<i[<ESC>
-xnoremap ] <ESC>`>a]<ESC>`<i[<ESC>
-xnoremap { <ESC>`>a}<ESC>`<i{<ESC>
-xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
+# xnoremap ( <ESC>`>a)<ESC>`<i(<ESC>
+# xnoremap ) <ESC>`>a)<ESC>`<i(<ESC>
+# xnoremap [ <ESC>`>a]<ESC>`<i[<ESC>
+# xnoremap ] <ESC>`>a]<ESC>`<i[<ESC>
+# xnoremap { <ESC>`>a}<ESC>`<i{<ESC>
+# xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
 # Don't use the following otherwise you lose registers function!
 # Indent without leaving the cursor position
 nnoremap g= <Cmd>vim9cmd b:temp = winsaveview()<CR>gg=G
@@ -127,7 +152,7 @@ tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
 # tnoremap <c-PageDown> <c-w>:bprev<CR>
-tnoremap <S-tab> <c-w>:bnext<CR>
+tnoremap <S-Tab> <c-w>:bnext<CR>
 tnoremap <C-Tab> <Plug>Bufselect_Toggle
 
 # Open terminal below all windows
@@ -141,34 +166,58 @@ plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'preservim/nerdtree'
-Plug 'machakann/vim-highlightedyank'
-# Plug 'cjrh/vim-conda'
 Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
+Plug 'stevearc/vim-arduino'
 # # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
+# Plug 'girishji/search-complete.vim'
 # # Plug 'tpope/vim-scriptease'
-Plug 'ubaldot/vim-conda-activate'
+Plug 'ubaldot/vim-highlight-yanked'
+# Plug 'ubaldot/vim-conda-activate'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'ubaldot/vim-writegood'
+Plug 'bpstahlman/txtfmt'
+# Plug 'hungpham3112/vide'
+#
 plug#end()
 # filetype plugin indent on
 syntax on
 
+# Conda activate at startup
+# augroup CondaActivate
+#     autocmd!
+#     autocmd VimEnter * :CondaActivate myenv
+# augroup END
 
 # Plugins settings
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 19 < hour
+if hour < 7 || 17 < hour
     set background=dark
 else
     set background=light
 endif
 colorscheme everforest
-g:airline_theme = 'everforest'
+
+# txtfmt settings
+# TODO fix this and change the Shortcuts with R Y and G rather than r,y,g
+g:txtfmtBgcolor2 = '^R$,c:LightRed,g:' .. matchstr(execute('highlight DiffDelete'), 'guibg=\zs#\x\+')
+g:txtfmtBgcolor3 = '^Y$,c:LightYellow,g:' .. matchstr(execute('highlight DiffChange'), 'guibg=\zs#\x\+')
+g:txtfmtBgcolor5 = '^G$,c:LightGreen,g:' .. matchstr(execute('highlight DiffAdd'), 'guibg=\zs#\x\+')
+
+g:txtfmtShortcuts = []
+
+# Note: Shortcuts that don't specify modes will get select mode mappings if and only if txtfmtShortcutsWorkInSelect=1.
+# bold-underline (\u for Visual and Operator)
+add(g:txtfmtShortcuts, 'h1 kR')
+add(g:txtfmtShortcuts, 'h2 kY')
+add(g:txtfmtShortcuts, 'h3 kG')
+add(g:txtfmtShortcuts, 'hh k-')
+
 
 # statusline
 # ---------------
@@ -210,7 +259,7 @@ enddef
 
 augroup CONDA_ENV
     autocmd!
-    autocmd BufEnter,BufWinEnter * g:conda_env = Conda_env()
+    autocmd VimEnter,BufEnter,BufWinEnter * g:conda_env = Conda_env()
 augroup END
 
 augroup LSP_DIAG
@@ -250,57 +299,99 @@ augroup END
 g:NERDTreeQuitOnOpen = 1
 
 
-
 # This json-like style to encode configs like
 # pylsp.plugins.pycodestyle.enabled = true
 var pylsp_config = {
     'pylsp': {
         'plugins': {
             'pycodestyle': {
-                'enabled': v:false},
+                'enabled': false},
             'pyflakes': {
-                'enabled': v:false},
+                'enabled': true},
             'pydocstyle': {
-                'enabled': v:false},
+                'enabled': false},
             'autopep8': {
-                'enabled': v:false}, }, }, }
+                'enabled': false}, }, }, }
 
 
+# path: trim(system('where pylsp')),
+        # workspaceConfig: pylsp_config,
 var lspServers = [
     {
         name: 'pylsp',
         filetype: ['python'],
-        path: trim(system('where pylsp')),
+        path: 'pylsp',
         workspaceConfig: pylsp_config,
+        args: ['--check-parent-process', '-v'],
     },
+    {
+        name: 'clangd',
+        filetype: ['c', 'cpp'],
+        path: 'clangd',
+        args: ['--background-index', '--clang-tidy']
+    },
+    {
+        name: 'arduino-language-server',
+        filetype: ['arduino'],
+        path: $HOME .. '/Documents/arduino-language-server/arduino-language-server',
+        debug: true,
+        args: ['-clangd', '/usr/bin/clangd',
+                '-cli-config', '/Users/ubaldot/Library/Arduino15/arduino-cli.yaml',
+                '-cli', '/opt/homebrew/bin/arduino-cli',
+                '-fqbn', 'arduino:avr:uno']
+    }
 ]
+
+# var lspServers = [
+#   {
+#     name: 'pyright',
+#     filetype: 'python',
+#     path: 'pyright-langserver',
+#     args: ['--stdio'],
+#     workspaceConfig: {
+#       python: {
+#         analysis: {
+#           autoSearchPaths: true,
+#           diagnosticMode: 'workspace',
+#           useLibraryCodeForTypes: true,
+#         },
+#       },
+#     },
+#     customNotificationHandlers: {
+#       'pyright/beginProgress': (_, _) => true,
+#       'pyright/reportProgress': (_, _) => true,
+#       'pyright/endProgress': (_, _) => true,
+#     },
+#   },
+# ]
 autocmd VimEnter * g:LspAddServer(lspServers)
 
-var lspOpts = {'showDiagOnStatusLine': v:true}
+# autocmd! User CondaEnvActivated echom "pippo"
+
+var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
 autocmd VimEnter * g:LspOptionsSet(lspOpts)
 highlight link LspDiagLine NONE
 
-nnoremap <silent> <buffer> <leader>N <Cmd>LspDiagPrev<cr>
-nnoremap <silent> <buffer> <leader>n <Cmd>LspDiagNext<cr>
-nnoremap <silent> <buffer> <leader>i <Cmd>LspGotoImpl<cr>
-nnoremap <silent> <buffer> <leader>g <Cmd>LspGotoDefinition<cr>
-nnoremap <silent> <buffer> <leader>d <Cmd>LspDiagCurrent<cr>
-nnoremap <silent> <buffer> <leader>k <Cmd>LspHover<cr>
-nnoremap <silent> <buffer> <leader>r <Cmd>LspPeekReferences<cr>
+nnoremap <silent> <leader>N <Cmd>LspDiagPrev<cr>
+nnoremap <silent> <leader>n <Cmd>LspDiagNext<cr>
+nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
+nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
+nnoremap <silent> <leader>d <Cmd>LspDiagCurrent<cr>
+nnoremap <silent> <leader>k <Cmd>LspHover<cr>
+nnoremap <silent> <leader>r <Cmd>LspPeekReferences<cr>
 
 
 # HelpMe files for my poor memory
-command! VimHelpBasic :HelpMe ~/.vim/helpme_files/vim_basic.txt
-command! VimHelpScript :HelpMe ~/.vim/helpme_files/vim_scripting.txt
-command! VimHelpCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
-command! VimHelpGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
-command! VimHelpExCommands :HelpMe ~/.vim/helpme_files/vim_excommands.txt
-command! VimHelpSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
-command! VimHelpAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
-command! VimHelpNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
-command! VimHelpMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
+command! HelpmeBasic :HelpMe ~/.vim/helpme_files/vim_basic.txt
+command! HelpmeScript :HelpMe ~/.vim/helpme_files/vim_scripting.txt
+command! HelpmeGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
+command! HelpmeExCommands :HelpMe ~/.vim/helpme_files/vim_excommands.txt
+command! HelpmeSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
+command! HelpmeAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
+command! HelpmeNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
+command! HelpmeMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 
-command! ColorToggle myfunctions.ColorsToggle()
+command! ColorsToggle myfunctions.ColorsToggle()
 
 # Utils commands
 command! -nargs=1 -complete=command -range Redir
@@ -312,21 +403,27 @@ command! -nargs=1 -complete=command -range Redir
 # source $HOME/dymoval.vim
 
 # vim-replica stuff
-g:replica_console_position = "J"
-g:replica_console_height = 10
+# g:replica_console_position = "J"
+# g:replica_console_height = 10
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
             \ " --config ~/.jupyter/jupyter_console_config.py"}
 
+g:writegood_compiler = "vale"
+g:writegood_options = "--config=$HOME/vale.ini"
+
+g:use_black = true
 
 
 # Self-defined functions
 # -----------------------
 augroup remove_trailing_whitespaces
     autocmd!
-    autocmd BufWritePre * if !&binary
-                \ | myfunctions.TrimWhitespace() |
-                \ endif
+    autocmd BufWritePre * {
+        if !&binary
+            myfunctions.TrimWhitespace()
+        endif
+    }
 augroup END
 
 
@@ -351,8 +448,20 @@ def ChangeTerminalDir()
     endfor
 enddef
 
+# Close all terminals with :qa!
+def WipeoutTerminals()
+    for buf_nr in term_list()
+        exe "bw! " .. buf_nr
+    endfor
+enddef
+
+augroup shoutoff_terminals
+    autocmd QuitPre * call WipeoutTerminals()
+augroup END
 
 # Manim commands
+# To make docs go to manim/docs and run make html. Be sure that all the sphinx
+# extensions packages are installed.
 command ManimDocs silent :!open -a safari.app
             \ ~/Documents/github/manim/docs/build/html/index.html
 command ManimNew :enew | :0read ~/.manim/new_manim.txt
@@ -360,3 +469,17 @@ command ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
 command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
 command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
 command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
+
+
+# xnoremap h1 <Plug>Highlight<cr>
+# xnoremap h2 <Plug>Highlight2<cr>
+
+
+
+
+# xnoremap <leader>h :call myfunctions.MyFuncV2()
+# xnoremap <leader>h <Plug>MyFunc<cr>
+
+# Arduino
+# command! AArduinoFlash :exe "!arduino-cli compile --fqbn arduino:avr:uno " .. expand('%')
+#             \ .. " && arduino-cli upload -p /dev/tty.usbmodem101 --fqbn arduino:avr:uno " .. expand('%')
