@@ -196,9 +196,9 @@ def _square_data_old(times, signal, discontinuity_points, alpha=0.0):
 def _square_data(times, signal, discontinuity_points, alpha=0.0):
     """
     Manim interpolates with FOH, i.e. "/".
-    This function is used to get "_|" or "|_" instead of "/" between two consecutive points.
+    This function is used to get "_|" or "|_" instead of "/" between two consecutive "continuous" points.
 
-    You can have either "|_" (alpha = 0) or "_|" (alpha = 1)
+    You can have either "|_" (alpha = 0) or "_|" (alpha = 1) or anything in the middle.
     The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
     """
     if alpha < 0 or alpha > 1:
