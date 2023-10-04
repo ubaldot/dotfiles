@@ -150,10 +150,8 @@ def get_axis_config(alpha: bool = False):
     return axis_config, plot_stroke_width
 
 
-# Square continuous signals.
-
-
-def _square_data_old(times, signal, discontinuity_points):
+# Square continuous signals to avoid FOH.
+def _square_data_old_old(times, signal, discontinuity_points):
     """
     OLD but GOOD!
 
@@ -172,6 +170,29 @@ def _square_data_old(times, signal, discontinuity_points):
     return times, signal
 
 
+def _square_data_old(times, signal, discontinuity_points, alpha=0.0):
+    """
+    Manim interpolates with FOH, i.e. "/".
+    This function is used to get "_|" or "|_" instead of "/" between two consecutive points.
+
+    You can have either "|_" (alpha = 0) or "_|" (alpha = 1)
+    The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
+    """
+    print(discontinuity_points)
+    if alpha < 0 or alpha > 1:
+        raise ValueError("alpha must be in [0,1].")
+
+    for ii, p in enumerate(discontinuity_points):
+        idx = p + ii * 2
+        # np.insert add to the left, but we want to add to the right, that is why idx+1 in position
+        signal = np.insert(signal, idx + 1, [signal[idx], signal[idx + 1]])
+
+        delta_t = alpha * (times[idx + 1] - times[idx])
+        times = np.insert(times, idx + 1, [times[idx] + delta_t, times[idx] + delta_t])
+
+    return times, signal
+
+
 def _square_data(times, signal, discontinuity_points, alpha=0.0):
     """
     Manim interpolates with FOH, i.e. "/".
@@ -180,34 +201,29 @@ def _square_data(times, signal, discontinuity_points, alpha=0.0):
     You can have either "|_" (alpha = 0) or "_|" (alpha = 1)
     The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
     """
-    # TODO: see if you can fix it with list of comprehension.
-    # s = [[signal[p], signal[p+1]] for p in discontinuity_points]
-    # t = [[times[p], times[p]] for p in discontinuity_points]
+    if alpha < 0 or alpha > 1:
+        raise ValueError("alpha must be in [0,1].")
+    # We need to add two points: A = (tx,s0) and B = (tx,s1) where sampling_instant < tx < sampling_instant + Ts
+    s = np.array([[signal[p], signal[p + 1]] for p in discontinuity_points])
+    t = np.array(
+        [
+            [
+                alpha * (times[p + 1] - times[p]) + times[p],
+                alpha * (times[p + 1] - times[p]) + times[p],
+            ]
+            for p in discontinuity_points
+        ]
+    )
 
     # signal = np.insert(signal, discontinuity_points, s)
     # times = np.insert(times, discontinuity_points, t)
-    if alpha < 0 or alpha > 1:
-        raise ValueError("alpha must be in [0,1].")
-
-    print(f"dp = {discontinuity_points}")
-    print("----------------")
-    pippo = list(zip(np.around(times[:10], 2), np.around(signal[:10], 2)))
-    print(f"Punti base = {pippo}")
-    print("----------------")
-    # signal[0 : discontinuity_points[1]] = signal[0]
     for ii, p in enumerate(discontinuity_points):
         idx = p + ii * 2
-        # print(p)
         # np.insert add to the left, but we want to add to the right, that is why idx+1 in position
-        # signal = np.insert(signal, idx + 1, [signal[idx], signal[idx + 1]])
-        signal = np.insert(signal, idx, [signal[idx - 1], signal[idx]])
+        signal = np.insert(signal, idx + 1, s[ii])
 
-        delta_t = alpha * (times[idx] - times[idx - 1])
-        # times = np.insert(times, idx + 1, [times[idx] + delta_t, times[idx] + delta_t])
-        times = np.insert(times, idx, [times[idx - 1] + delta_t, times[idx - 1] + delta_t])
-
-    pippo = list(zip(np.around(times[:20], 2), np.around(signal[:20], 2)))
-    print(f"Punti add_ = {pippo}")
+        # delta_t = alpha * (times[idx + 1] - times[idx])
+        times = np.insert(times, idx + 1, t[ii])
 
     return times, signal
 
@@ -225,23 +241,21 @@ def zoh(times: npt.ArrayLike, signal: npt.ArrayLike, Ts: float):
     N = int(Ts / (times[1] - times[0]))
     for ii, val in enumerate(signal):
         if ii % N == 0:
-            # print("updated")
             closest_value = val  # ZOH
             prev_val = val
         else:
-            # print("Not_updated")
             closest_value = prev_val
         zoh_signal[ii] = closest_value
 
-    discontinuity_points = np.asarray(range(0, len(times) - 1, N))
-    pippo = list(zip(np.around(times[:10], 2), np.around(zoh_signal[:10], 2)))
-    print(f"zoh = {pippo[:10]}")
-    print("========")
+    discontinuity_points = np.asarray(range(N - 1, len(times) - 1, N))
     return _square_data(times, zoh_signal, discontinuity_points, alpha=1.0)
 
 
 def lebesgue_sampling(
-    times: npt.ArrayLike, signal: npt.ArrayLike, bins: npt.ArrayLike, quantize=False, alpha: float = 0.0
+    times: npt.ArrayLike,
+    signal: npt.ArrayLike,
+    bins: npt.ArrayLike,
+    quantize=False,
 ):
     """
     Sample when signal is on the boundary of a bin, thus getting a piece-wise continuous function.
@@ -255,58 +269,30 @@ def lebesgue_sampling(
     """
     eb_signal = np.empty_like(signal)
     bins_no = np.digitize(signal, bins)
-    print(f"bins_no = {bins_no}")
-    print(f"di_bins = {np.diff(bins_no)}")
-
-    # indices = np.roll(bins, 1)
-    # indices = np.insert(bins, 0, 0)[:-1]
 
     sampling_points = np.nonzero(np.diff((bins_no)))[0]
-    # if sampling_points[0] != 0:
-    #     sampling_points = np.roll(sampling_points, 1)
-    #     sampling_points[0] = 0
-
-    # sampling_points = np.roll(sampling_points, -1)
-    # sampling_points[0] = 0
-    # print(f"sampling_points = {sampling_points}")
 
     # Init
     if quantize:
-        prev_val = min(bins, key=lambda x: np.abs(x - prev_val))
+        prev_val = min(bins, key=lambda x: np.abs(x - signal[0]))
     else:
         prev_val = signal[0]
-
     eb_signal[0] = prev_val
-    # Iteration
-    # for ii, val in enumerate(signal[1:-1]):
-    #     if ii in sampling_points:
-    #         if quantize:
-    #             closest_value = min(bins, key=lambda x: np.abs(x - val))
-    #         else:
-    #             closest_value = val
-    #     else:
-    #         closest_value = prev_val
-    #     prev_val = closest_value
-    #     eb_signal[ii + 1] = closest_value
 
     for ii, _ in enumerate(signal[:-1]):
         if ii in sampling_points:
-            # if quantize:
-            #     closest_value = min(bins, key=lambda x: np.abs(x - signal[ii]))
-            # else:
-            closest_value = signal[ii + 1]
+            if quantize:
+                closest_value = min(bins, key=lambda x: np.abs(x - signal[ii + 1]))
+            else:
+                closest_value = signal[ii + 1]
             prev_val = closest_value
         else:
             closest_value = prev_val
-        # print(np.around(prev_val, 2))
         eb_signal[ii + 1] = closest_value
-    # print(f"eb_signal = {np.around(eb_signal[:10],2)}")
-    # discontinuity_points = np.nonzero(np.diff(eb_signal))[0]
-    discontinuity_points = sampling_points
-    return _square_data(times, eb_signal, discontinuity_points, alpha=0.9)
+    return _square_data(times, eb_signal, sampling_points, alpha=1)
 
 
-def quantize(times: npt.ArrayLike, signal: npt.ArrayLike, bins: npt.ArrayLike, alpha: float = 0.0):
+def quantize(times: npt.ArrayLike, signal: npt.ArrayLike, bins: npt.ArrayLike, alpha: float = 0.5):
     """
     Flatten the values of signal on the q_bins, thus getting a piece-wise continuous function.
 
