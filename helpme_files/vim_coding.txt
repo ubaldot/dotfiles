@@ -1,12 +1,10 @@
-CODING:
--------------------------
-ALE key-bindings
-error prev, next    <leader>p, <leader>n
-hover               <leader>h
-find references     <leader>r
-go to definition    <leader>d (<c-i> or <c-t> to go back)
+LSP shortcuts
+-------------
 
-COMMENTARY
-comment line        gcc
-comment block       gc
-undo comment        gcu
+<leader>p LspDiagPrev
+<leader>n LspDiagNext
+<leader>i LspGotoImpl
+<leader>g LspGotoDefinition
+<leader>d LspDiagCurrent
+<leader>k LspHover
+<leader>r LspPeekReferences
