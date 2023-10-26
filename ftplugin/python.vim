@@ -19,18 +19,20 @@ augroup END
 # Manim stuff
 
 # Render in a terminal buffer
+# The popup_start have no filter function (see HelpMe)
 def Manim(scene: string="",  hq: bool=false, transparent: bool=false, dryrun: bool=false)
     var flags = ""
     if dryrun
         flags = " --dry_run"
     elseif hq
-        flags = " -pqh --media_dir ./output"
+        # flags = " -pqh --media_dir ./manimations"
+        flags = " -pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg"
     else
         flags = " -pql"
     endif
 
     if transparent
-        flags = flags .. " --transparent"
+        flags = flags .. " --output_file " .. scene .. "Alpha --transparent "
     endif
 
     var closeQT = "osascript ~/QuickTimeClose.scpt"
@@ -41,12 +43,28 @@ def Manim(scene: string="",  hq: bool=false, transparent: bool=false, dryrun: bo
     endfor
     echo terms_name
     if term_list() == [] || index(terms_name, 'MANIM') == -1
-        vert term_start(&shell, {'term_name': 'MANIM' })
+        # enable the following and remove the popup_create part if you want
+        # the terminal in a "classic" window.
+        # vert term_start(&shell, {'term_name': 'MANIM' })
+        term_start(&shell, {'term_name': 'MANIM', 'hidden': 1, 'term_finish': 'close'})
         set nowrap
     endif
+    popup_create(bufnr('MANIM'), {
+        title: " Manim ",
+        line: &lines,
+        col: &columns,
+        pos: "botright",
+        posinvert: false,
+        borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+        border: [1, 1, 1, 1],
+        maxheight: &lines - 1,
+        minwidth: 80,
+        minheight: 30,
+        close: 'button',
+        resize: true
+        })
     term_sendkeys(bufnr('MANIM'), "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
 enddef
-
 
 
 export def ManimComplete(arglead: string, cmdline: string, cursorPos: number): list<string>
@@ -66,14 +84,11 @@ export def ManimComplete(arglead: string, cmdline: string, cursorPos: number): l
 enddef
 
 # Manim user-defined commands
-command -nargs=? -complete=customlist,ManimComplete Manim silent call
-            \ Manim(<q-args>)
-command -nargs=? -complete=customlist,ManimComplete ManimHQ silent call
-            \ Manim(<q-args>, true)
-command -nargs=? -complete=customlist,ManimComplete ManimHQAlpha silent call
-            \ Manim(<q-args>, true, true)
-command -nargs=? -complete=customlist,ManimComplete ManimDry silent call
-            \ Manim(<q-args>, false, false, true)
+command -nargs=? -complete=customlist,ManimComplete Manim silent Manim(<q-args>)
+command -nargs=? -complete=customlist,ManimComplete ManimHQ silent Manim(<q-args>, true)
+command -nargs=? -complete=customlist,ManimComplete ManimHQAlpha silent Manim(<q-args>, true, true)
+command -nargs=? -complete=customlist,ManimComplete ManimDry silent Manim(<q-args>, false, false, true)
 
+nnoremap <buffer> <c-m> <cmd>Manim<cr>
 # Black
 command! Black120 :exe "!black --line-length 120 " .. expand('%')
