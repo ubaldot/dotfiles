@@ -9,6 +9,11 @@ myTexTemplate = mn.TexTemplate()
 # myTexTemplate.add_to_preamble(r"\MTfamily{augie}\Mathastext")
 
 # Control Theory in Practice colors
+ctip_grey_rgb = (122,122,122)
+ctip_blue_rgb = (61,127,187)
+ctip_grey = tuple(c/255 for c in ctip_grey_rgb)
+ctip_blue = tuple(c/255 for c in ctip_blue_rgb)
+# TODO: redefine complementary colors
 COMPLEMENTARY = ["#1F5887", "#6EBEFF", "#4694D4", "#875912", "#D49C46"]
 TRIAD = ["#1F5887", "#D45F5B", "#4694D4", "#CDD431", "#838726"]
 
@@ -21,6 +26,8 @@ imageBG = (
     .stretch_to_fit_height(mn.config.frame_height)
 )
 
+berlin = "Berlin Sans FB"
+berlin_demi = "Berlin Sans FB Demi"
 
 # Handwritten style
 def handwrite(mob, delta=0.1):
@@ -151,52 +158,11 @@ def get_axis_config(alpha: bool = False):
 
 
 # Square continuous signals to avoid FOH.
-def _square_data_old_old(times, signal, discontinuity_points):
-    """
-    OLD but GOOD!
-
-    Manim interpolates with FOH. To have a piece-wise constant function we have to add an horizontal and a vertical
-    segment between each discontinuity point, to get "_|" instead of "/" between two consecutive points.
-
-    The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
-    """
-    # Horizontal segments
-    signal = np.insert(signal, discontinuity_points, signal[discontinuity_points])
-    times = np.insert(times, discontinuity_points + 1, times[discontinuity_points + 1])
-    # Vertical segments
-    signal = np.insert(signal, discontinuity_points + 1, signal[discontinuity_points + 1])
-    times = np.insert(times, discontinuity_points, times[discontinuity_points])
-
-    return times, signal
-
-
-def _square_data_old(times, signal, discontinuity_points, alpha=0.0):
-    """
-    Manim interpolates with FOH, i.e. "/".
-    This function is used to get "_|" or "|_" instead of "/" between two consecutive points.
-
-    You can have either "|_" (alpha = 0) or "_|" (alpha = 1)
-    The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
-    """
-    print(discontinuity_points)
-    if alpha < 0 or alpha > 1:
-        raise ValueError("alpha must be in [0,1].")
-
-    for ii, p in enumerate(discontinuity_points):
-        idx = p + ii * 2
-        # np.insert add to the left, but we want to add to the right, that is why idx+1 in position
-        signal = np.insert(signal, idx + 1, [signal[idx], signal[idx + 1]])
-
-        delta_t = alpha * (times[idx + 1] - times[idx])
-        times = np.insert(times, idx + 1, [times[idx] + delta_t, times[idx] + delta_t])
-
-    return times, signal
-
-
 def _square_data(times, signal, discontinuity_points, alpha=0.0):
     """
     Manim interpolates with FOH, i.e. "/".
     This function is used to get "_|" or "|_" instead of "/" between two consecutive "continuous" points.
+    The discontinuity point is the "left" point.
 
     You can have either "|_" (alpha = 0) or "_|" (alpha = 1) or anything in the middle.
     The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
@@ -215,15 +181,8 @@ def _square_data(times, signal, discontinuity_points, alpha=0.0):
         ]
     )
 
-    # signal = np.insert(signal, discontinuity_points, s)
-    # times = np.insert(times, discontinuity_points, t)
-    for ii, p in enumerate(discontinuity_points):
-        idx = p + ii * 2
-        # np.insert add to the left, but we want to add to the right, that is why idx+1 in position
-        signal = np.insert(signal, idx + 1, s[ii])
-
-        # delta_t = alpha * (times[idx + 1] - times[idx])
-        times = np.insert(times, idx + 1, t[ii])
+    signal = np.insert(signal, np.repeat(discontinuity_points + 1, s.shape[1]), s.ravel())
+    times = np.insert(times, np.repeat(discontinuity_points + 1, t.shape[1]), t.ravel())
 
     return times, signal
 
@@ -387,4 +346,80 @@ mn.Tex.set_default(tex_template=myTexTemplate)
 # mn.Dot.set_default(color=mn.BLACK)
 # mn.NumberLine.set_default(color=mn.BLACK)
 
+
 # vim: set textwidth=120:
+def _square_data_old_old(times, signal, discontinuity_points):
+    """
+    OLD but GOOD!
+
+    Manim interpolates with FOH. To have a piece-wise constant function we have to add an horizontal and a vertical
+    segment between each discontinuity point, to get "_|" instead of "/" between two consecutive points.
+
+    The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
+    """
+    # Horizontal segments
+    signal = np.insert(signal, discontinuity_points, signal[discontinuity_points])
+    times = np.insert(times, discontinuity_points + 1, times[discontinuity_points + 1])
+    # Vertical segments
+    signal = np.insert(signal, discontinuity_points + 1, signal[discontinuity_points + 1])
+    times = np.insert(times, discontinuity_points, times[discontinuity_points])
+
+    return times, signal
+
+
+def _square_data_old(times, signal, discontinuity_points, alpha=0.0):
+    """
+    Manim interpolates with FOH, i.e. "/".
+    This function is used to get "_|" or "|_" instead of "/" between two consecutive points.
+
+    You can have either "|_" (alpha = 0) or "_|" (alpha = 1)
+    The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
+    """
+    print(discontinuity_points)
+    if alpha < 0 or alpha > 1:
+        raise ValueError("alpha must be in [0,1].")
+
+    for ii, p in enumerate(discontinuity_points):
+        idx = p + ii * 2
+        # np.insert add to the left, but we want to add to the right, that is why idx+1 in position
+        signal = np.insert(signal, idx + 1, [signal[idx], signal[idx + 1]])
+
+        delta_t = alpha * (times[idx + 1] - times[idx])
+        times = np.insert(times, idx + 1, [times[idx] + delta_t, times[idx] + delta_t])
+
+    return times, signal
+
+
+def _square_data_OLD(times, signal, discontinuity_points, alpha=0.0):
+    """
+    Manim interpolates with FOH, i.e. "/".
+    This function is used to get "_|" or "|_" instead of "/" between two consecutive "continuous" points.
+
+    You can have either "|_" (alpha = 0) or "_|" (alpha = 1) or anything in the middle.
+    The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
+    """
+    if alpha < 0 or alpha > 1:
+        raise ValueError("alpha must be in [0,1].")
+    # We need to add two points: A = (tx,s0) and B = (tx,s1) where sampling_instant < tx < sampling_instant + Ts
+    s = np.array([[signal[p], signal[p + 1]] for p in discontinuity_points])
+    t = np.array(
+        [
+            [
+                alpha * (times[p + 1] - times[p]) + times[p],
+                alpha * (times[p + 1] - times[p]) + times[p],
+            ]
+            for p in discontinuity_points
+        ]
+    )
+
+    # signal = np.insert(signal, discontinuity_points, s)
+    # times = np.insert(times, discontinuity_points, t)
+    for ii, p in enumerate(discontinuity_points):
+        idx = p + ii * 2
+        # np.insert add to the left, but we want to add to the right, that is why idx+1 in position
+        signal = np.insert(signal, idx + 1, s[ii])
+
+        # delta_t = alpha * (times[idx + 1] - times[idx])
+        times = np.insert(times, idx + 1, t[ii])
+
+    return times, signal
