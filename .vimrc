@@ -31,7 +31,7 @@ augroup END
 
 # augroup CommandWindowOpen
 #     autocmd!
-#     autocmd CmdwinEnter * map <buffer> <CR> <CR>q:
+#     autocmd CmdwinEnter * map <buffer> <cr> <cr>q:
 # augroup END
 
 
@@ -55,7 +55,8 @@ set smartindent
 set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
-# set clipboard=unnamed
+set clipboard=unnamed
+set splitright
 set splitbelow
 set laststatus=2
 set incsearch # for displaying while searching
@@ -72,12 +73,13 @@ set textwidth=78
 set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
+set wildcharm=<tab>
 
 # Some key bindings
 # ----------------------
 g:mapleader = ","
-map <leader>vr <Cmd>source $MYVIMRC<CR> \| <Cmd>echo ".vimrc reloaded."
-map <leader>vv <Cmd>e $MYVIMRC<CR>
+map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
+map <leader>vv <Cmd>e $MYVIMRC<cr>
 
 def QuitWindow()
     # Close window and wipe buffer but it prevent to quit Vim if one window is
@@ -90,25 +92,26 @@ enddef
 # For using up and down in popup menu
 # inoremap <expr><Down> pumvisible() ? "\<C-n>" : "\<Down>"
 # inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
+inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 
 # Avoid polluting registers
 nnoremap x "_x
-# nnoremap <c-w>q <c-w>c
-# nnoremap <c-w><c-q> <c-w>c
 # <ScriptCmd> allows remapping to functions without the need of defining
 # them as g:.
 nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
-nnoremap <leader>w <Cmd>bp<cr><Cmd>bw! #<cr>
-nnoremap <leader>b <Cmd>ls!<CR>:b
-nnoremap <C-Tab> <Plug>Bufselect_Toggle
-# nnoremap <C-Tab> <Plug>(FileselectToggle)
-nnoremap <S-Tab> <Cmd>bnext<CR>
-nnoremap <leader>c <C-w>c<cr>
-noremap <c-PageDown> <Cmd>bprev<CR>
-noremap <c-PageUp> <Cmd>bnext<CR>
+nnoremap <leader>l <Cmd>ls!<cr>:b
+nnoremap <leader>b :b <tab>
+nnoremap <c-tab> <Plug>Bufselect_Toggle
+# nnoremap <C-tab> <Plug>(FileselectToggle)
+nnoremap <tab> <Cmd>bnext<cr>
+# nnoremap <s-tab> <Cmd>bprev<cr>
+# nnoremap <leader>c <C-w>c<cr>
+noremap <c-PageDown> <Cmd>bprev<cr>
+noremap <c-PageUp> <Cmd>bnext<cr>
 # Switch window
 # nnoremap <C-w>w :bp<cr>:bw! #<cr>
+# nnoremap <leader>w <Cmd>bp<cr><Cmd>bw! #<cr>
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
@@ -118,7 +121,7 @@ nnoremap <c-j> <c-w>j
 # nnoremap <c-Right> <C-w>l<cr>
 
 # super quick search and replace:
-nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<CR>\>/
+nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
@@ -131,18 +134,19 @@ inoremap <c-w> <c-g>u<c-w>
 # xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
 # Don't use the following otherwise you lose registers function!
 # Indent without leaving the cursor position
-nnoremap g= <Cmd>vim9cmd b:temp = winsaveview()<CR>gg=G
+nnoremap g= <Cmd>vim9cmd b:temp = winsaveview()<cr>gg=G
             \ <Cmd>vim9cmd winrestview(b:temp)<cr>
             \ <Cmd>vim9cmd unlet b:temp<cr>
-            \ <Cmd>echo "file indented"<CR>
+            \ <Cmd>echo "file indented"<cr>
 
 # Format text
-nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<CR>gggqG
+nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<cr>gggqG
             \ <Cmd>vim9cmd winrestview(b:temp)<cr>
             \ <Cmd>vim9cmd unlet b:temp<cr>
             \ <Cmd>echo "file formatted, textwidth: "
             \ .. &textwidth .. " cols."<cr>
 
+# TERMINAL IN BUFFER (NO POPUP)
 # Some terminal remapping
 # When using iPython to avoid that shift space gives 32;2u
 tnoremap <S-space> <space>
@@ -151,9 +155,36 @@ tnoremap <c-h> <c-w>h
 tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
-# tnoremap <c-PageDown> <c-w>:bprev<CR>
-tnoremap <S-Tab> <c-w>:bnext<CR>
-tnoremap <C-Tab> <Plug>Bufselect_Toggle
+tnoremap <s-tab> <cmd>bnext<cr>
+# tnoremap <s-tab> <cmd>bprev<cr>
+tnoremap <c-tab> <cmd>Bufselect<cr>
+# tnoremap <leader>b <c-w>:b <tab>
+# tnoremap <leader>l :ls!<cr>:b
+
+# TERMINAL IN POPUP
+tnoremap <c-w>q <ScriptCmd>Quit_term_popup(true)<cr>
+tnoremap <c-w>c <ScriptCmd>Quit_term_popup(false)<cr>
+
+# This function can be called only from a terminal windows/popup, so there is
+# no risk of closing unwanted popups (such as HelpMe popups).
+def Quit_term_popup(quit: bool)
+    if empty(popup_list())
+        if quit
+           exe "quit"
+        else
+            exe "close"
+        endif
+    else
+        if quit
+            var bufno = bufnr()
+            popup_close(win_getid())
+            exe "bw! " .. bufno
+        else
+            popup_close(win_getid())
+        endif
+    endif
+enddef
+
 
 # Open terminal below all windows
 exe "cabbrev bter bo terminal " .. &shell
@@ -178,7 +209,7 @@ Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
-Plug 'ubaldot/vim-writegood'
+# Plug 'ubaldot/vim-writegood'
 Plug 'bpstahlman/txtfmt'
 # Plug 'hungpham3112/vide'
 #
@@ -342,28 +373,6 @@ var lspServers = [
     }
 ]
 
-# var lspServers = [
-#   {
-#     name: 'pyright',
-#     filetype: 'python',
-#     path: 'pyright-langserver',
-#     args: ['--stdio'],
-#     workspaceConfig: {
-#       python: {
-#         analysis: {
-#           autoSearchPaths: true,
-#           diagnosticMode: 'workspace',
-#           useLibraryCodeForTypes: true,
-#         },
-#       },
-#     },
-#     customNotificationHandlers: {
-#       'pyright/beginProgress': (_, _) => true,
-#       'pyright/reportProgress': (_, _) => true,
-#       'pyright/endProgress': (_, _) => true,
-#     },
-#   },
-# ]
 autocmd VimEnter * g:LspAddServer(lspServers)
 
 # autocmd! User CondaEnvActivated echom "pippo"
@@ -372,7 +381,7 @@ var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
 autocmd VimEnter * g:LspOptionsSet(lspOpts)
 highlight link LspDiagLine NONE
 
-nnoremap <silent> <leader>N <Cmd>LspDiagPrev<cr>
+nnoremap <silent> <leader>p <Cmd>LspDiagPrev<cr>
 nnoremap <silent> <leader>n <Cmd>LspDiagNext<cr>
 nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
 nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
@@ -390,6 +399,7 @@ command! HelpmeSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
 command! HelpmeAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
 command! HelpmeNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
 command! HelpmeMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
+command! HelpmeCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
@@ -405,6 +415,7 @@ command! -nargs=1 -complete=command -range Redir
 # vim-replica stuff
 # g:replica_console_position = "J"
 # g:replica_console_height = 10
+g:replica_display_range  = false
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
             \ " --config ~/.jupyter/jupyter_console_config.py"}
@@ -463,7 +474,7 @@ augroup END
 # To make docs go to manim/docs and run make html. Be sure that all the sphinx
 # extensions packages are installed.
 command ManimDocs silent :!open -a safari.app
-            \ ~/Documents/github/manim/docs/build/html/index.html
+            \ ~/Documents/manimce-latest/index.html
 command ManimNew :enew | :0read ~/.manim/new_manim.txt
 command ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
 command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
@@ -471,6 +482,36 @@ command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
 command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
 
 
+def OpenMyTerminal()
+    var terms_name = []
+    for ii in term_list()
+        add(terms_name, bufname(ii))
+    endfor
+
+    if term_list() == [] || index(terms_name, 'MY_TERMINAL') == -1
+        # enable the following and remove the popup_create part if you want
+        # the terminal in a "classic" window.
+        # vert term_start(&shell, {'term_name': 'MANIM' })
+        term_start(&shell, {'term_name': 'MY_TERMINAL', 'hidden': 1, 'term_finish': 'close'})
+        set nowrap
+    endif
+    popup_create(bufnr('MY_TERMINAL'), {
+        title: " MY TERMINAL ",
+        line: &lines,
+        col: &columns,
+        pos: "botright",
+        posinvert: false,
+        borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+        border: [1, 1, 1, 1],
+        maxheight: &lines - 1,
+        minwidth: 80,
+        minheight: 20,
+        close: 'button',
+        resize: true
+        })
+enddef
+
+command! Terminal OpenMyTerminal()
 # xnoremap h1 <Plug>Highlight<cr>
 # xnoremap h2 <Plug>Highlight2<cr>
 
