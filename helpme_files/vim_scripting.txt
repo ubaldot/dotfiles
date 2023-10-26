@@ -1,12 +1,27 @@
 VIM9SCRIPT
 ----------
+At the beginning always run :messages because there may be errors that you
+haven't seen.
+
+When you test other people PRs test the following: multiple windows, different
+files, change content of the interested
+windows, etc etc.
+
+For python scripts, read this;
+:h python
+http://codeseekah.com/2012/03/04/vim-scripting-with-python-lookup-ip-country/
+
 Folders structure
 -----------------
-1. /plugin everything inside here is loaded at vim start. Here you write config files, etc.
-2. /ftplugin python.vim is sourced every time a filteype=python buffer is opened (same for other languages).
+1. /plugin everything inside here is loaded at vim start. Here you write
+   config files, etc.
+2. /ftplugin python.vim is sourced every time a filteype=python buffer is
+   opened (same for other languages).
 OBS! Use only buffer-local settings here! <buffer>.
-3. /autoload here you write the implementation of all the functions that are called by the user.
-OBS! Functions inside here are referenced with the #, e.g. somefolder#somefile#MyFunc.
+3. /autoload here you write the implementation of all the functions that are
+   called by the user.
+OBS! Functions inside here are referenced with the #,
+e.g. somefolder#somefile#MyFunc.
 This way of calling functions only applies to stuff into /autoload:
 
     ~/.vim/autoload/myfunctions.vim
@@ -14,44 +29,68 @@ This way of calling functions only applies to stuff into /autoload:
 
 OBS! This is legacy way! Use import/export instead!
 
-4. /ftdetect is used file used for setting filetype, etc (if you create new ft for example).
+4. /ftdetect is used file used for setting filetype, etc (if you create new ft
+   for example).
 5. /after is loaded after the stuff in /plugin is loaded.
 6. /compiler for filetype specific compiler settings.
 7. /syntax for you custom filetype syntax.
 8. /color for your custom colorschemes.
 
+Function to be called with <Plug> from .vimrc (or other scripts)
+-----------------------------------------------------------------
+* Use nomap as it follows in the plugin script:
+
+noremap <unique> <script> <Plug>MyFunc :call <SID>whatever.MyFunction()<cr>
+
+* At this point you can use <Plug>My_Func in any script for example for:
+a) Keybindings, e.g. nnoremap <F2> <Plug>My_Func
+b) Commands, e.g. command! Mycommand <Plug>My_Func
+
+However, it is good practice to add some default key-bindings and/or commands
+in the plugin script.
+
+
 Mappings
 --------
 * In two steps:
-- define a mapping <Plug>Command -> :call <SID>whatever#MyFunction()
+- define a mapping <Plug>MyFunc as shown above
 - define a default mapping that connects mappings to <Plug>Command
-* <Plug>Command is the entry point for the user.
+* <Plug>MyFunc is the entry point for the user.
+
+EXAMPLE:
 
     # Define entry point for the user
-    noremap <unique> <script> <Plug>ReplicaSendLines :call <SID>replica#SendLines(<line1>, <line2>)<cr>
+    noremap <unique> <script> <Plug>ReplicaSendLines :call
+    <SID>replica#SendLines(<line1>, <line2>)<cr>
 
     # Provide a default mapping
     if !hasmapto('<Plug>ReplicaSendLines') || empty(mapcheck("<F9>", "nix"))
-        nnoremap <silent> <unique> <F9> <Plug>ReplicaSendLines # mark <F9> as unique!
+        nnoremap <silent> <unique> <F9> <Plug>ReplicaSendLines # mark <F9> as
+        unique!
         inoremap <silent> <unique> <F9> <Plug>ReplicaSendLines
         xnoremap <silent> <unique> <F9> <Plug>ReplicaSendLines
     endif
 
-* <Plug>ReplicaSendLines is the interface through the external world. User can use this.
-* <unique> gives a warning if the mapping is defined somewhere else or it provide an error
+* <Plug>ReplicaSendLines is the interface through the external world. User can
+  use this.
+* <unique> gives a warning if the mapping is defined somewhere else or it
+  provide an error
 if the user will define the same mapping later on.
-* <SID> is used if and only if a function is defined locally to a script and you want to call it externally
-* In the above example: create first a map <Plug>ReplicaSendLines and make such mapping unique. User can use this.
-Then, if there is not map to <Plug>ReplicaSendLines, then we map <F9> to <Plug>ReplicaSendLines
+* <SID> is used if and only if a function is defined locally to a script and
+  you want to call it externally
+* In the above example: create first a map <Plug>ReplicaSendLines and make
+  such mapping unique. User can use this.
+Then, if there is not map to <Plug>ReplicaSendLines, then we map <F9> to
+<Plug>ReplicaSendLines
 and we mark such <F9> mapping unique.
 
 Commands
 --------
 You can also provide the user with a command
 
-	if !exists(":MyCommand")
- 	  command -nargs=1  MyCorrect  call MyFunc(<q-args>, false)
- 	endif
+    if !exists(":MyCommand")
+      command -nargs=1  MyCorrect  call MyFunc(<q-args>, false)
+    endif
 
 Import/export
 -------------
@@ -73,28 +112,40 @@ mapping with imports:
     import autoload "../lib/foo.vim" as bar
     nnoremap <F4> :call <SID>bar.MyFunc()<CR>
 
-* If you don't add a path, the search happens in the .vim/autoload/ folder only.
+* If you don't add a path, the search happens in the .vim/autoload/ folder
+  only.
 * path must be in 'runtimepath' option
-* autoload option is faster but it will show errors only at runtime. Add it when you are done!
-* <ScriptCmd> is used to map stuff without changing mode but also for defining mappings when import are used.
+* autoload option is faster but it will show errors only at runtime. Add it
+  when you are done!
+* <ScriptCmd> is used to map stuff without changing mode but also for defining
+  mappings when import are used.
 
 Things to keep in mind:
 -----------------------
-* "" vs '' : '' take the string literally (as-is). E.g. 'a\nb' are 4 chars, whereas "a\nb" are 3 chars.
+* Single VS double quotes: single quotes take the string literally
+  (as-is). E.g. 'a\nb' are 4 chars, whereas "a\nb" are 3 chars.
 The only exception is that if you need ' then you double it ''.
 * to compare strings never use == you never know how a user has his settings.
 Use ==# (case sensitive, preferred) and ==? (case insensitive).
-* String comparison str =~ pattern returns true if pattern is in contained in str.
+* String comparison str =~ pattern returns true if pattern is in contained in
+  str.
 ( str !~ pattern, true if string is not in pattern).
 * normal! with the ! you ignore all the mappings.
 * execute "normal! ... " is used because :normal! won't take <cr>, <esc>, etc.
-* Every time you reload a script, all the autocmd referred to an event are appended again.
-autocmd! cancel all the previously defined autocmd, hence, always group autocommands and use a autocmd! as first line.
-* To create a user-defined command use command! -nargs= -preview= ... check :h command.
-* Variables that are functions, shall start with capital letter, e.g. b:MyFun = MyFunction.
-* Variables/functions have script scope, i.e. they born and die inside that script.
-If you want to use a variable/function in another script, you have to use export and then import in the other script.
-* variables have scope. In reality think as g:, b: and w: as global variables that you can access wherever you are.
+* Every time you reload a script, all the autocmd referred to an event are
+  appended again.
+autocmd! cancel all the previously defined autocmd, hence, always group
+autocommands and use a autocmd! as first line.
+* To create a user-defined command use command! -nargs= -preview= ... check :h
+  command.
+* Variables that are functions, shall start with capital letter, e.g. b:MyFun
+  = MyFunction.
+* Variables/functions have script scope, i.e. they born and die inside that
+  script.
+=> If you want to use a variable/function in another script, you have to use
+export and then import in the other script.
+* variables have scope. In reality think as g:, b: and w: as global variables
+  that you can access wherever you are.
 Script variables have script scope.
 
 # Won't work
@@ -112,28 +163,37 @@ else
     var x =4
 echo x
 
-* Internal variables are called 'options'. You can set with e.g. set filetype or with &filetype=python.
-You can also specify buffer-local options with setlocal or &l:filetype=python.
+* Internal variables are called 'options'. You can set with e.g. set filetype
+  or with &filetype=python, or with setlocal filetype=python or
+  &l:filetype=python..
 * To access options in a script use e.g. &commentstring.
-* You can directly write in a buffer with @a = "pippo".
-* <SID> is used if and only if a function is defined locally to a script and you want to call it externally
-e.g. nnoremap <F3> :call <sid>MyFunc()<cr> (does not apply for :command)
-* if there is only one buffer, then '#' is the 1st buffer itsels. No need to bufexists('#')
-* To cast a boolean into a number use the + operator: +my_var becomes 0 or 1 instead of v:false and v:true
+* You can directly write in a register with @a = "pippo".
+* if there is only one buffer, then '#' is the 1st buffer itsels. No need to
+  bufexists('#')
+* To cast a boolean into a number use the + operator: +my_var becomes 0 or 1
+  instead of v:false and v:true
 * When you use 0 or 1 Vim automatically reckon them as boolean values.
 
 Some common functions
 ---------------------
+* !/system/make
+ -! run a command and that is all
+ - system() (or systemlist()) is used if you want to capture the output of a
+   shell command.
+ - :make is used if you want that the output of the shell command goes to the
+   quickfix list
 * if bufname("pippo") does not work, use bufname(bufnr("pippo")).
-* expand() is used to expand wildcard, like expand("#"), expand(<afile>), expand(<cword>), etc. It returns a string.
+* expand() is used to expand wildcard, like expand("#"), expand(<afile>),
+  expand(<cword>), etc. It returns a string.
 
-* :s becomes substitute()
-* :g becomes filter()
-OBS! They work line-by-line!
+* :s becomes substitute() in vim9script
+* :g becomes filter() in vim9script
+OBS! substitute() and filter() work line-by-line!
 
 Example:
     var myLines = getline(1, '$') # '$' stands for last line.
-    \ ->filter('v:val =~ "^apple"') # Check if pattern '^apple' is contained in v:val
+    \ ->filter('v:val =~ "^apple"') # Check if pattern '^apple' is contained
+    in v:val
     \ ->filter('v:val !~ "^\s*$"')
 
 * =~ -> match a regex
@@ -142,14 +202,19 @@ Example:
 * line('.') get the current line number
 * getline('.') get the content of the current line
 * setline(1, ["a", "b", "c"]) start from line 1. It overwrite the content.
-* setbufline() is the same but you write in another buffer from current buffer.
+* setbufline() is the same but you write in another buffer from current
+  buffer.
 * append() is similar but it won't overwrite, it just append()
-* setpos('.', [5, 10], {'bufnum': 2}) cursor, line 5, column 10 and buffer 2. It is a generalization of cursor(l, c)
-* match(), mathchpos(), etc for changing highlight group of patterns or specific positions
+* setpos('.', [5, 10], {'bufnum': 2}) cursor, line 5, column 10 and buffer
+  2. It is a generalization of cursor(l, c)
+* match(), mathchpos(), etc for changing highlight group of patterns or
+  specific positions
 * sign() to mark specific lines based on some criteria
 
-* Avoid writing a script and run it all! Test a command in Ex mode and if it works then add it to your script step-wise.
-Once finished with the tests in Ex mode, exit and hit q: to see all the history of commands
+* Avoid writing a script and run it all! Test a command in Ex mode and if it
+  works then add it to your script step-wise.
+Once finished with the tests in Ex mode, exit and hit q: to see all the
+history of commands
 * For regular expressions ask ChatGTP.
 
 help

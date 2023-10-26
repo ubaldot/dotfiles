@@ -1,6 +1,12 @@
 VMOBJECT(MOBJECT):
 Circle.set_defaults(color=mn.GRAY) # Note that the Class object is called (not the instance!)
 
+stroke_color =
+stroke_opacity = (from 0 to 1)
+stroke_width =
+fill_color =
+fill_opacity = (from 0 to 1)
+
 .set_points([p1, p2, p3, p4, p5, p6])
 .set_points_as_corners([p1, p2, p3, p4, p5, p6])
 .set_points_smoothly([p1, p2, p3, p4, p5, p6])

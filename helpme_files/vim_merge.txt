@@ -8,8 +8,8 @@ VIMDIFF (Basic)
 :diffupdate             Run it every once in a while
 :diffoff[!]             Set diff off [! for all the diff files]
 
-dn                      (my command of) [c - jump to previous difference
-dN                      (my command of) ]c - jump to next difference
+dn                      (my command of) [c - jump to next difference
+dN                      (my command of) ]c - jump to previous difference
 
 CONFLICTS
 git mergetool

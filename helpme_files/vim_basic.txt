@@ -1,10 +1,10 @@
-MOVING:
+MOVE AROUND
 general motion                  hjkl,wW,bB
 beginning,end of line           0 or ^, $
 top, middle, bottom             H, M, L
 Formatting text (textwidth)     gggqG
 very long words                 gj, gk, gq (break long line in multiple lines)
-jump to, jump from              <c-i>, <c-o> (<c-å> :ALEGoToDefinition)
+jump to, jump from              <c-i>, <c-o>
 tags (to, from)                 <c-å>, <c-t>
 markers (set, jump)             ma,'a (Capital letters for inter-file jumps)
 
