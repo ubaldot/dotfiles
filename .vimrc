@@ -100,9 +100,10 @@ nnoremap x "_x
 # them as g:.
 nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
-nnoremap <leader>l <Cmd>ls!<cr>:b
-nnoremap <leader>b :b <tab>
-nnoremap <c-tab> <Plug>Bufselect_Toggle
+nnoremap <leader>b <Cmd>ls!<cr>:b
+nnoremap <c-tab> :b <tab>
+nnoremap <s-tab> <Cmd>b#<cr>
+# nnoremap <c-tab> <Plug>Bufselect_Toggle
 # nnoremap <C-tab> <Plug>(FileselectToggle)
 nnoremap <tab> <Cmd>bnext<cr>
 # nnoremap <s-tab> <Cmd>bprev<cr>
@@ -157,14 +158,11 @@ tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
 tnoremap <s-tab> <cmd>bnext<cr>
 # tnoremap <s-tab> <cmd>bprev<cr>
-tnoremap <c-tab> <cmd>Bufselect<cr>
+tnoremap <c-tab> <c-w>:b <tab>
 # tnoremap <leader>b <c-w>:b <tab>
 # tnoremap <leader>l :ls!<cr>:b
 
 # TERMINAL IN POPUP
-tnoremap <c-w>q <ScriptCmd>Quit_term_popup(true)<cr>
-tnoremap <c-w>c <ScriptCmd>Quit_term_popup(false)<cr>
-
 # This function can be called only from a terminal windows/popup, so there is
 # no risk of closing unwanted popups (such as HelpMe popups).
 def Quit_term_popup(quit: bool)
@@ -186,6 +184,25 @@ def Quit_term_popup(quit: bool)
 enddef
 
 
+tnoremap <c-w>q <ScriptCmd>Quit_term_popup(true)<cr>
+tnoremap <c-w>c <ScriptCmd>Quit_term_popup(false)<cr>
+
+# Make vim to speak
+if has('mac')
+    # <esc> is used in xnoremap because '<,'> are updated once you leave visual mode
+    xnoremap <leader>s <esc><ScriptCmd>TextToSpeech(line("'<"), line("'>"))<cr>
+    command -range Say vim9cmd TextToSpeech(<line1>, <line2>)
+
+    def TextToSpeech(firstline: number, lastline: number)
+        exe $":{firstline},{lastline}w !say"
+    enddef
+endif
+
+# def TextToSpeech(firstline: number, lastline: number)
+#     exe $":{firstline},{lastline}w !say"
+# enddef
+
+
 # Open terminal below all windows
 exe "cabbrev bter bo terminal " .. &shell
 exe "cabbrev vter vert botright terminal " .. &shell
@@ -197,7 +214,7 @@ plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'preservim/nerdtree'
-Plug 'yegappan/bufselect'
+# Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
 Plug 'stevearc/vim-arduino'
 # # Plug 'ludovicchabant/vim-gutentags'
@@ -227,7 +244,7 @@ syntax on
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 17 < hour
+if hour < 7 || 14 < hour
     set background=dark
 else
     set background=light
@@ -244,10 +261,10 @@ g:txtfmtShortcuts = []
 
 # Note: Shortcuts that don't specify modes will get select mode mappings if and only if txtfmtShortcutsWorkInSelect=1.
 # bold-underline (\u for Visual and Operator)
-add(g:txtfmtShortcuts, 'h1 kR')
-add(g:txtfmtShortcuts, 'h2 kY')
-add(g:txtfmtShortcuts, 'h3 kG')
-add(g:txtfmtShortcuts, 'hh k-')
+add(g:txtfmtShortcuts, 't1 kR')
+add(g:txtfmtShortcuts, 't2 kY')
+add(g:txtfmtShortcuts, 't3 kG')
+add(g:txtfmtShortcuts, 'tt k-')
 
 
 # statusline
@@ -324,7 +341,7 @@ nnoremap <F1> :NERDTreeToggle<cr>
 augroup DIRCHANGE
     autocmd!
     autocmd DirChanged global NERDTreeCWD
-    autocmd DirChanged global ChangeTerminalDir()
+    autocmd DirChanged global myfunctions.ChangeTerminalDir()
 augroup END
 # Close NERDTree when opening a file
 g:NERDTreeQuitOnOpen = 1
@@ -400,6 +417,7 @@ command! HelpmeAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
 command! HelpmeNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
 command! HelpmeMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
 command! HelpmeCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
+command! HelpmeClosures :HelpMe ~/.vim/helpme_files/python_closures.txt
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
@@ -420,8 +438,8 @@ g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
             \ " --config ~/.jupyter/jupyter_console_config.py"}
 
-g:writegood_compiler = "vale"
-g:writegood_options = "--config=$HOME/vale.ini"
+# g:writegood_compiler = "vale"
+# g:writegood_options = "--config=$HOME/vale.ini"
 
 g:use_black = true
 
@@ -438,7 +456,6 @@ augroup remove_trailing_whitespaces
 augroup END
 
 
-
 # git add -u && git commit -m "."
 command! GitCommitDot myfunctions.CommitDot()
 command! GitPushDot myfunctions.PushDot()
@@ -447,27 +464,8 @@ command! -nargs=? Diff myfunctions.Diff(<q-args>)
 nnoremap dn ]c
 nnoremap dN [c
 
-
-# Change all the terminal directories when you change vim directory
-def ChangeTerminalDir()
-    for ii in term_list()
-        if bufname(ii) == "JULIA"
-            term_sendkeys(ii, 'cd("' .. getcwd() .. '")' .. "\n")
-        else
-            term_sendkeys(ii, "cd " .. getcwd() .. "\n")
-        endif
-    endfor
-enddef
-
-# Close all terminals with :qa!
-def WipeoutTerminals()
-    for buf_nr in term_list()
-        exe "bw! " .. buf_nr
-    endfor
-enddef
-
 augroup shoutoff_terminals
-    autocmd QuitPre * call WipeoutTerminals()
+    autocmd QuitPre * call myfunctions.WipeoutTerminals()
 augroup END
 
 # Manim commands
@@ -482,45 +480,9 @@ command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
 command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
 
 
-def OpenMyTerminal()
-    var terms_name = []
-    for ii in term_list()
-        add(terms_name, bufname(ii))
-    endfor
-
-    if term_list() == [] || index(terms_name, 'MY_TERMINAL') == -1
-        # enable the following and remove the popup_create part if you want
-        # the terminal in a "classic" window.
-        # vert term_start(&shell, {'term_name': 'MANIM' })
-        term_start(&shell, {'term_name': 'MY_TERMINAL', 'hidden': 1, 'term_finish': 'close'})
-        set nowrap
-    endif
-    popup_create(bufnr('MY_TERMINAL'), {
-        title: " MY TERMINAL ",
-        line: &lines,
-        col: &columns,
-        pos: "botright",
-        posinvert: false,
-        borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
-        border: [1, 1, 1, 1],
-        maxheight: &lines - 1,
-        minwidth: 80,
-        minheight: 20,
-        close: 'button',
-        resize: true
-        })
-enddef
-
-command! Terminal OpenMyTerminal()
+command! Terminal myfunctions.OpenMyTerminal()
 # xnoremap h1 <Plug>Highlight<cr>
-# xnoremap h2 <Plug>Highlight2<cr>
-
-
-
-
-# xnoremap <leader>h :call myfunctions.MyFuncV2()
-# xnoremap <leader>h <Plug>MyFunc<cr>
-
+noremap <leader><s-tab> :buffers t<cr>:filter // buffers t <bar> call feedkeys(':buffer ')<home><s-right><s-right><left>
 # Arduino
 # command! AArduinoFlash :exe "!arduino-cli compile --fqbn arduino:avr:uno " .. expand('%')
 #             \ .. " && arduino-cli upload -p /dev/tty.usbmodem101 --fqbn arduino:avr:uno " .. expand('%')
