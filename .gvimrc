@@ -6,29 +6,36 @@ vim9script
 set mousehide
 
 # Set fonts for gvim
-# In this way with the 14'' MacBook you have exactly two columns
+# fontsize = 11 with the 14'' MacBook you have exactly two columns
 # with textwidth = 78
-g:fontsize = 13
+var fontsize = 18
+var fontface = "Arial"
+var fontsize_tail = ""
+
 if has("gui_win32")
-     g:fontsize = 11
-     g:fontface = "FiraCode_NFM:h"
-     g:fontsize_tail = ":cANSI:qDRAFT"
+     fontsize = 14
+     fontface = "FiraCode_NFM:h"
+     fontsize_tail = ":cANSI:qDRAFT"
      set guioptions-=T
     # Open gvim in full-screen
     au GUIEnter * simalt ~x
 elseif has("gui_macvim")
-    # set shell=zsh # to be able to source ~/.zshrc (conda init)
-     g:fontsize_tail = ""
-     g:fontface = "Fira\ Code:h"
+     fontsize_tail = ""
+     fontface = "Fira\ Code:h"
 endif
-# guifont is reserved word (aka 'option')
-&guifont = g:fontface .. string(g:fontsize) .. g:fontsize_tail
 
-def g:ChangeFontsize(n: number)
-    g:fontsize = g:fontsize + n
-    &guifont = g:fontface .. string(g:fontsize) .. g:fontsize_tail
+&guifont = fontface .. string(fontsize) .. fontsize_tail
+
+def ChangeFontsize(n: number)
+    var old_redraw = &lazyredraw
+    set lazyredraw
+
+    fontsize = fontsize + n
+    &guifont = fontface .. string(fontsize) .. fontsize_tail
+
+    &lazyredraw = old_redraw
 enddef
 
 # Some key bindings
-nnoremap  <c-c><c-i> :call g:ChangeFontsize(1)<cr>
-nnoremap  <c-c><c-o> :call g:ChangeFontsize(-1)<cr>
+command! FontsizeIncrease vim9cmd ChangeFontsize(1)
+command! FontsizeDecrease vim9cmd ChangeFontsize(-1)
