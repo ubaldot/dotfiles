@@ -45,24 +45,27 @@ def Manim(scene: string="",  hq: bool=false, transparent: bool=false, dryrun: bo
     if term_list() == [] || index(terms_name, 'MANIM') == -1
         # enable the following and remove the popup_create part if you want
         # the terminal in a "classic" window.
-        # vert term_start(&shell, {'term_name': 'MANIM' })
-        term_start(&shell, {'term_name': 'MANIM', 'hidden': 1, 'term_finish': 'close'})
+        vert term_start(&shell, {'term_name': 'MANIM' })
+
+        # Enable the following if you want a popup
+        # term_start(&shell, {'term_name': 'MANIM', 'hidden': 1, 'term_finish': 'close'})
         set nowrap
     endif
-    popup_create(bufnr('MANIM'), {
-        title: " Manim ",
-        line: &lines,
-        col: &columns,
-        pos: "botright",
-        posinvert: false,
-        borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
-        border: [1, 1, 1, 1],
-        maxheight: &lines - 1,
-        minwidth: 80,
-        minheight: 30,
-        close: 'button',
-        resize: true
-        })
+    # Enable the following if you want a popup
+    # popup_create(bufnr('MANIM'), {
+    #     title: " Manim ",
+    #     line: &lines,
+    #     col: &columns,
+    #     pos: "botright",
+    #     posinvert: false,
+    #     borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+    #     border: [1, 1, 1, 1],
+    #     maxheight: &lines - 1,
+    #     minwidth: 80,
+    #     minheight: 30,
+    #     close: 'button',
+    #     resize: true
+    #     })
     term_sendkeys(bufnr('MANIM'), "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
 enddef
 
