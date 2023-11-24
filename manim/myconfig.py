@@ -3,22 +3,86 @@ import numpy as np
 import numpy.typing as npt
 import random
 
-# Latex Stuff
-myTexTemplate = mn.TexTemplate()
-# myTexTemplate.add_to_preamble(r"\usepackage{mathastext}")
-# myTexTemplate.add_to_preamble(r"\MTfamily{augie}\Mathastext")
+# Fonts
+berlin = "Berlin Sans FB"
+berlin_demi = "Berlin Sans FB Demi"
+fira = "Fira Sans"
+fira_black = "Fira Sans Black"
+stix_two = "STIX Two Math"
+
+
+# Latex Stuff --------------------
+
+# System fonts or LaTeX bundled fonts?
+# System fonts -> less portable, but perhaps more powerful.
+# fontsetup allows use of system fonts in xelatex (but no math!)
+# If you want to use math you have to add unicode-math package as well
+#   a) system fonts support math (e.g. Fira): use unicode-math along with
+# fontspec and make some tweak, see
+# https://tex.stackexchange.com/questions/458222/use-medium-weight-fira-font
+#
+# If you don't want to bother with all the settings, use fontsetup which is
+# a wrapper for fontspec and unicode-math so you don't have to specify
+# what is *sf, what is *rm, what is math and what is *tt.
+#
+#   b) system fonts don't support math (eg. Berlin): use mathspec (it automatically
+# loads fontspec)
+# Or use mathastext to replace math digits and letters with text
+# letter. Clearly many gliphs may not be there.
+# However, not all the fonts are supported. See docs.
+
+fira_preamble = r"""
+\usepackage[fira]{fontsetup}
+\newfontfamily{\FSBold}{Fira Sans Bold}
+\newfontfamily{\FSBlack}{Fira Sans Black}
+"""
+
+fira_stix_preamble = r"""
+\usepackage[no-math]{fontspec}
+\usepackage{unicode-math}
+\setmainfont{Fira Sans Regular}
+\setmathfont{STIX Two Math}
+\setmathrm{Fira Sans Regular}
+\setboldmathrm{Fira Sans Bold}
+\newfontfamily{\FSBold}{Fira Sans Bold}
+\newfontfamily{\FSBlack}{Fira Sans Black}
+"""
+
+gfsneohellenic_preamble = r"\usepackage[gfsneohellenic]{fontsetup}"
+
+augie_preamble = r"""
+\usepackage{mathastext}
+\MTfamily{augie}\Mathastext
+"""
+
+berlin_preamble = r"""
+\usepackage{mathastext}
+\MTfamily{augie}\Mathastext
+"""
+
+myTexTemplate = mn.TexTemplate(tex_compiler="xelatex", output_format=".xdv")
+myTexTemplate.add_to_preamble(fira_stix_preamble)
+
+mn.MathTex.set_default(tex_template=myTexTemplate)
+mn.Tex.set_default(tex_template=myTexTemplate)
+# See docs for text. However, slat can be NORMAL, ITALIC, OBLIQUE etc. whereas weight has much
+# more choices like ULTRALIGHT, MEDIUM, BOLD, etc
+mn.Text.set_default(font=fira, weight="HEAVY")
+
 
 # Control Theory in Practice colors
-ctip_grey_rgb = (122,122,122)
-ctip_blue_rgb = (61,127,187)
-ctip_grey = tuple(c/255 for c in ctip_grey_rgb)
-ctip_blue = tuple(c/255 for c in ctip_blue_rgb)
+ctip_grey_rgb = (122, 122, 122)
+ctip_blue_rgb = (61, 127, 187)
+ctip_grey = tuple(c / 255 for c in ctip_grey_rgb)
+ctip_blue = tuple(c / 255 for c in ctip_blue_rgb)
 # TODO: redefine complementary colors
 COMPLEMENTARY = ["#1F5887", "#6EBEFF", "#4694D4", "#875912", "#D49C46"]
 TRIAD = ["#1F5887", "#D45F5B", "#4694D4", "#CDD431", "#838726"]
 
 
-mypath = "/users/ubaldot/Documents/YouTube/ControlTheoryInPractice/github_ctip/"
+mypath = (
+    "/users/ubaldot/Documents/YouTube/ControlTheoryInPractice/github_ctip/"
+)
 file = "ManimBG.png"
 imageBG = (
     mn.ImageMobject(mypath + file)
@@ -26,8 +90,24 @@ imageBG = (
     .stretch_to_fit_height(mn.config.frame_height)
 )
 
-berlin = "Berlin Sans FB"
-berlin_demi = "Berlin Sans FB Demi"
+velo = mn.Rectangle(
+    height=mn.config.frame_height,
+    width=mn.config.frame_width,
+    fill_color=mn.BLACK,
+    fill_opacity=0.5,
+)
+
+# Whitespaces for Text class
+def text_with_spaces(text, **kwargs):
+    spaces_at = []
+    for i in range(len(text)):
+        if text[i] == ' ':
+            spaces_at.append(i)
+    text = text.replace(' ', 'i')
+    t = mn.Text(text, **kwargs)
+    for i in spaces_at:
+        t.submobjects[i].set_opacity(0)
+    return t
 
 # Handwritten style
 def handwrite(mob, delta=0.1):
@@ -46,7 +126,9 @@ def LPF(signal, fs, fc):
     return signal_filt
 
 
-def get_xgrid(ax, delta=0.0, stroke_opacity=0.6, stroke_width=2, dash_length=0.1):
+def get_xgrid(
+    ax, delta=0.0, stroke_opacity=0.6, stroke_width=2, dash_length=0.1
+):
     """
     Return dashed grid associated to the x-axis of ax.
 
@@ -64,18 +146,32 @@ def get_xgrid(ax, delta=0.0, stroke_opacity=0.6, stroke_width=2, dash_length=0.1
     for y in np.arange(max(0.0, ymin) + ystep, ymax, ystep):
         p0 = ax.c2p(xmin, y)
         p1 = ax.c2p(xmax, y)
-        line = mn.DashedLine(p0, p1, stroke_opacity=stroke_opacity, stroke_width=stroke_width, dash_length=dash_length)
+        line = mn.DashedLine(
+            p0,
+            p1,
+            stroke_opacity=stroke_opacity,
+            stroke_width=stroke_width,
+            dash_length=dash_length,
+        )
         xgrid.add(line)
     # Lines from 0.0 ymin (going negative)
     for y in np.arange(min(0.0, ymax) - ystep, ymin, -ystep):
         p0 = ax.c2p(xmin, y)
         p1 = ax.c2p(xmax, y)
-        line = mn.DashedLine(p0, p1, stroke_opacity=stroke_opacity, stroke_width=stroke_width, dash_length=dash_length)
+        line = mn.DashedLine(
+            p0,
+            p1,
+            stroke_opacity=stroke_opacity,
+            stroke_width=stroke_width,
+            dash_length=dash_length,
+        )
         xgrid.add(line)
     return xgrid
 
 
-def get_ygrid(ax, delta=0.0, stroke_opacity=0.6, stroke_width=2, dash_length=0.1):
+def get_ygrid(
+    ax, delta=0.0, stroke_opacity=0.6, stroke_width=2, dash_length=0.1
+):
     """
     Return dashed grid associated to the y-axis of ax.
 
@@ -93,12 +189,24 @@ def get_ygrid(ax, delta=0.0, stroke_opacity=0.6, stroke_width=2, dash_length=0.1
     for x in np.arange(max(0.0, xmin) + xstep, xmax, xstep):
         p0 = ax.c2p(x, ymin)
         p1 = ax.c2p(x, ymax)
-        line = mn.DashedLine(p0, p1, stroke_opacity=stroke_opacity, stroke_width=stroke_width, dash_length=dash_length)
+        line = mn.DashedLine(
+            p0,
+            p1,
+            stroke_opacity=stroke_opacity,
+            stroke_width=stroke_width,
+            dash_length=dash_length,
+        )
         ygrid.add(line)
     for x in np.arange(min(0.0, xmax) - xstep, xmin, -xstep):
         p0 = ax.c2p(x, ymin)
         p1 = ax.c2p(x, ymax)
-        line = mn.DashedLine(p0, p1, stroke_opacity=stroke_opacity, stroke_width=stroke_width, dash_length=dash_length)
+        line = mn.DashedLine(
+            p0,
+            p1,
+            stroke_opacity=stroke_opacity,
+            stroke_width=stroke_width,
+            dash_length=dash_length,
+        )
         ygrid.add(line)
     return ygrid
 
@@ -138,6 +246,7 @@ def get_axis_config(alpha: bool = False):
         plot_stroke_width = 8
         axis_config = {
             "include_numbers": False,
+            "tip_shape": mn.StealthTip,
             "tick_size": 0.0,
             "tip_width": 0.1,
             "tip_height": 0.1,
@@ -181,8 +290,12 @@ def _square_data(times, signal, discontinuity_points, alpha=0.0):
         ]
     )
 
-    signal = np.insert(signal, np.repeat(discontinuity_points + 1, s.shape[1]), s.ravel())
-    times = np.insert(times, np.repeat(discontinuity_points + 1, t.shape[1]), t.ravel())
+    signal = np.insert(
+        signal, np.repeat(discontinuity_points + 1, s.shape[1]), s.ravel()
+    )
+    times = np.insert(
+        times, np.repeat(discontinuity_points + 1, t.shape[1]), t.ravel()
+    )
 
     return times, signal
 
@@ -241,7 +354,9 @@ def lebesgue_sampling(
     for ii, _ in enumerate(signal[:-1]):
         if ii in sampling_points:
             if quantize:
-                closest_value = min(bins, key=lambda x: np.abs(x - signal[ii + 1]))
+                closest_value = min(
+                    bins, key=lambda x: np.abs(x - signal[ii + 1])
+                )
             else:
                 closest_value = signal[ii + 1]
             prev_val = closest_value
@@ -251,7 +366,12 @@ def lebesgue_sampling(
     return _square_data(times, eb_signal, sampling_points, alpha=1)
 
 
-def quantize(times: npt.ArrayLike, signal: npt.ArrayLike, bins: npt.ArrayLike, alpha: float = 0.5):
+def quantize(
+    times: npt.ArrayLike,
+    signal: npt.ArrayLike,
+    bins: npt.ArrayLike,
+    alpha: float = 0.5,
+):
     """
     Flatten the values of signal on the q_bins, thus getting a piece-wise continuous function.
 
@@ -306,7 +426,14 @@ def quantize(times: npt.ArrayLike, signal: npt.ArrayLike, bins: npt.ArrayLike, a
 # Arrow tips
 class ArrowStealthTip(mn.ArrowTip, mn.VMobject):
     def __init__(
-        self, width=0.5, length=1, fraction=0.4, scale=1, stroke_width=mn.DEFAULT_STROKE_WIDTH, fill_opacity=1, **kwargs
+        self,
+        width=0.5,
+        length=1,
+        fraction=0.4,
+        scale=1,
+        stroke_width=mn.DEFAULT_STROKE_WIDTH,
+        fill_opacity=1,
+        **kwargs
     ):
         mn.VMobject.__init__(self, **kwargs)
         fraction = min(fraction, 0.999999)
@@ -358,11 +485,19 @@ def _square_data_old_old(times, signal, discontinuity_points):
     The discontinuity points are indices and are found by other functions (zoh, lebesgue_sampling, etc).
     """
     # Horizontal segments
-    signal = np.insert(signal, discontinuity_points, signal[discontinuity_points])
-    times = np.insert(times, discontinuity_points + 1, times[discontinuity_points + 1])
+    signal = np.insert(
+        signal, discontinuity_points, signal[discontinuity_points]
+    )
+    times = np.insert(
+        times, discontinuity_points + 1, times[discontinuity_points + 1]
+    )
     # Vertical segments
-    signal = np.insert(signal, discontinuity_points + 1, signal[discontinuity_points + 1])
-    times = np.insert(times, discontinuity_points, times[discontinuity_points])
+    signal = np.insert(
+        signal, discontinuity_points + 1, signal[discontinuity_points + 1]
+    )
+    times = np.insert(
+        times, discontinuity_points, times[discontinuity_points]
+    )
 
     return times, signal
 
@@ -385,7 +520,9 @@ def _square_data_old(times, signal, discontinuity_points, alpha=0.0):
         signal = np.insert(signal, idx + 1, [signal[idx], signal[idx + 1]])
 
         delta_t = alpha * (times[idx + 1] - times[idx])
-        times = np.insert(times, idx + 1, [times[idx] + delta_t, times[idx] + delta_t])
+        times = np.insert(
+            times, idx + 1, [times[idx] + delta_t, times[idx] + delta_t]
+        )
 
     return times, signal
 
