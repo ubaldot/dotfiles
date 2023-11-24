@@ -11,6 +11,8 @@ EXAMPLES
 :%y             yank the whole file
 :%normal @a     run macro a through all the file
 :10,15normal $x remove last character from line 10 to line 15
+:'a,'by *  copy from marker a to marker b into * register
+:23,39norm >> Indent lines 23-39
 
 RANGES
 ------
