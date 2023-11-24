@@ -1,0 +1,57 @@
+
+Example 1:
+----------
+
+def sine_wave(a, f, phi):
+    def _sine_wave(t):
+        return a * np.sin(2 * np.pi * f * t + phi)
+
+    return _sine_wave
+
+y = sin_wave(1.1, 10.0, 0.6)
+y(4)
+
+y_vals = map(y, np.arange(0,10,0.1))
+y_vals_np = np.fromiter(y_vals, dtype=float)
+
+Example 2
+---------
+def mean():
+    sample = []
+
+    def inner_mean(number):
+        sample.append(number)
+        return sum(sample) / len(sample)
+
+    return inner_mean
+
+m = mean(2)
+m(3)
+m(10)
+
+Example 3
+---------
+def ss_discrete(A, B, C, D):
+    x = np.zeros(A.shape[0])
+
+    def forced_response(u):
+        nonlocal x
+        x = A @ x + B @ u
+        return C @ x + D @ u
+
+    def init(x0):
+        nonlocal x
+        x = x0
+
+    def initial_condition():
+        nonlocal x
+        x = A @ x
+        return C @ x
+
+    ss_discrete.init = init
+    ss_discrete.forced_response = forced_response
+    ss_discrete.initial_condition = initial_condition
+
+    return ss_discrete
+
+my_sys = ss_discrete(Ad, Bd, Cd, Dd)
