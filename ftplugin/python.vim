@@ -16,7 +16,6 @@ augroup BLACK
     }
 augroup END
 
-# Manim stuff
 
 # Render in a terminal buffer
 # The popup_start have no filter function (see HelpMe)
@@ -36,7 +35,7 @@ def Manim(scene: string="",  hq: bool=false, transparent: bool=false, dryrun: bo
     endif
 
     var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --fps 30 --disable_caching -v WARNING"
+    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --fps 30 --disable_caching -v WARNING --save_sections"
     var terms_name = []
     for ii in term_list()
         add(terms_name, bufname(ii))
@@ -79,7 +78,9 @@ export def ManimComplete(arglead: string, cmdline: string, cursorPos: number): l
         # Check if the line defines a class (a simple check for 'class <class_name>:')
         if line =~# '^\s*class\s\+\(\w\+\)'
             # Extract the class name and append it to the list
-            class_name = matchstr(line, '\s\+\(\w\+\)')
+            # class_name = matchstr(line, '\s\+\(\w\+\)')
+            # \zs start of the match, \ze end of the match
+            class_name = matchstr(line, '^\s*class\s\+\zs\w\+\ze')
             add(class_names, class_name)
         endif
     endfor
