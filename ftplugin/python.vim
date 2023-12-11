@@ -4,6 +4,7 @@ vim9script
 
 setlocal foldmethod=indent
 
+# Autocmd to format with black.
 augroup BLACK
     autocmd!
     autocmd BufWritePost <buffer> {
@@ -18,58 +19,76 @@ augroup END
 
 
 # Render in a terminal buffer
-# The popup_start have no filter function (see HelpMe)
-def Manim(scene: string="",  hq: bool=false, transparent: bool=false, dryrun: bool=false)
+def Manim(scene: string="",  passed_flags: string="", transparent: bool=false)
     var flags = ""
-    if dryrun
-        flags = " --dry_run"
-    elseif hq
-        # flags = " -pqh --media_dir ./manimations"
-        flags = " -pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg"
-    else
-        flags = " -pql"
-    endif
-
     if transparent
-        flags = flags .. " --output_file " .. scene .. "Alpha --transparent "
+        flags = passed_flags .. " --output_file " .. scene .. "Alpha --transparent "
+    else
+        flags = passed_flags
     endif
 
-    var closeQT = "osascript ~/QuickTimeClose.scpt"
-    var cmd = "manim " .. expand("%:t") .. " " .. scene .. flags .. " --fps 30 --disable_caching -v WARNING --save_sections"
+    var manim_pre_cmd = "clear && osascript ~/QuickTimeClose.scpt"
+    var manim_cmd = "manim " .. expand("%:t") .. " " .. scene .. flags
+    var terms_name = []
+    for ii in term_list()
+        add(terms_name, bufname(ii))
+    endfor
+    echo terms_name
+    # TODO
+    # You may want to replace this part with something like (once you created
+    # a manim.vim compiler in compiler (obs! check if you have python filetype)
+    # var temp = &compiler
+    # &compiler = manim
+    # manim_pre_cmd .. " && " make! manim cmd
+    # &compiler = temp
+    if term_list() == [] || index(terms_name, 'MANIM') == -1
+        vert term_start(&shell, {'term_name': 'MANIM' })
+        set nowrap
+    endif
+    term_sendkeys(bufnr('MANIM'), manim_pre_cmd .. " && " .. manim_cmd .. "\n")
+enddef
+
+
+# Render in a terminal popup (cute but not practical).
+def ManimPopup(scene: string="",  passed_flags: string="", transparent: bool=false)
+    var flags = ""
+    if transparent
+        flags = passed_flags .. " --output_file " .. scene .. "Alpha --transparent "
+    else
+        flags = passed_flags
+    endif
+
+    var manim_pre_cmd = "clear && osascript ~/QuickTimeClose.scpt"
+    var manim_cmd = "manim " .. expand("%:t") .. " " .. scene .. flags
     var terms_name = []
     for ii in term_list()
         add(terms_name, bufname(ii))
     endfor
     echo terms_name
     if term_list() == [] || index(terms_name, 'MANIM') == -1
-        # enable the following and remove the popup_create part if you want
-        # the terminal in a "classic" window.
-        vert term_start(&shell, {'term_name': 'MANIM' })
-
-        # Enable the following if you want a popup
-        # term_start(&shell, {'term_name': 'MANIM', 'hidden': 1, 'term_finish': 'close'})
+        term_start(&shell, {'term_name': 'MANIM', 'hidden': 1, 'term_finish': 'close'})
         set nowrap
     endif
-    # Enable the following if you want a popup
-    # popup_create(bufnr('MANIM'), {
-    #     title: " Manim ",
-    #     line: &lines,
-    #     col: &columns,
-    #     pos: "botright",
-    #     posinvert: false,
-    #     borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
-    #     border: [1, 1, 1, 1],
-    #     maxheight: &lines - 1,
-    #     minwidth: 80,
-    #     minheight: 30,
-    #     close: 'button',
-    #     resize: true
-    #     })
-    term_sendkeys(bufnr('MANIM'), "clear \n" .. closeQT .. "&& " .. cmd .. "\n")
+    # Add popup
+    b:manim_pup_id = popup_create(bufnr('MANIM'), {
+        title: " Manim ",
+        line: &lines,
+        col: &columns,
+        pos: "botright",
+        posinvert: false,
+        borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+        border: [1, 1, 1, 1],
+        maxheight: &lines - 1,
+        minwidth: 80,
+        minheight: 30,
+        close: 'button',
+        resize: true
+        })
+    term_sendkeys(bufnr('MANIM'), manim_pre_cmd .. " && " .. manim_cmd .. "\n")
+    # popup_close(b:manim_pup_id)
 enddef
 
-
-export def ManimComplete(arglead: string, cmdline: string, cursorPos: number): list<string>
+def ManimComplete(arglead: string, cmdline: string, cursorPos: number): list<string>
     var class_names = []
     var class_name = ""
 
@@ -87,12 +106,22 @@ export def ManimComplete(arglead: string, cmdline: string, cursorPos: number): l
     return class_names
 enddef
 
-# Manim user-defined commands
-command -nargs=? -complete=customlist,ManimComplete Manim silent Manim(<q-args>)
-command -nargs=? -complete=customlist,ManimComplete ManimHQ silent Manim(<q-args>, true)
-command -nargs=? -complete=customlist,ManimComplete ManimHQAlpha silent Manim(<q-args>, true, true)
-command -nargs=? -complete=customlist,ManimComplete ManimDry silent Manim(<q-args>, false, false, true)
+# Flags
+var manim_standard = " --fps 30 --disable_caching -v WARNING --save_sections"
+var manim_lq = " -pql" .. manim_standard
+var manim_dry_run = " --dry_run" .. manim_standard
+var manim_hq = " -pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg" .. manim_standard
 
-nnoremap <buffer> <c-m> <cmd>Manim<cr>
-# Black
-command! Black120 :exe "!black --line-length 120 " .. expand('%')
+# Manim user-defined commands. Use Manim or ManimPopup (which I find not
+# practical), e.g. ManimPopup(<q-args>, manim_lq)
+command -nargs=? -complete=customlist,ManimComplete Manim silent Manim(<q-args>, manim_lq)
+command -nargs=? -complete=customlist,ManimComplete ManimHQ silent Manim(<q-args>, manim_hq)
+command -nargs=? -complete=customlist,ManimComplete ManimHQAlpha silent Manim(<q-args>, manim_hq, true)
+command -nargs=? -complete=customlist,ManimComplete ManimDry silent Manim(<q-args>, manim_dry_run)
+
+# Jump to next-prev section
+nnoremap <buffer> <c-m> /\<self.next_section\><cr>
+nnoremap <buffer> <c-n> ?\<self.next_section\><cr>
+
+# Call black to format 120 line length
+command! Black120 execute "!black --line-length 120 " .. expand('%')
