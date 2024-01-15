@@ -5,6 +5,7 @@ vim9script
 # gutentags automatically creates ctags as you open files
 # so you don't need to create them manually.
 
+
 import "./.vim/lib/myfunctions.vim"
 
 if has("gui_win32") || has("win32")
@@ -74,6 +75,7 @@ set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
+set cursorline
 
 # Some key bindings
 # ----------------------
@@ -216,7 +218,10 @@ Plug 'sainnhe/everforest'
 Plug 'preservim/nerdtree'
 # Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
-Plug 'stevearc/vim-arduino'
+# TODO enable plugin when matchbufline becomes available
+# Plug "yegappan/searchcomplete"
+Plug 'normen/vim-pio'
+# Plug 'stevearc/vim-arduino'
 # # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
 # Plug 'girishji/search-complete.vim'
@@ -249,7 +254,9 @@ if hour < 7 || 14 < hour
 else
     set background=light
 endif
+g:everforest_background = 'soft'
 colorscheme everforest
+
 
 # txtfmt settings
 # TODO fix this and change the Shortcuts with R Y and G rather than r,y,g
@@ -261,11 +268,22 @@ g:txtfmtShortcuts = []
 
 # Note: Shortcuts that don't specify modes will get select mode mappings if and only if txtfmtShortcutsWorkInSelect=1.
 # bold-underline (\u for Visual and Operator)
-add(g:txtfmtShortcuts, 't1 kR')
-add(g:txtfmtShortcuts, 't2 kY')
-add(g:txtfmtShortcuts, 't3 kG')
-add(g:txtfmtShortcuts, 'tt k-')
+add(g:txtfmtShortcuts, 'h1 kR')
+add(g:txtfmtShortcuts, 'h2 kY')
+add(g:txtfmtShortcuts, 'h3 kG')
+add(g:txtfmtShortcuts, 'hh k-')
 
+augroup SetTxtFmt
+    autocmd!
+    autocmd BufRead,BufNewFile *.txt set filetype=text.txtfmt
+    autocmd BufRead,BufNewFile *.md set filetype=markdown.txtfmt
+augroup END
+
+# Delete MakeTestPage so when typing :Ma I get Manim as first hit
+augroup deletePluginCommand
+    autocmd!
+    autocmd VimEnter * delcommand MakeTestPage
+augroup END
 
 # statusline
 # ---------------
@@ -291,6 +309,34 @@ augroup Gitget
     autocmd!
     autocmd BufEnter,BufWinEnter * b:gitbranch = Get_gitbranch()
 augroup END
+
+def ShowFuncName(): string
+  var n_max = 20 # max chars to be displayed.
+  var filetypes = ['c', 'cpp', 'python']
+  var text = "" # displayed text
+
+  if index(filetypes, &filetype) != -1
+      # If the filetype is recognized, then search the function line
+      var line = 0
+      if index(['c', 'cpp'], &filetype) != -1
+          line = search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bWn')
+      elseif &filetype ==# 'python'
+          line = search("^ \\{0,}def \\+.*", 'bWn')
+      endif
+      var n = match(getline(line), '\zs)') # Number of chars until ')'
+      if n < n_max
+          text = "|" .. trim(getline(line)[: n])
+      else
+          text = "|" .. trim(getline(line)[: n_max]) .. "..."
+      endif
+  endif
+  return text
+enddef
+
+augroup show_funcname
+  autocmd!
+  autocmd BufEnter,BufWinEnter,CursorMoved * b:current_function = ShowFuncName()
+augroup end
 
 
 def Conda_env(): string
@@ -324,7 +370,8 @@ augroup END
 # Left side
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
 set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
-set statusline+=%#StatusLine#\ %t(%n)%m\ %*
+set statusline+=%#StatusLine#\ %t(%n)%m%*
+set statusline+=%#StatusLineNC#\%{b:current_function}\ %*
 # Right side
 set statusline+=%=
 set statusline+=%#StatusLine#\ %y\ %*
@@ -376,7 +423,7 @@ var lspServers = [
         name: 'clangd',
         filetype: ['c', 'cpp'],
         path: 'clangd',
-        args: ['--background-index', '--clang-tidy']
+        args: ['--background-index', '--clang-tidy', '-header-insertion=never']
     },
     {
         name: 'arduino-language-server',
@@ -398,12 +445,12 @@ var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
 autocmd VimEnter * g:LspOptionsSet(lspOpts)
 highlight link LspDiagLine NONE
 
-nnoremap <silent> <leader>p <Cmd>LspDiagPrev<cr>
-nnoremap <silent> <leader>n <Cmd>LspDiagNext<cr>
+nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
+nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+nnoremap <silent> <leader>d <Cmd>LspDiag current<cr>
 nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
-nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
-nnoremap <silent> <leader>d <Cmd>LspDiagCurrent<cr>
 nnoremap <silent> <leader>k <Cmd>LspHover<cr>
+nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
 nnoremap <silent> <leader>r <Cmd>LspPeekReferences<cr>
 
 
@@ -415,7 +462,7 @@ command! HelpmeExCommands :HelpMe ~/.vim/helpme_files/vim_excommands.txt
 command! HelpmeSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
 command! HelpmeAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
 command! HelpmeNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
-command! HelpmeMerge :HelpMe ~/.vim/helpme_files/vim_merge.txt
+command! HelpmeDiffMerge :HelpMe ~/.vim/helpme_files/vim_merge_diff.txt
 command! HelpmeCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
 command! HelpmeClosures :HelpMe ~/.vim/helpme_files/python_closures.txt
 
@@ -483,6 +530,29 @@ command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
 command! Terminal myfunctions.OpenMyTerminal()
 # xnoremap h1 <Plug>Highlight<cr>
 noremap <leader><s-tab> :buffers t<cr>:filter // buffers t <bar> call feedkeys(':buffer ')<home><s-right><s-right><left>
-# Arduino
-# command! AArduinoFlash :exe "!arduino-cli compile --fqbn arduino:avr:uno " .. expand('%')
-#             \ .. " && arduino-cli upload -p /dev/tty.usbmodem101 --fqbn arduino:avr:uno " .. expand('%')
+
+# To get all the cppcheck issues in the QF list
+command! PIOCheck {
+    var current_makeprg = &l:makeprg
+    setlocal makeprg=pio
+    silent make check
+    execute "setlocal makeprg=" .. current_makeprg
+    copen
+}
+
+command! PIOCompileCommands execute "!pio run -t compiledb"
+
+def Make()
+    var previous_compiler = ""
+    if exists("b:current_compiler")
+        previous_compiler = b:current_compiler
+    endif
+    compiler erlang
+    silent make
+    if !isempty(previous_compiler) > 0
+        execute "compiler " .. previous_compiler
+    endif
+    copen
+enddef
+
+command! MyCommand vim9cmd Make()
