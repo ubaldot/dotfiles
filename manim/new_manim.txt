@@ -5,6 +5,11 @@ import sys
 
 sys.path.append("/users/ubaldot/.manim")
 import myconfig as mycfg  # type:ignore
+import search_shapes_in_text as sst
+from myconfig import berlin_demi, fira, fira_black, velo, imageBG, stix_two
+
+frame_height = mn.config.frame_height
+frame_width = mn.config.frame_width
 
 class MyScene(mn.Scene):
     def setup(self):
