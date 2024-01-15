@@ -6,6 +6,7 @@ import random
 # Fonts
 berlin = "Berlin Sans FB"
 berlin_demi = "Berlin Sans FB Demi"
+# fira = "Fira Sans Regular"
 fira = "Fira Sans"
 fira_black = "Fira Sans Black"
 stix_two = "STIX Two Math"
@@ -37,13 +38,17 @@ fira_preamble = r"""
 \newfontfamily{\FSBlack}{Fira Sans Black}
 """
 
+# USED
 fira_stix_preamble = r"""
 \usepackage[no-math]{fontspec}
 \usepackage{unicode-math}
 \setmainfont{Fira Sans Regular}
 \setmathfont{STIX Two Math}
-\setmathrm{Fira Sans Regular}
-\setboldmathrm{Fira Sans Bold}
+
+\setmathfontface\mathFSR{Fira Sans Regular}
+\setmathfontface\mathFSB{Fira Sans Bold}
+
+% fontspec, for normal text
 \newfontfamily{\FSBold}{Fira Sans Bold}
 \newfontfamily{\FSBlack}{Fira Sans Black}
 """
@@ -75,17 +80,59 @@ ctip_grey_rgb = (122, 122, 122)
 ctip_blue_rgb = (61, 127, 187)
 ctip_grey = tuple(c / 255 for c in ctip_grey_rgb)
 ctip_blue = tuple(c / 255 for c in ctip_blue_rgb)
-# TODO: redefine complementary colors
-COMPLEMENTARY = ["#1F5887", "#6EBEFF", "#4694D4", "#875912", "#D49C46"]
-TRIAD = ["#1F5887", "#D45F5B", "#4694D4", "#CDD431", "#838726"]
+
+BG_rgb = (37, 77, 110)
+BG_hsv = mn.ManimColor("#244D6E").to_hsv()
+mycolors = ["#FFFA4C", "#9EFF4C", "#4CFFFE"]
 
 
+def get_palette(hue_init=0, hue_step=180, sat=1.0, val=1.0):
+    """You pass a base_color (default imageBG) and a hue step and it returns
+    a list of tuples in hex format.
+
+    Example
+    -------
+        mycolors = mycfg.get_colors_rgb(hue_init=20, hue_step=120, sat=1.0, val=1.0)
+
+    to get a list with 3 colors (ternary)
+    """
+    HSV_COLORS_HEX = [
+        mn.ManimColor((0, 0, 0))
+        .from_hsv(((step + hue_init) % 360 / 360, sat, val))
+        .to_hex()
+        for step in range(0, 360, int(hue_step))
+    ]
+    return HSV_COLORS_HEX
+
+
+def get_colors_mono(base_color=BG_rgb, nlevels=2, sat=None):
+    """You pass a base_color (default imageBG) and a number of levels and it returns
+    a list of tuples in hex format.
+    The monochromacity is based on the value levels.
+    OBS: the base color may be lost! The value levels are 1.0/nlevels
+
+    Example
+    -------
+        mycolors = mycfg.get_colors_mono_values(nlevels = 120)
+
+    to get a list with 8 monochromatic colors.
+    """
+    hsv = mn.ManimColor((0, 0, 0)).from_rgb(base_color).to_hsv()
+    s = sat if sat else hsv[1]
+    HSV_COLORS_HEX = [
+        mn.ManimColor((0, 0, 0)).from_hsv((hsv[0], s, 1 / n)).to_hex()
+        for n in range(1, nlevels)
+    ]
+    return HSV_COLORS_HEX
+
+
+# Few images
 mypath = (
     "/users/ubaldot/Documents/YouTube/ControlTheoryInPractice/github_ctip/"
 )
-file = "ManimBG.png"
+ManimBG = "ManimBG.png"
 imageBG = (
-    mn.ImageMobject(mypath + file)
+    mn.ImageMobject(mypath + ManimBG)
     .stretch_to_fit_width(mn.config.frame_width)
     .stretch_to_fit_height(mn.config.frame_height)
 )
@@ -94,20 +141,25 @@ velo = mn.Rectangle(
     height=mn.config.frame_height,
     width=mn.config.frame_width,
     fill_color=mn.BLACK,
-    fill_opacity=0.5,
+    fill_opacity=0.8,
 )
+
+tick_mark = mn.SVGMobject(file_name=mypath + "tick_mark")
+wrong_mark = mn.SVGMobject(file_name=mypath + "wrong_mark")
+
 
 # Whitespaces for Text class
 def text_with_spaces(text, **kwargs):
     spaces_at = []
     for i in range(len(text)):
-        if text[i] == ' ':
+        if text[i] == " ":
             spaces_at.append(i)
-    text = text.replace(' ', 'i')
+    text = text.replace(" ", "i")
     t = mn.Text(text, **kwargs)
     for i in spaces_at:
         t.submobjects[i].set_opacity(0)
     return t
+
 
 # Handwritten style
 def handwrite(mob, delta=0.1):
@@ -421,6 +473,23 @@ def quantize(
 # curve = mn.VMobject().set_points_as_corners(steps)
 # curve2 = mn.VMobject().set_points_as_corners(points).set_color(mn.RED)
 # self.add(curve, curve2, zoh_curve)
+
+
+def discretize(ax, graph, x_values, vlines=False, **dots_kwargs):
+    """Returns discretization dots. If vlines = True it also returns vertical
+    lines. Graph shall be a parametric function."""
+
+    sampled_data_points = [ax.i2gp(x, graph) for x in x_values]
+    sampled_data_dots = mn.VGroup(
+        *[mn.Dot(p, **dots_kwargs) for p in sampled_data_points]
+    )
+    if vlines:
+        vlines = mn.VGroup(
+            *[ax.get_vertical_line(p) for p in sampled_data_points]
+        )
+    else:
+        vlines = None
+    return sampled_data_dots, vlines
 
 
 # Arrow tips
