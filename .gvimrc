@@ -8,7 +8,7 @@ set mousehide
 # Set fonts for gvim
 # fontsize = 11 with the 14'' MacBook you have exactly two columns
 # with textwidth = 78
-var fontsize = 18
+var fontsize = 14
 var fontface = "Arial"
 var fontsize_tail = ""
 
