@@ -27,6 +27,12 @@ enddef
 
 
 export def Diff(spec: string)
+    # For comparing:
+    #   1. Your open buffer VS its last saved version (no args)
+    #   2. Your open buffer with a given commit
+    #
+    # Usage: :Diff 12jhu23
+    # To exit, just wipe the scratch buffer.
     vertical new
     setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile
     var cmd = bufname('#')
@@ -48,6 +54,11 @@ enddef
 
 
 export def Redir(cmd: string, rng: number, start: number, end: number)
+    # Used to redirect the output from the terminal in a scratch buffer
+    #
+    # Example: :Redir !ls
+    #
+    # You can use it also to redirect the output of some Vim commands
 	for win in range(1, winnr('$'))
 		if !empty(getwinvar(win, 'scratch'))
 			execute win .. 'windo :close'
@@ -77,6 +88,7 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
 	setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
 	setline(1, output)
 enddef
+
 
 var color_is_shown = false
 # export def ColorsShow(clear: bool = false): void
@@ -145,5 +157,54 @@ export def Highlight()
     endif
 enddef
 
+# ------------ Terminal functions ------------------
+# Change all the terminal directories when you change vim directory
+export def ChangeTerminalDir()
+    for ii in term_list()
+        if bufname(ii) == "JULIA"
+            term_sendkeys(ii, 'cd("' .. getcwd() .. '")' .. "\n")
+        else
+            term_sendkeys(ii, "cd " .. getcwd() .. "\n")
+        endif
+    endfor
+enddef
+
+# Close all terminals with :qa!
+export def WipeoutTerminals()
+    for buf_nr in term_list()
+        exe "bw! " .. buf_nr
+    endfor
+enddef
+
+export def OpenMyTerminal()
+    var terms_name = []
+    for ii in term_list()
+        add(terms_name, bufname(ii))
+    endfor
+
+    if term_list() == [] || index(terms_name, 'MY_TERMINAL') == -1
+        # enable the following and remove the popup_create part if you want
+        # the terminal in a "classic" window.
+        # vert term_start(&shell, {'term_name': 'MANIM' })
+        term_start(&shell, {'term_name': 'MY_TERMINAL', 'hidden': 1, 'term_finish': 'close'})
+        set nowrap
+    endif
+    popup_create(bufnr('MY_TERMINAL'), {
+        title: " MY TERMINAL ",
+        line: &lines,
+        col: &columns,
+        pos: "botright",
+        posinvert: false,
+        borderchars: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+        border: [1, 1, 1, 1],
+        maxheight: &lines - 1,
+        minwidth: 80,
+        minheight: 20,
+        close: 'button',
+        resize: true
+        })
+enddef
+
+# Some mappings to learn
 noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
 # noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
