@@ -6,7 +6,7 @@ setlocal foldmethod=indent
 
 # Autocmd to format with black.
 augroup BLACK
-    autocmd!
+    autocmd! * <buffer>
     autocmd BufWritePost <buffer> {
         if g:use_black
             b:win_view = winsaveview()
@@ -19,21 +19,15 @@ augroup END
 
 
 # Render in a terminal buffer
-def Manim(scene: string="",  passed_flags: string="", transparent: bool=false)
-    var flags = ""
-    if transparent
-        flags = passed_flags .. " --output_file " .. scene .. "Alpha --transparent "
-    else
-        flags = passed_flags
-    endif
+def Manim(scene: string="", pre_cmd: string="", flags: string="")
+    var manim_cmd = "manim " .. expand("%:t") .. " " .. scene .. " " .. flags
 
-    var manim_pre_cmd = "clear && osascript ~/QuickTimeClose.scpt"
-    var manim_cmd = "manim " .. expand("%:t") .. " " .. scene .. flags
+    # Setup terminal
     var terms_name = []
     for ii in term_list()
         add(terms_name, bufname(ii))
     endfor
-    echo terms_name
+    # echo terms_name
     # TODO
     # You may want to replace this part with something like (once you created
     # a manim.vim compiler in compiler (obs! check if you have python filetype)
@@ -45,26 +39,22 @@ def Manim(scene: string="",  passed_flags: string="", transparent: bool=false)
         vert term_start(&shell, {'term_name': 'MANIM' })
         set nowrap
     endif
-    term_sendkeys(bufnr('MANIM'), manim_pre_cmd .. " && " .. manim_cmd .. "\n")
+
+    # Send command
+    term_sendkeys(bufnr('MANIM'), pre_cmd .. " && " .. manim_cmd .. "\n")
 enddef
 
 
 # Render in a terminal popup (cute but not practical).
-def ManimPopup(scene: string="",  passed_flags: string="", transparent: bool=false)
-    var flags = ""
-    if transparent
-        flags = passed_flags .. " --output_file " .. scene .. "Alpha --transparent "
-    else
-        flags = passed_flags
-    endif
+def ManimPopup(scene: string="",  manim_pre_cmd: string="", flags: string="")
+    var manim_cmd = "manim " .. expand("%:t") .. " " .. scene .. " " .. flags
 
-    var manim_pre_cmd = "clear && osascript ~/QuickTimeClose.scpt"
-    var manim_cmd = "manim " .. expand("%:t") .. " " .. scene .. flags
+    # Setup terminal
     var terms_name = []
     for ii in term_list()
         add(terms_name, bufname(ii))
     endfor
-    echo terms_name
+    # echo terms_name
     if term_list() == [] || index(terms_name, 'MANIM') == -1
         term_start(&shell, {'term_name': 'MANIM', 'hidden': 1, 'term_finish': 'close'})
         set nowrap
@@ -84,6 +74,8 @@ def ManimPopup(scene: string="",  passed_flags: string="", transparent: bool=fal
         close: 'button',
         resize: true
         })
+
+    # Send command
     term_sendkeys(bufnr('MANIM'), manim_pre_cmd .. " && " .. manim_cmd .. "\n")
     # popup_close(b:manim_pup_id)
 enddef
@@ -108,16 +100,18 @@ enddef
 
 # Flags
 var manim_standard = " --fps 30 --disable_caching -v WARNING --save_sections"
-var manim_lq = " -pql" .. manim_standard
-var manim_dry_run = " --dry_run" .. manim_standard
-var manim_hq = " -pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg" .. manim_standard
+var manim_pre_cmd = "clear && osascript ~/QuickTimeClose.scpt"
+# var manim_pre_cmd = "clear"
+var manim_lq = "-pql" .. manim_standard
+var manim_dry_run = "--dry_run" .. manim_standard
+var manim_hq = "-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg" .. manim_standard
 
 # Manim user-defined commands. Use Manim or ManimPopup (which I find not
 # practical), e.g. ManimPopup(<q-args>, manim_lq)
-command -nargs=? -complete=customlist,ManimComplete Manim silent Manim(<q-args>, manim_lq)
-command -nargs=? -complete=customlist,ManimComplete ManimHQ silent Manim(<q-args>, manim_hq)
-command -nargs=? -complete=customlist,ManimComplete ManimHQAlpha silent Manim(<q-args>, manim_hq, true)
-command -nargs=? -complete=customlist,ManimComplete ManimDry silent Manim(<q-args>, manim_dry_run)
+command! -nargs=? -complete=customlist,ManimComplete Manim silent Manim(<q-args>, manim_pre_cmd, manim_lq)
+command! -nargs=? -complete=customlist,ManimComplete ManimHQ silent Manim(<q-args>, manim_pre_cmd, manim_hq)
+command! -nargs=? -complete=customlist,ManimComplete ManimHQAlpha silent Manim(<q-args>, manim_pre_cmd, manim_hq .. " --transparent")
+command! -nargs=? -complete=customlist,ManimComplete ManimDry silent Manim(<q-args>, manim_pre_cmd, manim_dry_run)
 
 # Jump to next-prev section
 nnoremap <buffer> <c-m> /\<self.next_section\><cr>
