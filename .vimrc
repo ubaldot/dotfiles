@@ -6,17 +6,18 @@ vim9script
 # so you don't need to create them manually.
 
 
-import "./.vim/lib/myfunctions.vim"
 
 if has("gui_win32") || has("win32")
     g:dotvim = $HOME .. "\\vimfiles"
-    set pythonthreehome=$HOME .. "\\Miniconda3"
-    set pythonthreedll=$HOME .. "\\Miniconda3\\python39.dll"
+    &pythonthreehome = $HOME .. "\\Miniconda3"
+    &pythonthreedll = $HOME .. "\\Miniconda3\\python39.dll"
 elseif has("mac")
     g:dotvim = $HOME .. "/.vim"
     &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     &pythonthreedll = trim(system("which python"))
 endif
+
+import g:dotvim .. "/lib/myfunctions.vim"
 
 # Set cursor
 &t_SI = "\e[6 q"
@@ -425,16 +426,16 @@ var lspServers = [
         path: 'clangd',
         args: ['--background-index', '--clang-tidy', '-header-insertion=never']
     },
-    {
-        name: 'arduino-language-server',
-        filetype: ['arduino'],
-        path: $HOME .. '/Documents/arduino-language-server/arduino-language-server',
-        debug: true,
-        args: ['-clangd', '/usr/bin/clangd',
-                '-cli-config', '/Users/ubaldot/Library/Arduino15/arduino-cli.yaml',
-                '-cli', '/opt/homebrew/bin/arduino-cli',
-                '-fqbn', 'arduino:avr:uno']
-    }
+    # {
+    #     name: 'arduino-language-server',
+    #     filetype: ['arduino'],
+    #     path: $HOME .. '/Documents/arduino-language-server/arduino-language-server',
+    #     debug: true,
+    #     args: ['-clangd', '/usr/bin/clangd',
+    #             '-cli-config', '/Users/ubaldot/Library/Arduino15/arduino-cli.yaml',
+    #             '-cli', '/opt/homebrew/bin/arduino-cli',
+    #             '-fqbn', 'arduino:avr:uno']
+    # }
 ]
 
 autocmd VimEnter * g:LspAddServer(lspServers)
