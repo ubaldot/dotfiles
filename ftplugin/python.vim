@@ -41,7 +41,7 @@ def Manim(scene: string="", pre_cmd: string="", flags: string="")
     endif
 
     # Send command
-    term_sendkeys(bufnr('MANIM'), pre_cmd .. " && " .. manim_cmd .. "\n")
+    term_sendkeys(bufnr('MANIM'), pre_cmd .. " && " .. manim_cmd .. "\r\n")
 enddef
 
 
@@ -101,7 +101,9 @@ enddef
 # Flags
 var manim_standard = " --fps 30 --disable_caching -v WARNING --save_sections"
 var manim_pre_cmd = "clear && osascript ~/QuickTimeClose.scpt"
-# var manim_pre_cmd = "clear"
+if has("gui_win32") || has("win32")
+    manim_pre_cmd = "cls"
+endif
 var manim_lq = "-pql" .. manim_standard
 var manim_dry_run = "--dry_run" .. manim_standard
 var manim_hq = "-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg" .. manim_standard
