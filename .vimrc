@@ -6,18 +6,17 @@ vim9script
 # so you don't need to create them manually.
 
 
+import "./.vim/lib/myfunctions.vim"
 
 if has("gui_win32") || has("win32")
     g:dotvim = $HOME .. "\\vimfiles"
-    &pythonthreehome = $HOME .. "\\Miniconda3"
-    &pythonthreedll = $HOME .. "\\Miniconda3\\python39.dll"
+    set pythonthreehome=$HOME .. "\\Miniconda3"
+    set pythonthreedll=$HOME .. "\\Miniconda3\\python39.dll"
 elseif has("mac")
     g:dotvim = $HOME .. "/.vim"
     &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     &pythonthreedll = trim(system("which python"))
 endif
-
-import g:dotvim .. "/lib/myfunctions.vim"
 
 # Set cursor
 &t_SI = "\e[6 q"
@@ -280,6 +279,11 @@ augroup SetTxtFmt
     autocmd BufRead,BufNewFile *.md set filetype=markdown.txtfmt
 augroup END
 
+augroup SetHeadersAsC
+    autocmd!
+    autocmd BufRead,BufNewFile *.h set filetype=c
+augroup END
+
 # Delete MakeTestPage so when typing :Ma I get Manim as first hit
 augroup deletePluginCommand
     autocmd!
@@ -426,16 +430,6 @@ var lspServers = [
         path: 'clangd',
         args: ['--background-index', '--clang-tidy', '-header-insertion=never']
     },
-    # {
-    #     name: 'arduino-language-server',
-    #     filetype: ['arduino'],
-    #     path: $HOME .. '/Documents/arduino-language-server/arduino-language-server',
-    #     debug: true,
-    #     args: ['-clangd', '/usr/bin/clangd',
-    #             '-cli-config', '/Users/ubaldot/Library/Arduino15/arduino-cli.yaml',
-    #             '-cli', '/opt/homebrew/bin/arduino-cli',
-    #             '-fqbn', 'arduino:avr:uno']
-    # }
 ]
 
 autocmd VimEnter * g:LspAddServer(lspServers)
@@ -527,6 +521,29 @@ command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
 command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
 command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
 
+# Debugger stuff
+
+g:termdebug_config = {}
+
+var debugger_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.macos64_1.1.100.202310310803/tools/bin/"
+var debugger = "arm-none-eabi-gdb"
+var debugger_fullpath = debugger_path .. debugger
+# var openocd_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.macos64_2.3.100.202310310803/tools/bin/"
+# var probe_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.1.0.202306221132/resources/openocd/st_scripts/interface/"
+# var probe = "stlink.cfg"
+# var board_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.1.0.202306221132/resources/openocd/st_scripts/target/"
+# var board = "stm32f4x.cfg"
+
+
+g:termdebug_config['command'] = [debugger_fullpath, "-x", "gdb_init_commands.txt"]
+
+# g:termdebug_config['command'] = debugger_path .. "arm-none-eabi-gdb"
+g:termdebug_config['variables_window'] = 1
+# var openocd_command = openocd .. " -f " .. board
+
+
+command! XXX execute "terminal " .. openocd_command
+
 
 command! Terminal myfunctions.OpenMyTerminal()
 # xnoremap h1 <Plug>Highlight<cr>
@@ -557,3 +574,54 @@ def Make()
 enddef
 
 command! MyCommand vim9cmd Make()
+
+# def JoinParagraphs()
+#    exe ":%!fmt -1000"
+# enddef
+
+# command! JoinParagraphs vim9cmd JoinParagraphs()
+
+# vip = visual inside paragraph
+command! JoinParagraphs v/^$/norm! vipJ
+
+# def ST32make(build_type: string, target: string, compiledb: string = "")
+#     var prev_makeprg = &makeprg
+#     var head = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/"
+#     var tail = "/tools/bin"
+
+#     # To update the following variables, check the PATH used in ST32CubeIDE -> Project ->
+#     # Configuration and search for PATH environment variable (CubeIDE has its
+#     # own shell configured in its own way)
+#     var folder1 = "com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.macos64_1.1.100.202310310803"
+#     var folder2 = "com.st.stm32cube.ide.mcu.externaltools.make.macos64_2.1.100.202310310804"
+
+#     &makeprg = $"PATH={head}{folder1}{tail}:{head}{folder2}{tail}:" .. $PATH .. $" {compiledb} make"
+#     execute $"cd {build_type}"
+#     execute $"make -j9 {target}"
+#     &makeprg = prev_makeprg
+#     if !empty(compiledb)
+#         execute "!mv compile_commands.json .."
+#     endif
+#     cd ..
+# enddef
+
+# def ST32upload(build_type: string, options: string)
+#     var prev_makeprg = &makeprg
+#     var head = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/"
+#     var tail = "/tools/bin"
+
+#     # You have to figure out where is the CubeProgrammer_CLI
+#     var folder = "com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.macos64_2.1.100.202311100844"
+
+#     &makeprg = $"PATH={head}{folder1}{tail}" .. $PATH .. $" STM32_Programmer_CLI"
+#     execute $"cd {build_type}"
+#     execute $"make {options}"
+#     &makeprg = prev_makeprg
+#     cd ..
+# enddef
+
+# command! ST32MakeDebug vim9cmd ST32make("Debug", "all")
+# command! ST32MakeDebugClean vim9cmd ST32make("Debug", "clean")
+# command! ST32MakeRelease vim9cmd ST32make("Release", "all")
+# command! ST32MakeReleaseClean vim9cmd ST32make("Release", "clean")
+# command! ST32CompileCommands vim9cmd ST32make("Debug", "all", "compiledb")
