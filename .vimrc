@@ -220,11 +220,10 @@ Plug 'preservim/nerdtree'
 Plug 'yegappan/lsp'
 # TODO enable plugin when matchbufline becomes available
 # Plug "yegappan/searchcomplete"
-Plug 'normen/vim-pio'
+# Plug 'normen/vim-pio'
 # Plug 'stevearc/vim-arduino'
 # # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
-# Plug 'girishji/search-complete.vim'
 # # Plug 'tpope/vim-scriptease'
 Plug 'ubaldot/vim-highlight-yanked'
 # Plug 'ubaldot/vim-conda-activate'
@@ -434,8 +433,6 @@ var lspServers = [
 
 autocmd VimEnter * g:LspAddServer(lspServers)
 
-# autocmd! User CondaEnvActivated echom "pippo"
-
 var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
 autocmd VimEnter * g:LspOptionsSet(lspOpts)
 highlight link LspDiagLine NONE
@@ -521,107 +518,59 @@ command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
 command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
 command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
 
-# Debugger stuff
+command! Terminal myfunctions.OpenMyTerminal()
+# xnoremap h1 <Plug>Highlight<cr>
+# noremap <leader><s-tab> :buffers t<cr>:filter // buffers t <bar> call feedkeys(':buffer ')<home><s-right><s-right><left>
+
+# vip = visual inside paragraph
+# This is used for preparing a text file for the caption to be sent to
+# YouTube.
+command! JoinParagraphs v/^$/norm! vipJ
+
+# Termdebug stuff
+# Call as Termdebug build/myfile.elf
 
 g:termdebug_config = {}
 
 var debugger_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.macos64_1.1.100.202310310803/tools/bin/"
 var debugger = "arm-none-eabi-gdb"
-var debugger_fullpath = debugger_path .. debugger
-# var openocd_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.openocd.macos64_2.3.100.202310310803/tools/bin/"
-# var probe_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.1.0.202306221132/resources/openocd/st_scripts/interface/"
-# var probe = "stlink.cfg"
-# var board_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.debug.openocd_2.1.0.202306221132/resources/openocd/st_scripts/target/"
-# var board = "stm32f4x.cfg"
 
+var opendocd_script = "openocd_stm32f4x_stlink.sh"
 
-g:termdebug_config['command'] = [debugger_fullpath, "-x", "gdb_init_commands.txt"]
-
-# g:termdebug_config['command'] = debugger_path .. "arm-none-eabi-gdb"
+g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_init_commands.txt"]
 g:termdebug_config['variables_window'] = 1
-# var openocd_command = openocd .. " -f " .. board
 
 
-command! XXX execute "terminal " .. openocd_command
+packadd Termdebug
+def MyTermdebug()
+    # The .elf name is supposed to be the same as the folder name.
+    # Before calling this function you must launch a openocd server.
+    # This happens inside this script with
 
+    #   source ../openocd_stm32f4x_stlink.sh
+    #
+    # Then Termdebug is launched.
+    # When Termdebug is closed, then the server is automatically shutoff
 
-command! Terminal myfunctions.OpenMyTerminal()
-# xnoremap h1 <Plug>Highlight<cr>
-noremap <leader><s-tab> :buffers t<cr>:filter // buffers t <bar> call feedkeys(':buffer ')<home><s-right><s-right><left>
+    # Start a openocd terminal
 
-# To get all the cppcheck issues in the QF list
-command! PIOCheck {
-    var current_makeprg = &l:makeprg
-    setlocal makeprg=pio
-    silent make check
-    execute "setlocal makeprg=" .. current_makeprg
-    copen
-}
+    var ii = term_start(&shell, {'term_name': 'OPENOCD', 'hidden': 1, 'term_finish': 'close'})
+    term_sendkeys(ii, 'source ../' .. opendocd_script .. "\n")
 
-command! PIOCompileCommands execute "!pio run -t compiledb"
-
-def Make()
-    var previous_compiler = ""
-    if exists("b:current_compiler")
-        previous_compiler = b:current_compiler
-    endif
-    compiler erlang
-    silent make
-    if !isempty(previous_compiler) > 0
-        execute "compiler " .. previous_compiler
-    endif
-    copen
+    var filename = fnamemodify(getcwd(), ':t')
+    execute "Termdebug build/" .. filename .. ".elf"
+    execute "close " ..  bufwinnr("debugged program")
 enddef
 
-command! MyCommand vim9cmd Make()
+augroup OpenOCDShutdown
+    autocmd!
+    autocmd User TermdebugStopPost {
+        for bufnum in term_list()
+            if bufname(bufnum) ==# 'OPENOCD'
+               execute "bw! " .. bufnum
+            endif
+        endfor
+    }
+augroup END
 
-# def JoinParagraphs()
-#    exe ":%!fmt -1000"
-# enddef
-
-# command! JoinParagraphs vim9cmd JoinParagraphs()
-
-# vip = visual inside paragraph
-command! JoinParagraphs v/^$/norm! vipJ
-
-# def ST32make(build_type: string, target: string, compiledb: string = "")
-#     var prev_makeprg = &makeprg
-#     var head = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/"
-#     var tail = "/tools/bin"
-
-#     # To update the following variables, check the PATH used in ST32CubeIDE -> Project ->
-#     # Configuration and search for PATH environment variable (CubeIDE has its
-#     # own shell configured in its own way)
-#     var folder1 = "com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.macos64_1.1.100.202310310803"
-#     var folder2 = "com.st.stm32cube.ide.mcu.externaltools.make.macos64_2.1.100.202310310804"
-
-#     &makeprg = $"PATH={head}{folder1}{tail}:{head}{folder2}{tail}:" .. $PATH .. $" {compiledb} make"
-#     execute $"cd {build_type}"
-#     execute $"make -j9 {target}"
-#     &makeprg = prev_makeprg
-#     if !empty(compiledb)
-#         execute "!mv compile_commands.json .."
-#     endif
-#     cd ..
-# enddef
-
-# def ST32upload(build_type: string, options: string)
-#     var prev_makeprg = &makeprg
-#     var head = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/"
-#     var tail = "/tools/bin"
-
-#     # You have to figure out where is the CubeProgrammer_CLI
-#     var folder = "com.st.stm32cube.ide.mcu.externaltools.cubeprogrammer.macos64_2.1.100.202311100844"
-
-#     &makeprg = $"PATH={head}{folder1}{tail}" .. $PATH .. $" STM32_Programmer_CLI"
-#     execute $"cd {build_type}"
-#     execute $"make {options}"
-#     &makeprg = prev_makeprg
-#     cd ..
-# enddef
-
-# command! ST32MakeDebug vim9cmd ST32make("Debug", "all")
-# command! ST32MakeDebugClean vim9cmd ST32make("Debug", "clean")
-# command! ST32MakeRelease vim9cmd ST32make("Release", "all")
-# command! ST32MakeReleaseClean vim9cmd ST32make("Release", "clean")
-# command! ST32CompileCommands vim9cmd ST32make("Debug", "all", "compiledb")
+command! Debug vim9cmd MyTermdebug()
