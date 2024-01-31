@@ -457,6 +457,7 @@ command! HelpmeNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
 command! HelpmeDiffMerge :HelpMe ~/.vim/helpme_files/vim_merge_diff.txt
 command! HelpmeCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
 command! HelpmeClosures :HelpMe ~/.vim/helpme_files/python_closures.txt
+command! HelpmeDebug :HelpMe ~/.vim/helpme_files/vim_debug.txt
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
