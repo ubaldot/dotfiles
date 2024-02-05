@@ -231,7 +231,7 @@ Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 # Plug 'ubaldot/vim-writegood'
-Plug 'bpstahlman/txtfmt'
+# Plug 'bpstahlman/txtfmt'
 # Plug 'hungpham3112/vide'
 #
 plug#end()
@@ -284,10 +284,10 @@ augroup SetHeadersAsC
 augroup END
 
 # Delete MakeTestPage so when typing :Ma I get Manim as first hit
-augroup deletePluginCommand
-    autocmd!
-    autocmd VimEnter * delcommand MakeTestPage
-augroup END
+# augroup deletePluginCommand
+#     autocmd!
+#     autocmd VimEnter * delcommand MakeTestPage
+# augroup END
 
 # statusline
 # ---------------
