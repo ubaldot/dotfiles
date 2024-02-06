@@ -1,31 +1,183 @@
 TEX
-.get_parts_by_text(A) # returns a list
-.tex_strings # Return a list that shows how the equation has been partitioned
 
-print(mob.tex_strings)
+\math* is changed to \sym*, e.g. \mathbf{} becomes \symbf{}, see
+  unicode-math LaTeX package for more info.
+
+For the text, then you have \textbf{} can be replaced with \FSBlack{}, see
+  myconfig
+
+LaTeX input can be written as:
+
+    1. One string
+    2. Comma-separated strings
+
+Avoid using f-strings, too many {} that collide with LaTeX. Use modulo format (%s) instead:
+
+    x = 1.1
+    y = 2.1
+    t = MathTex(r"\sqrt{%s^2+%s^2}" %(x,y))
+    self.add(t)
 
 
-Classic: separate pieces by comma
-     t = mn.MathTex(
-         rf"(y-{ii})",
-         r"^2+",
-         f"(y-{ii})",
-         r"+1 = 0,",
-         r"{{(y-a)}}^3-3{{(y-a)}}=1",
-     )
+One string
+-----------
+If the input of a MathTex/Tex is only one string:
 
-- Here you have t[0], t[1], where each index point to string passed and
-comma-separated. Then, each element is a letter because a string is a list
-of letters in Python.
-- For example t[2][4] is the fifth letter of the third string, in this case
-"i". etc.
+    t = mn.Tex(r"This is just an example $x+1=0$")
 
-- If you don't comma separate, then you only have t[0] and then each character is
-t[0][0], t[0][1], t[0][2], ...
-- Each of t[i] is a SingleStringMathTex instance.
+then it is accessed with t[0] and t[0][3] indicate the third rendered object.
 
-- If you have one long string either in Text/Tex/MathTex, you can get a
-  pointer only to what you need with search_shapes_in_text:
+To print all rendered objects, use
+
+    print(pmatrix.tex_strings)
+
+To visualize all the rendered objects, use
+
+    indices = mn.index_labels(pmatrix[0])
+    self.add(pmatrix, indices)
+
+At this point you can refer to a specific object with e.g. myObj = t[0][3:8]
+
+
+Comma-separated strings (do this if you use f-strings or %.2f)
+--------------------------------------------------------------
+You comma separate the strings:
+
+        x = 3.2
+        t = Tex(
+        r"This is just an example: ",
+        "$\mathrm{MyVec}$",
+        f"$=({x},y)$")
+
+Here you can access t[0], t[1], etc.
+
+=> OBS! Each part must be buildable with LaTeX (e.g. r"\begin{pmatrix}", alone is
+not buildable)
+
+=> If things get hard, define your own tex_environment and pass it as
+tex_environment= argument, see examples.
+
+=> f-string and latex fight against one each other. Use modulo string
+formatting, e.g.
+
+    x = mn.MathTex(r"\mathFSB{Rome} = (%.2f, %.2f)" %(x.get_value(), y.get_value())
+
+To align commas and automatically adjust parenthesis in animations, look at
+ErrorAQI class in 07_Norms.
+
+How to isolate elements
+-----------------------
+Use
+    *.group_shapes_in_text() - external, search by Mobject
+    Use t[0], t[1], ... if the string is separated by commas or
+    Use e.g. t[0][3:8] if the string is a single string, with the aid of indices
+    (DON'T USE) *.get_parts_by_tex() - builtin, search by text, requires comma-separated
+
+Examples:
+
+    r_tex = t.get_parts_by_tex(f"$\mathrm{MyVec}$").to_corner(mn.UR) # BAD
+    r_tex = sst.group_shapes_in_text(pmatrix, mn.MathTex("3")).to_corner(mn.UR)
+    r_tex = t[3]
+    r_tex = t[0][3:8]
+
+
+
+How to deal with matrices
+-------------------------
+Don't get mad. Use mn.Matrix or mn.DecimalMatrix or IntegerMatrix.
+
+Otherwise with LaTeX is as follows.
+The ideal would be to comma-separate rows and recall them with m[0], m[1], ... but you have the
+problem of the first and last lime \begin{pmatrix}. How shall be rendered?
+=> You create a new environment
+
+        temp = mycfg.myTexTemplate
+        temp.add_to_preamble(r"\newenvironment{mymatrix}{\begin{equation*}\begin{pmatrix}}{\end{pmatrix}\end{equation*}}")
+        x = 0
+        y = 1.1
+        m = mn.Tex(
+                rf"{x} & 4 \\",
+                f"{y} & -1",
+                tex_environment="mymatrix",
+                tex_template=temp
+                )
+
+        self.add(m)
+        self.add(m, m[1][:-1].to_corner(mn.DL), m[0][1].to_corner(mn.UR))
+
+Now you can access elements with m[i][j].
+
+Some examples:
+--------------
+1) Write all in one single string and cherry pick shapes with
+sst.group_shapes_in_text():
+
+        pmatrix = mn.MathTex(
+            r"""
+            \begin{pmatrix}
+            1 & 3 \\
+            3 & 0
+            \end{pmatrix}
+        """,
+        )
+
+        # You capture the mobject, now move it around!
+        r_tex = sst.group_shapes_in_text(pmatrix, mn.MathTex("3")).to_corner(mn.UR)
+
+2) Separate by commas and use .get_parts_by_tex(). In this case each line
+shall be buildable
+
+        t = Tex(
+        r"This is just an example: ", # 0
+        "$\mathrm{MyVec}$", # 1
+        "$=(x,y)$") # 2
+
+        # You capture the tex part, now move it around!
+        # BAD (because the next is equivalent)
+        r_tex = t.get_parts_by_tex("MyVec")
+        # GOOD
+        r_tex = t[1]
+
+No need to use substrings_to_isolate.
+
+
+How substrings_to_isolate works? (DON'T USE)
+-------------------------------------------
+Don't use because it is equivalent to breakdown a LaTeX expression with commas.
+Anyway, it isolate the string and each line is wrapper around a
+\begin{center}\end{center} environment:
+
+    t = Tex(r"This is just an example: $\mathrm{MyVec}=(x,y)$", substrings_to_isolate=["MyVec"])
+
+is broken into (manim automatically adds the missing {'s or }'s)
+
+    This is just an example: $\mathrm{}
+    MyVec
+    {}=(x,y)$
+
+Here is what is sent to Manim:
+
+    % snippet 1
+    \begin{center}
+    This is just an example: $\mathrm{}
+    \end{center}
+
+    % snippet 2
+    \begin{center}
+    MyVec
+    \end{center}
+
+    % snippet 3
+    \begin{center}
+    {}=(x,y)$
+    \end{center}
+
+To overcome the issue in the example, then use substrings_to_isolate=[r"$\mathrm{MyVec}$"]
+
+
+Few more complex examples:
+---------------------------
+Example with search_shapes_in_text:
 
         numbers = [3.5, -11.8]
         my_vec = MathTex(
@@ -36,21 +188,7 @@ t[0][0], t[0][1], t[0][2], ...
         number1 = group_shapes_in_text(my_vec, MathTex(str(numbers[0])))
         number2 = group_shapes_in_text(my_vec, MathTex(str(numbers[1])))
 
-- Note that \math* is changed to \sym*, e.g. \mathbf{} becomes \symbf{}, see
-  unicode-math LaTeX package for more info.
 
-- For the text, then you have \textbf{} can be replaced with \FSBlack{}, see
-  myconfig
-
-Use
-
-    self.add(
-            t.copy()
-            .get_parts_by_tex(f"(y-{ii})")
-            .next_to(t, mn.DOWN, aligned_edge=mn.LEFT)
-        )
-
-# Allowed values for substrings_to_isolate arguments must be any SingleStringMathTex that are present in t.tex_strings
 
 # Tex() VS MathTex() VS tex_environment.
 # Tex() is equivalent to
@@ -104,14 +242,8 @@ t = mn.Tex(
 ).scale_to_fit_width(12)
 
 
-# This is insane, you should check which part is rendered.
-mn.VGroup(t[3][2:9]).set_color(mn.TEAL)
-mn.VGroup(t[5][:3]).set_color(mn.GREEN)
-mn.VGroup(t[6][-2:], t[7][:4]).set_color(mn.ORANGE)
-mn.VGroup(t[8][-4:]).set_color(mn.RED)
-mn.VGroup(t[10][-6:], t[11][:2]).set_color(mn.PURPLE)
 
-Matrices
+Matrices (don't use)
     dns = VGroup(*[DecimalNumber(val, num_decimal_places=1).scale(0.5) for val in [3.2, 0.8]])
     template = TexTemplate()
     template.add_to_preamble(r"\newenvironment{mymatrix}{\begin{equation*}\begin{pmatrix}}{\end{pmatrix*}\end{equation}}")
