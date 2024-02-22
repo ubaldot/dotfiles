@@ -14,7 +14,7 @@ var fontsize_tail = ""
 
 if has("gui_win32")
      fontsize = 14
-     fontface = "FiraCode_NFM:h"
+     fontface = "Fira_Code:h"
      fontsize_tail = ":cANSI:qDRAFT"
      fontsize = 12
      set guioptions-=T
