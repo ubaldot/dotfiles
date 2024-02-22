@@ -1,7 +1,7 @@
 import manim as mn  # type: ignore
 import numpy as np
 import numpy.typing as npt
-import random
+import random, sys, os
 
 # Fonts
 berlin = "Berlin Sans FB"
@@ -127,9 +127,13 @@ def get_colors_mono(base_color=BG_rgb, nlevels=2, sat=None):
 
 
 # Few images
-mypath = (
-    "/users/ubaldot/Documents/YouTube/ControlTheoryInPractice/github_ctip/"
-)
+
+home_directory = os.path.expanduser("~")
+if sys.platform == "win32":
+    mypath = home_directory+'/Documents/github_ctip/'
+else:
+    mypath = home_directory + '/Documents/YouTube/ControlTheoryInPractice/github_ctip/'
+
 ManimBG = "ManimBG.png"
 imageBG = (
     mn.ImageMobject(mypath + ManimBG)
