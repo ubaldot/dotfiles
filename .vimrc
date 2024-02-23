@@ -5,17 +5,18 @@ vim9script
 # gutentags automatically creates ctags as you open files
 # so you don't need to create them manually.
 
+
+import "./.vim/lib/myfunctions.vim"
+
 if has("gui_win32") || has("win32")
     g:dotvim = $HOME .. "\\vimfiles"
-    &pythonthreehome = $HOME .. "\\Miniconda3"
-    &pythonthreedll = $HOME .. "\\Miniconda3\\python39.dll"
-elseif has("mac")
+    set pythonthreehome=$HOME .. "\\Miniconda3"
+    set pythonthreedll=$HOME .. "\\Miniconda3\\python39.dll"
+else
     g:dotvim = $HOME .. "/.vim"
     &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     &pythonthreedll = trim(system("which python"))
 endif
-
-import g:dotvim .. "/lib/myfunctions.vim"
 
 # Set cursor
 &t_SI = "\e[6 q"
@@ -36,11 +37,11 @@ augroup END
 
 
 # Open help pages in vertical split
-# augroup vimrc_help
-#     autocmd!
-#     autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
-# augroup END
-#
+augroup vimrc_help
+    autocmd!
+    autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
+augroup END
+
 # Internal vim variables aka 'options'
 # Set terminal with 256 colors
 set encoding=utf-8
@@ -75,7 +76,6 @@ set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
 set cursorline
-set diffopt+=iwhite
 
 # Some key bindings
 # ----------------------
@@ -248,7 +248,7 @@ syntax on
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 14 < hour
+if hour < 7 || 16 < hour
     set background=dark
 else
     set background=light
@@ -415,6 +415,7 @@ var pylsp_config = {
 
 # path: trim(system('where pylsp')),
         # workspaceConfig: pylsp_config,
+
 var lspServers = [
     {
         name: 'pylsp',
@@ -427,7 +428,8 @@ var lspServers = [
         name: 'clangd',
         filetype: ['c', 'cpp'],
         path: 'clangd',
-        args: ['--background-index', '--clang-tidy', '-header-insertion=never']
+        args: ['--background-index', '--clang-tidy',
+        '-header-insertion=never']
     },
 ]
 
@@ -447,17 +449,17 @@ nnoremap <silent> <leader>r <Cmd>LspPeekReferences<cr>
 
 
 # HelpMe files for my poor memory
-command! HelpmeBasic exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_basic.txt"
-command! HelpmeScript exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_scripting.txt"
-command! HelpmeGlobal exe "HelpMe" .. g:dotvim ..  "/helpme_files/vim_global.txt"
-command! HelpmeExCommands exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_excommands.txt"
-command! HelpmeSubstitute exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_substitute.txt"
-command! HelpmeAdvanced exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_advanced.txt"
-command! HelpmeNERDTree exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_nerdtree.txt"
-command! HelpmeDiffMerge exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_merge_diff.txt"
-command! HelpmeCoding exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_coding.txt"
-command! HelpmeClosures exe "HelpMe" .. g:dotvim .. "/helpme_files/python_closures.txt"
-command! HelpmeDebug exe "HelpMe" .. g:dotvim .. "/helpme_files/vim_debug.txt"
+command! HelpmeBasic :HelpMe ~/.vim/helpme_files/vim_basic.txt
+command! HelpmeScript :HelpMe ~/.vim/helpme_files/vim_scripting.txt
+command! HelpmeGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
+command! HelpmeExCommands :HelpMe ~/.vim/helpme_files/vim_excommands.txt
+command! HelpmeSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
+command! HelpmeAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
+command! HelpmeNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
+command! HelpmeDiffMerge :HelpMe ~/.vim/helpme_files/vim_merge_diff.txt
+command! HelpmeCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
+command! HelpmeClosures :HelpMe ~/.vim/helpme_files/python_closures.txt
+command! HelpmeDebug :HelpMe ~/.vim/helpme_files/vim_debug.txt
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
@@ -532,8 +534,11 @@ command! JoinParagraphs v/^$/norm! vipJ
 # Call as Termdebug build/myfile.elf
 
 g:termdebug_config = {}
+var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
 
-var debugger_path = "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.11.3.rel1.macos64_1.1.100.202310310803/tools/bin/"
+if has("gui_win32") || has("win32")
+    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
+endif
 var debugger = "arm-none-eabi-gdb"
 
 var opendocd_script = "openocd_stm32f4x_stlink.sh"
