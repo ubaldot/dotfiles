@@ -6,9 +6,15 @@ vim9script
 # so you don't need to create them manually.
 
 
-import "./.vim/lib/myfunctions.vim"
+if has("win32")
+    g:dotvim = $HOME .. "/vimfiles"
+else
+    g:dotvim = $HOME .. "./vim"
+endif
 
-g:dotvim = $HOME .. "/.vim"
+import g:dotvim .. "/lib/myfunctions.vim"
+
+
 &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
 &pythonthreedll = trim(system("which python"))
 
