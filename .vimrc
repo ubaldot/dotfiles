@@ -8,15 +8,9 @@ vim9script
 
 import "./.vim/lib/myfunctions.vim"
 
-if has("gui_win32") || has("win32")
-    g:dotvim = $HOME .. "\\vimfiles"
-    set pythonthreehome=$HOME .. "\\Miniconda3"
-    set pythonthreedll=$HOME .. "\\Miniconda3\\python39.dll"
-else
-    g:dotvim = $HOME .. "/.vim"
-    &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-    &pythonthreedll = trim(system("which python"))
-endif
+g:dotvim = $HOME .. "/.vim"
+&pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+&pythonthreedll = trim(system("which python"))
 
 # Set cursor
 &t_SI = "\e[6 q"
@@ -56,7 +50,7 @@ set smartindent
 set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
-set clipboard=unnamed
+# set clipboard=unnamed
 set splitright
 set splitbelow
 set laststatus=2
