@@ -6,15 +6,9 @@ vim9script
 # so you don't need to create them manually.
 
 
-if has("win32")
-    g:dotvim = $HOME .. "/vimfiles"
-else
-    g:dotvim = $HOME .. "./vim"
-endif
+import "./.vim/lib/myfunctions.vim"
 
-import g:dotvim .. "/lib/myfunctions.vim"
-
-
+g:dotvim = $HOME .. "/.vim"
 &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
 &pythonthreedll = trim(system("which python"))
 
@@ -534,10 +528,10 @@ command! JoinParagraphs v/^$/norm! vipJ
 # Call as Termdebug build/myfile.elf
 
 g:termdebug_config = {}
-var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
+var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
 
 if has("gui_win32") || has("win32")
-    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
+    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
 endif
 var debugger = "arm-none-eabi-gdb"
 
