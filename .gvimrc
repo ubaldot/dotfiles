@@ -20,9 +20,13 @@ if has("gui_win32")
      set guioptions-=T
     # Open gvim in full-screen
     au GUIEnter * simalt ~x
-elseif has("gui_macvim")
+elseif has("mac")
      fontsize_tail = ""
      fontface = "Fira\ Code:h"
+else
+     fontsize_tail = ""
+     fontface = "Fira\ Code\ "
+
 endif
 
 &guifont = fontface .. string(fontsize) .. fontsize_tail
