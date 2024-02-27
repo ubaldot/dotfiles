@@ -6,11 +6,16 @@ vim9script
 # so you don't need to create them manually.
 
 
-import "./.vim/lib/myfunctions.vim"
+if has("win32")
+    g:dotvim = $HOME .. "/vimfiles"
+else
+    g:dotvim = $HOME .. "/.vim"
+    &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+    &pythonthreedll = trim(system("which python"))
+endif
 
-g:dotvim = $HOME .. "/.vim"
-&pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-&pythonthreedll = trim(system("which python"))
+import g:dotvim .. "/lib/myfunctions.vim"
+
 
 # Set cursor
 &t_SI = "\e[6 q"
@@ -528,10 +533,10 @@ command! JoinParagraphs v/^$/norm! vipJ
 # Call as Termdebug build/myfile.elf
 
 g:termdebug_config = {}
-var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
+var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
 
 if has("gui_win32") || has("win32")
-    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
+    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
 endif
 var debugger = "arm-none-eabi-gdb"
 
@@ -541,7 +546,7 @@ g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_init_c
 g:termdebug_config['variables_window'] = 1
 
 
-packadd Termdebug
+packadd termdebug
 def MyTermdebug()
     # The .elf name is supposed to be the same as the folder name.
     # Before calling this function you must launch a openocd server.
