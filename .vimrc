@@ -428,7 +428,7 @@ var lspServers = [
         filetype: ['c', 'cpp'],
         path: 'clangd',
         args: ['--background-index', '--clang-tidy',
-        '-header-insertion=never']
+        '-header-insertion=never', '--path-mappings=/home/yt75534/avap_example=/app,/home/yt75534/docker_bin=/usr/bin']
     },
 ]
 
