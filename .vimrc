@@ -55,7 +55,7 @@ set smartindent
 set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
-# set clipboard=unnamed
+set clipboard=unnamedplus
 set splitright
 set splitbelow
 set laststatus=2
@@ -424,12 +424,20 @@ var lspServers = [
         args: ['--check-parent-process', '-v'],
     },
     {
-        name: 'clangd',
+        # name: 'enter_container_uba.sh clangd --path-mappings=/home/yt75534/avap_example=/app,/home/yt75534=/host_home,/home/yt75534/docker_include/c++/9=/usr/include/c++/9 --log=verbose',
+        name: 'enter_container_uba.sh',
         filetype: ['c', 'cpp'],
         path: 'clangd',
-        args: ['--background-index', '--clang-tidy',
-        '-header-insertion=never', '--path-mappings=/home/yt75534/avap_example=/app,/home/yt75534/docker_bin=/usr/bin']
+        args: [ 'clangd', '--background-index', '--clang-tidy',
+        '-header-insertion=never']
     },
+    # {
+    #     name: 'clangd',
+    #     filetype: ['c', 'cpp'],
+    #     path: 'clangd',
+    #     args: ['--background-index', '--clang-tidy',
+    #     '-header-insertion=never', '--path-mappings=/home/yt75534/avap_example=/app,/home/yt75534/docker_bin=/usr/bin']
+    # },
 ]
 
 autocmd VimEnter * g:LspAddServer(lspServers)
