@@ -584,7 +584,7 @@ def MyTermdebug()
     term_sendkeys(ii, openocd_cmd)
 
     var filename = fnamemodify(getcwd(), ':t')
-    echom filename
+    echo filename
     execute "Termdebug build/" .. filename .. ".elf"
     execute "close " ..  bufwinnr("debugged program")
 enddef
