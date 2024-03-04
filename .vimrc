@@ -55,7 +55,7 @@ set smartindent
 set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
-set clipboard=unnamedplus
+# set clipboard=unnamedplus
 set splitright
 set splitbelow
 set laststatus=2
@@ -136,10 +136,10 @@ inoremap <c-w> <c-g>u<c-w>
 # xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
 # Don't use the following otherwise you lose registers function!
 # Indent without leaving the cursor position
-nnoremap g= <Cmd>vim9cmd b:temp = winsaveview()<cr>gg=G
-            \ <Cmd>vim9cmd winrestview(b:temp)<cr>
-            \ <Cmd>vim9cmd unlet b:temp<cr>
-            \ <Cmd>echo "file indented"<cr>
+# nnoremap g= <Cmd>vim9cmd b:temp = winsaveview()<cr>gg=G
+#             \ <Cmd>vim9cmd winrestview(b:temp)<cr>
+#             \ <Cmd>vim9cmd unlet b:temp<cr>
+#             \ <Cmd>echo "file indented"<cr>
 
 # Format text
 nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<cr>gggqG
@@ -214,7 +214,9 @@ exe "cabbrev vter vert botright terminal " .. &shell
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-Plug 'preservim/nerdtree'
+# Plug 'preservim/nerdtree'
+Plug 'lambdalisue/fern.vim'
+Plug 'lambdalisue/fern-git-status.vim'
 # Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
 # TODO enable plugin when matchbufline becomes available
@@ -277,7 +279,7 @@ augroup SetTxtFmt
     autocmd BufRead,BufNewFile *.md set filetype=markdown.txtfmt
 augroup END
 
-augroup SetHeadersAsC
+augroup SetHeadersAsCfiletype
     autocmd!
     autocmd BufRead,BufNewFile *.h set filetype=c
 augroup END
@@ -386,17 +388,86 @@ set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
 
 # NERDTree
 # ----------------
-autocmd FileType nerdtree setlocal nolist
-nnoremap <F1> :NERDTreeToggle<cr>
+# autocmd FileType nerdtree setlocal nolist
+# nnoremap <F1> :NERDTreeToggle<cr>
+# augroup DIRCHANGE
+#     autocmd!
+#     autocmd DirChanged global NERDTreeCWD
+#     autocmd DirChanged global myfunctions.ChangeTerminalDir()
+# augroup END
+# Close NERDTree when opening a file
+# g:NERDTreeQuitOnOpen = 1
+
+
+# Fern
+# ------------
+
+# Disable netrw.
+g:loaded_netrw  = 1
+g:loaded_netrwPlugin = 1
+g:loaded_netrwSettings = 1
+g:loaded_netrwFileHandlers = 1
+
+augroup my-fern-hijack
+  autocmd!
+  autocmd BufEnter * ++nested call Hijack_directory()
+augroup END
+
+def Hijack_directory()
+  var path = expand('%:p')
+  if !isdirectory(path)
+    return
+  endif
+  bwipeout %
+  execute printf('Fern %s', fnameescape(path))
+enddef
+
+# Custom settings and mappings.
+g:fern#disable_default_mappings = 1
+
+
+g:fern#renderer#default#leading = "  "
+g:fern#renderer#default#leaf_symbol = ""
+g:fern#renderer#default#collapsed_symbol = "+"
+g:fern#renderer#default#expanded_symbol = "-"
+# g:fern#renderer#default#collapsed_symbol = "▶"
+# g:fern#renderer#default#expanded_symbol = "▼"
+
+noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
+
+def FernInit()
+  nmap <buffer><expr>
+        \ <Plug>(fern-my-open-expand-collapse)
+        \ fern#smart#leaf(
+        \   "\<Plug>(fern-action-open:select)",
+        \   "\<Plug>(fern-action-expand)",
+        \   "\<Plug>(fern-action-collapse)",
+        \ )
+  nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
+  nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
+  nmap <buffer> n <Plug>(fern-action-new-path)
+  nmap <buffer> d <Plug>(fern-action-remove)
+  nmap <buffer> m <Plug>(fern-action-move)
+  nmap <buffer> M <Plug>(fern-action-rename)
+  nmap <buffer> h <Plug>(fern-action-hidden)
+  nmap <buffer> r <Plug>(fern-action-reload)
+  nmap <buffer> k <Plug>(fern-action-mark)
+  nmap <buffer> b <Plug>(fern-action-open:split)
+  nmap <buffer> v <Plug>(fern-action-open:vsplit)
+  nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>cd ..<cr>
+  nmap <buffer><nowait> > <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
+  nmap <buffer><nowait> cd <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
+enddef
+
+augroup FernGroup
+  autocmd!
+  autocmd FileType fern call FernInit()
+augroup END
+
 augroup DIRCHANGE
     autocmd!
-    autocmd DirChanged global NERDTreeCWD
     autocmd DirChanged global myfunctions.ChangeTerminalDir()
 augroup END
-# Close NERDTree when opening a file
-g:NERDTreeQuitOnOpen = 1
-
-
 # This json-like style to encode configs like
 # pylsp.plugins.pycodestyle.enabled = true
 var pylsp_config = {
@@ -421,7 +492,7 @@ var clangd_name = 'clangd'
 var clangd_path = 'clangd'
 var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=never']
 
-var is_avap = true
+var is_avap = false
 if is_avap
     clangd_name = 'avap'
     clangd_path = '/home/yt75534/avap_example/clangd_in_docker.sh'
@@ -458,21 +529,21 @@ nnoremap <silent> <leader>d <Cmd>LspDiag current<cr>
 nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
 nnoremap <silent> <leader>k <Cmd>LspHover<cr>
 nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
-nnoremap <silent> <leader>r <Cmd>LspPeekReferences<cr>
+nnoremap <silent> <leader>r <Cmd>LspReferences<cr>
 
 
 # HelpMe files for my poor memory
-command! HelpmeBasic :HelpMe ~/.vim/helpme_files/vim_basic.txt
-command! HelpmeScript :HelpMe ~/.vim/helpme_files/vim_scripting.txt
-command! HelpmeGlobal :HelpMe ~/.vim/helpme_files/vim_global.txt
-command! HelpmeExCommands :HelpMe ~/.vim/helpme_files/vim_excommands.txt
-command! HelpmeSubstitute :HelpMe ~/.vim/helpme_files/vim_substitute.txt
-command! HelpmeAdvanced :HelpMe ~/.vim/helpme_files/vim_advanced.txt
-command! HelpmeNERDTree :HelpMe ~/.vim/helpme_files/vim_nerdtree.txt
-command! HelpmeDiffMerge :HelpMe ~/.vim/helpme_files/vim_merge_diff.txt
-command! HelpmeCoding :HelpMe ~/.vim/helpme_files/vim_coding.txt
-command! HelpmeClosures :HelpMe ~/.vim/helpme_files/python_closures.txt
-command! HelpmeDebug :HelpMe ~/.vim/helpme_files/vim_debug.txt
+command! HelpmeBasic exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_basic.txt"
+command! HelpmeScript exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_scripting.txt"
+command! HelpmeGlobal exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_global.txt"
+command! HelpmeExCommands exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_excommands.txt"
+command! HelpmeSubstitute exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_substitute.txt"
+command! HelpmeAdvanced exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_advanced.txt"
+# command! HelpmeNERDTree :HelpMe g:dotvim .. /helpme_files/vim_nerdtree.txt
+command! HelpmeDiffMerge exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_merge_diff.txt"
+command! HelpmeCoding exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_coding.txt"
+command! HelpmeClosures exe "HelpMe " .. g:dotvim .. "/helpme_files/python_closures.txt"
+command! HelpmeDebug exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_debug.txt"
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
@@ -529,10 +600,10 @@ augroup END
 command ManimDocs silent :!open -a safari.app
             \ ~/Documents/manimce-latest/index.html
 command ManimNew :enew | :0read ~/.manim/new_manim.txt
-command ManimHelpVMobjs :HelpMe ~/.vim/helpme_files/manim_vmobjects.txt
-command ManimHelpTex :HelpMe ~/.vim/helpme_files/manim_tex.txt
-command ManimHelpUpdaters :HelpMe ~/.vim/helpme_files/manim_updaters.txt
-command ManimHelpTransform :HelpMe ~/.vim/helpme_files/manim_transform.txt
+command ManimHelpVMobjs exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_vmobjects.txt"
+command ManimHelpTex exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_tex.txt"
+command ManimHelpUpdaters exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_updaters.txt"
+command ManimHelpTransform exe "HelpMe " .. g:dotvim .. "/helpme_files/manim_transform.txt"
 
 command! Terminal myfunctions.OpenMyTerminal()
 # xnoremap h1 <Plug>Highlight<cr>
@@ -593,3 +664,6 @@ augroup OpenOCDShutdown
 augroup END
 
 command! Debug vim9cmd MyTermdebug()
+
+
+# vim:tw=120
