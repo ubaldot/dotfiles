@@ -2,6 +2,7 @@ vim9script
 
 if has("win32")
     g:dotvim = $HOME .. "/vimfiles"
+    set shell=powershell
 else
     g:dotvim = $HOME .. "/.vim"
     &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
