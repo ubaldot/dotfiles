@@ -1,11 +1,5 @@
 vim9script
 
-# For auto-completion, jumps to definitions, etc
-# you can either use ctags or LSP.
-# gutentags automatically creates ctags as you open files
-# so you don't need to create them manually.
-
-
 if has("win32")
     g:dotvim = $HOME .. "/vimfiles"
 else
@@ -29,6 +23,7 @@ augroup ReloadVimScripts
     }
 augroup END
 
+# For plugin writing
 # augroup CommandWindowOpen
 #     autocmd!
 #     autocmd CmdwinEnter * map <buffer> <cr> <cr>q:
@@ -55,7 +50,6 @@ set smartindent
 set nobackup
 set backspace=indent,eol,start
 set nocompatible              # required
-# set clipboard=unnamedplus
 set splitright
 set splitbelow
 set laststatus=2
@@ -104,42 +98,21 @@ nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
 nnoremap <leader>b <Cmd>ls!<cr>:b
 nnoremap <c-tab> :b <tab>
 nnoremap <s-tab> <Cmd>b#<cr>
-# nnoremap <c-tab> <Plug>Bufselect_Toggle
-# nnoremap <C-tab> <Plug>(FileselectToggle)
 nnoremap <tab> <Cmd>bnext<cr>
 # nnoremap <s-tab> <Cmd>bprev<cr>
-# nnoremap <leader>c <C-w>c<cr>
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 # Switch window
-# nnoremap <C-w>w :bp<cr>:bw! #<cr>
-# nnoremap <leader>w <Cmd>bp<cr><Cmd>bw! #<cr>
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
-# Switch window with arrows
-# nnoremap <c-Left> <C-w>h<cr>
-# nnoremap <c-Right> <C-w>l<cr>
 
 # super quick search and replace:
 nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
-# Automatically surround highlighted selection
-# xnoremap ( <ESC>`>a)<ESC>`<i(<ESC>
-# xnoremap ) <ESC>`>a)<ESC>`<i(<ESC>
-# xnoremap [ <ESC>`>a]<ESC>`<i[<ESC>
-# xnoremap ] <ESC>`>a]<ESC>`<i[<ESC>
-# xnoremap { <ESC>`>a}<ESC>`<i{<ESC>
-# xnoremap } <ESC>`>a}<ESC>`<i{<ESC>
-# Don't use the following otherwise you lose registers function!
-# Indent without leaving the cursor position
-# nnoremap g= <Cmd>vim9cmd b:temp = winsaveview()<cr>gg=G
-#             \ <Cmd>vim9cmd winrestview(b:temp)<cr>
-#             \ <Cmd>vim9cmd unlet b:temp<cr>
-#             \ <Cmd>echo "file indented"<cr>
 
 # Format text
 nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<cr>gggqG
@@ -148,8 +121,7 @@ nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<cr>gggqG
             \ <Cmd>echo "file formatted, textwidth: "
             \ .. &textwidth .. " cols."<cr>
 
-# TERMINAL IN BUFFER (NO POPUP)
-# Some terminal remapping
+# Some terminal remapping when terminal is in buffer (no popup)
 # When using iPython to avoid that shift space gives 32;2u
 tnoremap <S-space> <space>
 tnoremap <ESC> <c-w>N
@@ -158,10 +130,7 @@ tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
 tnoremap <s-tab> <cmd>bnext<cr>
-# tnoremap <s-tab> <cmd>bprev<cr>
 tnoremap <c-tab> <c-w>:b <tab>
-# tnoremap <leader>b <c-w>:b <tab>
-# tnoremap <leader>l :ls!<cr>:b
 
 # TERMINAL IN POPUP
 # This function can be called only from a terminal windows/popup, so there is
@@ -184,11 +153,10 @@ def Quit_term_popup(quit: bool)
     endif
 enddef
 
-
 tnoremap <c-w>q <ScriptCmd>Quit_term_popup(true)<cr>
 tnoremap <c-w>c <ScriptCmd>Quit_term_popup(false)<cr>
 
-# Make vim to speak
+# Make vim to speak on macos
 if has('mac')
     # <esc> is used in xnoremap because '<,'> are updated once you leave visual mode
     xnoremap <leader>s <esc><ScriptCmd>TextToSpeech(line("'<"), line("'>"))<cr>
@@ -198,10 +166,6 @@ if has('mac')
         exe $":{firstline},{lastline}w !say"
     enddef
 endif
-
-# def TextToSpeech(firstline: number, lastline: number)
-#     exe $":{firstline},{lastline}w !say"
-# enddef
 
 
 # Open terminal below all windows
@@ -214,27 +178,17 @@ exe "cabbrev vter vert botright terminal " .. &shell
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-# Plug 'preservim/nerdtree'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 # Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
 # TODO enable plugin when matchbufline becomes available
 # Plug "yegappan/searchcomplete"
-# Plug 'normen/vim-pio'
-# Plug 'stevearc/vim-arduino'
-# # Plug 'ludovicchabant/vim-gutentags'
 Plug 'tpope/vim-commentary'
-# # Plug 'tpope/vim-scriptease'
 Plug 'ubaldot/vim-highlight-yanked'
-# Plug 'ubaldot/vim-conda-activate'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
-# Plug 'ubaldot/vim-writegood'
-# Plug 'bpstahlman/txtfmt'
-# Plug 'hungpham3112/vide'
-#
 plug#end()
 # filetype plugin indent on
 syntax on
@@ -292,9 +246,7 @@ augroup END
 
 # statusline
 # ---------------
-# var palette = everforest#get_palette(&background, {})
-# echom palette
-
+# Define all the functions that you need in your statusline and then build the statusline
 set laststatus=2
 set statusline=
 
@@ -350,8 +302,6 @@ def Conda_env(): string
         conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
     elseif has("mac") && exists("$CONDA_DEFAULT_ENV")
         conda_env = $CONDA_DEFAULT_ENV
-        # system() open a new shell and by default is 'base'.
-        # conda_env = trim(system("echo $CONDA_DEFAULT_ENV"))
     endif
     return conda_env
 enddef
@@ -384,20 +334,7 @@ set statusline+=%#StatusLineNC#\ col:%c\ %*
 # Add some conditionals here bitch!
 set statusline+=%#Visual#\ W:\ %{b:num_warnings}\ %*
 set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
-
-
-# NERDTree
-# ----------------
-# autocmd FileType nerdtree setlocal nolist
-# nnoremap <F1> :NERDTreeToggle<cr>
-# augroup DIRCHANGE
-#     autocmd!
-#     autocmd DirChanged global NERDTreeCWD
-#     autocmd DirChanged global myfunctions.ChangeTerminalDir()
-# augroup END
-# Close NERDTree when opening a file
-# g:NERDTreeQuitOnOpen = 1
-
+# ----------- end statusline setup -------------------------
 
 # Fern
 # ------------
@@ -468,6 +405,11 @@ augroup DIRCHANGE
     autocmd!
     autocmd DirChanged global myfunctions.ChangeTerminalDir()
 augroup END
+
+
+# LSP setup
+# ---------------------------
+
 # This json-like style to encode configs like
 # pylsp.plugins.pycodestyle.enabled = true
 var pylsp_config = {
@@ -483,11 +425,7 @@ var pylsp_config = {
                 'enabled': false}, }, }, }
 
 
-# path: trim(system('where pylsp')),
-        # workspaceConfig: pylsp_config,
-
 # clangd env setup
-
 var clangd_name = 'clangd'
 var clangd_path = 'clangd'
 var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=never']
@@ -498,7 +436,6 @@ if is_avap
     clangd_path = '/home/yt75534/avap_example/clangd_in_docker.sh'
     clangd_args = []
 endif
-
 
 var lspServers = [
     {
@@ -539,7 +476,6 @@ command! HelpmeGlobal exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_global.txt"
 command! HelpmeExCommands exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_excommands.txt"
 command! HelpmeSubstitute exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_substitute.txt"
 command! HelpmeAdvanced exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_advanced.txt"
-# command! HelpmeNERDTree :HelpMe g:dotvim .. /helpme_files/vim_nerdtree.txt
 command! HelpmeDiffMerge exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_merge_diff.txt"
 command! HelpmeCoding exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_coding.txt"
 command! HelpmeClosures exe "HelpMe " .. g:dotvim .. "/helpme_files/python_closures.txt"
@@ -551,12 +487,9 @@ command! ColorsToggle myfunctions.ColorsToggle()
 command! -nargs=1 -complete=command -range Redir
             \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
-# Source additional files
-# source $HOME/PE.vim
-# source $HOME/VAS.vim
-# source $HOME/dymoval.vim
 
 # vim-replica stuff
+# ----------------------------------
 # g:replica_console_position = "J"
 # g:replica_console_height = 10
 g:replica_display_range  = false
@@ -597,6 +530,7 @@ augroup END
 # Manim commands
 # To make docs go to manim/docs and run make html. Be sure that all the sphinx
 # extensions packages are installed.
+# TODO Make it working with Windows
 command ManimDocs silent :!open -a safari.app
             \ ~/Documents/manimce-latest/index.html
 command ManimNew :enew | :0read ~/.manim/new_manim.txt
@@ -606,8 +540,6 @@ command ManimHelpUpdaters exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_upd
 command ManimHelpTransform exe "HelpMe " .. g:dotvim .. "/helpme_files/manim_transform.txt"
 
 command! Terminal myfunctions.OpenMyTerminal()
-# xnoremap h1 <Plug>Highlight<cr>
-# noremap <leader><s-tab> :buffers t<cr>:filter // buffers t <bar> call feedkeys(':buffer ')<home><s-right><s-right><left>
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
@@ -616,7 +548,6 @@ command! JoinParagraphs v/^$/norm! vipJ
 
 # Termdebug stuff
 # Call as Termdebug build/myfile.elf
-
 g:termdebug_config = {}
 var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
 
@@ -629,7 +560,6 @@ var opendocd_script = "openocd_stm32f4x_stlink.sh"
 
 g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_init_commands.txt"]
 g:termdebug_config['variables_window'] = 1
-
 
 packadd termdebug
 def MyTermdebug()
