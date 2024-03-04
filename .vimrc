@@ -99,6 +99,7 @@ nnoremap <leader>b <Cmd>ls!<cr>:b
 nnoremap <c-tab> :b <tab>
 nnoremap <s-tab> <Cmd>b#<cr>
 nnoremap <tab> <Cmd>bnext<cr>
+nnoremap Y y$
 # nnoremap <s-tab> <Cmd>bprev<cr>
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
@@ -338,7 +339,6 @@ set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
 
 # Fern
 # ------------
-
 # Disable netrw.
 g:loaded_netrw  = 1
 g:loaded_netrwPlugin = 1
@@ -391,8 +391,8 @@ def FernInit()
   nmap <buffer> k <Plug>(fern-action-mark)
   nmap <buffer> b <Plug>(fern-action-open:split)
   nmap <buffer> v <Plug>(fern-action-open:vsplit)
-  nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>cd ..<cr>
-  nmap <buffer><nowait> > <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
+  nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>pwd<cr>
+  nmap <buffer><nowait> > <Plug>(fern-action-enter)<Cmd>pwd<cr>
   nmap <buffer><nowait> cd <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
 enddef
 
@@ -549,19 +549,27 @@ command! JoinParagraphs v/^$/norm! vipJ
 # Termdebug stuff
 # Call as Termdebug build/myfile.elf
 g:termdebug_config = {}
-var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
+var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin//"
 
 if has("gui_win32") || has("win32")
-    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin"
+    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
 endif
 var debugger = "arm-none-eabi-gdb"
 
-var opendocd_script = "openocd_stm32f4x_stlink.sh"
+# TODO: Adjust for windows
+var openocd_script = "openocd_stm32f4x_stlink.sh\n"
+var openocd_cmd = '../source ../' .. openocd_script
+
+if has("gui_win32") || has("win32")
+    openocd_cmd = "..\\openocd_stm32f4x_stlink.bat\n\r"
+endif
 
 g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_init_commands.txt"]
 g:termdebug_config['variables_window'] = 1
 
 packadd termdebug
+
+# The windows debugger sucks. Use an external debugger (like use MinGW64).
 def MyTermdebug()
     # The .elf name is supposed to be the same as the folder name.
     # Before calling this function you must launch a openocd server.
@@ -575,9 +583,10 @@ def MyTermdebug()
     # Start a openocd terminal
 
     var ii = term_start(&shell, {'term_name': 'OPENOCD', 'hidden': 1, 'term_finish': 'close'})
-    term_sendkeys(ii, 'source ../' .. opendocd_script .. "\n")
+    term_sendkeys(ii, openocd_cmd)
 
     var filename = fnamemodify(getcwd(), ':t')
+    echom filename
     execute "Termdebug build/" .. filename .. ".elf"
     execute "close " ..  bufwinnr("debugged program")
 enddef
@@ -594,6 +603,5 @@ augroup OpenOCDShutdown
 augroup END
 
 command! Debug vim9cmd MyTermdebug()
-
 
 # vim:tw=120
