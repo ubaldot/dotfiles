@@ -548,18 +548,17 @@ command! JoinParagraphs v/^$/norm! vipJ
 
 # Termdebug stuff
 # Call as Termdebug build/myfile.elf
+# OBS! BE sure to be in the project root folder and that a build/ folder exists!
 g:termdebug_config = {}
-var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin//"
-
+var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
 if has("gui_win32") || has("win32")
     debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
 endif
+
 var debugger = "arm-none-eabi-gdb"
 
-# TODO: Adjust for windows
 var openocd_script = "openocd_stm32f4x_stlink.sh\n"
-var openocd_cmd = '../source ../' .. openocd_script
-
+var openocd_cmd = 'source ../' .. openocd_script
 if has("gui_win32") || has("win32")
     openocd_cmd = "..\\openocd_stm32f4x_stlink.bat\n\r"
 endif
@@ -568,8 +567,7 @@ g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_init_c
 g:termdebug_config['variables_window'] = 1
 
 packadd termdebug
-
-# The windows debugger sucks. Use an external debugger (like use MinGW64).
+# The windows debugger sucks. It is based on cmd.exe. Use an external debugger (like use MinGW64).
 def MyTermdebug()
     # The .elf name is supposed to be the same as the folder name.
     # Before calling this function you must launch a openocd server.
