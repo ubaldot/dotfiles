@@ -1,6 +1,13 @@
+Start the debugger with arm-none-eabi-gdb -x ../gdb_init_commands.txt
+
 You can build the .elf file, then Termdebug myfile.elf and then monitor system
 halt and then (gdb) load
 
+LAYOUT
+- lay next
+- file filename.c:1
+
+COMMANDS
 - break <symbol/line>, (e.g. break blink_main.c:blink_main)
 - delete <breakpoint number>, (delete with no args for deleting all breakpoints)
 - clear <line number>, delete all breakpoints
@@ -24,6 +31,7 @@ halt and then (gdb) load
 - info <breakpoints, registers, threads, locals, globals, args>
     info breakpoints (show all active breakpoints)
 
+OPENOCD COMMANDS
 - monitor <command>, to use openocd commands
 - monitor (reset) halt /monitor resume
 
