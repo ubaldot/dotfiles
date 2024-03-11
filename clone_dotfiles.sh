@@ -8,4 +8,4 @@ DOTVIM_DIR="$HOME_DIR/.vim"
 cd "$HOME_DIR"
 git clone https://github.com/ubaldot/dotfiles.git
 
-./read_dotfiles.sh
+./pull_dotfiles.sh
