@@ -13,5 +13,5 @@ cp ~/write_dotfiles.sh ~/dotfiles
 
 cd ~/dotfiles
 git add -u
-git cim
+git ci -m "Updated some files..."
 git push
