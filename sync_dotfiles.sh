@@ -3,7 +3,7 @@
 # Define paths
 HOME_DIR=~
 DOTFILES_DIR="$HOME_DIR/dotfiles"
-DOTVIM_DIR ="$HOME_DIR/.vim"
+DOTVIM_DIR="$HOME_DIR/.vim"
 
 cd "$DOTFILES_DIR"
 git pull
