@@ -16,9 +16,9 @@ for file in "${files[@]}"; do
 done
 
 # Vim
-cp -r "$HOME_DIR/$DOTFILES_DIR/vim/helpme_files/"* "$DOTVIM_DIR/helpme_files"
-cp -r "$HOME_DIR/$DOTFILES_DIR/vim/ftplugin/"* "$DOTVIM_DIR/ftplugin"
-cp -r "$HOME_DIR/$DOTFILES_DIR/vim/lib/"* "$DOTVIM_DIR/lib"
+cp -r "$DOTFILES_DIR/vim/helpme_files/"* "$DOTVIM_DIR/helpme_files"
+cp -r "$DOTFILES_DIR/vim/ftplugin/"* "$DOTVIM_DIR/ftplugin"
+cp -r "$DOTFILES_DIR/vim/lib/"* "$DOTVIM_DIR/lib"
 
 # Manim
-cp -r "$HOME_DIR/$DOTFILES_DIR/manim/"* "$HOME/.manim"
+cp -r "$DOTFILES_DIR/manim/"* "$HOME/.manim"
