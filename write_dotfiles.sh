@@ -11,15 +11,15 @@ for file in "${files[@]}"; do
 done
 
 # Copy vim files
-cp -rv "$HOME_DIR/.vim/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
-cp -rv "$HOME_DIR/.vim/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
-cp -rv "$HOME_DIR/.vim/lib/"* "$DOTFILES_DIR/vim/lib"
+cp -r "$HOME_DIR/.vim/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
+cp -r "$HOME_DIR/.vim/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
+cp -r "$HOME_DIR/.vim/lib/"* "$DOTFILES_DIR/vim/lib"
 
 # Copy manim files
-cp -rv "$HOME_DIR/.manim/"* "$DOTFILES_DIR/manim"
+rsync -a --exclude="__manim__" "$HOME_DIR/.manim/" "$DOTFILES_DIR/manim"
 
 # Copy script files
-cp -v "$HOME_DIR/read_dotfiles.sh" "$HOME_DIR/write_dotfiles.sh" "$DOTFILES_DIR"
+cp "$HOME_DIR/read_dotfiles.sh" "$HOME_DIR/write_dotfiles.sh" "$DOTFILES_DIR"
 
 # Change directory to dotfiles
 cd "$DOTFILES_DIR" || exit
