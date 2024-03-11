@@ -3,7 +3,7 @@
 # Run from WSL
 
 # Define paths
-HOME_DIR="C:/Users/yt75534"
+HOME_DIR=/mnt/c/Users/yt75534
 DOTFILES_DIR="$HOME_DIR/dotfiles"
 DOTVIM_DIR="$HOME_DIR/vimfiles"
 
