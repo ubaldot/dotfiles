@@ -17,7 +17,7 @@ curl -o /tmp/clone_dotfiles_ssh.sh https://raw.githubusercontent.com/ubaldot/dot
 ```
 
 and run `/tmp/clone_dotfiles_ssh.sh` (or `/tmp/clone_dotfiles_https.sh`).
-Note that you need to `chmod u+x /tmp/clone_dotfiles*` and maybe you need to `dos2unix
+Note that you need to `chmod u+x /tmp/clone_dotfiles*` and you may need to `dos2unix
 /tmp/clone_dotfiles*` before running the script.
 
 **If you are using Windows you must use WSL and your C: drive must be mounted in /mnt/c.**
