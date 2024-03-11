@@ -4,10 +4,6 @@
 DOTFILES_DIR=~/dotfiles
 HOME_DIR=~
 
-# Backup existing files in dotfiles directory
-mkdir -p "$DOTFILES_DIR/backup"
-cp -v "$DOTFILES_DIR"/* "$DOTFILES_DIR/backup"
-
 # Copy dotfiles
 files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc")
 for file in "${files[@]}"; do
@@ -29,7 +25,7 @@ cp -v "$HOME_DIR/read_dotfiles.sh" "$HOME_DIR/write_dotfiles.sh" "$DOTFILES_DIR"
 cd "$DOTFILES_DIR" || exit
 
 # Add all changes to Git
-git add .
+git add -u
 
 # Check if there are changes to commit
 if git diff-index --quiet HEAD --; then
@@ -41,4 +37,4 @@ fi
 git commit -m "Update dotfiles: $(date)"
 
 # Push changes to remote repository
-git push origin master
+git push
