@@ -22,6 +22,7 @@ rsync -a "$DOTVIM_DIR/lib/"* "$DOTFILES_DIR/vim/lib"
 
 # Manim
 rsync -a --exclude="__pycache__" "$HOME/.manim" "$DOTFILES_DIR/manim"
+
 # Add all changes to Git
 git add -u
 
