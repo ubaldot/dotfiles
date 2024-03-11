@@ -13,7 +13,6 @@ files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "sync_dotfiles.sh" "clone_dotfile
 for file in "${files[@]}"; do
     # Copy files from ~/dotfiles to ~
         cp -v "$DOTFILES_DIR/$file" "$HOME_DIR"
-    fi
 done
 
 # Vim
