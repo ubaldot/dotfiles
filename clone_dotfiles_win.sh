@@ -13,7 +13,6 @@ files=(".vimrc" ".gvimrc" "sync_dotfiles_win.sh" "clone_dotfiles_win.sh")
 for file in "${files[@]}"; do
     # Copy files from ~/dotfiles to ~
         cp -v "$DOTFILES_DIR/$file" "$HOME_DIR"
-    fi
 done
 
 # Vim
