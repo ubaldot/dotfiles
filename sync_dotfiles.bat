@@ -16,6 +16,7 @@ for %%f in (%files%) do (
     ) else (
         REM File doesn't exist, use copy
         copy /Y "%HOME_DIR%\%%f" "%DOTFILES_DIR%"
+        git add "%DOTFILES_DIR%\%%f"
     )
 )
 
