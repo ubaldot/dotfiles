@@ -4,25 +4,22 @@
 DOTFILES_DIR=~/dotfiles
 HOME_DIR=~
 
+cd "$DOTFILES_DIR"
+git pull
+
 # Copy dotfiles
-files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc")
+files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "sync_dotfiles.sh")
 for file in "${files[@]}"; do
-    cp -v "$HOME_DIR/$file" "$DOTFILES_DIR"
+    rsync -a "$HOME_DIR/$file" "$DOTFILES_DIR"
 done
 
 # Copy vim files
-cp -r "$HOME_DIR/.vim/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
-cp -r "$HOME_DIR/.vim/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
-cp -r "$HOME_DIR/.vim/lib/"* "$DOTFILES_DIR/vim/lib"
+rsync -a "$HOME_DIR/.vim/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
+rsync -a "$HOME_DIR/.vim/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
+rsync -a "$HOME_DIR/.vim/lib/"* "$DOTFILES_DIR/vim/lib"
 
 # Copy manim files
 rsync -a --exclude="__manim__" "$HOME_DIR/.manim/" "$DOTFILES_DIR/manim"
-
-# Copy script files
-cp "$HOME_DIR/read_dotfiles.sh" "$HOME_DIR/write_dotfiles.sh" "$DOTFILES_DIR"
-
-# Change directory to dotfiles
-cd "$DOTFILES_DIR" || exit
 
 # Add all changes to Git
 git add -u
@@ -38,3 +35,4 @@ git commit -m "Update dotfiles: $(date)"
 
 # Push changes to remote repository
 git push
+cd "$HOME_DIR"
