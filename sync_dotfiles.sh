@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Define paths
-DOTFILES_DIR=~/dotfiles
 HOME_DIR=~
+DOTFILES_DIR="$HOME_DIR/dotfiles"
+DOTVIM_DIR ="$HOME_DIR/.vim"
 
 cd "$DOTFILES_DIR"
 git pull
@@ -22,9 +23,9 @@ for file in "${files[@]}"; do
 done
 
 # Copy vim files
-rsync -a "$HOME_DIR/.vim/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
-rsync -a "$HOME_DIR/.vim/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
-rsync -a "$HOME_DIR/.vim/lib/"* "$DOTFILES_DIR/vim/lib"
+rsync -a "$HOME_DIR/$DOTVIM_DIR/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
+rsync -a "$HOME_DIR/$DOTVIM_DIR/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
+rsync -a "$HOME_DIR/$DOTVIM_DIR/lib/"* "$DOTFILES_DIR/vim/lib"
 
 # Copy manim files
 rsync -a --exclude="__manim__" "$HOME_DIR/.manim/" "$DOTFILES_DIR/manim"
