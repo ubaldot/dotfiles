@@ -5,12 +5,12 @@ Repo to keep track of my configs files.
 Download the `clone_*` scripts with the following commands:
 
 ```
-curl -o ~/clone_dotfiles.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles.sh
+curl -o /tmp/clone_dotfiles.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles.sh
 ```
 
 ```
 # For windows
-curl -o ~/clone_dotfiles_win.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_win.sh
+curl -o /tmp/clone_dotfiles_win.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_win.sh
 ```
 
 and run them from a POSIX shell. **If you are using Windows consider using WSL or MINGW64.**
