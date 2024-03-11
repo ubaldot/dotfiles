@@ -13,6 +13,7 @@ DOTFILES_DIR="$HOME_DIR/dotfiles"
 
 cd "$DOTFILES_DIR"
 
+git pull
 # Copy dotfiles
 files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "pull_dotfiles.sh" "push_dotfiles.sh")
 for file in "${files[@]}"; do
