@@ -9,7 +9,7 @@ cd "$HOME_DIR"
 git clone https://github.com/ubaldot/dotfiles.git
 
 # Copy dotfiles
-files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "sync_dotfiles.sh" "clone_dotfiles.sh")
+files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "sync_dotfiles.sh")
 for file in "${files[@]}"; do
     # Copy files from ~/dotfiles to ~
         cp -v "$DOTFILES_DIR/$file" "$HOME_DIR"
