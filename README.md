@@ -24,5 +24,9 @@ Once done you can use the `push_/pull_` scripts to keep your files updated.
 Note that you need to `chmod u+x /tmp/clone_dotfiles*` and you may need to `dos2unix
 /tmp/clone_dotfiles*` to run the script.
 
-**If you plan to use Windows natively (i.e. no WSL), then you must still use WSL for running the `clone...sh` script
-and you must pass the argument `win` and your C: drive must be mounted in /mnt/c.**
+**Windows**
+
+If you plan to use Windows natively (i.e. no WSL), then you must still use WSL for running the `clone_dotfiles_*.sh` script
+and you must pass the argument `win`, e.g. `/tmp/clone_dotfiles_https.sh win` and your C: drive must be mounted in /mnt/c.
+The same for the `push_/pull_` scripts, you shall use e.g. `pull_dotfiles.sh
+win`.
