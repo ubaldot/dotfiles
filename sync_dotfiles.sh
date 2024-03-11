@@ -17,6 +17,7 @@ for file in "${files[@]}"; do
     else
         # File doesn't exist, use cp
         cp -v "$HOME_DIR/$file" "$DOTFILES_DIR"
+        git add "$DOTFILES_DIR/$file"
     fi
 done
 

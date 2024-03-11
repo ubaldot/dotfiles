@@ -214,6 +214,12 @@ endif
 g:everforest_background = 'soft'
 colorscheme everforest
 
+# easyjump settings
+g:easyjump_default_keymap = false
+nmap s <Plug>EasyjumpJump;
+omap s <Plug>EasyjumpJump;
+vmap s <Plug>EasyjumpJump;
+
 
 # txtfmt settings
 # TODO fix this and change the Shortcuts with R Y and G rather than r,y,g
