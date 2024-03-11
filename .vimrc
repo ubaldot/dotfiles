@@ -395,7 +395,7 @@ def FernInit()
   nmap <buffer> M <Plug>(fern-action-rename)
   nmap <buffer> h <Plug>(fern-action-hidden)
   nmap <buffer> r <Plug>(fern-action-reload)
-  nmap <buffer> k <Plug>(fern-action-mark)
+  nmap <buffer> o <Plug>(fern-action-mark)
   nmap <buffer> b <Plug>(fern-action-open:split)
   nmap <buffer> v <Plug>(fern-action-open:vsplit)
   nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>pwd<cr>
@@ -416,7 +416,6 @@ augroup END
 
 # LSP setup
 # ---------------------------
-
 # This json-like style to encode configs like
 # pylsp.plugins.pycodestyle.enabled = true
 var pylsp_config = {
