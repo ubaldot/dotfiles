@@ -4,6 +4,7 @@ Repo to keep track of my configs files.
 # Usage
 Download the `clone_*` scripts with the following commands:
 
+**Linux & MacOs**
 ```
 # https
 curl -o /tmp/clone_dotfiles_https.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_https.sh
@@ -14,6 +15,7 @@ curl -o /tmp/clone_dotfiles_https.sh https://raw.githubusercontent.com/ubaldot/d
 curl -o /tmp/clone_dotfiles_ssh.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_ssh.sh
 ```
 
+**Windows**
 ```
 # For windows
 curl -o /tmp/clone_dotfiles_win.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_win.sh
