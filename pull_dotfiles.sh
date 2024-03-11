@@ -9,7 +9,7 @@ cd "$DOTFILES_DIR"
 git pull
 
 # Copy dotfiles
-files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "read_dotfiles.sh" "write_dotfiles.sh")
+files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "pull_dotfiles.sh" "push_dotfiles.sh")
 for file in "${files[@]}"; do
     # Copy files from ~/dotfiles to ~
         cp -v "$DOTFILES_DIR/$file" "$HOME_DIR"
