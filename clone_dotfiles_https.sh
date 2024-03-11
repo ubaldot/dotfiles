@@ -1,9 +1,14 @@
 #!/bin/bash
 
 # Define paths
-HOME_DIR=~
+
+if [ "$1" = "win" ];
+    HOME_DIR=/mnt/c/Users/yt75534
+else
+    HOME_DIR=~
+fi
 
 cd "$HOME_DIR"
 git clone https://github.com/ubaldot/dotfiles.git
 
-./dotfiles/pull_dotfiles.sh
+./dotfiles/pull_dotfiles.sh "$1"
