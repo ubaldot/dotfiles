@@ -5,7 +5,6 @@ far so good (it is still better than manually copy and paste).
 # Usage
 Download the `clone_*` scripts with the following commands:
 
-**Linux & MacOs**
 ```
 # https
 curl -o /tmp/clone_dotfiles_https.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_https.sh
@@ -17,12 +16,13 @@ curl -o /tmp/clone_dotfiles_ssh.sh https://raw.githubusercontent.com/ubaldot/dot
 ```
 
 and run `/tmp/clone_dotfiles_ssh.sh` (or `/tmp/clone_dotfiles_https.sh`).
-Note that you need to `chmod u+x /tmp/clone_dotfiles*` and you may need to `dos2unix
-/tmp/clone_dotfiles*` before running the script.
-
-**If you are using Windows you must use WSL and your C: drive must be mounted in /mnt/c.**
-
 The scripts will clone this repo and copy the various files in the correct
 place.
 
 Once done you can use the `push_/pull_` scripts to keep your files updated.
+
+Note that you need to `chmod u+x /tmp/clone_dotfiles*` and you may need to `dos2unix
+/tmp/clone_dotfiles*` to run the script.
+
+**If you plan to use Windows natively (i.e. no WSL), then you must still use WSL for running the `clone...sh` script
+and you must pass the argument `win` and your C: drive must be mounted in /mnt/c.**
