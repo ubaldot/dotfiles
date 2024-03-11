@@ -10,7 +10,14 @@ git pull
 # Copy dotfiles
 files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "sync_dotfiles.sh")
 for file in "${files[@]}"; do
-    rsync -a "$HOME_DIR/$file" "$DOTFILES_DIR"
+    # Check if the file exists in $HOME_DIR
+    if [ -f "$HOME_DIR/$file" ]; then
+        # File exists, use rsync
+        rsync -a "$HOME_DIR/$file" "$DOTFILES_DIR"
+    else
+        # File doesn't exist, use cp
+        cp -v "$HOME_DIR/$file" "$DOTFILES_DIR"
+    fi
 done
 
 # Copy vim files
