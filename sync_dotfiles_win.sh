@@ -25,9 +25,9 @@ for file in "${files[@]}"; do
 done
 
 # Copy vim files
-rsync -a "$HOME_DIR/$DOTVIM_DIR/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
-rsync -a "$HOME_DIR/$DOTVIM_DIR/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
-rsync -a "$HOME_DIR/$DOTVIM_DIR/lib/"* "$DOTFILES_DIR/vim/lib"
+rsync -a "$DOTVIM_DIR/helpme_files/"* "$DOTFILES_DIR/vim/helpme_files"
+rsync -a "$DOTVIM_DIR/ftplugin/"* "$DOTFILES_DIR/vim/ftplugin"
+rsync -a "$DOTVIM_DIR/lib/"* "$DOTFILES_DIR/vim/lib"
 
 # Copy manim files
 rsync -a --exclude="__manim__" "$HOME_DIR/.manim/" "$DOTFILES_DIR/manim"
