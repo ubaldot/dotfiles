@@ -8,7 +8,7 @@ cd "$DOTFILES_DIR"
 git pull
 
 # Copy dotfiles
-files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "sync_dotfiles.sh" "sync_dotfiles.bat")
+files=(".zshrc" ".zprofile" ".vimrc" ".gvimrc" "sync_dotfiles.sh" "sync_dotfiles_win.sh")
 for file in "${files[@]}"; do
     # Check if the file exists in $HOME_DIR
     if [ -f "$HOME_DIR/$file" ]; then
