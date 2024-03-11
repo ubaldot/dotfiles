@@ -9,8 +9,9 @@ curl -o ~/clone_dotfiles.sh https://raw.githubusercontent.com/ubaldot/dotfiles/m
 curl -o ~/clone_dotfiles_win.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_win.sh
 ```
 
-and run them.
-They will clone this repo and copy the various files in the correct
-place. Once done you can use the `sync_*` scripts to keep your files updated. 
+and run them fro a POSIX shell. **If you are using windows consider using WSL.**
+The scripts will clone this repo and copy the various files in the correct
+place. 
 
-OBS! For Windows you mush use WSL.
+Once done you can use the `sync_*` scripts to keep your files updated. 
+
