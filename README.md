@@ -20,5 +20,5 @@ and run `/tmp/clone_dotfiles.sh` (or `/tmp/clone_dotfiles_win.sh` if you plan to
 The scripts will clone this repo and copy the various files in the correct
 place. 
 
-Once done you can use the `sync_*` scripts to keep your files updated. 
+Once done you can use the `push_/pull_` scripts to keep your files updated. 
 
