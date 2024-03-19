@@ -2,7 +2,7 @@
 
 # Define paths
 
-if [ "$1" = "win" ];
+if [ "$1" = "win" ]; then
     HOME_DIR=/mnt/c/Users/yt75534
 else
     HOME_DIR=~
