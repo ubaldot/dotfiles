@@ -96,8 +96,8 @@ nnoremap x "_x
 nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
 nnoremap <leader>b <Cmd>ls!<cr>:b
-nnoremap <c-tab> :b <tab>
-nnoremap <s-tab> <Cmd>b#<cr>
+nnoremap <s-tab> :b <tab><cr>
+# nnoremap <s-tab> <Cmd>b#<cr>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
 # nnoremap <s-tab> <Cmd>bprev<cr>
@@ -405,7 +405,7 @@ def FernInit()
       \ <Plug>(fern-my-leave-or-open-or-enter)
       \ fern#smart#root(
       \   "<Plug>(fern-action-leave)",
-      \   "<Plug>(fern-action-expand-tree)",
+      \   "<Plug>(fern-action-open-or-expand)",
       \ )
 
   nmap <buffer> <CR> <Plug>(fern-my-leave-or-open-or-enter)
@@ -504,8 +504,8 @@ command! -nargs=1 -complete=command -range Redir
 
 # vim-replica stuff
 # ----------------------------------
-# g:replica_console_position = "J"
-# g:replica_console_height = 10
+g:replica_console_position = "J"
+g:replica_console_height = 1
 g:replica_display_range  = false
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
