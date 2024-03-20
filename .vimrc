@@ -496,8 +496,8 @@ command! -nargs=1 -complete=command -range Redir
 
 # vim-replica stuff
 # ----------------------------------
-g:replica_console_position = "J"
-g:replica_console_height = 10
+# g:replica_console_position = "J"
+# g:replica_console_height = 10
 g:replica_display_range  = false
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
