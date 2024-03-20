@@ -401,6 +401,14 @@ def FernInit()
   nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>pwd<cr>
   nmap <buffer><nowait> > <Plug>(fern-action-enter)<Cmd>pwd<cr>
   nmap <buffer><nowait> cd <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
+  nmap <buffer><expr>
+      \ <Plug>(fern-my-leave-or-open-or-enter)
+      \ fern#smart#root(
+      \   "<Plug>(fern-action-leave)",
+      \   "<Plug>(fern-action-expand-tree)",
+      \ )
+
+  nmap <buffer> <CR> <Plug>(fern-my-leave-or-open-or-enter)
 enddef
 
 augroup FernGroup
