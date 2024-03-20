@@ -19,7 +19,7 @@ and run `/tmp/clone_dotfiles_ssh.sh` (or `/tmp/clone_dotfiles_https.sh`).
 The scripts will clone this repo and copy the various files in the correct
 place.
 
-Once done you can use the `~/dotfiles/push_` and `~/dotfiles/pull_` scripts to keep your files updated.
+Once done you can use the `~/dotfiles/push_dotfiles.sh` and `~/dotfiles/pull_dotfiles.sh` scripts to keep your files updated.
 
 Note that you need to `chmod u+x /tmp/clone_dotfiles*` and you may need to `dos2unix
 /tmp/clone_dotfiles*` to run the script.
