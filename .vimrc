@@ -105,6 +105,8 @@ noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 # Switch window
 nnoremap <c-h> <c-w>h
+nnoremap <c-down> <c-e>
+nnoremap <c-up> <c-y>
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
