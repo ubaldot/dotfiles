@@ -96,7 +96,7 @@ nnoremap x "_x
 nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
 nnoremap <leader>b <Cmd>ls!<cr>:b
-nnoremap <s-tab> :b <tab><cr>
+nnoremap <s-tab> :b <tab>
 # nnoremap <s-tab> <Cmd>b#<cr>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
@@ -402,13 +402,12 @@ def FernInit()
   nmap <buffer><nowait> > <Plug>(fern-action-enter)<Cmd>pwd<cr>
   nmap <buffer><nowait> cd <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
   nmap <buffer><expr>
-      \ <Plug>(fern-my-leave-or-open-or-enter)
+      \ <Plug>(fern-cr-mapping)
       \ fern#smart#root(
       \   "<Plug>(fern-action-leave)",
-      \   "<Plug>(fern-action-open-or-expand)",
+      \   "<Plug>(fern-my-open-expand-collapse)",
       \ )
-
-  nmap <buffer> <CR> <Plug>(fern-my-leave-or-open-or-enter)
+  nmap <buffer> <CR> <Plug>(fern-cr-mapping)
 enddef
 
 augroup FernGroup
@@ -504,8 +503,9 @@ command! -nargs=1 -complete=command -range Redir
 
 # vim-replica stuff
 # ----------------------------------
-g:replica_console_position = "J"
-g:replica_console_height = 1
+g:replica_console_position = "L"
+g:replica_console_height = &lines
+g:replica_console_width = &columns / 2
 g:replica_display_range  = false
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
