@@ -39,6 +39,8 @@ augroup END
 # Internal vim variables aka 'options'
 # Set terminal with 256 colors
 set encoding=utf-8
+set belloff=all
+set clipboard=unnamed
 set termguicolors
 set autoread
 set number
@@ -380,6 +382,7 @@ g:fern#renderer#default#expanded_symbol = "-"
 # g:fern#renderer#default#expanded_symbol = "▼"
 
 noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
+noremap <silent> <F1> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 
 def FernInit()
   nmap <buffer><expr>
