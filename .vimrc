@@ -120,11 +120,12 @@ inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
 
 # Format text
-nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<cr>gggqG
-            \ <Cmd>vim9cmd winrestview(b:temp)<cr>
-            \ <Cmd>vim9cmd unlet b:temp<cr>
-            \ <Cmd>echo "file formatted, textwidth: "
-            \ .. &textwidth .. " cols."<cr>
+# nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<cr>gggqG
+#             \ <Cmd>vim9cmd winrestview(b:temp)<cr>
+#             \ <Cmd>vim9cmd unlet b:temp<cr>
+#             \ <Cmd>echo "file formatted, textwidth: "
+#             \ .. &textwidth .. " cols."<cr>
+
 
 # Some terminal remapping when terminal is in buffer (no popup)
 # When using iPython to avoid that shift space gives 32;2u

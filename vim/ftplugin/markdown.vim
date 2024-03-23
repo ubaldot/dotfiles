@@ -1,5 +1,20 @@
 vim9script
 
+augroup PRETTIER
+    autocmd! * <buffer>
+    autocmd BufWritePre <buffer> call Prettify()
+augroup END
+
+def Prettify()
+    b:win_view = winsaveview()
+    silent exe ":%!prettier --prose-wrap always --print-width 80 " .. expand("%")
+    winrestview(b:win_view)
+    echo "File prettified!"
+enddef
+
+# Consequently, this does not work
+nnoremap <buffer> g- <ScriptCmd>Prettify()<cr>
+
 def MarkdownRender()
     if has("win32")
         silent exe "!type " .. expand('%') .. " | pandoc -f gfm -o C:\\temp\\md_rendered.html | start C:\\temp\\md_rendered.html"
