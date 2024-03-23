@@ -9,7 +9,7 @@ def Prettify()
     b:win_view = winsaveview()
     silent exe ":%!prettier --prose-wrap always --print-width 80 " .. expand("%")
     winrestview(b:win_view)
-    echo "File prettified!"
+    # echo "File prettified!"
 enddef
 
 # Consequently, this does not work
