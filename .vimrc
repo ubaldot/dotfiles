@@ -520,7 +520,6 @@ g:replica_jupyter_console_options = {"python":
 # g:writegood_compiler = "vale"
 # g:writegood_options = "--config=$HOME/vale.ini"
 
-g:use_black = true
 
 
 # Self-defined functions
