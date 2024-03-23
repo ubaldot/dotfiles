@@ -2,12 +2,12 @@ vim9script
 
 augroup PRETTIER
     autocmd! * <buffer>
-    autocmd BufWritePost <buffer> call Prettify()
+    autocmd BufWritePre <buffer> call Prettify()
 augroup END
 
 def Prettify()
     var win_view = winsaveview()
-    silent exe ":%!prettier --prose-wrap always --print-width 80 " .. expand("%")
+    silent exe $":%!prettier --prose-wrap always --print-width {&l:textwidth} {shellescape(expand("%"))}"
     winrestview(win_view)
     # echo "File prettified!"
 enddef

@@ -7,16 +7,17 @@ setlocal foldmethod=indent
 # Autocmd to format with black.
 augroup BLACK
     autocmd! * <buffer>
-    autocmd BufWritePost <buffer> {
-        if g:use_black
-            b:win_view = winsaveview()
-            silent exe "!black --line-length " .. &l:textwidth .. " " .. expand('<afile>')
-            edit!
-            winrestview(b:win_view)
-        endif
-    }
+    autocmd BufWritePre <buffer> call Black(&l:textwidth)
 augroup END
 
+def Black(textwidth: number)
+        var win_view = winsaveview()
+        exe $":%!cat {shellescape(expand("%"))} | black - -q --line-length {textwidth}"
+        winrestview(win_view)
+enddef
+
+# Call black to format 120 line length
+command! Black120 call Black(120)
 
 # Render in a terminal buffer
 def Manim(scene: string="", pre_cmd: string="", flags: string="")
@@ -118,6 +119,3 @@ command! -nargs=? -complete=customlist,ManimComplete ManimDry silent Manim(<q-ar
 # Jump to next-prev section
 nnoremap <buffer> <c-m> /\<self.next_section\><cr>
 nnoremap <buffer> <c-n> ?\<self.next_section\><cr>
-
-# Call black to format 120 line length
-command! Black120 execute "!black --line-length 120 " .. expand('%')
