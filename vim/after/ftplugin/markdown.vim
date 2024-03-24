@@ -13,7 +13,6 @@ augroup END
 
 def Prettify()
     var win_view = winsaveview()
-    # silent exe $":%!prettier 2>{null_device} --prose-wrap always --print-width {&l:textwidth}"
     silent exe $":%!prettier --prose-wrap always --print-width {&l:textwidth}
                 \ --stdin-filepath {shellescape(expand("%"))}"
     winrestview(win_view)
