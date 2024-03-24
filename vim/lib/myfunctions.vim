@@ -157,6 +157,13 @@ export def Highlight()
     endif
 enddef
 
+# --------- General formatting function -----------------
+export def FormatWithoutMoving()
+    var view = winsaveview()
+    silent normal! gggqG
+    winrestview(view)
+enddef
+
 # ------------ Terminal functions ------------------
 # Change all the terminal directories when you change vim directory
 export def ChangeTerminalDir()
