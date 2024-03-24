@@ -23,7 +23,8 @@ augroup END
 
 def Black(textwidth: number)
         var win_view = winsaveview()
-        exe $":%!black - -q 2>{null_device} --line-length {textwidth}"
+        exe $":%!black - -q 2>{null_device} --line-length {textwidth}
+                    \ --stdin-filename {shellescape(expand("%"))}"
         winrestview(win_view)
 enddef
 
