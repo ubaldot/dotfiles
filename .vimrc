@@ -1,24 +1,26 @@
 vim9script
 
 if has("win32")
-    g:start_cmd = "start "
     g:tmp = "C:/temp/"
     g:null_device = "/dev/null"
     g:dotvim = $HOME .. "/vimfiles"
-elseif has("mac")
-    g:start_cmd = "open "
+else
     g:tmp = "/tmp/"
     g:null_device = "/dev/null"
     g:dotvim = $HOME .. "/.vim"
     # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     # &pythonthreedll = trim(system("which python"))
-else
-    g:start_cmd = "xdg-open "
-    g:tmp = "/tmp/"
-    g:null_device = "/dev/null"
-    g:dotvim = $HOME .. "/.vim"
 endif
 
+if executable('cmd.exe')
+     g:start_cmd = "start"
+# Linux/BSD
+elseif executable("xdg-open")
+     g:start_cmd = "xdg-open"
+# MacOS
+elseif executable("open")
+     g:start_cmd = "open"
+endif
 
 import g:dotvim .. "/lib/myfunctions.vim"
 
