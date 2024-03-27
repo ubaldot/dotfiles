@@ -1,11 +1,5 @@
 vim9script
 
-var null_device = "/dev/null"
-if has("win32")
-   null_device = "nul"
-endif
-
-
 augroup PRETTIER
     autocmd! * <buffer>
     autocmd BufWritePre <buffer> call Prettify()
@@ -13,7 +7,7 @@ augroup END
 
 def Prettify()
     var win_view = winsaveview()
-    silent exe $":%!prettier 2>{null_device} --prose-wrap always
+    silent exe $":%!prettier 2>{g:null_device} --prose-wrap always
                 \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
     winrestview(win_view)
     # echo "File prettified!"
