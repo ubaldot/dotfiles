@@ -1,29 +1,26 @@
 vim9script
 
 if has("win32")
-    g:dotvim = $HOME .. "/vimfiles"
-else
-    g:dotvim = $HOME .. "/.vim"
-    &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-    &pythonthreedll = trim(system("which python"))
-endif
-
-import g:dotvim .. "/lib/myfunctions.vim"
-
-
-if has("win32")
     g:start_cmd = "start "
     g:tmp = "C:/temp/"
-    g:null_device = "nul"
+    g:null_device = "/dev/null"
+    g:dotvim = $HOME .. "/vimfiles"
 elseif has("mac")
     g:start_cmd = "open "
     g:tmp = "/tmp/"
     g:null_device = "/dev/null"
+    g:dotvim = $HOME .. "/.vim"
+    # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+    # &pythonthreedll = trim(system("which python"))
 else
     g:start_cmd = "xdg-open "
     g:tmp = "/tmp/"
     g:null_device = "/dev/null"
+    g:dotvim = $HOME .. "/.vim"
 endif
+
+
+import g:dotvim .. "/lib/myfunctions.vim"
 
 
 # Set cursor
