@@ -4,15 +4,10 @@ vim9script
 
 setlocal foldmethod=indent
 
-var null_device = "/dev/null"
-if has("win32")
-    null_device = "nul"
-endif
-
 # set formatprg=black\ -q\ 2>/dev/null\ --stdin-filename\ %\ -
 # augroup BLACK
 #     autocmd! * <buffer>
-#     autocmd BufWritePre <buffer> exe "norm gggqG"
+#     autocmd BufWritePre <buffer> call myfunctions.FormatWithoutMoving()
 # augroup END
 
 # Autocmd to format with black.
@@ -23,7 +18,7 @@ augroup END
 
 def Black(textwidth: number)
         var win_view = winsaveview()
-        exe $":%!black - -q 2>{null_device} --line-length {textwidth}
+        exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
                     \ --stdin-filename {shellescape(expand("%"))}"
         winrestview(win_view)
 enddef

@@ -14,12 +14,15 @@ import g:dotvim .. "/lib/myfunctions.vim"
 if has("win32")
     g:start_cmd = "start "
     g:tmp = "C:/temp/"
+    g:null_device = "nul"
 elseif has("mac")
     g:start_cmd = "open "
     g:tmp = "/tmp/"
+    g:null_device = "/dev/null"
 else
     g:start_cmd = "xdg-open "
     g:tmp = "/tmp/"
+    g:null_device = "/dev/null"
 endif
 
 
