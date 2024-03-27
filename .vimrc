@@ -11,17 +11,29 @@ endif
 import g:dotvim .. "/lib/myfunctions.vim"
 
 
+if has("win32")
+    g:start_cmd = "start "
+    g:tmp = "C:/temp/"
+elseif has("mac")
+    g:start_cmd = "open "
+    g:tmp = "/tmp/"
+else
+    g:start_cmd = "xdg-open "
+    g:tmp = "/tmp/"
+endif
+
+
 # Set cursor
 &t_SI = "\e[6 q"
 &t_EI = "\e[2 q"
 
-augroup ReloadVimScripts
-    autocmd!
-    autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
-        exe "source %"
-        echo expand('%:t') .. " reloaded."
-    }
-augroup END
+# augroup ReloadVimScripts
+#     autocmd!
+#     autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
+#         exe "source %"
+#         echo expand('%:t') .. " reloaded."
+#     }
+# augroup END
 
 # For plugin writing
 # augroup CommandWindowOpen
@@ -70,7 +82,7 @@ set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
-set cursorline
+# set cursorline
 
 # Some key bindings
 # ----------------------
@@ -93,6 +105,8 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 
 # Avoid polluting registers
 nnoremap x "_x
+# Opposite of J, i.e. split from current cursor position
+nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
 # them as g:.
 nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>

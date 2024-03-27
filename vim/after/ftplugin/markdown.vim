@@ -22,14 +22,11 @@ enddef
 # Consequently, this does not work
 nnoremap <buffer> g- <ScriptCmd>Prettify()<cr>
 
+
 def MarkdownRender()
-    if has("win32")
-        silent exe "!type " .. expand('%') .. " | pandoc -f gfm -o C:\\temp\\md_rendered.html | start C:\\temp\\md_rendered.html"
-    elseif has("mac")
-        silent exe "!cat " .. expand('%') .. " | pandoc -f gfm -o /tmp/md_rendered.html | open /tmp/md_rendered.html"
-    else
-        silent exe "!cat " .. expand('%') .. " | pandoc -f gfm -o /tmp/md_rendered.html | xdg-open /tmp/md_rendered.html"
-    endif
+    var out_html = $"{g:tmp}/md_rendered.html"
+    silent exe $"!pandoc {shellescape(expand("%")} -f gfm -o {out_html}"
+    silent exe $"!{g:start_cmd} {out_html}"
 enddef
 
 command -buffer MarkdownRender MarkdownRender()
