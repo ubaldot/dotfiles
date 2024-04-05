@@ -593,12 +593,12 @@ endif
 var debugger = "arm-none-eabi-gdb"
 
 var openocd_script = "openocd_stm32f4x_stlink.sh\n"
-var openocd_cmd = 'source ../' .. openocd_script
+var openocd_cmd = 'source ../gdb_stuff/' .. openocd_script
 if has("gui_win32") || has("win32")
-    openocd_cmd = "..\\openocd_stm32f4x_stlink.bat\n\r"
+    openocd_cmd = "..\\gdb_stuff\\openocd_stm32f4x_stlink.bat\n\r"
 endif
 
-g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_init_commands.txt"]
+g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_stuff/gdb_init_commands.txt"]
 g:termdebug_config['variables_window'] = 1
 
 packadd termdebug
