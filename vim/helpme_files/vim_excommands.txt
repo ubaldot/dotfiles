@@ -8,12 +8,11 @@ range specifies the lines where cmd shall be executed.
 
 EXAMPLES
 --------
-:%y                 yank the whole file
-:%normal @a         run macro a through all the file
-:10,15normal $x     remove last character from line 10 to line 15
-:'a,'by z           copy from marker a to marker b into z register
-:23,39norm >>       Indent lines 23-39
-:'a,'bs/<c-r><c-w>  add the word under the cursor
+:%y             yank the whole file
+:%normal @a     run macro a through all the file
+:10,15normal $x remove last character from line 10 to line 15
+:'a,'by z  copy from marker a to marker b into z register
+:23,39norm >> Indent lines 23-39
 
 RANGES
 ------
@@ -29,13 +28,12 @@ To create ranges of arbitrary lines, use :g (global)
 TIPS
 ----
 * to replace stuff in specific "geometrical" positions (for example,
-to remove the commas at the end of each line) use :norm, e.g.
+to remove the commas at the end of each line) use macros, e.g.
 
-:10,20normal qa05xjq
-
-Or macros, but perhaps :normal is better.
-
-:norm <c-v> and then hit <esc> add an actual <esc> to your command
+Example:
+--------
+qa05xjq (remove first 5 chars in current line and move to next line)
+:10,20normal @a
 
 * to replace stuff that follow a certain pattern (no matter where
 these guys are located), for example remove all " in a file,
