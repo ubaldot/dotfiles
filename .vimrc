@@ -84,6 +84,7 @@ set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
+set path+=**
 # set cursorline
 
 # Some key bindings
@@ -151,12 +152,15 @@ tnoremap <c-h> <c-w>h
 tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
-tnoremap <s-tab> <cmd>bnext<cr>
-tnoremap <c-tab> <c-w>:b <tab>
+# tnoremap <s-tab> <cmd>bnext<cr>
+tnoremap <s-tab> <c-w>:b <tab>
 
 # TERMINAL IN POPUP
 # This function can be called only from a terminal windows/popup, so there is
 # no risk of closing unwanted popups (such as HelpMe popups).
+# Although this function could be moved to lib, I keep it here to remind me how to map functions without the need of
+# creating commands by using <ScriptCmd>
+
 def Quit_term_popup(quit: bool)
     if empty(popup_list())
         if quit
@@ -212,9 +216,16 @@ Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'girishji/easyjump.vim'
+# Plug 'monkoose/vim9-stargate'
 plug#end()
 # filetype plugin indent on
 syntax on
+
+# vim9-stargate
+# For 1 character to search before showing hints
+# noremap s <Cmd>call stargate#OKvim('\<')<CR>
+# For 2 consecutive characters to search
+# noremap s <Cmd>call stargate#OKvim(1)<CR>
 
 # Conda activate at startup
 # augroup CondaActivate
