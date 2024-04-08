@@ -340,7 +340,7 @@ def Conda_env(): string
     var conda_env = "base"
     if has("gui_win32") || has("win32")
         conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
-    elseif has("mac") && exists("$CONDA_DEFAULT_ENV")
+    elseif exists("$CONDA_DEFAULT_ENV")
         conda_env = $CONDA_DEFAULT_ENV
     endif
     return conda_env
