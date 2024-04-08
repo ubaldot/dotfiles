@@ -245,13 +245,6 @@ endif
 g:everforest_background = 'soft'
 colorscheme everforest
 
-# easyjump settings
-g:easyjump_default_keymap = false
-nmap s <Plug>EasyjumpJump;
-omap s <Plug>EasyjumpJump;
-vmap s <Plug>EasyjumpJump;
-
-
 # txtfmt settings
 # TODO fix this and change the Shortcuts with R Y and G rather than r,y,g
 g:txtfmtBgcolor2 = '^R$,c:LightRed,g:' .. matchstr(execute('highlight DiffDelete'), 'guibg=\zs#\x\+')
@@ -648,4 +641,29 @@ augroup END
 
 command! Debug vim9cmd MyTermdebug()
 
-# vim:tw=120
+# Example of user-command with multiple args from different lists
+# command! -nargs=* -complete=customlist,FooCompleteNope Manim call Foo(<f-args>)
+
+# def FooComplete(current_arg: string, command_line: string, cursor_position: number): list<string>
+#   # split by whitespace to get the separate components:
+#   var parts = split(command_line, '\s\+')
+
+#   if len(parts) > 2
+#     # then we're definitely finished with the first argument:
+#     return SecondCompletion(current_arg)
+#   elseif len(parts) > 1 && current_arg =~ '^\s*$'
+#     # then we've entered the first argument, but the current one is still blank:
+#     return SecondCompletion(current_arg)
+#   else
+#     # we're still on the first argument:
+#     return FirstCompletion(current_arg)
+#   endif
+# enddef
+
+# def FirstCompletion(arg: string): list<string>
+#     return ['pippo', 'pluto', 'stocazzo']->filter($'v:val =~ "^{arg}"')
+# enddef
+
+# def SecondCompletion(arg: string): list<string>
+#     return ['cazzo', 'figa']->filter($'v:val =~ "^{arg}"')
+# enddef
