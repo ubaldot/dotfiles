@@ -215,3 +215,31 @@ enddef
 # Some mappings to learn
 noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
 # noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
+#
+
+# Example of user-command with multiple args from different lists
+# command! -nargs=* -complete=customlist,FooCompleteNope Manim call Foo(<f-args>)
+
+# def FooComplete(current_arg: string, command_line: string, cursor_position: number): list<string>
+#   # split by whitespace to get the separate components:
+#   var parts = split(command_line, '\s\+')
+
+#   if len(parts) > 2
+#     # then we're definitely finished with the first argument:
+#     return SecondCompletion(current_arg)
+#   elseif len(parts) > 1 && current_arg =~ '^\s*$'
+#     # then we've entered the first argument, but the current one is still blank:
+#     return SecondCompletion(current_arg)
+#   else
+#     # we're still on the first argument:
+#     return FirstCompletion(current_arg)
+#   endif
+# enddef
+
+# def FirstCompletion(arg: string): list<string>
+#     return ['pippo', 'pluto', 'stocazzo']->filter($'v:val =~ "^{arg}"')
+# enddef
+
+# def SecondCompletion(arg: string): list<string>
+#     return ['cazzo', 'figa']->filter($'v:val =~ "^{arg}"')
+# enddef

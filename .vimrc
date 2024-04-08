@@ -84,6 +84,7 @@ set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
+# TODO adjust path option. Move to after/ftplugin
 set path+=**
 # set cursorline
 
@@ -116,10 +117,8 @@ nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
 nnoremap <leader>b <Cmd>ls!<cr>:b
 nnoremap <s-tab> :b <tab>
-# nnoremap <s-tab> <Cmd>b#<cr>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
-# nnoremap <s-tab> <Cmd>bprev<cr>
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 # Switch window
@@ -135,13 +134,6 @@ nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
-
-# Format text
-# nnoremap g- <Cmd>vim9cmd b:temp = winsaveview()<cr>gggqG
-#             \ <Cmd>vim9cmd winrestview(b:temp)<cr>
-#             \ <Cmd>vim9cmd unlet b:temp<cr>
-#             \ <Cmd>echo "file formatted, textwidth: "
-#             \ .. &textwidth .. " cols."<cr>
 
 
 # Some terminal remapping when terminal is in buffer (no popup)
@@ -216,16 +208,9 @@ Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'girishji/easyjump.vim'
-# Plug 'monkoose/vim9-stargate'
 plug#end()
 # filetype plugin indent on
 syntax on
-
-# vim9-stargate
-# For 1 character to search before showing hints
-# noremap s <Cmd>call stargate#OKvim('\<')<CR>
-# For 2 consecutive characters to search
-# noremap s <Cmd>call stargate#OKvim(1)<CR>
 
 # Conda activate at startup
 # augroup CondaActivate
@@ -399,8 +384,6 @@ g:fern#renderer#default#leading = "  "
 g:fern#renderer#default#leaf_symbol = ""
 g:fern#renderer#default#collapsed_symbol = "+"
 g:fern#renderer#default#expanded_symbol = "-"
-# g:fern#renderer#default#collapsed_symbol = "▶"
-# g:fern#renderer#default#expanded_symbol = "▼"
 
 noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 noremap <silent> <F1> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
@@ -640,30 +623,3 @@ augroup OpenOCDShutdown
 augroup END
 
 command! Debug vim9cmd MyTermdebug()
-
-# Example of user-command with multiple args from different lists
-# command! -nargs=* -complete=customlist,FooCompleteNope Manim call Foo(<f-args>)
-
-# def FooComplete(current_arg: string, command_line: string, cursor_position: number): list<string>
-#   # split by whitespace to get the separate components:
-#   var parts = split(command_line, '\s\+')
-
-#   if len(parts) > 2
-#     # then we're definitely finished with the first argument:
-#     return SecondCompletion(current_arg)
-#   elseif len(parts) > 1 && current_arg =~ '^\s*$'
-#     # then we've entered the first argument, but the current one is still blank:
-#     return SecondCompletion(current_arg)
-#   else
-#     # we're still on the first argument:
-#     return FirstCompletion(current_arg)
-#   endif
-# enddef
-
-# def FirstCompletion(arg: string): list<string>
-#     return ['pippo', 'pluto', 'stocazzo']->filter($'v:val =~ "^{arg}"')
-# enddef
-
-# def SecondCompletion(arg: string): list<string>
-#     return ['cazzo', 'figa']->filter($'v:val =~ "^{arg}"')
-# enddef
