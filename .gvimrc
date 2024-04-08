@@ -4,6 +4,7 @@ vim9script
 # This file is sourced AFTER .vimrc
 # -----------------------------------
 set mousehide
+set guioptions+=!
 
 # Set fonts for gvim
 # fontsize = 11 with the 14'' MacBook you have exactly two columns
