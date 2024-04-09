@@ -432,6 +432,31 @@ augroup DIRCHANGE
     autocmd DirChanged global myfunctions.ChangeTerminalDir()
 augroup END
 
+# vim-manim setup
+var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
+g:manim_flags = {'low_quality': $"-pql {manim_common_flags}",
+              'high_quality': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
+             'dry_run': $'--dry-run {manim_common_flags}',
+             'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
+g:manim_default_flag = keys(g:manim_flags)[-1]
+
+# augroup ManimPre
+#     autocmd!
+#     autocmd User ManimPre echom "ManimPre"
+# augroup END
+
+# augroup ManimPost
+#     autocmd!
+#     autocmd User ManimPost echom "ManimPost"
+# augroup END
+
+
+if has("mac")
+    augroup CloseQuickTime
+        autocmd!
+        autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
+    augroup END
+endif
 
 # LSP setup
 # ---------------------------
