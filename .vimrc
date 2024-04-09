@@ -441,17 +441,6 @@ g:manim_flags = {'low_quality': $"-pql {manim_common_flags}",
              'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
 g:manim_default_flag = keys(g:manim_flags)[-1]
 
-# augroup ManimPre
-#     autocmd!
-#     autocmd User ManimPre echom "ManimPre"
-# augroup END
-
-# augroup ManimPost
-#     autocmd!
-#     autocmd User ManimPost echom "ManimPost"
-# augroup END
-
-
 if has("mac")
     augroup CloseQuickTime
         autocmd!
