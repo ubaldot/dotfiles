@@ -437,7 +437,7 @@ augroup END
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
 g:manim_flags = {'low_quality': $"-pql {manim_common_flags}",
               'high_quality': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
-             'dry_run': $'--dry-run {manim_common_flags}',
+             'dry_run': $'--dry_run {manim_common_flags}',
              'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
 g:manim_default_flag = keys(g:manim_flags)[-1]
 
