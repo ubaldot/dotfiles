@@ -18,24 +18,29 @@ command! Black120 call Black(120)
 # Manim stuff
 command! -nargs=* -complete=customlist,ManimComplete Manim Manim(<f-args>)
 
-def Manim(scene: string, quality = 'low_quality')
+g:manim_flags = {'low_quality': "-pql",
+             'high_quality': "-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg",
+             'dry_run': "--dry-run",
+             'transparent': "-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg --transparent"}
+g:manim_default_flag = keys(g:manim_flags)[-1]
+
+def Manim(scene: string, flag = g:manim_default_flag)
   if has("mac")
     exe "!osascript ~/QuickTimeClose.scpt"
   endif
 
-  var flags = ""
-  if quality ==# 'low_quality'
-      flags = "-pql"
-  elseif quality ==# 'high_quality'
-      flags = "-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg"
-  elseif quality ==# 'transparent'
-      flags = "-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg --transparent"
-  elseif quality ==# 'dry_run'
-       flags = "--dry-run"
+  if exists("ManimPre")
+        doautocmd User ManimPre
   endif
 
-  &l:makeprg = $'manim {expand("%:t")} {scene} {flags} --fps 30 --disable_caching -v WARNING --save_sections'
-  make
+  var tmp = &l:makeprg
+  &l:makeprg = $'manim {expand("%:t")} {scene} {g:manim_flags[flag]} --fps 30 --disable_caching -v WARNING --save_sections'
+  make!
+  &l:makeprg = tmp
+
+  if exists("ManimPost")
+        doautocmd User ManimPost
+  endif
 enddef
 
 
@@ -78,8 +83,7 @@ def ManimSceneCompletion(arglead: string): list<string>
 enddef
 
 def ManimQualityCompletion(arglead: string): list<string>
-    var quality = ['low_quality', 'high_quality', 'dry_run', 'transparent']
-    return quality->filter($'v:val =~ "^{arglead}"')
+    return keys(g:manim_flags)->filter($'v:val =~ "^{arglead}"')
 enddef
 
 # Jump to next-prev section
