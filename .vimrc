@@ -107,6 +107,8 @@ enddef
 # inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
 inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 
+#
+nnoremap <c-å> <c-]>
 # Avoid polluting registers
 nnoremap x "_x
 # Opposite of J, i.e. split from current cursor position
@@ -207,6 +209,7 @@ Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
+Plug 'ubaldot/vim-manim'
 Plug 'girishji/easyjump.vim'
 plug#end()
 # filetype plugin indent on
