@@ -2,19 +2,20 @@ vim9script
 
 # If prettier is not available, then the buffer content will be canceled upon
 # write
-if executable('prettier')
-    augroup PRETTIER
-        autocmd! * <buffer>
-        autocmd BufWritePre <buffer> call Prettify()
-    augroup END
-endif
+augroup PRETTIER
+    autocmd! * <buffer>
+    autocmd BufWritePre <buffer> call Prettify()
+augroup END
 
 def Prettify()
-    var win_view = winsaveview()
-    silent exe $":%!prettier 2>{g:null_device} --prose-wrap always
-                \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
-    winrestview(win_view)
-    # echo "File prettified!"
+    if executable('prettier')
+        var win_view = winsaveview()
+        silent exe $":%!prettier 2>{g:null_device} --prose-wrap always
+                    \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
+        winrestview(win_view)
+    else
+        echom "prettier not installed!"
+    endif
 enddef
 
 def MarkdownRender()
