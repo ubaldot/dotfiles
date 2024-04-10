@@ -24,4 +24,4 @@ def MarkdownRender()
     silent exe $"!{g:start_cmd} {out_html}"
 enddef
 
-command -buffer MarkdownRender MarkdownRender()
+command! -buffer MarkdownRender MarkdownRender()
