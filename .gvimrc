@@ -45,3 +45,4 @@ enddef
 # Some key bindings
 command! FontsizeIncrease vim9cmd ChangeFontsize(1)
 command! FontsizeDecrease vim9cmd ChangeFontsize(-1)
+command! -nargs=1 FontsizeChange vim9cmd ChangeFontsize(<args>)
