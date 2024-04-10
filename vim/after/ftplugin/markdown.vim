@@ -17,10 +17,6 @@ def Prettify()
     # echo "File prettified!"
 enddef
 
-# Consequently, this does not work
-nnoremap <buffer> g- <ScriptCmd>Prettify()<cr>
-
-
 def MarkdownRender()
     var out_html = $"{g:tmp}/md_rendered.html"
     silent exe $"!pandoc {shellescape(expand("%")} -f gfm -o {out_html}"
