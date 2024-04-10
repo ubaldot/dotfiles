@@ -56,7 +56,11 @@ augroup END
 # Set terminal with 256 colors
 set encoding=utf-8
 set belloff=all
-set clipboard=unnamed
+if has("Linux")
+    set clipboard=unnamedplus
+else
+    set clipboard=unnamed
+endif
 set termguicolors
 set autoread
 set number
