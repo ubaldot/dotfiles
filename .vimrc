@@ -1,7 +1,5 @@
 vim9script
 
-
-
 if has("win32")
     g:tmp = "C:/temp/"
     g:null_device = "/dev/null"

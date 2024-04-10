@@ -1,9 +1,13 @@
 vim9script
 
-augroup PRETTIER
-    autocmd! * <buffer>
-    autocmd BufWritePre <buffer> call Prettify()
-augroup END
+# If prettier is not available, then the buffer content will be canceled upon
+# write
+if executable('prettier')
+    augroup PRETTIER
+        autocmd! * <buffer>
+        autocmd BufWritePre <buffer> call Prettify()
+    augroup END
+endif
 
 def Prettify()
     var win_view = winsaveview()

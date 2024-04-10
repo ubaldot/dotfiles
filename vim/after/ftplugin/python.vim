@@ -5,12 +5,16 @@ vim9script
 setlocal foldmethod=indent
 
 
-def Black(textwidth: number)
-        var win_view = winsaveview()
-        exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
-                    \ --stdin-filename {shellescape(expand("%"))}"
-        winrestview(win_view)
-enddef
+# If black is not available, then the buffer content will be canceled upon
+# write
+if executable('black')
+    def Black(textwidth: number)
+            var win_view = winsaveview()
+            exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
+                        \ --stdin-filename {shellescape(expand("%"))}"
+            winrestview(win_view)
+    enddef
+endif
 
 # Call black to format 120 line length
 command! Black120 call Black(120)
