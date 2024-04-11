@@ -1,13 +1,13 @@
 vim9script
 
-# If prettier is not available, then the buffer content will be canceled upon
-# write
 augroup PRETTIER
     autocmd! * <buffer>
     autocmd BufWritePre <buffer> call Prettify()
 augroup END
 
 def Prettify()
+    # If prettier is not available, then the buffer content will be canceled upon
+    # write
     if executable('prettier')
         var win_view = winsaveview()
         silent exe $":%!prettier 2>{g:null_device} --prose-wrap always

@@ -13,7 +13,7 @@ var fontsize = 12
 var fontface = "Arial"
 var fontsize_tail = ""
 
-if has("gui_win32")
+if g:os == "Windows"
      fontsize = 14
      fontface = "Fira_Code:h"
      fontsize_tail = ":cANSI:qDRAFT"
@@ -21,13 +21,12 @@ if has("gui_win32")
      set guioptions-=T
     # Open gvim in full-screen
     au GUIEnter * simalt ~x
-elseif has("mac")
+elseif g:os == "Darwin"
      fontsize_tail = ""
      fontface = "Fira\ Code:h"
 else
      fontsize_tail = ""
      fontface = "Fira\ Code\ "
-
 endif
 
 &guifont = fontface .. string(fontsize) .. fontsize_tail
