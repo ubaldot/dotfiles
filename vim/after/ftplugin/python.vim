@@ -10,9 +10,9 @@ augroup BLACK
     autocmd BufWritePre <buffer> call Black(&l:textwidth)
 augroup END
 
-# If black is not available, then the buffer content will be canceled upon
-# write
 def Black(textwidth: number)
+    # If black is not available, then the buffer content will be canceled upon
+    # write
     if executable('black')
                 var win_view = winsaveview()
                 exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
@@ -26,6 +26,18 @@ enddef
 # Call black to format 120 line length
 command! Black120 call Black(120)
 
+
+# Manim
+if has("mac")
+    command! ManimDocs silent :!open -a safari.app
+            \ ~/Documents/manimce-latest/index.html
+elseif has("Linux")
+    command! ManimDocs silent :!xdg-open
+            \ ~/Documents/manimce-latest/index.html
+else
+    command! ManimDocs silent :!start
+            \ ~/Documents/manimce-latest/index.html
+endif
 
 # Manim: Jump to next-prev section
 nnoremap <buffer> <c-m> /\<self.next_section\><cr>

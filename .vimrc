@@ -1,8 +1,15 @@
 vim9script
 
-if has("win32")
+if has("win64") || has("win32") || has("win16")
+    g:os = "Windows"
+else
+    g:os = substitute(system('uname'), '\n', '', '')
+endif
+
+
+if g:os == "Windows"
     g:tmp = "C:/temp/"
-    g:null_device = "/dev/null"
+    g:null_device = "NUL"
     g:dotvim = $HOME .. "/vimfiles"
 else
     g:tmp = "/tmp/"
@@ -13,13 +20,13 @@ else
 endif
 
 if executable('cmd.exe')
-     g:start_cmd = "start"
+    g:start_cmd = "start"
 # Linux/BSD
 elseif executable("xdg-open")
-     g:start_cmd = "xdg-open"
+    g:start_cmd = "xdg-open"
 # MacOS
 elseif executable("open")
-     g:start_cmd = "open"
+    g:start_cmd = "open"
 endif
 
 import g:dotvim .. "/lib/myfunctions.vim"
@@ -101,9 +108,9 @@ map <leader>vv <Cmd>e $MYVIMRC<cr>
 def QuitWindow()
     # Close window and wipe buffer but it prevent to quit Vim if one window is
     # left.
-   if winnr('$') != 1
-      quit
-   endif
+    if winnr('$') != 1
+        quit
+    endif
 enddef
 
 # For using up and down in popup menu
@@ -162,7 +169,7 @@ tnoremap <s-tab> <c-w>:b <tab>
 def Quit_term_popup(quit: bool)
     if empty(popup_list())
         if quit
-           exe "quit"
+            exe "quit"
         else
             exe "close"
         endif
@@ -294,31 +301,31 @@ augroup Gitget
 augroup END
 
 def ShowFuncName(): string
-  var n_max = 20 # max chars to be displayed.
-  var filetypes = ['c', 'cpp', 'python']
-  var text = "" # displayed text
+    var n_max = 20 # max chars to be displayed.
+    var filetypes = ['c', 'cpp', 'python']
+    var text = "" # displayed text
 
-  if index(filetypes, &filetype) != -1
-      # If the filetype is recognized, then search the function line
-      var line = 0
-      if index(['c', 'cpp'], &filetype) != -1
-          line = search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bWn')
-      elseif &filetype ==# 'python'
-          line = search("^ \\{0,}def \\+.*", 'bWn')
-      endif
-      var n = match(getline(line), '\zs)') # Number of chars until ')'
-      if n < n_max
-          text = "|" .. trim(getline(line)[: n])
-      else
-          text = "|" .. trim(getline(line)[: n_max]) .. "..."
-      endif
-  endif
-  return text
+    if index(filetypes, &filetype) != -1
+        # If the filetype is recognized, then search the function line
+        var line = 0
+        if index(['c', 'cpp'], &filetype) != -1
+            line = search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bWn')
+        elseif &filetype ==# 'python'
+            line = search("^ \\{0,}def \\+.*", 'bWn')
+        endif
+        var n = match(getline(line), '\zs)') # Number of chars until ')'
+        if n < n_max
+            text = "|" .. trim(getline(line)[: n])
+        else
+            text = "|" .. trim(getline(line)[: n_max]) .. "..."
+        endif
+    endif
+    return text
 enddef
 
 augroup show_funcname
-  autocmd!
-  autocmd BufEnter,BufWinEnter,CursorMoved * b:current_function = ShowFuncName()
+    autocmd!
+    autocmd BufEnter,BufWinEnter,CursorMoved * b:current_function = ShowFuncName()
 augroup end
 
 
@@ -371,17 +378,17 @@ g:loaded_netrwSettings = 1
 g:loaded_netrwFileHandlers = 1
 
 augroup my-fern-hijack
-  autocmd!
-  autocmd BufEnter * ++nested call Hijack_directory()
+    autocmd!
+    autocmd BufEnter * ++nested call Hijack_directory()
 augroup END
 
 def Hijack_directory()
-  var path = expand('%:p')
-  if !isdirectory(path)
-    return
-  endif
-  bwipeout %
-  execute printf('Fern %s', fnameescape(path))
+    var path = expand('%:p')
+    if !isdirectory(path)
+        return
+    endif
+    bwipeout %
+    execute printf('Fern %s', fnameescape(path))
 enddef
 
 # Custom settings and mappings.
@@ -397,39 +404,39 @@ noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 noremap <silent> <F1> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 
 def FernInit()
-  nmap <buffer><expr>
-        \ <Plug>(fern-my-open-expand-collapse)
-        \ fern#smart#leaf(
-        \   "\<Plug>(fern-action-open:select)",
-        \   "\<Plug>(fern-action-expand)",
-        \   "\<Plug>(fern-action-collapse)",
-        \ )
-  nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
-  nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
-  nmap <buffer> n <Plug>(fern-action-new-path)
-  nmap <buffer> d <Plug>(fern-action-remove)
-  nmap <buffer> m <Plug>(fern-action-move)
-  nmap <buffer> M <Plug>(fern-action-rename)
-  nmap <buffer> h <Plug>(fern-action-hidden)
-  nmap <buffer> r <Plug>(fern-action-reload)
-  nmap <buffer> o <Plug>(fern-action-mark)
-  nmap <buffer> b <Plug>(fern-action-open:split)
-  nmap <buffer> v <Plug>(fern-action-open:vsplit)
-  nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>pwd<cr>
-  nmap <buffer><nowait> > <Plug>(fern-action-enter)<Cmd>pwd<cr>
-  nmap <buffer><nowait> cd <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
-  nmap <buffer><expr>
-      \ <Plug>(fern-cr-mapping)
-      \ fern#smart#root(
-      \   "<Plug>(fern-action-leave)",
-      \   "<Plug>(fern-my-open-expand-collapse)",
-      \ )
-  nmap <buffer> <CR> <Plug>(fern-cr-mapping)
+    nmap <buffer><expr>
+                \ <Plug>(fern-my-open-expand-collapse)
+                \ fern#smart#leaf(
+                \   "\<Plug>(fern-action-open:select)",
+                \   "\<Plug>(fern-action-expand)",
+                \   "\<Plug>(fern-action-collapse)",
+                \ )
+    nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer> n <Plug>(fern-action-new-path)
+    nmap <buffer> d <Plug>(fern-action-remove)
+    nmap <buffer> m <Plug>(fern-action-move)
+    nmap <buffer> M <Plug>(fern-action-rename)
+    nmap <buffer> h <Plug>(fern-action-hidden)
+    nmap <buffer> r <Plug>(fern-action-reload)
+    nmap <buffer> o <Plug>(fern-action-mark)
+    nmap <buffer> b <Plug>(fern-action-open:split)
+    nmap <buffer> v <Plug>(fern-action-open:vsplit)
+    nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>pwd<cr>
+    nmap <buffer><nowait> > <Plug>(fern-action-enter)<Cmd>pwd<cr>
+    nmap <buffer><nowait> cd <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
+    nmap <buffer><expr>
+                \ <Plug>(fern-cr-mapping)
+                \ fern#smart#root(
+                \   "<Plug>(fern-action-leave)",
+                \   "<Plug>(fern-my-open-expand-collapse)",
+                \ )
+    nmap <buffer> <CR> <Plug>(fern-cr-mapping)
 enddef
 
 augroup FernGroup
-  autocmd!
-  autocmd FileType fern call FernInit()
+    autocmd!
+    autocmd FileType fern call FernInit()
 augroup END
 
 augroup DIRCHANGE
@@ -440,9 +447,9 @@ augroup END
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
 g:manim_flags = {'low_quality': $"-pql {manim_common_flags}",
-              'high_quality': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
-             'dry_run': $'--dry_run {manim_common_flags}',
-             'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
+    'high_quality': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
+    'dry_run': $'--dry_run {manim_common_flags}',
+    'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
 g:manim_default_flag = keys(g:manim_flags)[-1]
 
 if has("mac")
@@ -575,8 +582,10 @@ augroup END
 # To make docs go to manim/docs and run make html. Be sure that all the sphinx
 # extensions packages are installed.
 # TODO Make it working with Windows
-command ManimDocs silent :!open -a safari.app
-            \ ~/Documents/manimce-latest/index.html
+
+# command ManimDocs silent :!open -a safari.app
+#             \ ~/Documents/manimce-latest/index.html
+
 command ManimNew :enew | :0read ~/.manim/new_manim.txt
 command ManimHelpVMobjs exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_vmobjects.txt"
 command ManimHelpTex exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_tex.txt"
@@ -638,7 +647,7 @@ augroup OpenOCDShutdown
     autocmd User TermdebugStopPost {
         for bufnum in term_list()
             if bufname(bufnum) ==# 'OPENOCD'
-               execute "bw! " .. bufnum
+                execute "bw! " .. bufnum
             endif
         endfor
     }
