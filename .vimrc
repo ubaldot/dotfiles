@@ -209,6 +209,7 @@ exe "cabbrev vter vert botright terminal " .. &shell
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
+Plug 'sainnhe/gruvbox-material'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 # Plug 'yegappan/bufselect'
@@ -242,8 +243,13 @@ if hour < 7 || 16 < hour
 else
     set background=light
 endif
-g:everforest_background = 'soft'
+g:everforest_background = 'medium'
 colorscheme everforest
+
+# g:gruvbox_material_background = 'soft' # soft, medium, hard
+# g:gruvbox_material_better_performance = 1
+# g:gruvbox_material_foreground = 'original' # material, mix, original
+# colorscheme gruvbox-material
 
 # txtfmt settings
 # TODO fix this and change the Shortcuts with R Y and G rather than r,y,g
@@ -504,7 +510,7 @@ g:manim_flags = {'low_quality': $"-pql {manim_common_flags}",
     'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
 g:manim_default_flag = keys(g:manim_flags)[-1]
 
-if has("mac")
+if g:os == "Darwin"
     augroup CloseQuickTime
         autocmd!
         autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
