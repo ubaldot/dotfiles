@@ -129,7 +129,8 @@ nnoremap S i<cr><esc>
 nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
 nnoremap <leader>b <Cmd>ls!<cr>:b
-nnoremap <s-tab> :b <tab>
+nnoremap <s-tab> <cmd>bprev <cr>
+nnoremap <c-tab> :b <tab>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
@@ -143,7 +144,7 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
 # super quick search and replace:
-nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
+# nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
@@ -378,50 +379,51 @@ set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
 # ---------- Bufline -----------------------
 #  OBS! DOES NOT WORK WITH GVIM
 # -----------------------------------------
-# set showtabline=2
+set showtabline=2
 
-# def g:SpawnBufferLine(): string
-#   var s = ' hello r/vim | '
+def g:SpawnBufferLine(): string
+  # var s = pwd .. ' | '
+  var s = ''
 
-#   # Get the list of buffers. Use bufexists() to include hidden buffers
-#   var bufferNums = filter(range(1, bufnr('$')), 'buflisted(v:val)')
-#   # Making a buffer list on the left side
-#   for i in bufferNums
-#     # Highlight with yellow if it's the current buffer
-#     s ..= (i == bufnr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-#     s = $'{s}{i} '		# Append the buffer number
-#     if bufname(i) == ''
-#       s = $'{s}[NEW]'		# Give a name to a new buffer
-#     endif
-#     if getbufvar(i, '&modifiable')
-#       s ..= fnamemodify(bufname(i), ':t')	# Append the file name
-#       # s ..= pathshorten(bufname(i))  # Use this if you want a trimmed path
-#       # If the buffer is modified, add + and separator. Else, add separator
-#       s ..= (getbufvar(i, "&modified")) ? (' [+] | ') : (' | ')
-#     else
-#       s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only flag
-#     endif
-#   endfor
-#   s = $'{s}%#TabLineFill#%T'  # Reset highlight
+  # Get the list of buffers. Use bufexists() to include hidden buffers
+  var bufferNums = filter(range(1, bufnr('$')), 'buflisted(v:val)')
+  # Making a buffer list on the left side
+  for i in bufferNums
+    # Highlight with yellow if it's the current buffer
+    s ..= (i == bufnr()) ? ('%#TabLineSel#') : ('%#TabLine#')
+    s = $'{s}{i} '		# Append the buffer number
+    if bufname(i) == ''
+      s = $'{s}[NEW]'		# Give a name to a new buffer
+    endif
+    if getbufvar(i, '&modifiable')
+      s ..= fnamemodify(bufname(i), ':t')	# Append the file name
+      # s ..= pathshorten(bufname(i))  # Use this if you want a trimmed path
+      # If the buffer is modified, add + and separator. Else, add separator
+      s ..= (getbufvar(i, "&modified")) ? (' [+] |') : (' |')
+    else
+      s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only flag
+    endif
+  endfor
+  s = $'{s}%#TabLineFill#%T'  # Reset highlight
 
-#   s = $'{s}%='			# Spacer
+  s = $'{s}%='			# Spacer
 
-#   # Making a tab list on the right side
-#   for i in range(1, tabpagenr('$'))  # Loop through the number of tabs
-#     # Highlight with yellow if it's the current tab
-#     s ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-#     s = $'{s}%{i}T '		# set the tab page number (for mouse clicks)
-#     s = $'{s}{i}'		# set page number string
-#   endfor
-#   s = $'{s}%#TabLineFill#%T'	# Reset highlight
+  # Making a tab list on the right side
+  for i in range(1, tabpagenr('$'))  # Loop through the number of tabs
+    # Highlight with yellow if it's the current tab
+    s ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
+    s = $'{s}%{i}T '		# set the tab page number (for mouse clicks)
+    s = $'{s}{i}'		# set page number string
+  endfor
+  s = $'{s}%#TabLineFill#%T'	# Reset highlight
 
-#   # Close button on the right if there are multiple tabs
-#   if tabpagenr('$') > 1
-#     s = $'{s}%999X X'
-#   endif
+  # Close button on the right if there are multiple tabs
+  if tabpagenr('$') > 1
+    s = $'{s}%999X X'
+  endif
 
-#   return s
-# enddef
+  return s
+enddef
 # ---------- Bufline -----------------------
 
 set tabline=%!SpawnBufferLine()  # Assign the tabline
@@ -459,7 +461,7 @@ g:fern#renderer#default#collapsed_symbol = "+"
 g:fern#renderer#default#expanded_symbol = "-"
 
 noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
-noremap <silent> <F1> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
+noremap <silent> <space> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 
 def FernInit()
     nmap <buffer><expr>

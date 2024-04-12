@@ -5,6 +5,7 @@ vim9script
 # -----------------------------------
 set mousehide
 set guioptions+=!
+set guioptions-=e
 
 # Set fonts for gvim
 # fontsize = 11 with the 14'' MacBook you have exactly two columns
@@ -25,6 +26,7 @@ elseif g:os == "Darwin"
      fontsize_tail = ""
      fontface = "Fira\ Code:h"
 else
+     set guioptions-=T
      fontsize_tail = ""
      fontface = "Fira\ Code\ "
 endif
