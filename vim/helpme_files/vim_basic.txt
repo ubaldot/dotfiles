@@ -1,5 +1,5 @@
 MOVE AROUND
-general motion                  hjkl,wW,bB
+general motion                  hjkl,wW,bB,fF,tT
 beginning,end of line           0 or ^, $
 top, middle, bottom             H, M, L
 Formatting text (textwidth)     gggqG
