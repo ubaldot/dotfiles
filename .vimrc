@@ -118,6 +118,10 @@ enddef
 # inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
 inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 
+# Remap command-line stuff
+cnoremap <c-p> <up>
+cnoremap <c-n> <down>
+
 #
 nnoremap <c-å> <c-]>
 # Avoid polluting registers
@@ -223,7 +227,7 @@ Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'ubaldot/vim-manim'
-Plug 'ubaldot/vim-conda-activate'
+# Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 plug#end()
 # filetype plugin indent on
@@ -598,6 +602,8 @@ command! ColorsToggle myfunctions.ColorsToggle()
 command! -nargs=1 -complete=command -range Redir
             \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
+# Example: :HH 62, execute the 62 element of :history
+command! -nargs=1 HH execute histget("cmd", <args>)
 
 # vim-replica stuff
 # ----------------------------------
