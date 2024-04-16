@@ -13,7 +13,7 @@ augroup END
 def Black(textwidth: number)
     # If black is not available, then the buffer content will be canceled upon
     # write
-    if executable('black')
+    if executable('black') && &filetype == 'python'
                 var win_view = winsaveview()
                 exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
                             \ --stdin-filename {shellescape(expand("%"))}"
