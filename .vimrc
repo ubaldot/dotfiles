@@ -8,20 +8,20 @@ endif
 
 
 if g:os == "Windows"
-    g:tmp = "C:/temp/"
+    g:tmp = "C:/temp"
     g:null_device = "NUL"
     g:dotvim = $HOME .. "/vimfiles"
 else
-    g:tmp = "/tmp/"
+    g:tmp = "/tmp"
     g:null_device = "/dev/null"
     g:dotvim = $HOME .. "/.vim"
     # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     # &pythonthreedll = trim(system("which python"))
 endif
 
-if executable('cmd.exe')
-    g:start_cmd = "start"
 # Linux/BSD
+if executable('cmd.exe')
+    g:start_cmd = "explorer.exe"
 elseif executable("xdg-open")
     g:start_cmd = "xdg-open"
 # MacOS
@@ -229,6 +229,7 @@ Plug 'ubaldot/vim-replica'
 Plug 'ubaldot/vim-manim'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
+Plug 'Konfekt/vim-compilers'
 plug#end()
 # filetype plugin indent on
 syntax on

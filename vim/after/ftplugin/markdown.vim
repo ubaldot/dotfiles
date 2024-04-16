@@ -1,27 +1,31 @@
 vim9script
 
+
+compiler pandoc
+
 augroup PRETTIER
     autocmd! * <buffer>
     autocmd BufWritePre <buffer> call Prettify()
 augroup END
 
+
 def Prettify()
     # If prettier is not available, then the buffer content will be canceled upon
     # write
-    if executable('prettier')
+    if executable('prettier') && (&filetype == 'markdown' || &filetype == 'markdown.txtfmt')
         var win_view = winsaveview()
         silent exe $":%!prettier 2>{g:null_device} --prose-wrap always
                     \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
         winrestview(win_view)
     else
-        echom "prettier not installed!"
+        echom "prettier not installed OR current filetype is not markdown!"
     endif
 enddef
 
-def MarkdownRender()
-    var out_html = $"{g:tmp}/md_rendered.html"
-    silent exe $"!pandoc {shellescape(expand("%")} -f gfm -o {out_html}"
-    silent exe $"!{g:start_cmd} {out_html}"
+def MarkdownRender(format = "html")
+    exe "make " .. expand(format)
+    silent exe $'!{g:start_cmd} {shellescape(expand("%:r"))}.{format}'
 enddef
 
-command! -buffer MarkdownRender MarkdownRender()
+# Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc
+command! -nargs=? -buffer MarkdownRender MarkdownRender(<f-args>)
