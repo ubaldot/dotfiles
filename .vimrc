@@ -546,11 +546,18 @@ var clangd_name = 'clangd'
 var clangd_path = 'clangd'
 var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=never']
 
-var is_avap = false
+var is_avap = true
 if is_avap
     clangd_name = 'avap'
-    clangd_path = '/home/yt75534/avap_example/clangd_in_docker.sh'
+    var project_root = '/home/yt75534/avap_example'
+    clangd_path = $'{project_root}/clangd_in_docker.sh'
     clangd_args = []
+    set makeprg=./enter-container.sh\ -b\ \\\|\ ./fix_qf_paths.sh
+
+	# au! BufReadPost quickfix  setlocal modifiable
+	# 	\ | silent exe ':%s/^\/app/\/home\/yt75534\/avap_example/g'
+	# 	\ | setlocal nomodifiable
+
 endif
 
 var lspServers = [
@@ -582,7 +589,7 @@ nnoremap <silent> <leader>d <Cmd>LspDiag current<cr>
 nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
 nnoremap <silent> <leader>k <Cmd>LspHover<cr>
 nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
-nnoremap <silent> <leader>r <Cmd>LspReferences<cr>
+nnoremap <silent> <leader>r <Cmd>LspShowReferences<cr>
 
 
 # HelpMe files for my poor memory
