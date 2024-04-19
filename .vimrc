@@ -552,7 +552,7 @@ if is_avap
     var project_root = '/home/yt75534/avap_example'
     clangd_path = $'{project_root}/clangd_in_docker.sh'
     clangd_args = []
-    set makeprg=./enter-container.sh\ -b\ \\\|\ ./fix_qf_paths.sh
+    set makeprg=./enter-container.sh\ -b\ linuxMachine
 
 	# au! BufReadPost quickfix  setlocal modifiable
 	# 	\ | silent exe ':%s/^\/app/\/home\/yt75534\/avap_example/g'
