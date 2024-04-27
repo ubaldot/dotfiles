@@ -183,21 +183,31 @@ export def WipeoutTerminals()
     endfor
 enddef
 
+
+var my_term_name = &shell
+
 export def OpenMyTerminal()
     var terms_name = []
     for ii in term_list()
         add(terms_name, bufname(ii))
     endfor
 
-    if term_list() == [] || index(terms_name, 'MY_TERMINAL') == -1
+    if term_list() == [] || index(terms_name, my_term_name) == -1
         # enable the following and remove the popup_create part if you want
         # the terminal in a "classic" window.
         # vert term_start(&shell, {'term_name': 'MANIM' })
-        term_start(&shell, {'term_name': 'MY_TERMINAL', 'hidden': 1, 'term_finish': 'close'})
+        var os_shell = ""
+        if g:os == "Windows"
+            os_shell = "powershell"
+        else
+            os_shell = &shell
+        endif
+        term_start(os_shell, {'term_name': my_term_name, 'hidden': 1, 'term_finish': 'close'})
         set nowrap
     endif
-    popup_create(bufnr('MY_TERMINAL'), {
-        title: " MY TERMINAL ",
+
+    popup_create(bufnr(my_term_name), {
+        title: my_term_name,
         line: &lines,
         col: &columns,
         pos: "botright",
@@ -211,6 +221,19 @@ export def OpenMyTerminal()
         resize: true
         })
 enddef
+
+export def HideMyTerminal()
+    var terms_name = []
+    for ii in term_list()
+        add(terms_name, bufname(ii))
+    endfor
+    # This works because once a terminal popup is in place, it takes all the
+    # focus and you cannot go anywhere if you don't close it first.
+    if index(terms_name, my_term_name) != -1 && !empty(popup_list())
+        popup_close(popup_list()[0])
+    endif
+enddef
+
 
 # Some mappings to learn
 noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
