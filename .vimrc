@@ -205,8 +205,11 @@ endif
 
 
 # Open terminal below all windows
-exe "cabbrev bter bo terminal " .. &shell
-exe "cabbrev vter vert botright terminal " .. &shell
+if g:os == "Windows"
+    exe "cabbrev bter bo terminal powershell"
+else
+    exe "cabbrev vter vert botright terminal " .. &shell
+endif
 
 
 # vim-plug
@@ -616,8 +619,8 @@ command! -nargs=1 HH execute histget("cmd", <args>)
 # vim-replica stuff
 # ----------------------------------
 g:replica_console_position = "L"
-g:replica_console_height = &lines
-g:replica_console_width = &columns / 2
+# g:replica_console_height = &lines
+# g:replica_console_width = &columns / 2
 g:replica_display_range  = false
 g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
@@ -667,6 +670,8 @@ command ManimHelpUpdaters exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_upd
 command ManimHelpTransform exe "HelpMe " .. g:dotvim .. "/helpme_files/manim_transform.txt"
 
 command! Terminal myfunctions.OpenMyTerminal()
+nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
+tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
