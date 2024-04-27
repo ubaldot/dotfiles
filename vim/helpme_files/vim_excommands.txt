@@ -27,6 +27,8 @@ To create ranges of arbitrary lines, use :g (global)
 
 TIPS
 ----
+* To escape <cr> in the Ex mode (for example when using :s/) you must use \r,
+  e.g. :s/\s/\r/g replace the space with a new line.
 * To access :history run :<c-f>
 * to replace stuff in specific "geometrical" positions (for example,
 to remove the commas at the end of each line) use [range]normal, e.g.
