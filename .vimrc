@@ -233,6 +233,7 @@ Plug 'ubaldot/vim-manim'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 Plug 'Konfekt/vim-compilers'
+Plug 'puremourning/vimspector'
 plug#end()
 # filetype plugin indent on
 syntax on
@@ -259,6 +260,10 @@ colorscheme everforest
 # g:gruvbox_material_better_performance = 1
 # g:gruvbox_material_foreground = 'original' # material, mix, original
 # colorscheme gruvbox-material
+
+# vimspector TODO
+g:vimspector_configurations = ""
+
 
 # txtfmt settings
 # TODO fix this and change the Shortcuts with R Y and G rather than r,y,g
