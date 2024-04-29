@@ -263,6 +263,7 @@ colorscheme everforest
 
 # vimspector TODO
 g:vimspector_configurations = ""
+g:vimspector_enable_mappings = 'HUMAN'
 
 
 # txtfmt settings
@@ -627,7 +628,7 @@ g:replica_console_position = "L"
 # g:replica_console_height = &lines
 # g:replica_console_width = &columns / 2
 g:replica_display_range  = false
-g:replica_python_options = "-Xfrozen_modules=off"
+# g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
             \ " --config ~/.jupyter/jupyter_console_config.py"}
 

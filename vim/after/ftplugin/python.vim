@@ -42,3 +42,6 @@ endif
 # Manim: Jump to next-prev section
 nnoremap <buffer> <c-m> /\<self.next_section\><cr>
 nnoremap <buffer> <c-n> ?\<self.next_section\><cr>
+
+# For replica
+# nmap <buffer> <c-enter> <Plug>ReplicaSendCell<cr>j
