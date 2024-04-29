@@ -164,6 +164,9 @@ export def FormatWithoutMoving()
     winrestview(view)
 enddef
 
+command! -nargs=* Prettify exe ":%!prettier " .. expand("%")
+
+
 # ------------ Terminal functions ------------------
 # Change all the terminal directories when you change vim directory
 export def ChangeTerminalDir()

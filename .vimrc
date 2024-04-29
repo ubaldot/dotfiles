@@ -262,7 +262,7 @@ colorscheme everforest
 # colorscheme gruvbox-material
 
 # vimspector TODO
-g:vimspector_configurations = ""
+# g:vimspector_configurations = ""
 g:vimspector_enable_mappings = 'HUMAN'
 
 
@@ -612,6 +612,7 @@ command! HelpmeDiffMerge exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_merge_d
 command! HelpmeCoding exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_coding.txt"
 command! HelpmeClosures exe "HelpMe " .. g:dotvim .. "/helpme_files/python_closures.txt"
 command! HelpmeDebug exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_debug.txt"
+command! HelpmeVimspector exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_vimspector.txt"
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
