@@ -264,6 +264,7 @@ colorscheme everforest
 # vimspector TODO
 # g:vimspector_configurations = ""
 g:vimspector_enable_mappings = 'HUMAN'
+g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
 
 
 # txtfmt settings
