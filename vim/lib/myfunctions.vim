@@ -164,7 +164,7 @@ export def FormatWithoutMoving()
     winrestview(view)
 enddef
 
-command! -nargs=* Prettify exe ":%!prettier " .. expand("%")
+command! -nargs=* Prettify execute(":%!prettier " .. expand("%"))
 
 
 # ------------ Terminal functions ------------------

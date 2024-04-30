@@ -27,6 +27,8 @@ elseif g:os == "Darwin"
      fontface = "Fira\ Code:h"
 else
      set guioptions-=T
+     set lines=48
+     set columns=180
      fontsize_tail = ""
      fontface = "Fira\ Code\ "
 endif
