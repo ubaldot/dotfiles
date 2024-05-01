@@ -256,263 +256,31 @@ endif
 g:everforest_background = 'medium'
 colorscheme everforest
 
+exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
+# exe "source " .. g:dotvim .. "/plugins_settings/vimspector_setting.vim"
+
+nnoremap <buffer> GF <ScriptCmd>OpenFileSpecial()<cr>
+
+def OpenFileSpecial()
+    var pattern = 'g:dotvim\s*\.\.\s*"\(.*\)"'
+    var filename = matchlist(getline("."), pattern)[0]
+    echom filename
+    if !empty(filename)
+        exe "edit " .. filename
+    endif
+enddef
+
+
 # g:gruvbox_material_background = 'soft' # soft, medium, hard
 # g:gruvbox_material_better_performance = 1
 # g:gruvbox_material_foreground = 'original' # material, mix, original
 # colorscheme gruvbox-material
 
-# vimspector TODO
-# g:vimspector_configurations = ""
-g:vimspector_enable_mappings = 'HUMAN'
-g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
-
-
-# txtfmt settings
-# TODO fix this and change the Shortcuts with R Y and G rather than r,y,g
-g:txtfmtBgcolor2 = '^R$,c:LightRed,g:' .. matchstr(execute('highlight DiffDelete'), 'guibg=\zs#\x\+')
-g:txtfmtBgcolor3 = '^Y$,c:LightYellow,g:' .. matchstr(execute('highlight DiffChange'), 'guibg=\zs#\x\+')
-g:txtfmtBgcolor5 = '^G$,c:LightGreen,g:' .. matchstr(execute('highlight DiffAdd'), 'guibg=\zs#\x\+')
-
-g:txtfmtShortcuts = []
-
-# Note: Shortcuts that don't specify modes will get select mode mappings if and only if txtfmtShortcutsWorkInSelect=1.
-# bold-underline (\u for Visual and Operator)
-add(g:txtfmtShortcuts, 'h1 kR')
-add(g:txtfmtShortcuts, 'h2 kY')
-add(g:txtfmtShortcuts, 'h3 kG')
-add(g:txtfmtShortcuts, 'hh k-')
-
-augroup SetTxtFmt
-    autocmd!
-    autocmd BufRead,BufNewFile *.txt set filetype=text.txtfmt
-    autocmd BufRead,BufNewFile *.md set filetype=markdown.txtfmt
-augroup END
-
-augroup SetHeadersAsCfiletype
-    autocmd!
-    autocmd BufRead,BufNewFile *.h set filetype=c
-augroup END
-
-# Delete MakeTestPage so when typing :Ma I get Manim as first hit
-# augroup deletePluginCommand
-#     autocmd!
-#     autocmd VimEnter * delcommand MakeTestPage
-# augroup END
-
-# statusline
-# ---------------
-# Define all the functions that you need in your statusline and then build the statusline
-set laststatus=2
-set statusline=
-
-# Get git branch name for statusline.
-# OBS !It may need to be changed for other OS.
-def Get_gitbranch(): string
-    var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
-                \ --show-current"))
-    # strdix(A,B) >=0 check if B is in A.
-    if stridx(current_branch, "not a git repository") >= 0
-        current_branch = "(no repo)"
-    endif
-    return current_branch
-enddef
-
-augroup Gitget
-    autocmd!
-    autocmd BufEnter,BufWinEnter * b:gitbranch = Get_gitbranch()
-augroup END
-
-def ShowFuncName(): string
-    var n_max = 20 # max chars to be displayed.
-    var filetypes = ['c', 'cpp', 'python']
-    var text = "" # displayed text
-
-    if index(filetypes, &filetype) != -1
-        # If the filetype is recognized, then search the function line
-        var line = 0
-        if index(['c', 'cpp'], &filetype) != -1
-            line = search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bWn')
-        elseif &filetype ==# 'python'
-            line = search("^ \\{0,}def \\+.*", 'bWn')
-        endif
-        var n = match(getline(line), '\zs)') # Number of chars until ')'
-        if n < n_max
-            text = "|" .. trim(getline(line)[: n])
-        else
-            text = "|" .. trim(getline(line)[: n_max]) .. "..."
-        endif
-    endif
-    return text
-enddef
-
-augroup show_funcname
-    autocmd!
-    autocmd BufEnter,BufWinEnter,CursorMoved * b:current_function = ShowFuncName()
-augroup end
-
-
-def Conda_env(): string
-    var conda_env = "base"
-    if has("gui_win32") || has("win32")
-        conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
-    elseif exists("$CONDA_DEFAULT_ENV")
-        conda_env = $CONDA_DEFAULT_ENV
-    endif
-    return conda_env
-enddef
-
-augroup CONDA_ENV
-    autocmd!
-    autocmd VimEnter,BufEnter,BufWinEnter * g:conda_env = Conda_env()
-augroup END
-
-augroup LSP_DIAG
-    autocmd!
-    autocmd BufEnter *  b:num_warnings = 0 | b:num_errors = 0
-    autocmd User LspDiagsUpdated b:num_warnings = lsp#lsp#ErrorCount()['Warn']
-                \ | b:num_errors = lsp#lsp#ErrorCount()['Error']
-augroup END
-
-# Anatomy of the statusline:
-# Start of highlighting	- Dynamic content - End of highlighting
-# %#IsModified#	- %{&mod?expand('%'):''} - %*
-
-# Left side
-set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
-set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
-set statusline+=%#StatusLine#\ %t(%n)%m%*
-set statusline+=%#StatusLineNC#\%{b:current_function}\ %*
-# Right side
-set statusline+=%=
-set statusline+=%#StatusLine#\ %y\ %*
-set statusline+=%#StatusLineNC#\ col:%c\ %*
-# Add some conditionals here bitch!
-set statusline+=%#Visual#\ W:\ %{b:num_warnings}\ %*
-set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
-# ----------- end statusline setup -------------------------
-
-# ---------- Bufline -----------------------
-#  OBS! DOES NOT WORK WITH GVIM
-# -----------------------------------------
-set showtabline=2
-
-def g:SpawnBufferLine(): string
-  # var s = pwd .. ' | '
-  var s = ''
-
-  # Get the list of buffers. Use bufexists() to include hidden buffers
-  var bufferNums = filter(range(1, bufnr('$')), 'buflisted(v:val)')
-  # Making a buffer list on the left side
-  for i in bufferNums
-    # Highlight with yellow if it's the current buffer
-    s ..= (i == bufnr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-    s = $'{s}{i} '		# Append the buffer number
-    if bufname(i) == ''
-      s = $'{s}[NEW]'		# Give a name to a new buffer
-    endif
-    if getbufvar(i, '&modifiable')
-      s ..= fnamemodify(bufname(i), ':t')	# Append the file name
-      # s ..= pathshorten(bufname(i))  # Use this if you want a trimmed path
-      # If the buffer is modified, add + and separator. Else, add separator
-      s ..= (getbufvar(i, "&modified")) ? (' [+] |') : (' |')
-    else
-      s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only flag
-    endif
-  endfor
-  s = $'{s}%#TabLineFill#%T'  # Reset highlight
-
-  s = $'{s}%='			# Spacer
-
-  # Making a tab list on the right side
-  for i in range(1, tabpagenr('$'))  # Loop through the number of tabs
-    # Highlight with yellow if it's the current tab
-    s ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-    s = $'{s}%{i}T '		# set the tab page number (for mouse clicks)
-    s = $'{s}{i}'		# set page number string
-  endfor
-  s = $'{s}%#TabLineFill#%T'	# Reset highlight
-
-  # Close button on the right if there are multiple tabs
-  if tabpagenr('$') > 1
-    s = $'{s}%999X X'
-  endif
-
-  return s
-enddef
-# ---------- Bufline -----------------------
-
-set tabline=%!SpawnBufferLine()  # Assign the tabline
-
-
-# Fern
-# ------------
-# Disable netrw.
-g:loaded_netrw  = 1
-g:loaded_netrwPlugin = 1
-g:loaded_netrwSettings = 1
-g:loaded_netrwFileHandlers = 1
-
-augroup my-fern-hijack
-    autocmd!
-    autocmd BufEnter * ++nested call Hijack_directory()
-augroup END
-
-def Hijack_directory()
-    var path = expand('%:p')
-    if !isdirectory(path)
-        return
-    endif
-    bwipeout %
-    execute printf('Fern %s', fnameescape(path))
-enddef
-
-# Custom settings and mappings.
-g:fern#disable_default_mappings = 1
-
-
-g:fern#renderer#default#leading = "  "
-g:fern#renderer#default#leaf_symbol = ""
-g:fern#renderer#default#collapsed_symbol = "+"
-g:fern#renderer#default#expanded_symbol = "-"
-
-noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
-noremap <silent> <space> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
-
-def FernInit()
-    nmap <buffer><expr>
-                \ <Plug>(fern-my-open-expand-collapse)
-                \ fern#smart#leaf(
-                \   "\<Plug>(fern-action-open:select)",
-                \   "\<Plug>(fern-action-expand)",
-                \   "\<Plug>(fern-action-collapse)",
-                \ )
-    nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
-    nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
-    nmap <buffer> n <Plug>(fern-action-new-path)
-    nmap <buffer> d <Plug>(fern-action-remove)
-    nmap <buffer> m <Plug>(fern-action-move)
-    nmap <buffer> M <Plug>(fern-action-rename)
-    nmap <buffer> h <Plug>(fern-action-hidden)
-    nmap <buffer> r <Plug>(fern-action-reload)
-    nmap <buffer> o <Plug>(fern-action-mark)
-    nmap <buffer> b <Plug>(fern-action-open:split)
-    nmap <buffer> v <Plug>(fern-action-open:vsplit)
-    nmap <buffer><nowait> < <Plug>(fern-action-leave)<Cmd>pwd<cr>
-    nmap <buffer><nowait> > <Plug>(fern-action-enter)<Cmd>pwd<cr>
-    nmap <buffer><nowait> cd <Plug>(fern-action-enter)<Plug>(fern-action-cd:cursor)<Cmd>pwd<cr>
-    nmap <buffer><expr>
-                \ <Plug>(fern-cr-mapping)
-                \ fern#smart#root(
-                \   "<Plug>(fern-action-leave)",
-                \   "<Plug>(fern-my-open-expand-collapse)",
-                \ )
-    nmap <buffer> <CR> <Plug>(fern-cr-mapping)
-enddef
-
-augroup FernGroup
-    autocmd!
-    autocmd FileType fern call FernInit()
-augroup END
 
 augroup DIRCHANGE
     autocmd!
@@ -533,73 +301,6 @@ if g:os == "Darwin"
         autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
     augroup END
 endif
-
-# LSP setup
-# ---------------------------
-# This json-like style to encode configs like
-# pylsp.plugins.pycodestyle.enabled = true
-var pylsp_config = {
-    'pylsp': {
-        'plugins': {
-            'pycodestyle': {
-                'enabled': false},
-            'pyflakes': {
-                'enabled': true},
-            'pydocstyle': {
-                'enabled': false},
-            'autopep8': {
-                'enabled': false}, }, }, }
-
-
-# clangd env setup
-var clangd_name = 'clangd'
-var clangd_path = 'clangd'
-var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=never']
-
-var is_avap = true
-if is_avap
-    clangd_name = 'avap'
-    var project_root = '/home/yt75534/avap_example'
-    clangd_path = $'{project_root}/clangd_in_docker.sh'
-    clangd_args = []
-    set makeprg=./avap-util/scripts/enter-container.sh\ build_avap\ linux
-
-	# au! BufReadPost quickfix  setlocal modifiable
-	# 	\ | silent exe ':%s/^\/app/\/home\/yt75534\/avap_example/g'
-	# 	\ | setlocal nomodifiable
-
-endif
-
-var lspServers = [
-    {
-        name: 'pylsp',
-        filetype: ['python'],
-        path: 'pylsp',
-        workspaceConfig: pylsp_config,
-        args: ['--check-parent-process', '-v'],
-    },
-    {
-        name: clangd_name,
-        filetype: ['c', 'cpp'],
-        path: clangd_path,
-        args: clangd_args,
-        debug: true,
-    },
-]
-
-autocmd VimEnter * g:LspAddServer(lspServers)
-
-var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
-autocmd VimEnter * g:LspOptionsSet(lspOpts)
-highlight link LspDiagLine NONE
-
-nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
-nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
-nnoremap <silent> <leader>d <Cmd>LspDiag current<cr>
-nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
-nnoremap <silent> <leader>k <Cmd>LspHover<cr>
-nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
-nnoremap <silent> <leader>r <Cmd>LspShowReferences<cr>
 
 
 # HelpMe files for my poor memory
@@ -685,59 +386,3 @@ tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 # This is used for preparing a text file for the caption to be sent to
 # YouTube.
 command! JoinParagraphs v/^$/norm! vipJ
-
-# Termdebug stuff
-# Call as Termdebug build/myfile.elf
-# OBS! BE sure to be in the project root folder and that a build/ folder exists!
-g:termdebug_config = {}
-var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
-if has("gui_win32") || has("win32")
-    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
-endif
-
-var debugger = "arm-none-eabi-gdb"
-
-var openocd_script = "openocd_stm32f4x_stlink.sh\n"
-var openocd_cmd = 'source ../gdb_stuff/' .. openocd_script
-if has("gui_win32") || has("win32")
-    openocd_cmd = "..\\gdb_stuff\\openocd_stm32f4x_stlink.bat\n\r"
-endif
-
-g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_stuff/gdb_init_commands.txt"]
-g:termdebug_config['variables_window'] = 1
-
-packadd termdebug
-# The windows debugger sucks. It is based on cmd.exe. Use an external debugger (like use MinGW64).
-def MyTermdebug()
-    # The .elf name is supposed to be the same as the folder name.
-    # Before calling this function you must launch a openocd server.
-    # This happens inside this script with
-
-    #   source ../openocd_stm32f4x_stlink.sh
-    #
-    # Then Termdebug is launched.
-    # When Termdebug is closed, then the server is automatically shutoff
-
-    # Start a openocd terminal
-
-    var ii = term_start(&shell, {'term_name': 'OPENOCD', 'hidden': 1, 'term_finish': 'close'})
-    term_sendkeys(ii, openocd_cmd)
-
-    var filename = fnamemodify(getcwd(), ':t')
-    echo filename
-    execute "Termdebug build/" .. filename .. ".elf"
-    execute "close " ..  bufwinnr("debugged program")
-enddef
-
-augroup OpenOCDShutdown
-    autocmd!
-    autocmd User TermdebugStopPost {
-        for bufnum in term_list()
-            if bufname(bufnum) ==# 'OPENOCD'
-                execute "bw! " .. bufnum
-            endif
-        endfor
-    }
-augroup END
-
-command! Debug vim9cmd MyTermdebug()
