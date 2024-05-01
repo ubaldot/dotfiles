@@ -93,7 +93,7 @@ set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
 # TODO adjust path option. Move to after/ftplugin
-set path+=**
+# set path+=**
 # set cursorline
 
 # Some key bindings
@@ -184,10 +184,8 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
-Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
 # TODO enable plugin when matchbufline becomes available
-Plug "yegappan/searchcomplete"
 Plug 'tpope/vim-commentary'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
