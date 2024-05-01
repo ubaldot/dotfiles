@@ -219,6 +219,7 @@ g:everforest_background = 'medium'
 colorscheme everforest
 
  # Plugin settings
+ # TODO: You may want to use a popup_create and pick
 exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
