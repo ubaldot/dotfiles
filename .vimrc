@@ -6,7 +6,6 @@ else
     g:os = substitute(system('uname'), '\n', '', '')
 endif
 
-
 if g:os == "Windows"
     g:tmp = "C:/temp"
     g:null_device = "NUL"
@@ -31,7 +30,6 @@ endif
 
 import g:dotvim .. "/lib/myfunctions.vim"
 
-
 # Set cursor
 &t_SI = "\e[6 q"
 &t_EI = "\e[2 q"
@@ -49,7 +47,6 @@ import g:dotvim .. "/lib/myfunctions.vim"
 #     autocmd!
 #     autocmd CmdwinEnter * map <buffer> <cr> <cr>q:
 # augroup END
-
 
 # Open help pages in vertical split
 augroup vimrc_help
@@ -105,14 +102,6 @@ g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<cr>
 
-def QuitWindow()
-    # Close window and wipe buffer but it prevent to quit Vim if one window is
-    # left.
-    if winnr('$') != 1
-        quit
-    endif
-enddef
-
 # For using up and down in popup menu
 # inoremap <expr><Down> pumvisible() ? "\<C-n>" : "\<Down>"
 # inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
@@ -122,7 +111,6 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
-#
 nnoremap <c-å> <c-]>
 # Avoid polluting registers
 nnoremap x "_x
@@ -130,8 +118,8 @@ nnoremap x "_x
 nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
 # them as g:.
-nnoremap <c-w>q <ScriptCmd>call QuitWindow()<cr>
-nnoremap <c-w><c-q> <ScriptCmd>call QuitWindow()<cr>
+nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
+nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <leader>b <Cmd>ls!<cr>:b
 nnoremap <s-tab> <cmd>bprev <cr>
 nnoremap <c-tab> :b <tab>
@@ -153,7 +141,8 @@ nnoremap <c-j> <c-w>j
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
 
-
+# Terminal stuff
+# --------------
 # Some terminal remapping when terminal is in buffer (no popup)
 # When using iPython to avoid that shift space gives 32;2u
 tnoremap <S-space> <space>
@@ -165,45 +154,13 @@ tnoremap <c-j> <c-w>j
 # tnoremap <s-tab> <cmd>bnext<cr>
 tnoremap <s-tab> <c-w>:b <tab>
 
-# TERMINAL IN POPUP
-# This function can be called only from a terminal windows/popup, so there is
-# no risk of closing unwanted popups (such as HelpMe popups).
-# Although this function could be moved to lib, I keep it here to remind me how to map functions without the need of
-# creating commands by using <ScriptCmd>
+tnoremap <c-w>q <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
+tnoremap <c-w>c <ScriptCmd>myfunctions.Quit_term_popup(false)<cr>
 
-def Quit_term_popup(quit: bool)
-    if empty(popup_list())
-        if quit
-            exe "quit"
-        else
-            exe "close"
-        endif
-    else
-        if quit
-            var bufno = bufnr()
-            popup_close(win_getid())
-            exe "bw! " .. bufno
-        else
-            popup_close(win_getid())
-        endif
-    endif
-enddef
+nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
+tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 
-tnoremap <c-w>q <ScriptCmd>Quit_term_popup(true)<cr>
-tnoremap <c-w>c <ScriptCmd>Quit_term_popup(false)<cr>
-
-# Make vim to speak on macos
-if has('mac')
-    # <esc> is used in xnoremap because '<,'> are updated once you leave visual mode
-    xnoremap <leader>s <esc><ScriptCmd>TextToSpeech(line("'<"), line("'>"))<cr>
-    command -range Say vim9cmd TextToSpeech(<line1>, <line2>)
-
-    def TextToSpeech(firstline: number, lastline: number)
-        exe $":{firstline},{lastline}w !say"
-    enddef
-endif
-
-
+command! Terminal myfunctions.OpenMyTerminal()
 # Open terminal below all windows
 if g:os == "Windows"
     exe "cabbrev bter bo terminal powershell"
@@ -211,19 +168,26 @@ else
     exe "cabbrev vter vert botright terminal " .. &shell
 endif
 
+augroup DIRCHANGE
+    autocmd!
+    autocmd DirChanged global myfunctions.ChangeTerminalDir()
+augroup END
+
+augroup shoutoff_terminals
+    autocmd QuitPre * call myfunctions.WipeoutTerminals()
+augroup END
 
 # vim-plug
 # ----------------
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-Plug 'sainnhe/gruvbox-material'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
-# Plug 'yegappan/bufselect'
+Plug 'yegappan/bufselect'
 Plug 'yegappan/lsp'
 # TODO enable plugin when matchbufline becomes available
-# Plug "yegappan/searchcomplete"
+Plug "yegappan/searchcomplete"
 Plug 'tpope/vim-commentary'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
@@ -256,36 +220,17 @@ endif
 g:everforest_background = 'medium'
 colorscheme everforest
 
+ # Plugin settings
 exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
-# exe "source " .. g:dotvim .. "/plugins_settings/vimspector_setting.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 
-nnoremap <buffer> GF <ScriptCmd>OpenFileSpecial()<cr>
-
-def OpenFileSpecial()
-    var pattern = 'g:dotvim\s*\.\.\s*"\(.*\)"'
-    var filename = matchlist(getline("."), pattern)[0]
-    echom filename
-    if !empty(filename)
-        exe "edit " .. filename
-    endif
-enddef
-
-
-# g:gruvbox_material_background = 'soft' # soft, medium, hard
-# g:gruvbox_material_better_performance = 1
-# g:gruvbox_material_foreground = 'original' # material, mix, original
-# colorscheme gruvbox-material
-
-
-augroup DIRCHANGE
-    autocmd!
-    autocmd DirChanged global myfunctions.ChangeTerminalDir()
-augroup END
+# Open plugin settings
+nnoremap <leader>f <ScriptCmd>myfunctions.OpenFileSpecial('"')<cr>
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
@@ -302,68 +247,6 @@ if g:os == "Darwin"
     augroup END
 endif
 
-
-# HelpMe files for my poor memory
-command! HelpmeBasic exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_basic.txt"
-command! HelpmeScript exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_scripting.txt"
-command! HelpmeGlobal exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_global.txt"
-command! HelpmeExCommands exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_excommands.txt"
-command! HelpmeSubstitute exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_substitute.txt"
-command! HelpmeAdvanced exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_advanced.txt"
-command! HelpmeDiffMerge exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_merge_diff.txt"
-command! HelpmeCoding exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_coding.txt"
-command! HelpmeClosures exe "HelpMe " .. g:dotvim .. "/helpme_files/python_closures.txt"
-command! HelpmeDebug exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_debug.txt"
-command! HelpmeVimspector exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_vimspector.txt"
-
-command! ColorsToggle myfunctions.ColorsToggle()
-
-# Utils commands
-command! -nargs=1 -complete=command -range Redir
-            \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
-
-# Example: :HH 62, execute the 62 element of :history
-command! -nargs=1 HH execute histget("cmd", <args>)
-
-# vim-replica stuff
-# ----------------------------------
-g:replica_console_position = "L"
-# g:replica_console_height = &lines
-# g:replica_console_width = &columns / 2
-g:replica_display_range  = false
-# g:replica_python_options = "-Xfrozen_modules=off"
-g:replica_jupyter_console_options = {"python":
-            \ " --config ~/.jupyter/jupyter_console_config.py"}
-
-# g:writegood_compiler = "vale"
-# g:writegood_options = "--config=$HOME/vale.ini"
-
-
-
-# Self-defined functions
-# -----------------------
-augroup remove_trailing_whitespaces
-    autocmd!
-    autocmd BufWritePre * {
-        if !&binary
-            myfunctions.TrimWhitespace()
-        endif
-    }
-augroup END
-
-
-# git add -u && git commit -m "."
-command! GitCommitDot myfunctions.CommitDot()
-command! GitPushDot myfunctions.PushDot()
-# Merge and diff
-command! -nargs=? Diff myfunctions.Diff(<q-args>)
-nnoremap dn ]c
-nnoremap dN [c
-
-augroup shoutoff_terminals
-    autocmd QuitPre * call myfunctions.WipeoutTerminals()
-augroup END
-
 # Manim commands
 # To make docs go to manim/docs and run make html. Be sure that all the sphinx
 # extensions packages are installed.
@@ -378,10 +261,62 @@ command ManimHelpTex exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_tex.txt"
 command ManimHelpUpdaters exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_updaters.txt"
 command ManimHelpTransform exe "HelpMe " .. g:dotvim .. "/helpme_files/manim_transform.txt"
 
-command! Terminal myfunctions.OpenMyTerminal()
-nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
-tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 
+# HelpMe files for my poor memory
+command! HelpmeBasic exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_basic.txt"
+command! HelpmeScript exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_scripting.txt"
+command! HelpmeGlobal exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_global.txt"
+command! HelpmeExCommands exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_excommands.txt"
+command! HelpmeSubstitute exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_substitute.txt"
+command! HelpmeAdvanced exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_advanced.txt"
+command! HelpmeDiffMerge exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_merge_diff.txt"
+command! HelpmeCoding exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_coding.txt"
+command! HelpmeClosures exe "HelpMe " .. g:dotvim .. "/helpme_files/python_closures.txt"
+command! HelpmeDebug exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_debug.txt"
+command! HelpmeVimspector exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_vimspector.txt"
+
+# vim-replica stuff
+# ----------------------------------
+g:replica_console_position = "L"
+g:replica_display_range  = false
+# g:replica_python_options = "-Xfrozen_modules=off"
+g:replica_jupyter_console_options = {"python":
+            \ " --config ~/.jupyter/jupyter_console_config.py"}
+
+# g:writegood_compiler = "vale"
+# g:writegood_options = "--config=$HOME/vale.ini"
+
+# Outline. <F8> is overriden by vimspector
+nnoremap <silent> <F8> <Plug>OutlineToggle
+
+
+# Bunch of commands
+# -----------------------
+augroup remove_trailing_whitespaces
+    autocmd!
+    autocmd BufWritePre * {
+        if !&binary
+            myfunctions.TrimWhitespace()
+        endif
+    }
+augroup END
+
+# git add -u && git commit -m "."
+command! GitCommitDot myfunctions.CommitDot()
+command! GitPushDot myfunctions.PushDot()
+# Merge and diff
+command! -nargs=? Diff myfunctions.Diff(<q-args>)
+nnoremap dn ]c
+nnoremap dN [c
+
+command! ColorsToggle myfunctions.ColorsToggle()
+
+# Utils commands
+command! -nargs=1 -complete=command -range Redir
+            \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
+
+# Example: :HH 62, execute the 62 element of :history
+command! -nargs=1 HH execute histget("cmd", <args>)
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
 # YouTube.
