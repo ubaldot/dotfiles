@@ -10,20 +10,12 @@ export def TrimWhitespace()
     setpos('.', save_cursor)
 enddef
 
-export def OpenFileSpecial(char: string)
-    # TODO: return matched_string and open externally to the function
-    # It is equivalent to yi" but you can pass a char.
+export def GetSurroundedText(char: string): string
+    # Return the text surrounded by char
     var prev_char_y_pos = searchpos(char, 'bnW')[1]
     var next_char_y_pos = searchpos(char, 'nW')[1] - 2
-    # echom "p_y: " .. prev_char_y_pos
-    # echom "n_y: " .. next_char_y_pos
-    var filename = g:dotvim .. getline('.')[prev_char_y_pos : next_char_y_pos]
-    # var matched_string = getline('.')[prev_char_y_pos : next_char_y_pos]
-    # return matched_string
-    # echom "filename: " .. filename
-    if !empty(filename)
-        execute("edit " .. filename)
-    endif
+    var matched_text = getline('.')[prev_char_y_pos : next_char_y_pos]
+    return matched_text
 enddef
 
 # Commit a dot.

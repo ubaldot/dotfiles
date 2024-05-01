@@ -220,6 +220,16 @@ colorscheme everforest
 
  # Plugin settings
  # TODO: You may want to use a popup_create and pick
+# Open plugin settings
+var Open_special = (char) => {
+        var filename = g:dotvim .. myfunctions.GetSurroundedText(char)
+        if stridx(filename, "/plugins_settings/") != -1
+            execute("edit " .. filename)
+        else
+            echo "Not a plugin settings path."
+        endif
+    }
+
 exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
@@ -228,8 +238,7 @@ exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 
-# Open plugin settings
-nnoremap <leader>f <ScriptCmd>myfunctions.OpenFileSpecial('"')<cr>
+nnoremap <leader>z <ScriptCmd>Open_special('"')<cr>
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
