@@ -182,7 +182,7 @@ enddef
 command! -nargs=* Prettify execute(":%!prettier " .. expand("%"))
 
 
-def QuitWindow()
+export def QuitWindow()
     # Close window and wipe buffer but it prevent to quit Vim if one window is
     # left.
     if winnr('$') != 1
