@@ -10,6 +10,21 @@ export def TrimWhitespace()
     setpos('.', save_cursor)
 enddef
 
+export def OpenFileSpecial(char: string)
+    # TODO: return matched_string and open externally to the function
+    # It is equivalent to yi" but you can pass a char.
+    var prev_char_y_pos = searchpos(char, 'bnW')[1]
+    var next_char_y_pos = searchpos(char, 'nW')[1] - 2
+    # echom "p_y: " .. prev_char_y_pos
+    # echom "n_y: " .. next_char_y_pos
+    var filename = g:dotvim .. getline('.')[prev_char_y_pos : next_char_y_pos]
+    # var matched_string = getline('.')[prev_char_y_pos : next_char_y_pos]
+    # return matched_string
+    # echom "filename: " .. filename
+    if !empty(filename)
+        execute("edit " .. filename)
+    endif
+enddef
 
 # Commit a dot.
 # It is related to the opened buffer not to pwd!
@@ -167,6 +182,14 @@ enddef
 command! -nargs=* Prettify execute(":%!prettier " .. expand("%"))
 
 
+def QuitWindow()
+    # Close window and wipe buffer but it prevent to quit Vim if one window is
+    # left.
+    if winnr('$') != 1
+        quit
+    endif
+enddef
+
 # ------------ Terminal functions ------------------
 # Change all the terminal directories when you change vim directory
 export def ChangeTerminalDir()
@@ -186,9 +209,29 @@ export def WipeoutTerminals()
     endfor
 enddef
 
+# TERMINAL IN POPUP
+# This function can be called only from a terminal windows/popup, so there is
+# no risk of closing unwanted popups (such as HelpMe popups).
+
+def Quit_term_popup(quit: bool)
+    if empty(popup_list())
+        if quit
+            exe "quit"
+        else
+            exe "close"
+        endif
+    else
+        if quit
+            var bufno = bufnr()
+            popup_close(win_getid())
+            exe "bw! " .. bufno
+        else
+            popup_close(win_getid())
+        endif
+    endif
+enddef
 
 var my_term_name = &shell
-
 export def OpenMyTerminal()
     var terms_name = []
     for ii in term_list()
@@ -241,8 +284,21 @@ export def HideMyTerminal()
 enddef
 
 
+# Make vim to speak on macos
+if has('mac')
+    # <esc> is used in xnoremap because '<,'> are updated once you leave visual mode
+    xnoremap <leader>s <esc><ScriptCmd>TextToSpeech(line("'<"), line("'>"))<cr>
+    command -range Say vim9cmd TextToSpeech(<line1>, <line2>)
+
+    def TextToSpeech(firstline: number, lastline: number)
+        exe $":{firstline},{lastline}w !say"
+    enddef
+endif
+
 # Some mappings to learn
 noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
+
+# HOW TO WRITE FUNCTION THAT ALLOW COMMAND TO HAVE DOUBLE COMPLETION.
 # noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
 #
 
