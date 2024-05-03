@@ -210,7 +210,7 @@ syntax on
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 16 < hour
+if hour < 7 || 19 < hour
     set background=dark
 else
     set background=light
@@ -221,9 +221,8 @@ colorscheme everforest
  # Plugin settings
  # TODO: You may want to use a popup_create and pick
 # Open plugin settings
-var Open_special = (char) => {
-        var filename = g:dotvim .. myfunctions.GetSurroundedText(char)
-        echom filename
+var Open_special = (textobject) => {
+        var filename = g:dotvim .. myfunctions.GetTextObject(textobject)
         if stridx(filename, "/plugins_settings/") != -1
             execute("edit " .. filename)
         else
@@ -239,7 +238,7 @@ exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 
-nnoremap <leader>z <ScriptCmd>Open_special('"')<cr>
+nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'

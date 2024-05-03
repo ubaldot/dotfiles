@@ -10,7 +10,7 @@ export def TrimWhitespace()
     setpos('.', save_cursor)
 enddef
 
-export def GetSurroundedText(textobject: string): string
+export def GetTextObject(textobject: string): string
     # backup the content of register t (arbitrary choice, YMMV)
     var oldreg = getreg("t")
     # silently yank the text covered by whatever text object
@@ -19,7 +19,7 @@ export def GetSurroundedText(textobject: string): string
     # save the content of register t into a variable
     var text = getreg("t")
     # restore register t
-    call setreg("t", oldreg)
+    setreg("t", oldreg)
     # return the content of given text object
     return text
 enddef
