@@ -223,6 +223,7 @@ colorscheme everforest
 # Open plugin settings
 var Open_special = (char) => {
         var filename = g:dotvim .. myfunctions.GetSurroundedText(char)
+        echom filename
         if stridx(filename, "/plugins_settings/") != -1
             execute("edit " .. filename)
         else
