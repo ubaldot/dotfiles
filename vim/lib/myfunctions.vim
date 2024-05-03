@@ -211,7 +211,7 @@ enddef
 # This function can be called only from a terminal windows/popup, so there is
 # no risk of closing unwanted popups (such as HelpMe popups).
 
-def Quit_term_popup(quit: bool)
+export def Quit_term_popup(quit: bool)
     if empty(popup_list())
         if quit
             exe "quit"

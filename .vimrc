@@ -237,6 +237,8 @@ exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
+g:vimspector_enable_mappings = 'HUMAN'
+g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
 
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 

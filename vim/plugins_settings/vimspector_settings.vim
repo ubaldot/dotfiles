@@ -1,11 +1,10 @@
 vim9script
 
 # vimspector TODO
+# "$schema": "https://puremourning.github.io/vimspector/schema/vimspector.schema.json",
 g:vimspector_enable_mappings = 'HUMAN'
 g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
-g:vimspector_configurations = {
-  "$schema": "https://puremourning.github.io/vimspector/schema/vimspector.schema.json",
-  "adapters": {
+g:vimspector_adapters = {
     "run_with_debugpy": {
       "extends": "debugpy",
       "variables": {
@@ -39,10 +38,10 @@ g:vimspector_configurations = {
         }
       }
     }
-  },
+  }
 
-  "configurations": {
-    "Remote: attach": {
+g:vimspector_configurations = {
+    "Remote: attach (experimental)": {
       "adapter": "run_with_debugpy",
       "filetypes": ["python"],
       "configuration": {
@@ -53,18 +52,8 @@ g:vimspector_configurations = {
         "args": [""]
       }
     },
-    "Simple: launch": {
-      "adapter": "debugpy",
-      "filetypes": ["python"],
-      "configuration": {
-        "request": "launch",
-        "program": "${file}",
-        "stopOnEntry": true,
-        "console": "integratedTerminal"
-      }
-    },
 
-    "Remote: launch": {
+    "Remote: launch (experimental)": {
       "adapter": "python-remote",
       "filetypes": ["python"],
       "remote-request": "launch",
@@ -80,7 +69,7 @@ g:vimspector_configurations = {
       }
     },
 
-    "run current script": {
+    "run current script (use this!)": {
       "adapter": "debugpy",
       "configuration": {
         "request": "launch",
@@ -113,4 +102,3 @@ g:vimspector_configurations = {
       }
     }
   }
-}
