@@ -23,6 +23,7 @@ done
 
 # Vim
 rsync -a "$DOTFILES_DIR/vim/helpme_files/"* "$DOTVIM_DIR/helpme_files"
+rsync -a "$DOTFILES_DIR/vim/plugins_settings/"* "$DOTVIM_DIR/plugins_settings"
 rsync -a "$DOTFILES_DIR/vim/after/ftplugin/"* "$DOTVIM_DIR/after/ftplugin"
 rsync -a "$DOTFILES_DIR/vim/compiler"* "$DOTVIM_DIR/compiler"
 rsync -a "$DOTFILES_DIR/vim/lib/"* "$DOTVIM_DIR/lib"
