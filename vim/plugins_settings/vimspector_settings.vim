@@ -18,7 +18,6 @@ g:vimspector_configurations = {
       "port": "${Port}"
     },
 
-    // This does not extends debugpy. Will it work?
     "python-remote": {
       "variables": {
         "Host": "localhost",
@@ -55,19 +54,13 @@ g:vimspector_configurations = {
       }
     },
     "Simple: launch": {
-      // This should be the simplest
-      // No adapter defined. Use a standard gadget.
       "adapter": "debugpy",
       "filetypes": ["python"],
-      // "default": true,
       "configuration": {
         "request": "launch",
         "program": "${file}",
         "stopOnEntry": true,
         "console": "integratedTerminal"
-        // args to pass to program ${file}
-        // "args": ["*${args:--update-gadget-config}"]
-        // "args": [ "*${args}" ]
       }
     },
 
@@ -76,10 +69,6 @@ g:vimspector_configurations = {
       "filetypes": ["python"],
       "remote-request": "launch",
       "remote-cmdLine": [
-        // This is the value of %CMD% in the adapter
-        // Were ${RemoteRoot} is defined?
-        // "${RemoteRoot}/${fileBasename}",
-        // "*${args}"
         "${file}"
       ],
       "configuration": {
@@ -100,7 +89,6 @@ g:vimspector_configurations = {
         "program": "${file}",
         "stopOnEntry": true,
         "console": "integratedTerminal"
-        // "args": [ "*${args}" ]
       }
     },
     "platformio_configuration": {
@@ -114,10 +102,8 @@ g:vimspector_configurations = {
         "miDebuggerArgs": "--project-dir ${workspaceRoot} -x .pioinit"
       }
     },
-    //openocd -f interface/jlink.cfg -c 'transport select swd' -f target/stm32f4x.cfg
     "OpenOCD": {
-      // "adapter": "vscode-cpptools",
-      "adapter": "vscode-lldb",
+      "adapter": "vscode-cpptools",
       "configuration": {
         "request": "launch",
         "program": "${workspaceRoot}/build/zephyr/zephyr.elf",

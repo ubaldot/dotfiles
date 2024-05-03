@@ -10,12 +10,18 @@ export def TrimWhitespace()
     setpos('.', save_cursor)
 enddef
 
-export def GetSurroundedText(char: string): string
-    # Return the text surrounded by char
-    var prev_char_y_pos = searchpos(char, 'bnW')[1]
-    var next_char_y_pos = searchpos(char, 'nW')[1] - 2
-    var matched_text = getline('.')[prev_char_y_pos : next_char_y_pos]
-    return matched_text
+export def GetSurroundedText(textobject: string): string
+    # backup the content of register t (arbitrary choice, YMMV)
+    var oldreg = getreg("t")
+    # silently yank the text covered by whatever text object
+    # was given as argument into register t
+    execute 'silent normal "ty' .. textobject
+    # save the content of register t into a variable
+    var text = getreg("t")
+    # restore register t
+    call setreg("t", oldreg)
+    # return the content of given text object
+    return text
 enddef
 
 # Commit a dot.
