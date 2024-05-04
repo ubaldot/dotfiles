@@ -31,7 +31,7 @@ g:fern#renderer#default#leaf_symbol = ""
 g:fern#renderer#default#collapsed_symbol = "+"
 g:fern#renderer#default#expanded_symbol = "-"
 
-noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
+# noremap <silent> <Leader>f :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 noremap <silent> <space> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 
 def FernInit()
