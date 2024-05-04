@@ -1,7 +1,23 @@
 vim9script
 
+# NOTES:
+# python-remote adapter  does not extends debugpy. Will it work?
+#
+# Simple: launch should be the simplest configuration. No adapter defined. Use a standard gadget.
+#
+# args key inside configuration is args to pass to program ${file}
+#
+# This is the value of %CMD% in the adapter
+#  Were ${RemoteRoot} is defined?
+# "${RemoteRoot}/${fileBasename}",
+# "*${args}"
+#
+#  openocd -f interface/jlink.cfg -c 'transport select swd' -f target/stm32f4x.cfg
+# "adapter": "vscode-cpptools",
+# "adapter": "vscode-lldb",
+# "$schema": "https://puremourning.github.io/vimspector/schema/vimspector.schema.json",#
+#
 # vimspector TODO
-# "$schema": "https://puremourning.github.io/vimspector/schema/vimspector.schema.json",
 g:vimspector_enable_mappings = 'HUMAN'
 g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
 g:vimspector_adapters = {
