@@ -1,39 +1,37 @@
 vim9script
 
-# NOTES:
-# python-remote adapter  does not extends debugpy. Will it work?
-#
-# Simple: launch should be the simplest configuration. No adapter defined. Use a standard gadget.
 #
 # args key inside configuration is args to pass to program ${file}
 #
-# This is the value of %CMD% in the adapter
-#  Were ${RemoteRoot} is defined?
-# "${RemoteRoot}/${fileBasename}",
-# "*${args}"
+# Remote-cmdline in the configuration is the value of %CMD% in the adapter
 #
-#  openocd -f interface/jlink.cfg -c 'transport select swd' -f target/stm32f4x.cfg
-# "adapter": "vscode-cpptools",
-# "adapter": "vscode-lldb",
-# "$schema": "https://puremourning.github.io/vimspector/schema/vimspector.schema.json",#
-#
-# vimspector TODO
 g:vimspector_enable_mappings = 'HUMAN'
 g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
+
+var python_path = system("where python")
 g:vimspector_adapters = {
-    "run_with_debugpy": {
+    "dymoval_adapter": {
       "extends": "debugpy",
       "variables": {
         "Host": "localhost",
         "Port": "5678"
       },
-      "command": [
-        "python -m debugpy --wait-for-client --listen ${Host}:${Port} ${file}"
-      ],
-      "port": "${Port}"
+
+      "command": [ "${workspaceRoot}/pippo.sh" ],
+      # "command": [
+      #       "python",
+      #       "-Xfrozen_modules=off",
+      #       "-m",
+      #       "debugpy",
+      #       "--listen",
+      #       "${Host}:${Port}",
+      #       "--wait-for-client",
+      # ],
+      "port": "${Port}",
     },
 
-    "python-remote": {
+    # OK!
+    "python-remote-launch": {
       "variables": {
         "Host": "localhost",
         "Port": "5678"
@@ -44,6 +42,7 @@ g:vimspector_adapters = {
         "remote": {
           "runCommand": [
             "python",
+            "-Xfrozen_modules=off",
             "-m",
             "debugpy",
             "--listen",
@@ -52,52 +51,80 @@ g:vimspector_adapters = {
             "%CMD%"
           ]
         }
-      }
+      },
+      # "delay": "1000m",
     }
   }
 
 g:vimspector_configurations = {
-    "Remote: attach (experimental)": {
-      "adapter": "run_with_debugpy",
+    "Dymoval (NOK)": {
+      "adapter": "dymoval_adapter",
       "filetypes": ["python"],
       "configuration": {
+       # If "request" is "launch" then the file to be debugged is specified in
+       # "program"
         "request": "attach",
         "program": "${file}",
+        "python": [python_path],
         "stopOnEntry": true,
         "console": "integratedTerminal",
-        "args": [""]
-      }
+        # args is what to pass to "program" along with ${file}.
+        # "args": ["-Xfrozen_modules=off"]
+        "autoReload": {
+        "enable": true
+        },
+      },
+      # "delay": "1000m",
     },
 
-    "Remote: launch (experimental)": {
-      "adapter": "python-remote",
+    "Remote: launch and attach (OK)": {
+      "adapter": "python-remote-launch",
       "filetypes": ["python"],
+      # Instead of manually run a process and fetch the PID, you directly
+      # lunch the process in the remote and connect to it.
       "remote-request": "launch",
+      # This replaces %CMD% in the adapter.
       "remote-cmdLine": [
         "${file}"
       ],
       "configuration": {
-        "request": "launch",
+        # You attach to the process launched in the remote.
+        "request": "attach",
         "program": "${file}",
+        "python": [python_path],
         "stopOnEntry": true,
         "console": "integratedTerminal",
-        "args": ["*${args}"]
+        "justMyCode": false,
+        "autoReload": {
+        "enable": true
+        },
       }
     },
 
-    "run current script (use this!)": {
+    "Python run generic script (venv problems)": {
+    # Launch current file with debugpy
+    # Does not work with dymoval
       "adapter": "debugpy",
+      "filetypes": ["python"],
       "configuration": {
+      # If you use "attach" you must specify a processID if you run everything
+      # locally OR you should use remote-request: launch
         "request": "launch",
-        "type": "python",
-        "cwd": "${fileDirname}",
         "program": "${file}",
+        # "python": [python_path],
+        # "type": "python",
+        "cwd": "${fileDirname}",
         "stopOnEntry": true,
-        "console": "integratedTerminal"
+        "console": "integratedTerminal",
+        "autoReload": {
+        "enable": true
+        },
       }
     },
+
     "platformio_configuration": {
       "adapter": "vscode-cpptools",
+      "filetypes": ["c", "cpp"],
       "configuration": {
         "request": "launch",
         "cwd": "${workspaceRoot}",
@@ -109,6 +136,7 @@ g:vimspector_configurations = {
     },
     "OpenOCD": {
       "adapter": "vscode-cpptools",
+      "filetypes": ["c", "cpp"],
       "configuration": {
         "request": "launch",
         "program": "${workspaceRoot}/build/zephyr/zephyr.elf",

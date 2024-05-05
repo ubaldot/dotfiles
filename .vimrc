@@ -237,8 +237,6 @@ exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
-g:vimspector_enable_mappings = 'HUMAN'
-g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
 
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
@@ -292,7 +290,7 @@ g:replica_display_range  = false
 # g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
             \ " --config ~/.jupyter/jupyter_console_config.py"}
-
+nmap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
 # g:writegood_compiler = "vale"
 # g:writegood_options = "--config=$HOME/vale.ini"
 

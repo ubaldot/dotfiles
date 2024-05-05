@@ -15,7 +15,9 @@ def Black(textwidth: number)
     # write
     if executable('black') && &filetype == 'python'
                 var win_view = winsaveview()
-                exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
+                # exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
+                #             \ --stdin-filename {shellescape(expand("%"))}"
+                exe $":%!black - --line-length {textwidth}
                             \ --stdin-filename {shellescape(expand("%"))}"
                 winrestview(win_view)
     else
