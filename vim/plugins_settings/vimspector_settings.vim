@@ -30,27 +30,10 @@ var elf_filename = fnamemodify(getcwd(), ":t") .. ".elf"
 var elf_fullpath = getcwd() .. "/build/" .. elf_filename
 
 g:vimspector_adapters = {
-    "dymoval_adapter": {
-      "extends": "debugpy",
-      "variables": {
-        "Host": "localhost",
-        "Port": "5678"
-      },
 
-      "command": [ "${workspaceRoot}/pippo.sh" ],
-      # "command": [
-      #       "python",
-      #       "-Xfrozen_modules=off",
-      #       "-m",
-      #       "debugpy",
-      #       "--listen",
-      #       "${Host}:${Port}",
-      #       "--wait-for-client",
-      # ],
-      "port": "${Port}",
-    },
-
-    # OK!
+    # PYTHON
+    # May be replaced once "Python run generic script (NOK)"
+    # will reckon virtual environments
     "python-remote-launch": {
       "variables": {
         "Host": "localhost",
@@ -75,6 +58,7 @@ g:vimspector_adapters = {
       # "delay": "1000m",
     },
 
+    # Embedded C
     "vscode-cpptools-extended": {
       "extends": "vscode-cpptools",
       "launch": {
@@ -83,20 +67,12 @@ g:vimspector_adapters = {
         }
       },
      },
-
-    #
-    "OpenOCDServer": {
-      # NOK!
-      # "command": HERE YOU SHALL SPECIFY THE DAP! FOR EXAMPLE OpenDebugAD7.
-      "launch": {
-        "remote": {
-          "runCommand": [gdb_stuff_path .. "/openocd_stm32f4x_stlink.sh"],
-        }
-      }
-    },
   }
 
 g:vimspector_configurations = {
+    # PYTHON
+    # May be replaced once "Python run generic script (NOK)"
+    # will reckon virtual environments
     "Remote: launch and attach (OK)": {
       "adapter": "python-remote-launch",
       "filetypes": ["python"],
@@ -122,44 +98,8 @@ g:vimspector_configurations = {
       }
     },
 
-    "Python run generic script (NOK)": {
-    # Launch current file with debugy. It doed not recognize virtual
-    # environments. Opened a issue on debugpy.
-      "adapter": "debugpy",
-      "filetypes": ["python"],
-      "configuration": {
-      # If you use "attach" you must specify a processID if you run everything
-      # locally OR you should use remote-request: launch
-        "request": "launch",
-        "program": "${file}",
-        "python": [python_path],
-        # "type": "python",
-        "cwd": "${fileDirname}",
-        "stopOnEntry": true,
-        "console": "integratedTerminal",
-        "autoReload": {
-        "enable": true
-        },
-      }
-    },
-
-    "gdb -> openocd (NOK)": {
-    # This is similar to what I have in Termdebug. I should use a DAP to make
-    # vimspector to work. THIS DOES NOT WORK!
-      "adapter": "OpenOCDServer",
-      "filetypes": ["c", "cpp"],
-      "remote-request": "launch",
-      "configuration": {
-        "request": "launch",
-        "program": elf_fullpath,
-        "console": "integratedTerminal",
-        "MImode": "gdb",
-        "MIDebuggerPath": debugger_path .. debugger,
-        "miDebuggerServerAddress": "localhost:3333",
-      }
-    },
-
-    # You need openocd server running
+    # Embedded C
+    # TODO: openocd does not close when vimspector closes
     "STM32F436RE Debug (OK)": {
       "adapter": "vscode-cpptools-extended",
       "filetypes": ["c", "cpp"],
@@ -173,8 +113,42 @@ g:vimspector_configurations = {
         "miDebuggerServerAddress": "localhost:3333",
         "console": "integratedTerminal"
       }
-    }
+    },
   }
+
+
+####### WRONG ADAPTERS ##################
+
+# "dymoval_adapter": {
+#   "extends": "debugpy",
+#   "variables": {
+#     "Host": "localhost",
+#     "Port": "5678"
+#   },
+#    "command": [
+#          "python",
+#          "-Xfrozen_modules=off",
+#          "-m",
+#          "debugpy",
+#          "--listen",
+#          "${Host}:${Port}",
+#          "--wait-for-client",
+#    ],
+#   "port": "${Port}",
+# },
+
+# "OpenOCDServer": {
+#   # NOK!
+#   # "command": HERE YOU SHALL SPECIFY THE DAP! FOR EXAMPLE OpenDebugAD7.
+#   "launch": {
+#     "remote": {
+#       "runCommand": [gdb_stuff_path .. "/openocd_stm32f4x_stlink.sh"],
+#     }
+#   }
+# },
+
+
+####### WRONG CONFIGURATIONS ##################
 
 # "Dymoval (NOK)": {
 #   "adapter": "dymoval_adapter",
@@ -194,4 +168,44 @@ g:vimspector_configurations = {
 #     },
 #   },
 #   # "delay": "1000m",
+# },
+#
+#
+
+
+#Python run generic script (NOK)": {
+# Launch current file with debugy. It doed not recognize virtual
+# environments. Opened a issue on debugpy.
+# "adapter": "debugpy",
+# "filetypes": ["python"],
+# "configuration": {
+# # If you use "attach" you must specify a processID if you run everything
+# # locally OR you should use remote-request: launch
+#   "request": "launch",
+#   "program": "${file}",
+#   "python": [python_path],
+#   # "type": "python",
+#   "cwd": "${fileDirname}",
+#   "stopOnEntry": true,
+#   "console": "integratedTerminal",
+#   "autoReload": {
+#   "enable": true
+#   },
+# }
+# },
+
+#gdb -> openocd (NOK)": {
+# This is similar to what I have in Termdebug. I should use a DAP to make
+# vimspector to work. THIS DOES NOT WORK!
+# "adapter": "OpenOCDServer",
+# "filetypes": ["c", "cpp"],
+# "remote-request": "launch",
+# "configuration": {
+#   "request": "launch",
+#   "program": elf_fullpath,
+#   "console": "integratedTerminal",
+#   "MImode": "gdb",
+#   "MIDebuggerPath": debugger_path .. debugger,
+#   "miDebuggerServerAddress": "localhost:3333",
+# }
 # },
