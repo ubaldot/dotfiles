@@ -34,13 +34,13 @@ import g:dotvim .. "/lib/myfunctions.vim"
 &t_SI = "\e[6 q"
 &t_EI = "\e[2 q"
 
-# augroup ReloadVimScripts
-#     autocmd!
-#     autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
-#         exe "source %"
-#         echo expand('%:t') .. " reloaded."
-#     }
-# augroup END
+augroup ReloadVimScripts
+    autocmd!
+    autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
+        exe "source %"
+        echo expand('%:t') .. " reloaded."
+    }
+augroup END
 
 # For plugin writing
 # augroup CommandWindowOpen
