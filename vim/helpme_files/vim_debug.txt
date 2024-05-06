@@ -1,5 +1,7 @@
 Start the debugger with arm-none-eabi-gdb -x ../gdb_init_commands.txt
 
+Use :Debug that is mine customized version of :Termdebug
+
 You can build the .elf file, then Termdebug myfile.elf and then monitor system
 halt and then (gdb) load
 
