@@ -98,6 +98,8 @@ set wildcharm=<tab>
 
 # Some key bindings
 # ----------------------
+map <f1> <nop>
+map! <f1> <nop>
 g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<cr>
@@ -195,7 +197,7 @@ Plug 'ubaldot/vim-manim'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 Plug 'Konfekt/vim-compilers'
-Plug 'ubaldot/vimspector'
+Plug 'puremourning/vimspector'
 plug#end()
 # filetype plugin indent on
 syntax on
