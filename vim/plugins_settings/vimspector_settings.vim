@@ -8,7 +8,27 @@ vim9script
 g:vimspector_enable_mappings = 'HUMAN'
 g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
 
+# Python
 var python_path = system("where python")
+
+# C/C++
+var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
+if g:os == "Windows"
+    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
+endif
+
+var debugger = "arm-none-eabi-gdb"
+
+var openocd_script = "openocd_stm32f4x_stlink.sh\n"
+var openocd_cmd = 'source ../gdb_stuff/' .. openocd_script
+if g:os == "Windows"
+    openocd_cmd = "..\\gdb_stuff\\openocd_stm32f4x_stlink.bat\n\r"
+endif
+
+var gdb_stuff_path = fnamemodify(getcwd(), ":h") .. "/gdb_stuff"
+var elf_filename = fnamemodify(getcwd(), ":t") .. ".elf"
+var elf_fullpath = getcwd() .. "/build/" .. elf_filename
+
 g:vimspector_adapters = {
     "dymoval_adapter": {
       "extends": "debugpy",
@@ -53,7 +73,30 @@ g:vimspector_adapters = {
         }
       },
       # "delay": "1000m",
-    }
+    },
+
+    # The server starts correctly but it isn't the point.
+    "OpenOCDServer": {
+      "port": "3333",
+      "host": "localhost",
+      "launch": {
+        "remote": {
+          "runCommand": [
+          gdb_stuff_path .. "/openocd_stm32f4x_stlink.sh "
+          ]
+        }
+      },
+      # "delay": "1000m",
+    },
+
+    # This makes more sense
+    "GDBClient": {
+      "port": "3333",
+      "host": "localhost",
+      # "command": [debugger_path .. debugger, "-ex", "target", "extended-remote", "localhost:3333"],
+      "command": [gdb_stuff_path .. "/gdb-to-openocd.sh"],
+      # "delay": "1000m",
+    },
   }
 
 g:vimspector_configurations = {
@@ -83,6 +126,7 @@ g:vimspector_configurations = {
       # Instead of manually run a process and fetch the PID, you directly
       # lunch the process in the remote and connect to it.
       "remote-request": "launch",
+      "default": true,
       # This replaces %CMD% in the adapter.
       "remote-cmdLine": [
         "${file}"
@@ -111,7 +155,7 @@ g:vimspector_configurations = {
       # locally OR you should use remote-request: launch
         "request": "launch",
         "program": "${file}",
-        # "python": [python_path],
+        "python": [python_path],
         # "type": "python",
         "cwd": "${fileDirname}",
         "stopOnEntry": true,
@@ -122,27 +166,41 @@ g:vimspector_configurations = {
       }
     },
 
-    "platformio_configuration": {
-      "adapter": "vscode-cpptools",
+
+    "gdb -> openocd (NOK)": {
+      "adapter": "OpenOCDServer",
       "filetypes": ["c", "cpp"],
+      "remote-request": "launch",
       "configuration": {
-        "request": "launch",
-        "cwd": "${workspaceRoot}",
-        "program": "${workspaceRoot}/.pio/build/nucleo_h743zi/firmware.elf",
-        "MIMode": "gdb",
-        "miDebuggerPath": "piodebuggdb",
-        "miDebuggerArgs": "--project-dir ${workspaceRoot} -x .pioinit"
+        "request": "attach",
+        "program": elf_filename,
+        "console": "integratedTerminal"
       }
     },
-    "OpenOCD": {
-      "adapter": "vscode-cpptools",
+
+
+    "GDB": {
+      "adapter": "GDBClient",
       "filetypes": ["c", "cpp"],
       "configuration": {
         "request": "launch",
-        "program": "${workspaceRoot}/build/zephyr/zephyr.elf",
+        "program": "load " .. elf_filename,
+        "console": "integratedTerminal"
+      }
+    },
+
+    # You need openocd server running
+    "STM32F436RE Debug (OK)": {
+      "adapter": "vscode-cpptools",
+      "filetypes": ["c", "cpp"],
+      # "default": true,
+      "configuration": {
+        "request": "launch",
+        "program": elf_fullpath,
         "MImode": "gdb",
-        "MIDebuggerPath": "~/zephyr-sdk-0.16.0/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb",
-        "miDebuggerServerAddress": "127.0.0.1:3333"
+        "MIDebuggerPath": debugger_path .. debugger,
+        "miDebuggerServerAddress": "localhost:3333",
+        "console": "integratedTerminal"
       }
     }
   }

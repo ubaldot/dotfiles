@@ -195,7 +195,7 @@ Plug 'ubaldot/vim-manim'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 Plug 'Konfekt/vim-compilers'
-Plug 'puremourning/vimspector'
+Plug 'ubaldot/vimspector'
 plug#end()
 # filetype plugin indent on
 syntax on
@@ -210,7 +210,7 @@ syntax on
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 19 < hour
+if hour < 7 || 18 < hour
     set background=dark
 else
     set background=light
