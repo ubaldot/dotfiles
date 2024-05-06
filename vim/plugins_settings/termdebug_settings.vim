@@ -53,21 +53,31 @@ def MyTermdebug()
     echo "Starting debugger for project: " .. filename
     execute "Termdebug build/" .. filename .. ".elf"
     execute "close " ..  bufwinnr("debugged program")
-    # Resize gdb window. It could be improved...
-    resize 5
+
+    # Create serial monitor
+    wincmd W
+    win_execute(win_getid(), 'term_start("make monitor",
+                        \ {"term_name": "serial_monitor"})' )
+
+    # TODO: can be done better
+    # Jumping around and resizing
+    wincmd j
+    wincmd j
+    resize 8
     wincmd k
 
     # Unlist the various buffers opened by termdebug
     setbufvar("debugged program", "&buflisted", 0)
     setbufvar("gdb communication", "&buflisted", 0)
-    setbufvar("arm-none-eabi-gdb", "&buflisted", 0)
+    setbufvar(debugger, "&buflisted", 0)
     setbufvar("Termdebug-variables-listing", "&buflisted", 0)
     setbufvar("OPENOCD", "&buflisted", 0)
+    setbufvar("serial_monitor", "&buflisted", 0)
 enddef
 
 def ShutoffTermdebug()
     for bufnum in term_list()
-        if bufname(bufnum) ==# 'OPENOCD'
+        if bufname(bufnum) ==# 'OPENOCD' || bufname(bufnum) ==# 'serial_monitor'
             execute "bw! " .. bufnum
         endif
     endfor
@@ -76,6 +86,92 @@ enddef
 augroup OpenOCDShutdown
     autocmd!
     autocmd User TermdebugStopPost ShutoffTermdebug()
+augroup END
+
+
+# Mappings
+var map_CC = ""
+var map_B = ""
+var map_C = ""
+var map_S = ""
+var map_O = ""
+var map_F = ""
+var map_X = ""
+
+def SetUpTermDebugOverrides()
+    if !empty(mapcheck("CC", "n"))
+        map_CC = maparg('CC', 'n')
+    endif
+    if !empty(mapcheck("B", "n"))
+        map_B = maparg('B', 'n')
+    endif
+    if !empty(mapcheck("C", "n"))
+        map_C = maparg('C', 'n')
+    endif
+    if !empty(mapcheck("S", "n"))
+        map_S = maparg('S', 'n')
+    endif
+    if !empty(mapcheck("O", "n"))
+        map_O = maparg('O', 'n')
+    endif
+    if !empty(mapcheck("F", "n"))
+        map_F = maparg('F', 'n')
+    endif
+    if !empty(mapcheck("X", "n"))
+        map_X = maparg('X', 'n')
+    endif
+
+    nnoremap C <Cmd>Continue<CR>
+    nnoremap B <Cmd>Break<CR>
+    nnoremap CC <Cmd>Clear<CR>
+    nnoremap S <Cmd>Step<CR>
+    nnoremap O <Cmd>Over<CR>
+    nnoremap F <Cmd>Finish<CR>
+    nnoremap X <Cmd>Stop<CR>
+enddef
+
+def TearDownTermDebugOverrides()
+    if !empty(map_CC)
+        nnoremap CC expand(map_CC)
+    else
+        nunmap CC
+    endif
+    if !empty(map_B)
+        nnoremap B expand(map_B)
+    else
+        nunmap B
+    endif
+    if !empty(map_C)
+        nnoremap C expand(map_C)
+    else
+        nunmap C
+    endif
+    if !empty(map_S)
+        nnoremap S expand(map_S)
+    else
+        nunmap S
+    endif
+    if !empty(map_O)
+        nnoremap O expand(map_O)
+    else
+        nunmap O
+    endif
+    if !empty(map_F)
+        nnoremap F expand(map_F)
+    else
+        nunmap F
+    endif
+    if !empty(map_X)
+        nnoremap X expand(map_X)
+    else
+        nunmap X
+    endif
+enddef
+
+augroup MyTermDebugOverrides
+    autocmd!
+    autocmd User TermdebugStartPost SetUpTermDebugOverrides()
+    autocmd User TermdebugStopPost  TearDownTermDebugOverrides()
 augroup END
 
 command! Debug vim9cmd MyTermdebug()

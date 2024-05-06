@@ -9,17 +9,30 @@ LAYOUT
 - lay next
 - file filename.c:1
 
-BREAKPOINTS
-:Break
-:Delete
-:Continue
-:Evaluate
+MAPPINGS (Termdebug)
+--------------------
+CC <Cmd>Continue<CR>
+B <Cmd>Break<CR>
+C <Cmd>Clear<CR>
+S <Cmd>Step<CR>
+O <Cmd>Over<CR>
+F <Cmd>Finish<CR>
 
-USE MOUSE RIGHT CLICK TO SET/CLEAR BREAKPOINTS!
+You can also use mouse right click to set/clear breakpoints!
+
+MAPPING (vimspector)
+--------------------
+<F5> - Launch debugger/Continue
+<F9> - Toggle breakpoints
+<F10> - Step Over
+<F11> - Step Into
+<F12> - Step Out
+
 
 COMMANDS
 - break <symbol/line>, (e.g. break blink_main.c:blink_main)
 - delete <breakpoint number>, (delete with no args for deleting all breakpoints)
+- info breakpoints, shall all the breakpoints
 - clear <line number>, delete all breakpoints
 - enable/disable <breakpoint>
 - run/continue, (you need a breakpoint first)
