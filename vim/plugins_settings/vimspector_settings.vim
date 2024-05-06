@@ -75,51 +75,28 @@ g:vimspector_adapters = {
       # "delay": "1000m",
     },
 
-    # The server starts correctly but it isn't the point.
-    "OpenOCDServer": {
-      "port": "3333",
-      "host": "localhost",
+    "vscode-cpptools-extended": {
+      "extends": "vscode-cpptools",
       "launch": {
         "remote": {
-          "runCommand": [
-          gdb_stuff_path .. "/openocd_stm32f4x_stlink.sh "
-          ]
+          "runCommand": [gdb_stuff_path .. "/openocd_stm32f4x_stlink.sh"],
         }
       },
-      # "delay": "1000m",
-    },
+     },
 
-    # This makes more sense
-    "GDBClient": {
-      "port": "3333",
-      "host": "localhost",
-      # "command": [debugger_path .. debugger, "-ex", "target", "extended-remote", "localhost:3333"],
-      "command": [gdb_stuff_path .. "/gdb-to-openocd.sh"],
-      # "delay": "1000m",
+    #
+    "OpenOCDServer": {
+      # NOK!
+      # "command": HERE YOU SHALL SPECIFY THE DAP! FOR EXAMPLE OpenDebugAD7.
+      "launch": {
+        "remote": {
+          "runCommand": [gdb_stuff_path .. "/openocd_stm32f4x_stlink.sh"],
+        }
+      }
     },
   }
 
 g:vimspector_configurations = {
-    "Dymoval (NOK)": {
-      "adapter": "dymoval_adapter",
-      "filetypes": ["python"],
-      "configuration": {
-       # If "request" is "launch" then the file to be debugged is specified in
-       # "program"
-        "request": "attach",
-        "program": "${file}",
-        "python": [python_path],
-        "stopOnEntry": true,
-        "console": "integratedTerminal",
-        # args is what to pass to "program" along with ${file}.
-        # "args": ["-Xfrozen_modules=off"]
-        "autoReload": {
-        "enable": true
-        },
-      },
-      # "delay": "1000m",
-    },
-
     "Remote: launch and attach (OK)": {
       "adapter": "python-remote-launch",
       "filetypes": ["python"],
@@ -145,9 +122,9 @@ g:vimspector_configurations = {
       }
     },
 
-    "Python run generic script (venv problems)": {
-    # Launch current file with debugpy
-    # Does not work with dymoval
+    "Python run generic script (NOK)": {
+    # Launch current file with debugy. It doed not recognize virtual
+    # environments. Opened a issue on debugpy.
       "adapter": "debugpy",
       "filetypes": ["python"],
       "configuration": {
@@ -166,34 +143,28 @@ g:vimspector_configurations = {
       }
     },
 
-
     "gdb -> openocd (NOK)": {
+    # This is similar to what I have in Termdebug. I should use a DAP to make
+    # vimspector to work. THIS DOES NOT WORK!
       "adapter": "OpenOCDServer",
       "filetypes": ["c", "cpp"],
       "remote-request": "launch",
       "configuration": {
-        "request": "attach",
-        "program": elf_filename,
-        "console": "integratedTerminal"
-      }
-    },
-
-
-    "GDB": {
-      "adapter": "GDBClient",
-      "filetypes": ["c", "cpp"],
-      "configuration": {
         "request": "launch",
-        "program": "load " .. elf_filename,
-        "console": "integratedTerminal"
+        "program": elf_fullpath,
+        "console": "integratedTerminal",
+        "MImode": "gdb",
+        "MIDebuggerPath": debugger_path .. debugger,
+        "miDebuggerServerAddress": "localhost:3333",
       }
     },
 
     # You need openocd server running
     "STM32F436RE Debug (OK)": {
-      "adapter": "vscode-cpptools",
+      "adapter": "vscode-cpptools-extended",
       "filetypes": ["c", "cpp"],
-      # "default": true,
+      "default": true,
+      "remote-request": "launch",
       "configuration": {
         "request": "launch",
         "program": elf_fullpath,
@@ -204,3 +175,23 @@ g:vimspector_configurations = {
       }
     }
   }
+
+# "Dymoval (NOK)": {
+#   "adapter": "dymoval_adapter",
+#   "filetypes": ["python"],
+#   "configuration": {
+#    # If "request" is "launch" then the file to be debugged is specified in
+#    # "program"
+#     "request": "attach",
+#     "program": "${file}",
+#     "python": [python_path],
+#     "stopOnEntry": true,
+#     "console": "integratedTerminal",
+#     # args is what to pass to "program" along with ${file}.
+#     # "args": ["-Xfrozen_modules=off"]
+#     "autoReload": {
+#     "enable": true
+#     },
+#   },
+#   # "delay": "1000m",
+# },
