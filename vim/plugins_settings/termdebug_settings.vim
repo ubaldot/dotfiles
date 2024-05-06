@@ -17,6 +17,7 @@ if g:os == "Windows"
     openocd_cmd = "..\\gdb_stuff\\openocd_stm32f4x_stlink.bat\n\r"
 endif
 
+g:debug_openocd_command = openocd_cmd
 
 # 2. Debugger settings
 g:termdebug_config = {}
@@ -25,11 +26,22 @@ if g:os == "Windows"
     debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
 endif
 
-var debugger = "arm-none-eabi-gdb"
+# var debugger = "arm-none-eabi-gdb"
+g:debug_debugger = debugger_path .. "arm-none-eabi-gdb"
+g:debug_debugger_args = ["-x", "../gdb_stuff/gdb_init_commands.txt"]
+# g:debug_debugger_args = ["-ex", '"target extended-remote localhost:3333"', "-ex", '"monitor reset"']
 
-g:termdebug_config['command'] = [debugger_path .. debugger, "-x", "../gdb_stuff/gdb_init_commands.txt"]
+
+g:termdebug_config['command'] = insert(g:debug_debugger_args, g:debug_debugger, 0)
 g:termdebug_config['variables_window'] = 1
 
+# Other globals
+g:debug_monitor_command = "make monitor"
+g:debug_show_monitor = true
+g:debug_elf_file = $"build/{fnamemodify(getcwd(), ':t')}.elf"
+
+g:debug_gdb_win_height = 8
+g:debug_monitor_win_height = 20
 
 # Run all the machinery
 packadd termdebug
@@ -44,40 +56,49 @@ def MyTermdebug()
     # When Termdebug is closed, then the server is automatically shutoff
 
     # 1. Start a openocd terminal
-    var ii = term_start(&shell, {'term_name': 'OPENOCD', 'hidden': 1, 'term_finish': 'close'})
-    term_sendkeys(ii, openocd_cmd)
+    var openocd_bufno = term_start(&shell, {'term_name': 'OPENOCD', 'hidden': 1, 'term_finish': 'close'})
+    term_sendkeys(openocd_bufno, g:debug_openocd_command)
 
     # 2. Start arm-eabi-none-gdb and connect to openocd (see g:termdebug_config['command'])
     # OBS! Be sure that the local and the loaded .elf file in the remote are the same!
-    var filename = fnamemodify(getcwd(), ':t')
-    echo "Starting debugger for project: " .. filename
-    execute "Termdebug build/" .. filename .. ".elf"
+    echo "Starting debugger for project: " .. fnamemodify(getcwd(), ':t')
+    execute $"Termdebug {g:debug_elf_file}"
     execute "close " ..  bufwinnr("debugged program")
 
     # Create serial monitor
     wincmd W
-    win_execute(win_getid(), 'term_start("make monitor",
-                        \ {"term_name": "serial_monitor"})' )
+    # var serial_monitor_bufno = term_start(&shell, {"term_name": "serial_monitor"})
+    # term_sendkeys(serial_monitor_bufno, "make monitor\n")
+    if g:debug_show_monitor == true && !empty(g:debug_monitor_command)
+        win_execute(win_getid(), 'term_start(g:debug_monitor_command,
+                            \ {"term_name": "monitor"})' )
+        # TODO check if to run a shell and then a program. NOTE: conda envs
+        # may mess up things, this is why this choice
+        # win_execute(win_getid(), 'term_sendkeys(bufno("serial_monitor"), "make monitor\n")')
 
-    # TODO: can be done better
-    # Jumping around and resizing
+        # TODO: can be done better
+        # Jumping around and resizing
+        wincmd j
+        win_execute(win_getid(), $"resize {g:debug_monitor_win_height}")
+    endif
     wincmd j
-    wincmd j
-    resize 8
+    win_execute(win_getid(), $"resize {g:debug_gdb_win_height}")
     wincmd k
 
     # Unlist the various buffers opened by termdebug
     setbufvar("debugged program", "&buflisted", 0)
     setbufvar("gdb communication", "&buflisted", 0)
+    # Termdebug calls the buffer with the gdb client as the gdb name
+    var debugger = fnamemodify(g:debug_debugger, ":t")
     setbufvar(debugger, "&buflisted", 0)
     setbufvar("Termdebug-variables-listing", "&buflisted", 0)
     setbufvar("OPENOCD", "&buflisted", 0)
-    setbufvar("serial_monitor", "&buflisted", 0)
+    setbufvar("monitor", "&buflisted", 0)
 enddef
 
 def ShutoffTermdebug()
     for bufnum in term_list()
-        if bufname(bufnum) ==# 'OPENOCD' || bufname(bufnum) ==# 'serial_monitor'
+        if bufname(bufnum) ==# 'OPENOCD' || bufname(bufnum) ==# 'monitor'
             execute "bw! " .. bufnum
         endif
     endfor
@@ -90,82 +111,43 @@ augroup END
 
 
 # Mappings
-var map_CC = ""
-var map_B = ""
-var map_C = ""
-var map_S = ""
-var map_O = ""
-var map_F = ""
-var map_X = ""
+# test
+# nnoremap C <cmd>echo "pippo"<cr>
+
+var key_mappings = {}
+var keys = ['C', 'B', 'D', 'S', 'O', 'F', 'X', 'I', 'U']
 
 def SetUpTermDebugOverrides()
-    if !empty(mapcheck("CC", "n"))
-        map_CC = maparg('CC', 'n')
-    endif
-    if !empty(mapcheck("B", "n"))
-        map_B = maparg('B', 'n')
-    endif
-    if !empty(mapcheck("C", "n"))
-        map_C = maparg('C', 'n')
-    endif
-    if !empty(mapcheck("S", "n"))
-        map_S = maparg('S', 'n')
-    endif
-    if !empty(mapcheck("O", "n"))
-        map_O = maparg('O', 'n')
-    endif
-    if !empty(mapcheck("F", "n"))
-        map_F = maparg('F', 'n')
-    endif
-    if !empty(mapcheck("X", "n"))
-        map_X = maparg('X', 'n')
-    endif
+    # Save possibly existing mappings
+    for key in keys
+        if !empty(mapcheck(key, "n"))
+            key_mappings[key] = maparg(key, 'n')
+        endif
+    endfor
 
     nnoremap C <Cmd>Continue<CR>
     nnoremap B <Cmd>Break<CR>
-    nnoremap CC <Cmd>Clear<CR>
-    nnoremap S <Cmd>Step<CR>
+    nnoremap D <Cmd>Clear<CR>
+    nnoremap I <Cmd>Step<CR>
     nnoremap O <Cmd>Over<CR>
     nnoremap F <Cmd>Finish<CR>
-    nnoremap X <Cmd>Stop<CR>
+    nnoremap S <Cmd>Stop<CR>
+    nnoremap U <Cmd>Until<CR>
+    nnoremap T <Cmd>Tbreak<CR>
+    nnoremap X <cmd>call TermDebugSendCommand('set confirm off')<cr><cmd>call TermDebugSendCommand('exit')<cr>
 enddef
 
 def TearDownTermDebugOverrides()
-    if !empty(map_CC)
-        nnoremap CC expand(map_CC)
-    else
-        nunmap CC
-    endif
-    if !empty(map_B)
-        nnoremap B expand(map_B)
-    else
-        nunmap B
-    endif
-    if !empty(map_C)
-        nnoremap C expand(map_C)
-    else
-        nunmap C
-    endif
-    if !empty(map_S)
-        nnoremap S expand(map_S)
-    else
-        nunmap S
-    endif
-    if !empty(map_O)
-        nnoremap O expand(map_O)
-    else
-        nunmap O
-    endif
-    if !empty(map_F)
-        nnoremap F expand(map_F)
-    else
-        nunmap F
-    endif
-    if !empty(map_X)
-        nnoremap X expand(map_X)
-    else
-        nunmap X
-    endif
+    # Restore mappings
+    for key in keys
+        if has_key(key_mappings, key)
+            echom key
+            echom key_mappings[key]
+            exe "nnoremap " .. key .. " " .. key_mappings[key]
+        else
+            exe "nunmap " .. key
+        endif
+    endfor
 enddef
 
 augroup MyTermDebugOverrides
