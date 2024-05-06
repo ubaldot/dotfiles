@@ -15,7 +15,7 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 
-conda activate dymoval_dev
+conda activate platformio
 
 #
 alias ctags="/opt/homebrew/bin/ctags"
