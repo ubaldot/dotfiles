@@ -59,39 +59,48 @@ def MyTermdebug()
     var openocd_bufno = term_start(&shell, {'term_name': 'OPENOCD', 'hidden': 1, 'term_finish': 'close'})
     term_sendkeys(openocd_bufno, g:debug_openocd_command)
 
-    # 2. Start arm-eabi-none-gdb and connect to openocd (see g:termdebug_config['command'])
-    # OBS! Be sure that the local and the loaded .elf file in the remote are the same!
+    # 2. Start Termdebug and connect the gdb client to openocd (see g:termdebug_config['command'])
+    # OBS! Be sure that the local and the remote .elf files are the same!
     echo "Starting debugger for project: " .. fnamemodify(getcwd(), ':t')
     execute $"Termdebug {g:debug_elf_file}"
+
+    # We close "debugged program" because it may not be of interest for
+    # embedded.
     execute "close " ..  bufwinnr("debugged program")
 
-    # Create serial monitor
-    wincmd W
-    # var serial_monitor_bufno = term_start(&shell, {"term_name": "serial_monitor"})
-    # term_sendkeys(serial_monitor_bufno, "make monitor\n")
+    # Create monitor buffer/window below the Termdebug-variables-window
+    # wincmd W - may be faster than exe "Var" but less robust
+    exe "Var"
     if g:debug_show_monitor == true && !empty(g:debug_monitor_command)
+        # TODO check if to run a shell and then a program. NOTE: conda envs
+        # may mess up things, this is call a command in term_start rather than
+        # a shell
+        #
+        # var serial_monitor_bufno = term_start(&shell, {"term_name": "serial_monitor"})
+        # term_sendkeys(serial_monitor_bufno, "make monitor\n")
+        #
         win_execute(win_getid(), 'term_start(g:debug_monitor_command,
                             \ {"term_name": "monitor"})' )
-        # TODO check if to run a shell and then a program. NOTE: conda envs
-        # may mess up things, this is why this choice
-        # win_execute(win_getid(), 'term_sendkeys(bufno("serial_monitor"), "make monitor\n")')
 
-        # TODO: can be done better
-        # Jumping around and resizing
-        wincmd j
-        win_execute(win_getid(), $"resize {g:debug_monitor_win_height}")
+        # wincmd j may be faster...
+        win_execute(bufwinid("^monitor$"), $"resize {g:debug_monitor_win_height}")
     endif
-    wincmd j
+    # wincmd j may be faster that exe "Gdb" but less robust
+    exe "Gdb"
     win_execute(win_getid(), $"resize {g:debug_gdb_win_height}")
-    wincmd k
+    # wincmd k may be faster than exe "Source" but less robust
+    # We start the debugging session from the :Source window.
+    exe "Source"
 
-    # Unlist the various buffers opened by termdebug
+    # Unlist the various buffers opened by termdebug and by this plugin
     setbufvar("debugged program", "&buflisted", 0)
     setbufvar("gdb communication", "&buflisted", 0)
     # Termdebug calls the buffer with the gdb client as the gdb name
     var debugger = fnamemodify(g:debug_debugger, ":t")
     setbufvar(debugger, "&buflisted", 0)
     setbufvar("Termdebug-variables-listing", "&buflisted", 0)
+
+    # Buffers created by this plugin
     setbufvar("OPENOCD", "&buflisted", 0)
     setbufvar("monitor", "&buflisted", 0)
 enddef
@@ -141,8 +150,6 @@ def TearDownTermDebugOverrides()
     # Restore mappings
     for key in keys
         if has_key(key_mappings, key)
-            echom key
-            echom key_mappings[key]
             exe "nnoremap " .. key .. " " .. key_mappings[key]
         else
             exe "nunmap " .. key
