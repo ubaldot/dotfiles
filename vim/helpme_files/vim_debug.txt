@@ -7,6 +7,14 @@ LAYOUT
 - lay next
 - file filename.c:1
 
+BREAKPOINTS
+:Break
+:Delete
+:Continue
+:Evaluate
+
+USE MOUSE RIGHT CLICK TO SET/CLEAR BREAKPOINTS!
+
 COMMANDS
 - break <symbol/line>, (e.g. break blink_main.c:blink_main)
 - delete <breakpoint number>, (delete with no args for deleting all breakpoints)
