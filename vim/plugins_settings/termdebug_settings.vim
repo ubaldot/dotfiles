@@ -66,8 +66,7 @@ def MyTermdebug()
 
     # We close "debugged program" because it may not be of interest for
     # embedded.
-    # TODO: Investigate this bad hack for Windows
-    if g:os != "Windows"
+    if !empty(win_findbuf(bufnr("debugged program")))
         execute ":close " ..  bufwinnr("debugged program")
     endif
 
