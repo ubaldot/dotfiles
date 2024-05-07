@@ -1,5 +1,4 @@
 vim9script
-
 #
 # args key inside configuration is args to pass to program ${file}
 #
@@ -58,6 +57,7 @@ g:vimspector_adapters = {
       # "delay": "1000m",
     },
 
+
     # Embedded C
     "vscode-cpptools-extended": {
       "extends": "vscode-cpptools",
@@ -79,7 +79,7 @@ g:vimspector_configurations = {
       # Instead of manually run a process and fetch the PID, you directly
       # lunch the process in the remote and connect to it.
       "remote-request": "launch",
-      "default": true,
+      # "default": true,
       # This replaces %CMD% in the adapter.
       "remote-cmdLine": [
         "${file}"
@@ -97,6 +97,29 @@ g:vimspector_configurations = {
         },
       }
     },
+
+        "Python run generic script (NOK)": {
+         # Launch current file with debugy. It doed not recognize virtual
+         # environments. Opened a issue on debugpy.
+         "adapter": "debugpy",
+         "filetypes": ["python"],
+         "configuration": {
+         # If you use "attach" you must specify a processID if you run everything
+         # locally OR you should use remote-request: launch
+           "request": "launch",
+           "program": "${file}",
+           # "python": [python_path],
+           # "type": "python",
+           "cwd": "${fileDirname}",
+           "stopOnEntry": true,
+           "console": "integratedTerminal",
+           "runInTerminal": true,
+           "autoReload": {
+           "enable": true
+           },
+         }
+         },
+
 
     # Embedded C
     # TODO: openocd does not close when vimspector closes
@@ -171,29 +194,6 @@ g:vimspector_configurations = {
 # },
 #
 #
-
-
-#Python run generic script (NOK)": {
-# Launch current file with debugy. It doed not recognize virtual
-# environments. Opened a issue on debugpy.
-# "adapter": "debugpy",
-# "filetypes": ["python"],
-# "configuration": {
-# # If you use "attach" you must specify a processID if you run everything
-# # locally OR you should use remote-request: launch
-#   "request": "launch",
-#   "program": "${file}",
-#   "python": [python_path],
-#   # "type": "python",
-#   "cwd": "${fileDirname}",
-#   "stopOnEntry": true,
-#   "console": "integratedTerminal",
-#   "autoReload": {
-#   "enable": true
-#   },
-# }
-# },
-
 #gdb -> openocd (NOK)": {
 # This is similar to what I have in Termdebug. I should use a DAP to make
 # vimspector to work. THIS DOES NOT WORK!
