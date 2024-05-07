@@ -134,15 +134,15 @@ def SetUpTermDebugOverrides()
         endif
     endfor
 
-    nnoremap C <Cmd>Continue<CR>
-    nnoremap B <Cmd>Break<CR>
-    nnoremap D <Cmd>Clear<CR>
-    nnoremap I <Cmd>Step<CR>
-    nnoremap O <Cmd>Over<CR>
-    nnoremap F <Cmd>Finish<CR>
-    nnoremap S <Cmd>Stop<CR>
-    nnoremap U <Cmd>Until<CR>
-    nnoremap T <Cmd>Tbreak<CR>
+    nnoremap C <Cmd>Continue<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap B <Cmd>Break<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap D <Cmd>Clear<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap I <Cmd>Step<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap O <Cmd>Over<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap F <Cmd>Finish<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap S <Cmd>Stop<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap U <Cmd>Until<CR><cmd>call TermDebugSendCommand('display')<cr>
+    nnoremap T <Cmd>Tbreak<CR><cmd>call TermDebugSendCommand('display')<cr>
     nnoremap X <cmd>call TermDebugSendCommand('set confirm off')<cr><cmd>call TermDebugSendCommand('exit')<cr>
 enddef
 
