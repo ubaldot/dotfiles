@@ -23,7 +23,7 @@ g:debug_openocd_command = openocd_cmd
 g:termdebug_config = {}
 var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
 if g:os == "Windows"
-    debugger_path = "C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
+    debugger_path = 'C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/'
 endif
 
 # var debugger = "arm-none-eabi-gdb"
@@ -66,7 +66,10 @@ def MyTermdebug()
 
     # We close "debugged program" because it may not be of interest for
     # embedded.
-    execute "close " ..  bufwinnr("debugged program")
+    # TODO: Investigate this bad hack for Windows
+    if g:os != "Windows"
+        execute ":close " ..  bufwinnr("debugged program")
+    endif
 
     # Create monitor buffer/window below the Termdebug-variables-window
     # wincmd W - may be faster than exe "Var" but less robust
