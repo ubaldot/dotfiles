@@ -56,6 +56,7 @@ augroup END
 
 # Internal vim variables aka 'options'
 # Set terminal with 256 colors
+set scrolloff=8
 set encoding=utf-8
 set belloff=all
 if has("Linux")
@@ -212,11 +213,12 @@ syntax on
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 18 < hour
+if hour < 7 || 17 < hour
     set background=dark
 else
     set background=light
 endif
+# set background=dark
 g:everforest_background = 'medium'
 colorscheme everforest
 
@@ -237,8 +239,8 @@ exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
-exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
-exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
+# exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
+# exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
