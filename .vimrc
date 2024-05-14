@@ -59,11 +59,7 @@ augroup END
 set scrolloff=8
 set encoding=utf-8
 set belloff=all
-if has("Linux")
-    set clipboard=unnamedplus
-else
-    set clipboard=unnamed
-endif
+set clipboard^=unnamed,unnamedplus
 set termguicolors
 set autoread
 set number
