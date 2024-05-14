@@ -74,7 +74,7 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
     # You can use it also to redirect the output of some Vim commands
 	for win in range(1, winnr('$'))
 		if !empty(getwinvar(win, 'scratch'))
-			execute win .. 'windo :close'
+			execute ":" .. win .. 'windo :close'
 		endif
 	endfor
     var output = []
