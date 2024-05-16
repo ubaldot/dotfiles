@@ -10,6 +10,8 @@ if g:os == "Windows" || g:os =~ "^MINGW64"
     g:tmp = "C:/temp"
     g:null_device = "NUL"
     g:dotvim = $HOME .. "/vimfiles"
+    # For mingw64
+    set runtimepath+=C:/Users/yt75534/vimfiles
 else
     g:tmp = "/tmp"
     g:null_device = "/dev/null"
