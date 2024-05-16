@@ -18,7 +18,6 @@ if g:os == "Windows"
      fontsize = 14
      fontface = "Fira_Code:h"
      fontsize_tail = ":cANSI:qDRAFT"
-     fontsize = 12
      set guioptions-=T
     # Open gvim in full-screen
     au GUIEnter * simalt ~x
@@ -26,6 +25,7 @@ elseif g:os == "Darwin"
      fontsize_tail = ""
      fontface = "Fira\ Code:h"
 else
+    fontsize = 14
      set guioptions-=T
      set lines=48
      set columns=180

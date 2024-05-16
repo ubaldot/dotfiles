@@ -6,7 +6,7 @@ else
     g:os = substitute(system('uname'), '\n', '', '')
 endif
 
-if g:os == "Windows"
+if g:os == "Windows" || g:os =~ "^MINGW64"
     g:tmp = "C:/temp"
     g:null_device = "NUL"
     g:dotvim = $HOME .. "/vimfiles"
@@ -73,7 +73,6 @@ set backspace=indent,eol,start
 set nocompatible              # required
 set splitright
 set splitbelow
-set laststatus=2
 set incsearch # for displaying while searching
 set smartcase
 set hidden
