@@ -50,6 +50,12 @@ augroup END
 #     autocmd CmdwinEnter * map <buffer> <cr> <cr>q:
 # augroup END
 
+
+augroup Vim9AutoCmdLine
+    autocmd!
+    autocmd CmdlineEnter : setcmdline('vim9cmd ')
+augroup END
+
 # Open help pages in vertical split
 augroup vimrc_help
     autocmd!
