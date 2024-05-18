@@ -1,3 +1,15 @@
+IN SHORT
+
+dn                      jump to next difference - (my command of) [c
+dN                      jump to previous difference - (my command of) ]c
+
+gr                      :diffget REMOTE
+gl                      :diffget LOCAL
+
+:diffupdate (refresh screen)
+:set noscrollbind
+:wqa
+
 DIFF
 In principle you could just vimdiff file1 file2 from any terminal window.
 Or, inside of Vim, you can:
@@ -16,9 +28,6 @@ Or, inside of Vim, you can:
 :diffupdate             Run it every once in a while
 :diffoff[!]             stop the diff thing. ! also close the current window.
 
-dn                      (my command of) [c - jump to next difference
-dN                      (my command of) ]c - jump to previous difference
-
 -- USER DEFINED --
 :Diff - compare the current buffer with the last saved buffer
 :Diff hbw923 - compare the current buffer with hbw923 commit
@@ -33,6 +42,7 @@ CONFLICTS
 git mergetool
 
 IF SOMETHING GOES WRONG
+git rebase --abort
 git reset --hard <commit-id>
 
 HELP
