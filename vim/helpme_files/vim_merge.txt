@@ -1,3 +1,15 @@
+IN SHORT
+
+dn                      jump to next difference - (my command of) [c
+dN                      jump to previous difference - (my command of) ]c
+
+gr                      :diffget REMOTE
+gl                      :diffget LOCAL
+
+:diffupdate (refresh screen)
+:set noscrollbind
+:wqa
+
 VIMDIFF (Basic)
 :diffsplit {filename}   Open the other file in split
 :diffthis               Mark this file for difference (set diff option)
@@ -8,8 +20,6 @@ VIMDIFF (Basic)
 :diffupdate             Run it every once in a while
 :diffoff[!]             Set diff off [! for all the diff files]
 
-dn                      (my command of) [c - jump to next difference
-dN                      (my command of) ]c - jump to previous difference
 
 CONFLICTS
 git mergetool
@@ -18,13 +28,13 @@ INSIDE VIMDIFF
 <c-w>h - to be in the window with the merged file
 :diffget <TAB> - choose who you want to keep (LOCAL or REMOTE)
 
-:wqa - save and close everything
 
 COMPARE DIFFERENT REVISIONS
 :Diff <commit-id> - If <commit-id> is not specified, it
                     compares with the file on disk.
 
 IF SOMETHING GOES WRONG
+git rebase --abort
 git reset --hard <commit-id>
 
 HELP

@@ -323,6 +323,8 @@ command! GitPushDot myfunctions.PushDot()
 command! -nargs=? Diff myfunctions.Diff(<q-args>)
 nnoremap dn ]c
 nnoremap dN [c
+nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
+nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
