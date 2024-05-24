@@ -44,6 +44,7 @@ augroup ReloadVimScripts
     }
 augroup END
 
+# ---- Activate the following autocmd only during plugin writing -----
 # For plugin writing
 # augroup CommandWindowOpen
 #     autocmd!
@@ -51,10 +52,11 @@ augroup END
 # augroup END
 
 
-augroup Vim9AutoCmdLine
-    autocmd!
-    autocmd CmdlineEnter : setcmdline('vim9cmd ')
-augroup END
+# augroup Vim9AutoCmdLine
+#     autocmd!
+#     autocmd CmdlineEnter : setcmdline('vim9cmd ')
+# augroup END
+# -------------------------------------------
 
 # Open help pages in vertical split
 augroup vimrc_help
@@ -188,6 +190,7 @@ augroup END
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
+Plug 'lifepillar/vim-solarized8'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'yegappan/lsp'
@@ -206,6 +209,10 @@ plug#end()
 # filetype plugin indent on
 syntax on
 
+augroup SetHeadersAsCfiletype
+    autocmd!
+    autocmd BufRead,BufNewFile *.h set filetype=c
+augroup END
 # Conda activate at startup
 # augroup CondaActivate
 #     autocmd!
@@ -221,8 +228,9 @@ if hour < 7 || 17 < hour
 else
     set background=light
 endif
-# set background=dark
+set background=dark
 g:everforest_background = 'medium'
+# colorscheme solarized8_flat
 colorscheme everforest
 
  # Plugin settings
