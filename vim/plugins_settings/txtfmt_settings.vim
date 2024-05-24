@@ -15,16 +15,12 @@ add(g:txtfmtShortcuts, 'h2 kY')
 add(g:txtfmtShortcuts, 'h3 kG')
 add(g:txtfmtShortcuts, 'hh k-')
 
-augroup SetTxtFmt
-    autocmd!
-    autocmd BufRead,BufNewFile *.txt set filetype=text.txtfmt
-    autocmd BufRead,BufNewFile *.md set filetype=markdown.txtfmt
-augroup END
+# augroup SetTxtFmt
+#     autocmd!
+#     autocmd BufRead,BufNewFile *.txt set filetype=text.txtfmt
+#     autocmd BufRead,BufNewFile *.md set filetype=markdown.txtfmt
+# augroup END
 
-augroup SetHeadersAsCfiletype
-    autocmd!
-    autocmd BufRead,BufNewFile *.h set filetype=c
-augroup END
 
 # Delete MakeTestPage so when typing :Ma I get Manim as first hit
 # augroup deletePluginCommand

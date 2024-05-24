@@ -14,7 +14,7 @@ def Prettify()
     # write
     if executable('prettier') && (&filetype == 'markdown' || &filetype == 'markdown.txtfmt')
         var win_view = winsaveview()
-        silent exe $":%!prettier 2>{g:null_device} --prose-wrap always
+        exe $":%!prettier 2>{g:null_device} --prose-wrap always
                     \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
         winrestview(win_view)
     else
