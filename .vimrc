@@ -114,6 +114,7 @@ map <leader>vv <Cmd>e $MYVIMRC<cr>
 # inoremap <expr><Down> pumvisible() ? "\<C-n>" : "\<Down>"
 # inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
 inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
+inoremap kj <esc>
 
 # Remap command-line stuff
 cnoremap <c-p> <up>
