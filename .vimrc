@@ -229,7 +229,7 @@ if hour < 7 || 17 < hour
 else
     set background=light
 endif
-set background=dark
+# set background=dark
 g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
@@ -330,10 +330,12 @@ command! GitCommitDot myfunctions.CommitDot()
 command! GitPushDot myfunctions.PushDot()
 # Merge and diff
 command! -nargs=? Diff myfunctions.Diff(<q-args>)
-nnoremap dn ]c
-nnoremap dN [c
 nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
 nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
+# nnoremap <expr> gn &diff ? ']c' : 'gn'
+# nnoremap <expr> gp &diff ? '[c' : 'gp'
+nnoremap gn lib#NextChange()
+nnoremap gp lib#PrevChange()
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
@@ -346,4 +348,3 @@ command! -nargs=1 HH execute histget("cmd", <args>)
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
 # YouTube.
-command! JoinParagraphs v/^$/norm! vipJ

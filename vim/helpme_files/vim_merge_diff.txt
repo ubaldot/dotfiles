@@ -1,7 +1,7 @@
 IN SHORT
 
-dn                      jump to next difference - (my command of) [c
-dN                      jump to previous difference - (my command of) ]c
+gn                      jump to next difference
+gp                      jump to previous difference
 
 gr                      :diffget REMOTE
 gl                      :diffget LOCAL
