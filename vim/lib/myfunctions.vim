@@ -296,6 +296,45 @@ endif
 # Some mappings to learn
 noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
 
+# Stolen from habamax
+export def NextChange()
+    if !&diff
+        return
+    endif
+    var line = line('.')
+    if diff_hlID(line, col('.')) == 28
+        line += 1
+    endif
+    while line <= line('$')
+        var change_pos = filter(range(1, len(getline(line))), 'diff_hlID(line, v:val) == 28')
+        if !empty(change_pos)
+            cursor(line, change_pos[0])
+            return
+        endif
+        line += 1
+    endwhile
+enddef
+
+export def PrevChange()
+    if !&diff
+        return
+    endif
+    var line = line('.')
+    if diff_hlID(line, col('.')) == 28
+        line -= 1
+    endif
+    while line > 1
+        var change_pos = filter(range(1, len(getline(line))), 'diff_hlID(line, v:val) == 28')
+        if !empty(change_pos)
+            cursor(line, change_pos[0])
+            return
+        endif
+        line -= 1
+    endwhile
+enddef
+
+
+
 # HOW TO WRITE FUNCTION THAT ALLOW COMMAND TO HAVE DOUBLE COMPLETION.
 # noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
 #
