@@ -253,6 +253,8 @@ exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 # exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
 # exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
+exe "source " .. g:dotvim .. "/experiments/termdebug9.vim"
+
 
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
@@ -332,10 +334,10 @@ command! GitPushDot myfunctions.PushDot()
 command! -nargs=? Diff myfunctions.Diff(<q-args>)
 nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
 nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
-# nnoremap <expr> gn &diff ? ']c' : 'gn'
-# nnoremap <expr> gp &diff ? '[c' : 'gp'
-nnoremap gn lib#NextChange()
-nnoremap gp lib#PrevChange()
+nnoremap <expr> gn &diff ? ']c' : 'gn'
+nnoremap <expr> gp &diff ? '[c' : 'gp'
+# nnoremap gn &diff ? 'lib.NextChange()' : 'gn'
+# nnoremap gp &diff ? 'lib.PrevChange()' : 'gp'
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
