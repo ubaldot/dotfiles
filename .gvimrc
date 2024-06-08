@@ -45,18 +45,18 @@ def ChangeFontsize(n: number)
     &lazyredraw = old_redraw
 enddef
 
-# def GuiResize()
-#   var old_size = matchstr(v:option_old, '\d\+')
-#   var new_size = matchstr(v:option_new, '\d\+')
-#   var factor = str2float(new_size) / str2float(old_size)
-#   &columns = float2nr(&columns / factor)
-#   &lines = float2nr(&lines / factor)
-# enddef
+def GuiResize()
+  var old_size = matchstr(v:option_old, '\d\+')
+  var new_size = matchstr(v:option_new, '\d\+')
+  var factor = str2float(new_size) / str2float(old_size)
+  &columns = float2nr(&columns / factor)
+  &lines = float2nr(&lines / factor)
+enddef
 
-# augroup GUI_RESIZE
-#     autocmd!
-#     autocmd OptionSet guifont GuiResize()
-# augroup END
+augroup GUI_RESIZE
+    autocmd!
+    autocmd OptionSet guifont GuiResize()
+augroup END
 
 # Some key bindings
 command! FontsizeIncrease vim9cmd ChangeFontsize(1)

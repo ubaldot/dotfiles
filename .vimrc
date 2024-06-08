@@ -16,6 +16,7 @@ else
     g:tmp = "/tmp"
     g:null_device = "/dev/null"
     g:dotvim = $HOME .. "/.vim"
+    &pythonthreedll = 'libpython3.10.so.1.0'
     # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     # &pythonthreedll = trim(system("which python"))
 endif
