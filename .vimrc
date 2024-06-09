@@ -16,16 +16,17 @@ else
     g:tmp = "/tmp"
     g:null_device = "/dev/null"
     g:dotvim = $HOME .. "/.vim"
-    &pythonthreedll = 'libpython3.10.so.1.0'
     # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     # &pythonthreedll = trim(system("which python"))
 endif
 
-# Linux/BSD
+# Windows
 if executable('cmd.exe')
     g:start_cmd = "explorer.exe"
+# Linux/BSD
 elseif executable("xdg-open")
     g:start_cmd = "xdg-open"
+    &pythonthreedll = 'libpython3.10.so.1.0'
 # MacOS
 elseif executable("open")
     g:start_cmd = "open"
@@ -69,6 +70,8 @@ augroup END
 # Set terminal with 256 colors
 set scrolloff=8
 set encoding=utf-8
+set langmenu=en_US.UTF-8
+set langmap=ö[,ä]
 set belloff=all
 set clipboard^=unnamed,unnamedplus
 set termguicolors
@@ -121,7 +124,9 @@ inoremap kj <esc>
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
-nnoremap <c-å> <c-]>
+# adjustment for Swedish keyboard
+# nmap å [
+# nmap ¨ ]
 # Avoid polluting registers
 nnoremap x "_x
 # Opposite of J, i.e. split from current cursor position
