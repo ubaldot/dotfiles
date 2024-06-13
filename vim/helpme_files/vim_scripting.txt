@@ -1,5 +1,8 @@
 VIM9SCRIPT
 ----------
+
+Use a pippo.vim to test partial stuff.
+
 At the beginning always run :messages because there may be errors that you
 haven't seen.
 
@@ -42,13 +45,13 @@ Function to be called with <Plug> from .vimrc (or other scripts)
 
 noremap <unique> <script> <Plug>MyFunc :call <SID>whatever.MyFunction()<cr>
 
-* At this point you can use <Plug>My_Func in any script for example for:
+* <Plug> becomes like a virtual key on your keyboard.
+  At this point you can use <Plug>My_Func in any script for example for:
 a) Keybindings, e.g. nnoremap <F2> <Plug>My_Func
 b) Commands, e.g. command! Mycommand <Plug>My_Func
 
 However, it is good practice to add some default key-bindings and/or commands
 in the plugin script.
-
 
 Mappings
 --------
@@ -128,14 +131,15 @@ The only exception is that if you need ' then you double it ''.
 * to compare strings never use == you never know how a user has his settings.
 Use ==# (case sensitive, preferred) and ==? (case insensitive).
 * String comparison str =~ pattern returns true if pattern is in contained in
-  str.
-( str !~ pattern, true if string is not in pattern).
+  str. (str !~ pattern, true if string is not in pattern).
+  You can also use stridx (quick and fast) and match.
+
 * normal! with the ! you ignore all the mappings.
 * execute "normal! ... " is used because :normal! won't take <cr>, <esc>, etc.
 * Every time you reload a script, all the autocmd referred to an event are
   appended again.
-autocmd! cancel all the previously defined autocmd, hence, always group
-autocommands and use a autocmd! as first line.
+  autocmd! cancel all the previously defined autocmd, hence, always group
+  autocommands and use a autocmd! as first line.
 * To create a user-defined command use command! -nargs= -preview= ... check :h
   command.
 * Variables that are functions, shall start with capital letter, e.g. b:MyFun

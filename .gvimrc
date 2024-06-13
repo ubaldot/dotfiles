@@ -10,12 +10,12 @@ set guioptions-=e
 # Set fonts for gvim
 # fontsize = 11 with the 14'' MacBook you have exactly two columns
 # with textwidth = 78
-var fontsize = 12
+var fontsize = 8
 var fontface = "Arial"
 var fontsize_tail = ""
 
 if g:os == "Windows"
-     fontsize = 14
+     fontsize = 10
      fontface = "Fira_Code:h"
      fontsize_tail = ":cANSI:qDRAFT"
      set guioptions-=T
@@ -25,7 +25,7 @@ elseif g:os == "Darwin"
      fontsize_tail = ""
      fontface = "Fira\ Code:h"
 else
-    fontsize = 14
+    fontsize = 10
      set guioptions-=T
      set lines=48
      set columns=180
