@@ -150,6 +150,9 @@ nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
+
+nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
+
 # super quick search and replace:
 # nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
 # to be able to undo accidental c-w"
@@ -235,7 +238,7 @@ if hour < 7 || 17 < hour
 else
     set background=light
 endif
-# set background=dark
+set background=dark
 g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
@@ -257,11 +260,11 @@ exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
+# source "~/vim_official/vim/runtime/pack/dist/opt/comment/plugin/comment.vim"
 # exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
 # exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
-exe "source " .. g:dotvim .. "/experiments/termdebug9.vim"
-
-
+# TODO; remove me
+#exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
 # vim-manim setup

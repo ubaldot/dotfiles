@@ -69,7 +69,7 @@ augroup END
 
 augroup LSP_DIAG
     autocmd!
-    autocmd BufEnter,BufWinEnter *  b:num_warnings = 0 | b:num_errors = 0
+    autocmd BufAdd,BufEnter,BufWinEnter *  b:num_warnings = 0 | b:num_errors = 0
     autocmd User LspDiagsUpdated b:num_warnings = lsp#lsp#ErrorCount()['Warn']
                 \ | b:num_errors = lsp#lsp#ErrorCount()['Error']
 augroup END
