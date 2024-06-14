@@ -26,7 +26,7 @@ if executable('cmd.exe')
 # Linux/BSD
 elseif executable("xdg-open")
     g:start_cmd = "xdg-open"
-    &pythonthreedll = 'libpython3.10.so.1.0'
+    # &pythonthreedll = 'libpython3.10.so.1.0'
 # MacOS
 elseif executable("open")
     g:start_cmd = "open"
