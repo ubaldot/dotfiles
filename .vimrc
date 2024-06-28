@@ -26,6 +26,7 @@ if executable('cmd.exe')
 # Linux/BSD
 elseif executable("xdg-open")
     g:start_cmd = "xdg-open"
+    # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
     # &pythonthreedll = 'libpython3.10.so.1.0'
 # MacOS
 elseif executable("open")
@@ -238,7 +239,7 @@ if hour < 7 || 17 < hour
 else
     set background=light
 endif
-set background=dark
+# set background=dark
 g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
