@@ -80,7 +80,8 @@ augroup END
 
 # Left side
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
-set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
+# set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
+set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
 set statusline+=%#StatusLine#\ %t(%n)%m%*
 set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
 # Right side
