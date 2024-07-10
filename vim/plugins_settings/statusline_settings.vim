@@ -8,28 +8,24 @@ set statusline=
 
 # Get git branch name for statusline.
 # OBS !It may need to be changed for other OS.
-def Get_gitbranch_old(): string
-    var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
-                \ --show-current"))
-    # strdix(A,B) >=0 check if B is in A.
-    if stridx(current_branch, "not a git repository") >= 0
-        current_branch = "(no repo)"
+
+# Does not work
+def Set_b_gitbranch()
+    var branch_name = trim(system($'git -C {expand("%:h")} rev-parse --abbrev-ref HEAD 2>{g:null_device}'))
+    if v:shell_error != 0
+        branch_name = '(no repo)'
+    else
+        branch_name = substitute(branch_name, '\n', '', '')
     endif
-    return current_branch
+    setbufvar(bufnr('%'), 'gitbranch', branch_name)
 enddef
-
-def Get_gitbranch(): string
-    var branch_name = system($'git rev-parse --abbrev-ref HEAD 2>{g:null_device}')
-  return v:shell_error ? '' : substitute(branch_name, '\n', '', '')
-enddef
-
 
 augroup Gitget
     autocmd!
-    autocmd BufEnter,BufWinEnter * b:gitbranch = Get_gitbranch()
+    autocmd BufEnter,BufWinEnter * Set_b_gitbranch()
 augroup END
 
-def ShowFuncName(): string
+def Set_b_current_function()
     var n_max = 20 # max chars to be displayed.
     var filetypes = ['c', 'cpp', 'python']
     var text = "" # displayed text
@@ -49,35 +45,30 @@ def ShowFuncName(): string
             text = "|" .. trim(getline(line)[: n_max]) .. "..."
         endif
     endif
-    return text
+    # return text
+    setbufvar(bufnr('%'), 'current_function', text)
 enddef
 
 augroup show_funcname
     autocmd!
-    autocmd BufEnter,BufWinEnter,CursorMoved * b:current_function = ShowFuncName()
+    autocmd BufEnter,BufWinEnter,CursorMoved * Set_b_current_function()
 augroup end
 
 
-def Conda_env(): string
+def Set_g_conda_env()
     var conda_env = "base"
-    if has("gui_win32") || has("win32")
+    if g:os ==# "Windows"
         conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
     elseif exists("$CONDA_DEFAULT_ENV")
         conda_env = $CONDA_DEFAULT_ENV
     endif
-    return conda_env
+    g:conda_env = conda_env
 enddef
 
 augroup CONDA_ENV
     autocmd!
-    autocmd VimEnter,BufEnter,BufWinEnter * g:conda_env = Conda_env()
-augroup END
-
-augroup LSP_DIAG
-    autocmd!
-    autocmd BufEnter,BufWinEnter *  b:num_warnings = 0 | b:num_errors = 0
-    autocmd User LspDiagsUpdated b:num_warnings = lsp#lsp#ErrorCount()['Warn']
-                \ | b:num_errors = lsp#lsp#ErrorCount()['Error']
+    # autocmd VimEnter,BufEnter,BufWinEnter * Set_g_conda_env()
+    autocmd VimEnter * Set_g_conda_env()
 augroup END
 
 # Anatomy of the statusline:
@@ -95,6 +86,6 @@ set statusline+=%=
 set statusline+=%#StatusLine#\ %y\ %*
 set statusline+=%#StatusLineNC#\ col:%c\ %*
 # Add some conditionals here bitch!
-set statusline+=%#Visual#\ W:\ %{get(b:,'num_warnings','')}\ %*
-set statusline+=%#CurSearch#\ E:\ %{get(b:,'num_errors','')}\ %*
+set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
+set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
 # ----------- end statusline setup -------------------------
