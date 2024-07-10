@@ -88,12 +88,12 @@ augroup END
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
 set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
 set statusline+=%#StatusLine#\ %t(%n)%m%*
-set statusline+=%#StatusLineNC#\%{b:current_function}\ %*
+set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
 # Right side
 set statusline+=%=
 set statusline+=%#StatusLine#\ %y\ %*
 set statusline+=%#StatusLineNC#\ col:%c\ %*
 # Add some conditionals here bitch!
-set statusline+=%#Visual#\ W:\ %{b:num_warnings}\ %*
-set statusline+=%#CurSearch#\ E:\ %{b:num_errors}\ %*
+set statusline+=%#Visual#\ W:\ %{get(b:,'num_warnings','')}\ %*
+set statusline+=%#CurSearch#\ E:\ %{get(b:,'num_errors','')}\ %*
 # ----------- end statusline setup -------------------------
