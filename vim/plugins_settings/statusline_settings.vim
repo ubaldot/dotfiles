@@ -8,7 +8,7 @@ set statusline=
 
 # Get git branch name for statusline.
 # OBS !It may need to be changed for other OS.
-def Get_gitbranch(): string
+def Get_gitbranch_old(): string
     var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
                 \ --show-current"))
     # strdix(A,B) >=0 check if B is in A.
@@ -17,6 +17,12 @@ def Get_gitbranch(): string
     endif
     return current_branch
 enddef
+
+def Get_gitbranch(): string
+    var branch_name = system($'git rev-parse --abbrev-ref HEAD 2>{g:null_device}')
+  return v:shell_error ? '' : substitute(branch_name, '\n', '', '')
+enddef
+
 
 augroup Gitget
     autocmd!
@@ -80,8 +86,8 @@ augroup END
 
 # Left side
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
-# set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
-set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
+set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
+# set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
 set statusline+=%#StatusLine#\ %t(%n)%m%*
 set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
 # Right side
