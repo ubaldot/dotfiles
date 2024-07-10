@@ -8,21 +8,15 @@ set statusline=
 
 # Get git branch name for statusline.
 # OBS !It may need to be changed for other OS.
-def Get_gitbranch_old(): string
+def Get_gitbranch(): string
     var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
                 \ --show-current"))
     # strdix(A,B) >=0 check if B is in A.
-    if stridx(current_branch, "not a git repository") >=
+    if stridx(current_branch, "not a git repository") >= 0
         current_branch = "(no repo)"
     endif
     return current_branch
 enddef
-
-def Get_gitbranch(): string
-  var branch_name = trim(system($'git rev-parse --abbrev-ref HEAD 2>{g:null_device}'))
-  return v:shell_error ? '' : substitute(branch_name, '\n', '', '')
-enddef
-
 
 augroup Gitget
     autocmd!
@@ -60,7 +54,7 @@ augroup end
 
 def Conda_env(): string
     var conda_env = "base"
-    if g:os ==# 'Windows'
+    if has("gui_win32") || has("win32")
         conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
     elseif exists("$CONDA_DEFAULT_ENV")
         conda_env = $CONDA_DEFAULT_ENV
@@ -75,7 +69,7 @@ augroup END
 
 augroup LSP_DIAG
     autocmd!
-    autocmd BufAdd,BufEnter,BufWinEnter *  b:num_warnings = 0 | b:num_errors = 0
+    autocmd BufEnter,BufWinEnter *  b:num_warnings = 0 | b:num_errors = 0
     autocmd User LspDiagsUpdated b:num_warnings = lsp#lsp#ErrorCount()['Warn']
                 \ | b:num_errors = lsp#lsp#ErrorCount()['Error']
 augroup END
