@@ -8,15 +8,21 @@ set statusline=
 
 # Get git branch name for statusline.
 # OBS !It may need to be changed for other OS.
-def Get_gitbranch(): string
+def Get_gitbranch_old(): string
     var current_branch = trim(system("git -C " .. expand("%:h") .. " branch
                 \ --show-current"))
     # strdix(A,B) >=0 check if B is in A.
-    if stridx(current_branch, "not a git repository") >= 0
+    if stridx(current_branch, "not a git repository") >=
         current_branch = "(no repo)"
     endif
     return current_branch
 enddef
+
+def Get_gitbranch(): string
+  var branch_name = trim(system($'git rev-parse --abbrev-ref HEAD 2>{g:null_device}'))
+  return v:shell_error ? '' : substitute(branch_name, '\n', '', '')
+enddef
+
 
 augroup Gitget
     autocmd!
@@ -54,7 +60,7 @@ augroup end
 
 def Conda_env(): string
     var conda_env = "base"
-    if has("gui_win32") || has("win32")
+    if g:os ==# 'Windows'
         conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
     elseif exists("$CONDA_DEFAULT_ENV")
         conda_env = $CONDA_DEFAULT_ENV
@@ -80,7 +86,7 @@ augroup END
 
 # Left side
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
-set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
+set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
 set statusline+=%#StatusLine#\ %t(%n)%m%*
 set statusline+=%#StatusLineNC#\%{b:current_function}\ %*
 # Right side
