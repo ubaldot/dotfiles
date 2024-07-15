@@ -266,7 +266,7 @@ exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 # exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
 # exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 # TODO; remove me
-#exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
+# exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
 # vim-manim setup

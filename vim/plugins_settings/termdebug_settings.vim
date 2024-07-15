@@ -11,28 +11,18 @@ vim9script
 # OBS! The windows debugger sucks. It is based on cmd.exe. Use an external debugger (like use MinGW64).
 
 # 1. OpenOCD settings
-var openocd_script = "openocd_stm32f4x_stlink.sh\n"
-var openocd_cmd = 'source ../gdb_stuff/' .. openocd_script
-if g:os == "Windows"
-    openocd_cmd = "..\\gdb_stuff\\openocd_stm32f4x_stlink.bat\n\r"
-endif
-
+var openocd_sh = "source ../gdb_stuff/openocd_stm32f4x_stlink.sh\n"
+var openocd_bat = "cmd.exe /c ..\\gdb_stuff\\openocd_stm32f4x_stlink.bat\n\r"
+var openocd_cmd = g:os == "Windows" ? openocd_bat : openocd_sh
 g:debug_openocd_command = openocd_cmd
 
 # 2. Debugger settings
 g:termdebug_config = {}
-var debugger_path = "/opt/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/"
-if g:os == "Windows"
-    debugger_path = 'C:/ST/STM32CubeCLT/GNU-tools-for-STM32/bin/'
-endif
+var debugger = "arm-none-eabi-gdb"
+var elf_file = $"build/{fnamemodify(getcwd(), ':t')}.elf"
+var debugger_args = ["-x", "../gdb_stuff/gdb_init_commands.txt", "-ex", $"file {elf_file}"]
+g:termdebug_config['command'] = insert(debugger_args, debugger, 0)
 
-# var debugger = "arm-none-eabi-gdb"
-g:debug_debugger = debugger_path .. "arm-none-eabi-gdb"
-g:debug_debugger_args = ["-x", "../gdb_stuff/gdb_init_commands.txt"]
-# g:debug_debugger_args = ["-ex", '"target extended-remote localhost:3333"', "-ex", '"monitor reset"']
-
-
-g:termdebug_config['command'] = insert(g:debug_debugger_args, g:debug_debugger, 0)
 g:termdebug_config['variables_window'] = 1
 
 # Other globals
@@ -98,7 +88,6 @@ def MyTermdebug()
     setbufvar("debugged program", "&buflisted", 0)
     setbufvar("gdb communication", "&buflisted", 0)
     # Termdebug calls the buffer with the gdb client as the gdb name
-    var debugger = fnamemodify(g:debug_debugger, ":t")
     setbufvar(debugger, "&buflisted", 0)
     setbufvar("Termdebug-variables-listing", "&buflisted", 0)
 
@@ -145,7 +134,7 @@ def SetUpTermDebugOverrides()
     nnoremap S <Cmd>Stop<CR><cmd>call TermDebugSendCommand('display')<cr>
     nnoremap U <Cmd>Until<CR><cmd>call TermDebugSendCommand('display')<cr>
     nnoremap T <Cmd>Tbreak<CR><cmd>call TermDebugSendCommand('display')<cr>
-    nnoremap X <cmd>call TermDebugSendCommand('set confirm off')<cr><cmd>call TermDebugSendCommand('exit')<cr>
+    # nnoremap X <cmd>Gdb<cr>exit<cr>
 enddef
 
 def TearDownTermDebugOverrides()
@@ -165,4 +154,4 @@ augroup MyTermDebugOverrides
     autocmd User TermdebugStopPost  TearDownTermDebugOverrides()
 augroup END
 
-command! Debug vim9cmd MyTermdebug()
+command! MyDebug vim9cmd MyTermdebug()
