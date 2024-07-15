@@ -22,6 +22,7 @@ if g:os == "Windows"
     # Open gvim in full-screen
     au GUIEnter * simalt ~x
 elseif g:os == "Darwin"
+     fontsize = 12
      fontsize_tail = ""
      fontface = "Fira\ Code:h"
 else
