@@ -3,10 +3,10 @@ SUBSTITUTE
 
 :[range]s[ubstitute]/pattern/new/[gci]
 
-replace "pattern" with "new" for all the lines in range. 
+replace "pattern" with "new" for all the lines in range.
 gci = global, ask for confirmation, case sensitive.
 
-OBS: Instead of using the delimiter / you can use the delimiter : so you avoid 
+OBS: Instead of using the delimiter / you can use the delimiter : so you avoid
 things like this -> \\/\//\/\\/
 
 Example:
@@ -17,7 +17,7 @@ EXAMPLES
 :10,15s:foo:bar:g   Replace foo with bar in lines 10--15
 :%s/./bar/g         Replace all characters of non-empty lines with bar in the whole file
 :%s/.\w*/bar/g      Replace all the words of non-empty lines with bar in the whole file
-:%s:\s*$::g         Remove all the blanks at the end of the line in the whole file 
+:%s:\s*$::g         Remove all the blanks at the end of the line in the whole file
 :.,$/"//g           Remove all the " from the current line to the end of the file
 :%s:^\s*$:bar:g     Replace all the blank lines with bar in the whole file
 :%s/foo/<c-r>a/g    Replace foo with the content of register a in the whole file
@@ -38,3 +38,15 @@ PATTERNS
 foo         foo
 \<foo\>     foo (match case)
 ^\s*$       empty-lines
+
+FUNCTION
+--------
+
+GetString() -> substitute(path, sub, flags)
+
+var text = "Hello \\123world\\045!"
+echom substitute(text, '\\\(\o\o\o\)', (m) => nr2char(str2nr(m[1], 8)), 'g')
+
+The substitute call is made using a lambda function: (m) => str2nr(m[1], 8)
+where m is the array of match m[i] corresponds to submatch(i).
+m[0] is the whole.

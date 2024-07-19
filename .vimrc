@@ -306,6 +306,7 @@ command! HelpmeScript exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_scripting.t
 command! HelpmeGlobal exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_global.txt"
 command! HelpmeExCommands exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_excommands.txt"
 command! HelpmeSubstitute exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_substitute.txt"
+command! HelpmeUnitTests exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_unit_tests.txt"
 command! HelpmeAdvanced exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_advanced.txt"
 command! HelpmeDiffMerge exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_merge_diff.txt"
 command! HelpmeCoding exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_coding.txt"
