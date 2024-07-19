@@ -1,0 +1,8 @@
+HOW TO RUN TEST WHEN CONTRIBUTING TO VIM
+-----------------------------------------
+
+1. Build vim from ~/vim_official/vim/src with make
+2. Write your test in ~/vim_official/vim/src/testdir
+3. Source the script with vim --clean and run :call <tab> and select your function
+4. Add some sleep X to be able to watch what happens during the test
+5. Run make clean and then make test_<your_tests>

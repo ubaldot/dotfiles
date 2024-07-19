@@ -1,0 +1,51 @@
+You can use a project .vimspector.json, in a vim variable
+g:vimspector_adapters or in a global file, but then you must set g:vimspector_base_dir.
+
+Config:
+You have two main keys:
+  - adapters
+  - configurations
+
+In the configurations you specify N configuration. Each configuration must
+specify the connected adpater (or gadget, a gadget is a sort of default
+adapter).
+
+Example:
+
+adapters:{
+    "my-adapter":{
+      "extends": "debugpy",
+      "variables": {
+        "Host": "localhost",
+        "Port": "5678"
+      },
+      "command": [
+        "python -m debugpy --wait-for-client --listen ${Host}:${Port} ${file}"
+      ],
+      "port": "${Port}"
+    },
+
+
+configurations:{
+    "my-config":{
+        "adapter": // Reference to the adapter
+        "remote-request": // For remote requests
+        "remote-command": // For remote requests
+        "variables": // First capital letter
+        configuration:{
+            "request": {"launch" or "attach"} // mandatory
+            "program": // mandatory, check VSCode docs. It is basically the
+            file that is used from the command specified in some adapter
+            config.
+            "args": // Args to pass to the command specified in the adapters
+            config
+            // The rest is written in relative VSCode adapter docs. Check
+            VSCode docs
+        }
+
+If variables are not specified, then they are prompted from the user.
+There are also builtin vars.
+
+For all the possible fields, check the json schema and use some free online
+tool to see it graphically. The fields under configuration comes from VSCode
+docs.
