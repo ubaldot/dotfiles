@@ -80,8 +80,8 @@ set termguicolors
 set autoread
 set number
 set nowrap
-set tabstop=4 softtabstop=4
-set shiftwidth=4
+set tabstop=2 softtabstop=2
+set shiftwidth=2
 set expandtab
 set smartindent
 set nobackup
@@ -110,8 +110,8 @@ set wildcharm=<tab>
 
 # Some key bindings
 # ----------------------
-map <f1> <nop>
-map! <f1> <nop>
+map <f1> <cmd>helpclose<cr>
+# map! <f1> <nop>
 g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<cr>
@@ -152,6 +152,8 @@ nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
+# Wipe buffer
+nnoremap <c-b><c-w> <cmd>bw!<cr>
 
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
 
@@ -214,6 +216,7 @@ Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'ubaldot/vim-manim'
 Plug 'ubaldot/vim-microdebugger'
+Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 Plug 'Konfekt/vim-compilers'
