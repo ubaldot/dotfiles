@@ -269,8 +269,9 @@ exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 # source "~/vim_official/vim/runtime/pack/dist/opt/comment/plugin/comment.vim"
-# exe "source " .. g:dotvim .. "/plugins_settings/termdebug_settings.vim"
-# exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
+g:termdebug_config = {}
+exe "source " .. g:dotvim .. "/plugins_settings/microdebugger_settings.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 # TODO; remove me
 # exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
