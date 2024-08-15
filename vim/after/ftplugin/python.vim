@@ -1,13 +1,12 @@
 vim9script
 # Tell vim where is Python. OBS: this is independent of the plugins!
-# You must check in the vim version what dll is required in the field -DDYNAMIC_PYTHON_DLL=\python310.dll\
 
 setlocal foldmethod=indent
 
 # Autocmd to format with black.
 augroup BLACK
     autocmd! * <buffer>
-    autocmd BufWritePre <buffer> call Black(&l:textwidth)
+    autocmd BufWritePre <buffer> Black(&l:textwidth)
 augroup END
 
 def Black(textwidth: number)
@@ -15,10 +14,8 @@ def Black(textwidth: number)
     # write
     if executable('black') && &filetype == 'python'
                 var win_view = winsaveview()
-                # exe $":%!black - -q 2>{g:null_device} --line-length {textwidth}
-                #             \ --stdin-filename {shellescape(expand("%"))}"
                 exe $":%!black - --line-length {textwidth}
-                            \ --stdin-filename {shellescape(expand("%"))} --quiet"
+                      \ --stdin-filename {shellescape(expand("%"))} --quiet 2>{g:null_device}"
                 winrestview(win_view)
     else
         echom "black not installed!"
@@ -26,8 +23,7 @@ def Black(textwidth: number)
 enddef
 
 # Call black to format 120 line length
-command! Black120 call Black(120)
-
+command! Black120 Black(120)
 
 # Manim
 if has("mac")
