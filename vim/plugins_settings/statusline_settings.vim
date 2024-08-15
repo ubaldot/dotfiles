@@ -54,6 +54,19 @@ augroup show_funcname
     autocmd BufEnter,BufWinEnter,CursorMoved * Set_b_current_function()
 augroup end
 
+# def Set_b_lsp_warns_errors()
+#   if exists('*lsp#lsp#ErrorCount')
+#     setbufvar(bufnr('%'), 'lsp_warns', lsp#lsp#ErrorCount()['Warn'])
+#     setbufvar(bufnr('%'), 'lsp_errors', lsp#lsp#ErrorCount()['Error'])
+#   endif
+# enddef
+
+# augroup LSP
+#     autocmd!
+#     autocmd Filetype c,cpp,python Set_b_lsp_warns_errors()
+# augroup END
+
+
 
 def Set_g_conda_env()
     var conda_env = "base"
@@ -86,6 +99,8 @@ set statusline+=%=
 set statusline+=%#StatusLine#\ %y\ %*
 set statusline+=%#StatusLineNC#\ col:%c\ %*
 # Add some conditionals here bitch!
+# set statusline+=%#Visual#\ W:\ %{get(b:,'lsp_warns','NA')}\ %*
+# set statusline+=%#CurSearch#\ E:\ %{get(b:,'lsp_errors','NA')}\ %*
 set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
 set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
 # ----------- end statusline setup -------------------------
