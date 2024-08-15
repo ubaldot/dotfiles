@@ -22,7 +22,7 @@ var clangd_name = 'clangd'
 var clangd_path = 'clangd'
 var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=never']
 
-var is_avap = true
+var is_avap = false
 if is_avap
     clangd_name = 'avap'
     var project_root = '/home/yt75534/avap_example'
