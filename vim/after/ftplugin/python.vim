@@ -11,7 +11,8 @@ augroup END
 
 def Black(textwidth: number)
     # If black is not available, then the buffer content will be canceled upon
-    # write
+    # write. To avoid appending stdout and stderr to the buffer we use
+    # --quiet.
     if executable('black') && &filetype == 'python'
                 var win_view = winsaveview()
                 exe $":%!black - --line-length {textwidth}
@@ -23,17 +24,17 @@ def Black(textwidth: number)
 enddef
 
 # Call black to format 120 line length
-command! Black120 Black(120)
+command! -buffer Black120 Black(120)
 
 # Manim
 if has("mac")
-    command! ManimDocs silent :!open -a safari.app
+    command! -buffer ManimDocs silent :!open -a safari.app
             \ ~/Documents/manimce-latest/index.html
 elseif has("Linux")
-    command! ManimDocs silent :!xdg-open
+    command! -buffer ManimDocs silent :!xdg-open
             \ ~/Documents/manimce-latest/index.html
 else
-    command! ManimDocs silent :!start
+    command! -buffer ManimDocs silent :!start
             \ ~/Documents/manimce-latest/index.html
 endif
 
