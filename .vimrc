@@ -9,7 +9,7 @@ endif
 if g:os == "Windows" || g:os =~ "^MINGW64"
     g:tmp = "C:/temp"
     g:null_device = "NUL"
-    g:dotvim = $HOME .. "/vimfiles"
+    g:dotvim = $HOME .. "\\vimfiles"
     # source $VIMRUNTIME/mswin.vim
     # For mingw64
     set runtimepath+=C:/Users/yt75534/vimfiles
@@ -144,6 +144,7 @@ nnoremap <s-tab> <cmd>bprev <cr>
 nnoremap <c-tab> :b <tab>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
+nnoremap bw <cmd>bw!<cr>
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 # Switch window
