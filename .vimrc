@@ -10,15 +10,19 @@ if g:os == "Windows" || g:os =~ "^MINGW64"
     g:tmp = "C:/temp"
     g:null_device = "NUL"
     g:dotvim = $HOME .. "/vimfiles"
-    source $VIMRUNTIME/mswin.vim
+    # source $VIMRUNTIME/mswin.vim
     # For mingw64
     set runtimepath+=C:/Users/yt75534/vimfiles
 else
     g:tmp = "/tmp"
     g:null_device = "/dev/null"
     g:dotvim = $HOME .. "/.vim"
-    # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-    # &pythonthreedll = trim(system("which python"))
+    &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+    if g:os == 'Linux'
+      &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
+    else
+      &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
+    endif
 endif
 
 # Windows
@@ -27,8 +31,6 @@ if executable('cmd.exe')
 # Linux/BSD
 elseif executable("xdg-open")
     g:start_cmd = "xdg-open"
-    # &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-    # &pythonthreedll = 'libpython3.10.so.1.0'
 # MacOS
 elseif executable("open")
     g:start_cmd = "open"
