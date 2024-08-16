@@ -24,6 +24,7 @@ def Black(textwidth: number)
 
     if v:shell_error != 0
       undo
+      # throw prevents writing on disk
       # throw "'black' errors!"
       # redraw!
       echoerr "'black' errors!"
