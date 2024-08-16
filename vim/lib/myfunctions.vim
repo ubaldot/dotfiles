@@ -180,7 +180,7 @@ export def FormatWithoutMoving()
 enddef
 
 # ------------- Prettier --------------------
-var prettier_supported_filetypes = ['markdown', 'markdown.txtfmt', 'json', 'yaml']
+var prettier_supported_filetypes = ['markdown', 'markdown.txtfmt', 'json', 'yaml', 'html', 'css']
 def Prettify()
     # If prettier is not available, then the buffer content will be canceled upon
     # write
