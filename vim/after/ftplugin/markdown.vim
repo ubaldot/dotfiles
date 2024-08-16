@@ -2,13 +2,6 @@ vim9script
 
 compiler pandoc
 
-# import g:dotvim .. "/lib/myfunctions.vim"
-
-# augroup PRETTIER
-#     autocmd! * <buffer>
-#     autocmd BufWritePre <buffer> myfunctions.Prettify()
-# augroup END
-
 def MarkdownRender(format = "html")
     var input_file = expand('%:p')
     var output_file = expand('%:p:r') .. "." .. format
