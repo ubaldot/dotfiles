@@ -1,39 +1,39 @@
 vim9script
 
 if has("win64") || has("win32") || has("win16")
-    g:os = "Windows"
+  g:os = "Windows"
 else
-    g:os = substitute(system('uname'), '\n', '', '')
+  g:os = substitute(system('uname'), '\n', '', '')
 endif
 
 if g:os == "Windows" || g:os =~ "^MINGW64"
-    g:tmp = "C:/temp"
-    g:null_device = "NUL"
-    g:dotvim = $HOME .. "\\vimfiles"
-    # source $VIMRUNTIME/mswin.vim
-    # For mingw64
-    set runtimepath+=C:/Users/yt75534/vimfiles
+  g:tmp = "C:/temp"
+  g:null_device = "NUL"
+  g:dotvim = $HOME .. "\\vimfiles"
+  # source $VIMRUNTIME/mswin.vim
+  # For mingw64
+  set runtimepath+=C:/Users/yt75534/vimfiles
 else
-    g:tmp = "/tmp"
-    g:null_device = "/dev/null"
-    g:dotvim = $HOME .. "/.vim"
-    &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-    if g:os == 'Linux'
-      &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
-    else
-      &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
-    endif
+  g:tmp = "/tmp"
+  g:null_device = "/dev/null"
+  g:dotvim = $HOME .. "/.vim"
+  &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+  if g:os == 'Linux'
+    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
+  else
+    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
+  endif
 endif
 
 # Windows
 if executable('cmd.exe')
-    g:start_cmd = "explorer.exe"
+  g:start_cmd = "explorer.exe"
 # Linux/BSD
 elseif executable("xdg-open")
-    g:start_cmd = "xdg-open"
+  g:start_cmd = "xdg-open"
 # MacOS
 elseif executable("open")
-    g:start_cmd = "open"
+  g:start_cmd = "open"
 endif
 
 import g:dotvim .. "/lib/myfunctions.vim"
@@ -43,11 +43,11 @@ import g:dotvim .. "/lib/myfunctions.vim"
 &t_EI = "\e[2 q"
 
 augroup ReloadVimScripts
-    autocmd!
-    autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
-        exe "source %"
-        echo expand('%:t') .. " reloaded."
-    }
+  autocmd!
+  autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
+    exe "source %"
+    echo expand('%:t') .. " reloaded."
+  }
 augroup END
 
 # ---- Activate the following autocmd only during plugin writing -----
@@ -66,8 +66,8 @@ augroup END
 
 # Open help pages in vertical split
 augroup vimrc_help
-    autocmd!
-    autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
+  autocmd!
+  autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
 augroup END
 
 # Internal vim variables aka 'options'
@@ -75,7 +75,7 @@ augroup END
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
-set langmap=ö[,ä]
+# set langmap=ö[,ä]
 set belloff=all
 set clipboard^=unnamed,unnamedplus
 set termguicolors
@@ -117,20 +117,22 @@ map <f1> <cmd>helpclose<cr>
 g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<cr>
+inoremap å `
+
 
 # For using up and down in popup menu
 # inoremap <expr><Down> pumvisible() ? "\<C-n>" : "\<Down>"
 # inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
 inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
-inoremap kj <esc>
+# inoremap kj <esc>
 
 # Remap command-line stuff
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
 # adjustment for Swedish keyboard
-# nmap å [
-# nmap ¨ ]
+nmap <c-ö> <c-[>
+nmap <c-ä> <c-]>
 # Avoid polluting registers
 nnoremap x "_x
 # Opposite of J, i.e. split from current cursor position
@@ -139,12 +141,12 @@ nnoremap S i<cr><esc>
 # them as g:.
 nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
-nnoremap <leader>b <Cmd>ls!<cr>:b
+# nnoremap <leader>b <Cmd>ls!<cr>:b
 nnoremap <s-tab> <cmd>bprev <cr>
 nnoremap <c-tab> :b <tab>
+nnoremap <leader>b :b <tab>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
-nnoremap bw <cmd>bw!<cr>
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 # Switch window
@@ -157,6 +159,7 @@ nnoremap <c-j> <c-w>j
 
 # Wipe buffer
 nnoremap <c-b><c-w> <cmd>bw!<cr>
+# nnoremap bw <cmd>bw!<cr>
 
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
 
@@ -188,18 +191,18 @@ tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 command! Terminal myfunctions.OpenMyTerminal()
 # Open terminal below all windows
 if g:os == "Windows"
-    exe "cabbrev bter bo terminal powershell"
+  exe "cabbrev bter bo terminal powershell"
 else
-    exe "cabbrev vter vert botright terminal " .. &shell
+  exe "cabbrev vter vert botright terminal " .. &shell
 endif
 
 augroup DIRCHANGE
-    autocmd!
-    autocmd DirChanged global myfunctions.ChangeTerminalDir()
+  autocmd!
+  autocmd DirChanged global myfunctions.ChangeTerminalDir()
 augroup END
 
 augroup shoutoff_terminals
-    autocmd QuitPre * call myfunctions.WipeoutTerminals()
+  autocmd QuitPre * call myfunctions.WipeoutTerminals()
 augroup END
 
 # vim-plug
@@ -211,8 +214,6 @@ Plug 'lifepillar/vim-solarized8'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'yegappan/lsp'
-# TODO enable plugin when matchbufline becomes available
-Plug 'tpope/vim-commentary'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
@@ -228,9 +229,13 @@ plug#end()
 # filetype plugin indent on
 syntax on
 
+# Bundled plugins
+packadd comment
+packadd! termdebug
+
 augroup SetHeadersAsCfiletype
-    autocmd!
-    autocmd BufRead,BufNewFile *.h set filetype=c
+  autocmd!
+  autocmd BufRead,BufNewFile *.h set filetype=c
 augroup END
 # Conda activate at startup
 # augroup CondaActivate
@@ -243,26 +248,26 @@ augroup END
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
 if hour < 7 || 17 < hour
-    set background=dark
+  set background=dark
 else
-    set background=light
+  set background=light
 endif
 # set background=dark
 g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
 
- # Plugin settings
- # TODO: You may want to use a popup_create and pick
+# Plugin settings
+# TODO: You may want to use a popup_create and pick
 # Open plugin settings
 var Open_special = (textobject) => {
-        var filename = g:dotvim .. myfunctions.GetTextObject(textobject)
-        if stridx(filename, "/plugins_settings/") != -1
-            execute("edit " .. filename)
-        else
-            echo "Not a plugin settings path."
-        endif
-    }
+  var filename = g:dotvim .. myfunctions.GetTextObject(textobject)
+  if stridx(filename, "/plugins_settings/") != -1
+    execute("edit " .. filename)
+  else
+    echo "Not a plugin settings path."
+  endif
+}
 
 exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
@@ -280,16 +285,16 @@ nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
 g:manim_flags = {'low_quality': $"-pql {manim_common_flags}",
-    'high_quality': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
-    'dry_run': $'--dry_run {manim_common_flags}',
-    'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
+  'high_quality': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
+  'dry_run': $'--dry_run {manim_common_flags}',
+  'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
 g:manim_default_flag = keys(g:manim_flags)[-1]
 
 if g:os == "Darwin"
-    augroup CloseQuickTime
-        autocmd!
-        autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
-    augroup END
+  augroup CloseQuickTime
+    autocmd!
+    autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
+  augroup END
 endif
 
 # Manim commands
@@ -327,7 +332,7 @@ g:replica_console_position = "L"
 g:replica_display_range  = false
 # g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {"python":
-            \ " --config ~/.jupyter/jupyter_console_config.py"}
+      \ " --config ~/.jupyter/jupyter_console_config.py"}
 nmap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
 # g:writegood_compiler = "vale"
 # g:writegood_options = "--config=$HOME/vale.ini"
@@ -339,12 +344,12 @@ nnoremap <silent> <F8> <Plug>OutlineToggle
 # Bunch of commands
 # -----------------------
 augroup remove_trailing_whitespaces
-    autocmd!
-    autocmd BufWritePre * {
-        if !&binary
-            myfunctions.TrimWhitespace()
-        endif
-    }
+  autocmd!
+  autocmd BufWritePre * {
+    if !&binary
+      myfunctions.TrimWhitespace()
+    endif
+  }
 augroup END
 
 # git add -u && git commit -m "."
@@ -363,7 +368,7 @@ command! ColorsToggle myfunctions.ColorsToggle()
 
 # Utils commands
 command! -nargs=1 -complete=command -range Redir
-            \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
+      \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
 # Example: :HH 62, execute the 62 element of :history
 command! -nargs=1 HH execute histget("cmd", <args>)

@@ -16,10 +16,17 @@ def Black(textwidth: number)
     if executable('black') && &filetype == 'python'
                 var win_view = winsaveview()
                 exe $":%!black - --line-length {textwidth}
-                      \ --stdin-filename {shellescape(expand("%"))} --quiet 2>{g:null_device}"
+                      \ --stdin-filename {shellescape(expand("%"))} --quiet"
                 winrestview(win_view)
     else
         echom "black not installed!"
+    endif
+
+    if v:shell_error != 0
+      undo
+      # throw "'black' errors!"
+      # redraw!
+      echoerr "'black' errors!"
     endif
 enddef
 

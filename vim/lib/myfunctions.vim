@@ -1,5 +1,9 @@
 vim9script
 
+export def Echoerr(msg: string)
+  echohl ErrorMsg | echom $'{msg}' | echohl None
+enddef
+
 # Remove trailing white spaces at the end of each line and at the end of the file
 export def TrimWhitespace()
     var currwin = winsaveview()
@@ -63,8 +67,6 @@ export def Diff(spec: string)
     wincmd p
     diffthis
 enddef
-
-
 
 export def Redir(cmd: string, rng: number, start: number, end: number)
     # Used to redirect the output from the terminal in a scratch buffer
@@ -177,8 +179,38 @@ export def FormatWithoutMoving()
     winrestview(view)
 enddef
 
-command! -nargs=* Prettify execute(":%!prettier " .. expand("%"))
+# ------------- Prettier --------------------
+var prettier_supported_filetypes = ['markdown', 'markdown.txtfmt', 'json', 'yaml']
+def Prettify()
+    # If prettier is not available, then the buffer content will be canceled upon
+    # write
+    if executable('prettier') && (index(prettier_supported_filetypes, &filetype) != -1)
+        var win_view = winsaveview()
+        # exe $":%!prettier 2>{g:null_device} --prose-wrap always
+        #             \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
+        exe $":%!prettier --prose-wrap always
+                    \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
+        winrestview(win_view)
+    else
+      echom $"'prettier' is not installed OR '{&filetype}' filetype is not supported"
+    endif
 
+    if v:shell_error != 0
+      silent! undo
+      # throw prevents to write on disk
+      # throw "'prettier' errors!"
+      # redraw!
+      echoerr "'prettier' errors!"
+    endif
+enddef
+
+command! Prettify Prettify()
+
+augroup PRETTIER
+    autocmd!
+    autocmd BufWritePre * if index(prettier_supported_filetypes, &filetype) != -1 | Prettify() | endif
+augroup END
+# --------------------------------------------------------------
 
 export def QuitWindow()
     # Close window and wipe buffer but it prevent to quit Vim if one window is
