@@ -132,6 +132,7 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
+# TODO: does not work with macos
 # adjustment for Swedish keyboard
 nmap <c-ö> <c-[>
 nmap <c-ä> <c-]>
@@ -282,6 +283,7 @@ exe "source " .. g:dotvim .. "/plugins_settings/microdebugger_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 # TODO; remove me
 # exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
+# 'i"' is interpreted as 'inside "'
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
 # vim-manim setup
