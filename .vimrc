@@ -106,7 +106,7 @@ set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
-set conceallevel=3
+set conceallevel=2
 set concealcursor=n
 # TODO adjust path option. Move to after/ftplugin
 # set path+=**
@@ -281,6 +281,7 @@ exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 g:termdebug_config = {}
 exe "source " .. g:dotvim .. "/plugins_settings/microdebugger_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
+
 # TODO; remove me
 # exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
 # 'i"' is interpreted as 'inside "'
@@ -376,6 +377,7 @@ command! -nargs=1 -complete=command -range Redir
 
 # Example: :HH 62, execute the 62 element of :history
 command! -nargs=1 HH execute histget("cmd", <args>)
+
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
 # YouTube.

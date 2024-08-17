@@ -4,12 +4,14 @@ vim9script
 #
 # Remote-cmdline in the configuration is the value of %CMD% in the adapter
 #
-g:vimspector_enable_mappings = 'HUMAN'
+# g:vimspector_enable_mappings = 'HUMAN'
 if g:os == "Windows"
   g:vimspector_base_dir = g:dotvim .. "\\plugins\\vimspector"
 else
   g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
 endif
+
+command! VimspectorLaunch call feedkeys('\<Plug>VimspectorContinue', 'xt')
 
 # C/C++
 # For all defrecs framework
@@ -18,11 +20,51 @@ var elf_fullpath = getcwd() .. "/build/" .. elf_filename
 var gdb_stuff_path = fnamemodify(getcwd(), ":h") .. "/gdb_stuff"
 
 # STM32F4xx
-var stm32f4xx_runCommand = ['source', $'{gdb_stuff_path}/openocd_stm32f4x_stlink.sh']
+var stm32f4xx_runCommand = [$'{gdb_stuff_path}/openocd_stm32f4x_stlink.sh']
 if g:os == "Windows"
   stm32f4xx_runCommand = ['cmd.exe', '/c', $'{gdb_stuff_path}\\openocd_stm32f4x_stlink.bat']
 endif
 
+# Mappings
+g:vimspector_mappings = { C: '<Plug>VimspectorContinue',
+    B: '<Plug>VimspectorToggleBreakpoint',
+    I: '<Plug>VimspectorStepInto',
+    O: '<Plug>VimspectorStepOver',
+    F: '<Plug>VimspectorStepOut',
+    X: '<cmd>VimspectorReset<cr>',
+    S: '<Plug>VimspectorStop'}
+
+var existing_mappings = {}
+def SetupVimspectorMappings()
+  if exists('g:vimspector_mappings')
+    for key in keys(g:vimspector_mappings)
+      # Save possibly existing mappings
+      if !empty(mapcheck(key, "n"))
+        existing_mappings[key] = maparg(key, 'n', false, true)
+      endif
+      exe 'nnoremap <expr> ' .. key .. " " .. $"$'{g:vimspector_mappings[key]}'"
+    endfor
+  endif
+enddef
+
+def TeardownVimspectorMappings()
+  if exists('g:vimspector_mappings')
+    for key in keys(g:vimspector_mappings)
+      if has_key(existing_mappings, key)
+        mapset('n', 0, existing_mappings[key])
+      else
+        exe $"nunmap {key}"
+      endif
+    endfor
+  endif
+  existing_mappings = {}
+enddef
+
+augroup VimspectorMappings
+  autocmd!
+  autocmd User VimspectorUICreated SetupVimspectorMappings()
+  autocmd User VimspectorDebugEnded TeardownVimspectorMappings()
+augroup END
 
 ##################################
 # ADAPTERS
