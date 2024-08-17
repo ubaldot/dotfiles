@@ -11,7 +11,7 @@ if g:os == 'Windows'
   g:microdebugger_openocd_command = ['cmd.exe', '/c', '..\\gdb_stuff\\openocd_stm32f4x_stlink.bat']
   g:microdebugger_windows_CtrlC_program = 'SendSignalCtrlC'
 else
-  g:microdebugger_openocd_command = ['source', '../gdb_stuff/openocd_stm32f4x_stlink.sh']
+  g:microdebugger_openocd_command = ['../gdb_stuff/openocd_stm32f4x_stlink.sh']
 endif
 
 g:microdebugger_aux_windows = ['openocd', 'variables', 'monitor']
