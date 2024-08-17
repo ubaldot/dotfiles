@@ -1,6 +1,10 @@
 vim9script
 
-compiler pandoc
+if executable('pandoc')
+  compiler pandoc
+else
+  echoerr "'pandoc' not installed. 'MarkdownRender' won't work"
+endif
 
 def MarkdownRender(format = "html")
     var input_file = expand('%:p')
