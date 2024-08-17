@@ -21,7 +21,7 @@ else
   if g:os == 'Linux'
     &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
   else
-    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
+    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
   endif
 endif
 
@@ -106,6 +106,8 @@ set iskeyword+="-"
 set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
+set conceallevel=3
+set concealcursor=n
 # TODO adjust path option. Move to after/ftplugin
 # set path+=**
 # set cursorline
@@ -269,7 +271,7 @@ var Open_special = (textobject) => {
   endif
 }
 
-exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
+# exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
