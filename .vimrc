@@ -107,7 +107,7 @@ set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
 set conceallevel=2
-set concealcursor=n
+set concealcursor=nvc
 # TODO adjust path option. Move to after/ftplugin
 # set path+=**
 # set cursorline
