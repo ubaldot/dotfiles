@@ -128,9 +128,15 @@ inoremap å `
 inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 # inoremap kj <esc>
 
-# Remap command-line stuff
+# Remap {['command-line']} stuff
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
+
+xnoremap " <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
+xnoremap ' <esc><ScriptCmd>myfunctions.Surround("'", "'")<cr>
+xnoremap ( <esc><ScriptCmd>myfunctions.Surround('(', ')')<cr>
+xnoremap [ <esc><ScriptCmd>myfunctions.Surround('[', ']')<cr>
+xnoremap { <esc><ScriptCmd>myfunctions.Surround('{', '}')<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
