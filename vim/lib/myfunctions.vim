@@ -328,44 +328,57 @@ endif
 # Some mappings to learn
 noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
 
-# Stolen from habamax
-export def NextChange()
-    if !&diff
-        return
-    endif
-    var line = line('.')
-    if diff_hlID(line, col('.')) == 28
-        line += 1
-    endif
-    while line <= line('$')
-        var change_pos = filter(range(1, len(getline(line))), 'diff_hlID(line, v:val) == 28')
-        if !empty(change_pos)
-            cursor(line, change_pos[0])
-            return
-        endif
-        line += 1
-    endwhile
+# TODO: separate leading and trailing chars
+export def Surround(pre: string, post: string)
+  # var [line_start, column_start] = getpos("v")[1 : 2]
+  # var [line_end, column_end] = getpos(".")[1 : 2]
+  var pre_len = strlen(pre)
+  var post_len = strlen(post)
+  var [line_start, column_start] = getpos("'<")[1 : 2]
+  var [line_end, column_end] = getpos("'>")[1 : 2]
+  if line_start > line_end
+    var tmp = line_start
+    line_start = line_end
+    line_end = tmp
+
+    tmp = column_start
+    column_start = column_end
+    column_end = tmp
+  endif
+  if line_start == line_end && column_start > column_end
+    var tmp = column_start
+    column_start = column_end
+    column_end = tmp
+  endif
+  var leading_chars = strcharpart(getline(line_start), column_start - 1 - pre_len, pre_len)
+  var trailing_chars = strcharpart(getline(line_end), column_end, post_len)
+
+  # echom "leading_chars: " .. leading_chars
+  # echom "trailing_chars: " .. trailing_chars
+
+  cursor(line_start, column_start)
+  var offset = 0
+  if leading_chars == pre
+    execute($"normal! {pre_len}X")
+    offset = -pre_len
+  else
+    execute($"normal! i{pre}")
+    offset = pre_len
+  endif
+
+  # Some chars have been added if you are working on the same line
+  if line_start == line_end
+    cursor(line_end, column_end + offset)
+  else
+    cursor(line_end, column_end)
+  endif
+
+  if trailing_chars == post
+      execute($"normal! l{post_len}x")
+  else
+      execute($"normal! a{post}")
+  endif
 enddef
-
-export def PrevChange()
-    if !&diff
-        return
-    endif
-    var line = line('.')
-    if diff_hlID(line, col('.')) == 28
-        line -= 1
-    endif
-    while line > 1
-        var change_pos = filter(range(1, len(getline(line))), 'diff_hlID(line, v:val) == 28')
-        if !empty(change_pos)
-            cursor(line, change_pos[0])
-            return
-        endif
-        line -= 1
-    endwhile
-enddef
-
-
 
 # HOW TO WRITE FUNCTION THAT ALLOW COMMAND TO HAVE DOUBLE COMPLETION.
 # noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
