@@ -233,6 +233,7 @@ Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
+Plug 'girishji/scope.vim'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 plug#end()
@@ -256,6 +257,8 @@ augroup END
 # Plugins settings
 # -----------------
 #
+import autoload 'scope/fuzzy.vim'
+nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
 
