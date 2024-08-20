@@ -255,6 +255,33 @@ augroup END
 
 # Plugins settings
 # -----------------
+#
+# vim-open-recent
+g:vim_open_change_dir = true
+
+def OpenRecentNicer()
+    if len(v:argv) > 1
+      # Iterate through the command-line arguments
+      for arg in v:argv[1 : ]
+          # Check if the argument is not an option (doesn't start with '-')
+          if arg[0] !=# '-'
+              # Check if the argument is a valid file. If so, don't open recent
+              # files.
+              if filereadable(arg)
+                  return
+              endif
+          endif
+      endfor
+    endif
+
+    execute('OpenRecent')
+enddef
+
+augroup OpenRecent
+    autocmd!
+    autocmd VimEnter * OpenRecentNicer()
+augroup END
+
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
 if hour < 7 || 17 < hour
