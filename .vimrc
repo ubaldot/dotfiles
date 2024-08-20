@@ -234,6 +234,8 @@ Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 Plug 'girishji/scope.vim'
+# Plug 'Donaldttt/fuzzyy'
+Plug 'ubaldot/fuzzyy'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 plug#end()
@@ -256,30 +258,6 @@ augroup END
 
 # Plugins settings
 # -----------------
-#
-import autoload 'scope/fuzzy.vim'
-nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
-# Vim9-conversion-aid
-g:vim9_conversion_aid_fix_let = true
-
-# vim-open-recent
-g:vim_open_change_dir = true
-
-# def ShowRecentFiles()
-#   var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
-#          !empty(x) && filereadable(x)
-#         )
-#   if len(readable_args) == 0
-#     execute('OpenRecent')
-#   endif
-# enddef
-
-# augroup OpenRecent
-#     autocmd!
-#     autocmd VimEnter * ShowRecentFiles()
-# augroup END
-
-
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
 if hour < 7 || 17 < hour
@@ -291,6 +269,42 @@ endif
 g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
+
+# fuzzyy setup
+g:enable_fuzzyy_keymaps = false
+g:fuzzyy_dropdown = true
+nnoremap <c-s>f <cmd>FuzzyFiles<cr>
+nnoremap <c-s>w <cmd>FuzzyInBuffer<cr>
+nnoremap <c-s>b <cmd>FuzzyBuffer<cr>
+nnoremap <c-s>o <cmd>FuzzyMRUFiles<cr>
+nnoremap <c-s>g <cmd>FuzzyGrep<cr>
+
+# g:fuzzyy_window_layout = {
+#   FuzzyFiles: { preview: false },
+#   FuzzyMRUFiles: { preview: false }
+# }
+
+def ShowRecentFiles()
+  var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
+         !empty(x) && filereadable(x)
+        )
+  if len(readable_args) == 0
+    execute('FuzzyMRUFiles')
+  endif
+enddef
+
+augroup OpenRecent
+    autocmd!
+    autocmd VimEnter * ShowRecentFiles()
+augroup END
+
+# Vim9-conversion-aid
+g:vim9_conversion_aid_fix_let = true
+
+# vim-open-recent
+g:vim_open_change_dir = true
+g:vim_open_at_empty_startup = false
+
 
 # Plugin settings
 # TODO: You may want to use a popup_create and pick
