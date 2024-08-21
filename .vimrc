@@ -147,6 +147,7 @@ nnoremap x "_x
 noremap cd <cmd>exe "cd %:p:h" \| pwd <cr>
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
+# noremap <silent> <c-v> :call system("clip.exe", getreg("0"))<cr>
 # <ScriptCmd> allows remapping to functions without the need of defining
 # them as g:.
 nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
@@ -273,11 +274,11 @@ colorscheme everforest
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
 g:fuzzyy_dropdown = true
-nnoremap <c-s> <cmd>FuzzyFiles<cr>
-nnoremap <c-s>w <cmd>FuzzyInBuffer<cr>
-nnoremap <c-s>b <cmd>FuzzyBuffer<cr>
-nnoremap <c-s>o <cmd>FuzzyMRUFiles<cr>
-tnoremap <c-s>g <cmd>FuzzyGrep<cr>
+nnoremap <c-p> <cmd>FuzzyFiles<cr>
+nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
+nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
+nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
+tnoremap <c-p>g <cmd>FuzzyGrep<cr>
 
 g:fuzzyy_window_layout = {
   FuzzyFiles: { preview: false },
