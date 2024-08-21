@@ -144,7 +144,7 @@ nmap <c-ö> <c-[>
 nmap <c-ä> <c-]>
 # Avoid polluting registers
 nnoremap x "_x
-noremap cd <cmd>exe "cd %:p:h"<cr>
+noremap cd <cmd>exe "cd %:p:h" \| pwd <cr>
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
