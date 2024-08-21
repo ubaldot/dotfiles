@@ -96,5 +96,5 @@ alias docker-om='docker run -it --rm -v "$HOME:$HOME" -e "HOME=$HOME" -w "$PWD" 
 
 # fzf stuff
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-source ~/fzf-git.sh
+source ~/.fzf-git/fzf-git.sh
 export FZF_COMPLETION_TRIGGER=''
