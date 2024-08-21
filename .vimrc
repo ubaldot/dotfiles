@@ -144,6 +144,7 @@ nmap <c-ö> <c-[>
 nmap <c-ä> <c-]>
 # Avoid polluting registers
 nnoremap x "_x
+noremap cd <cmd>exe "cd %:p:h"<cr>
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
@@ -233,7 +234,6 @@ Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-Plug 'girishji/scope.vim'
 # Plug 'Donaldttt/fuzzyy'
 Plug 'ubaldot/fuzzyy'
 Plug 'Konfekt/vim-compilers'
@@ -297,6 +297,11 @@ augroup OpenRecent
     autocmd!
     autocmd VimEnter * ShowRecentFiles()
 augroup END
+
+# augroup CHANGE_DIR
+#   autocmd!
+#   autocmd BufEnter * cd %:p:h
+# augroup END
 
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
