@@ -273,16 +273,16 @@ colorscheme everforest
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
 g:fuzzyy_dropdown = true
-nnoremap <c-s>f <cmd>FuzzyFiles<cr>
+nnoremap <c-s> <cmd>FuzzyFiles<cr>
 nnoremap <c-s>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-s>b <cmd>FuzzyBuffer<cr>
 nnoremap <c-s>o <cmd>FuzzyMRUFiles<cr>
-nnoremap <c-s>g <cmd>FuzzyGrep<cr>
+tnoremap <c-s>g <cmd>FuzzyGrep<cr>
 
-# g:fuzzyy_window_layout = {
-#   FuzzyFiles: { preview: false },
-#   FuzzyMRUFiles: { preview: false }
-# }
+g:fuzzyy_window_layout = {
+  FuzzyFiles: { preview: false },
+  FuzzyMRUFiles: { preview: false }
+}
 
 def ShowRecentFiles()
   var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
