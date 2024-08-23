@@ -235,8 +235,9 @@ Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-# Plug 'Donaldttt/fuzzyy'
-Plug 'ubaldot/fuzzyy'
+Plug 'girishji/scope.vim'
+Plug 'Donaldttt/fuzzyy'
+# Plug 'ubaldot/fuzzyy'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 plug#end()
@@ -270,6 +271,13 @@ endif
 g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
+
+# scope.vim
+import autoload 'scope/fuzzy.vim'
+nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
+nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
+nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
+nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
