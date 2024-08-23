@@ -100,7 +100,7 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=.*/,miniforge3/
+set wildignore+=.*/,docs
 set completeopt-=preview
 set textwidth=78
 set iskeyword+="-"
@@ -274,15 +274,19 @@ g:everforest_background = 'medium'
 colorscheme everforest
 
 # scope.vim
+#
 import autoload 'scope/fuzzy.vim'
 if executable('fd')
-  nnoremap <c-s> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
+  nnoremap <c-s>f <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
 else
-  nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
+  nnoremap <c-s>f <scriptcmd>fuzzy.File()<cr>
 endif
 nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
 nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
 nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
+
+# Manual fuzzy
+nnoremap <c-s> :e **/*<tab>
 
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
