@@ -282,6 +282,7 @@ nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
 g:fuzzyy_dropdown = true
+g:fuzzyy_menu_matched_hl = 'WarningMsg'
 nnoremap <c-p> <cmd>FuzzyFiles<cr>
 nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
@@ -298,7 +299,11 @@ def ShowRecentFiles()
          !empty(x) && filereadable(x)
         )
   if len(readable_args) == 0
-    execute('FuzzyMRUFiles')
+    if exists(':FuzzyMRUFiles') > 0
+      execute('FuzzyMRUFiles')
+    # elseif exists('*fuzzy.MRU') > 0
+    #   fuzzy.MRU()
+    endif
   endif
 enddef
 
