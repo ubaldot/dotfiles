@@ -1,4 +1,9 @@
 vim9script
+# if g:os == 'Windows'
+#   nnoremap <c-s>g <scriptcmd>fuzzy.Grep('powershell -command "findstr /i /n"', true, null_string, $'{getcwd()}')<cr>
+# else
+#   nnoremap <c-s>g <scriptcmd>fuzzy.Grep('grep --color=never --exclude-dir=".*"', true, null_string, $'{getcwd()}')<cr>
+# endif
 
 if has("win64") || has("win32") || has("win16")
   g:os = "Windows"
@@ -100,6 +105,7 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
+set wildignore+=.*,*/.*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+="-"
@@ -279,12 +285,7 @@ if executable('fd')
 else
   nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
 endif
-if g:os == 'Windows'
-  nnoremap <c-s>g <scriptcmd>fuzzy.Grep('powershell -command "findstr /i /n"', true, null_string, $'{getcwd()}')<cr>
-else
-  nnoremap <c-s>g <scriptcmd>fuzzy.Grep(null_string, true, null_string, $'{getcwd()}')<cr>
-endif
-# nnoremap <c-s>g <scriptcmd>fuzzy.Grep(null_string, true, null_string, $'{getcwd()}')<cr>
+nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
 nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
 nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 
