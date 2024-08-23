@@ -1,9 +1,4 @@
 vim9script
-# if g:os == 'Windows'
-#   nnoremap <c-s>g <scriptcmd>fuzzy.Grep('powershell -command "findstr /i /n"', true, null_string, $'{getcwd()}')<cr>
-# else
-#   nnoremap <c-s>g <scriptcmd>fuzzy.Grep('grep --color=never --exclude-dir=".*"', true, null_string, $'{getcwd()}')<cr>
-# endif
 
 if has("win64") || has("win32") || has("win16")
   g:os = "Windows"
@@ -105,7 +100,7 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=.*,*/.*
+set wildignore+=.*/,miniforge3/
 set completeopt-=preview
 set textwidth=78
 set iskeyword+="-"
@@ -294,10 +289,11 @@ g:enable_fuzzyy_keymaps = false
 g:fuzzyy_dropdown = true
 g:fuzzyy_menu_matched_hl = 'WarningMsg'
 nnoremap <c-p> <cmd>FuzzyFiles<cr>
+# nnoremap <c-p> :Fuzzy<tab>
 nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
 nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
-tnoremap <c-p>g <cmd>FuzzyGrep<cr>
+nnoremap <c-p>g <cmd>FuzzyGrep<cr>
 
 g:fuzzyy_window_layout = {
   FuzzyFiles: { preview: false },
@@ -309,7 +305,7 @@ def ShowRecentFiles()
          !empty(x) && filereadable(x)
         )
   if len(readable_args) == 0
-    if exists(':FuzzyMRUFilesXXX') > 0
+    if exists(':FuzzyMRUFiles') > 0
       execute('FuzzyMRUFiles')
     elseif exists('*fuzzy.MRU') > 0
         fuzzy.MRU()
