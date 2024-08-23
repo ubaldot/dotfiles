@@ -282,6 +282,7 @@ colorscheme everforest
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
 g:fuzzyy_dropdown = true
+g:fuzzyy_menu_matched_hl = 'WarningMsg'
 nnoremap <c-p> <cmd>FuzzyFiles<cr>
 nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
