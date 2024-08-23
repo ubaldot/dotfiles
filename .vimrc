@@ -279,7 +279,12 @@ if executable('fd')
 else
   nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
 endif
-nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
+if has('win32')
+  nnoremap <c-s>g <scriptcmd>fuzzy.Grep('powershell -command findstr /i /n', true, null_string, $'{getcwd()}')<cr>
+else
+  nnoremap <c-s>g <scriptcmd>fuzzy.Grep(null_string, true, null_string, $'{getcwd()}')<cr>
+endif
+# nnoremap <c-s>g <scriptcmd>fuzzy.Grep(null_string, true, null_string, $'{getcwd()}')<cr>
 nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
 nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 
@@ -303,10 +308,14 @@ def ShowRecentFiles()
          !empty(x) && filereadable(x)
         )
   if len(readable_args) == 0
-    if exists(':FuzzyMRUFilesX') > 0
+    if exists(':FuzzyMRUFilesXXX') > 0
       execute('FuzzyMRUFiles')
     elseif exists('*fuzzy.MRU') > 0
-      fuzzy.MRU()
+        fuzzy.MRU()
+      # To remove the <80><fd>a added by gvim
+      if has('win32') && has('gui_running')
+        feedkeys("\<c-u>")
+      endif
     endif
   endif
 enddef
@@ -320,8 +329,8 @@ augroup END
 g:vim9_conversion_aid_fix_let = true
 
 # vim-open-recent
-g:vim_open_change_dir = true
-g:vim_open_at_empty_startup = false
+# g:vim_open_change_dir = true
+# g:vim_open_at_empty_startup = false
 
 
 # Plugin settings
