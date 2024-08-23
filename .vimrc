@@ -277,16 +277,14 @@ colorscheme everforest
 #
 import autoload 'scope/fuzzy.vim'
 if executable('fd')
-  nnoremap <c-s>f <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
+  nnoremap <c-s> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
 else
-  nnoremap <c-s>f <scriptcmd>fuzzy.File()<cr>
+  nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
 endif
 nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
 nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
 nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 
-# Manual fuzzy
-nnoremap <c-s> :e **/*<tab>
 
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
@@ -360,6 +358,9 @@ exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 # exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
 # 'i"' is interpreted as 'inside "'
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
+
+# Manual fuzzy
+nnoremap <space> :e **/*
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
