@@ -235,7 +235,7 @@ Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-# Plug 'girishji/scope.vim'
+Plug 'girishji/scope.vim'
 Plug 'Donaldttt/fuzzyy'
 # Plug 'ubaldot/fuzzyy'
 Plug 'Konfekt/vim-compilers'
@@ -273,11 +273,15 @@ g:everforest_background = 'medium'
 colorscheme everforest
 
 # scope.vim
-# import autoload 'scope/fuzzy.vim'
-# nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
-# nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
-# nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
-# nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
+import autoload 'scope/fuzzy.vim'
+if executable('fd')
+  nnoremap <c-s> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
+else
+  nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
+endif
+nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
+nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
+nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
@@ -299,10 +303,10 @@ def ShowRecentFiles()
          !empty(x) && filereadable(x)
         )
   if len(readable_args) == 0
-    if exists(':FuzzyMRUFiles') > 0
+    if exists(':FuzzyMRUFilesX') > 0
       execute('FuzzyMRUFiles')
-    # elseif exists('*fuzzy.MRU') > 0
-    #   fuzzy.MRU()
+    elseif exists('*fuzzy.MRU') > 0
+      fuzzy.MRU()
     endif
   endif
 enddef
@@ -311,11 +315,6 @@ augroup OpenRecent
     autocmd!
     autocmd VimEnter * ShowRecentFiles()
 augroup END
-
-# augroup CHANGE_DIR
-#   autocmd!
-#   autocmd BufEnter * cd %:p:h
-# augroup END
 
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
