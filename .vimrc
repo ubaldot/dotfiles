@@ -279,8 +279,8 @@ if executable('fd')
 else
   nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
 endif
-if has('win32')
-  nnoremap <c-s>g <scriptcmd>fuzzy.Grep('powershell -command findstr /i /n', true, null_string, $'{getcwd()}')<cr>
+if g:os == 'Windows'
+  nnoremap <c-s>g <scriptcmd>fuzzy.Grep('powershell -command "findstr /i /n"', true, null_string, $'{getcwd()}')<cr>
 else
   nnoremap <c-s>g <scriptcmd>fuzzy.Grep(null_string, true, null_string, $'{getcwd()}')<cr>
 endif
