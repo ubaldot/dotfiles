@@ -236,7 +236,7 @@ Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-Plug 'girishji/scope.vim'
+# Plug 'girishji/scope.vim'
 # Plug 'Donaldttt/fuzzyy'
 Plug 'ubaldot/fuzzyy'
 Plug 'Konfekt/vim-compilers'
@@ -275,16 +275,18 @@ colorscheme everforest
 
 # scope.vim
 #
-import autoload 'scope/fuzzy.vim'
-if executable('fd')
-  nnoremap <c-s> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
-else
-  nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
-endif
-nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
-nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
-nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
+# import autoload 'scope/fuzzy.vim'
+# if executable('fd')
+#   nnoremap <c-s> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
+# else
+#   nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
+# endif
+# nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
+# nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
+# nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 
+# Manual fuzzy
+nnoremap <c-s> :e **/*
 
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
@@ -309,12 +311,12 @@ def ShowRecentFiles()
   if len(readable_args) == 0
     if exists(':FuzzyMRUFiles') > 0
       execute('FuzzyMRUFiles')
-    elseif exists('*fuzzy.MRU') > 0
-        fuzzy.MRU()
+    # elseif exists('*fuzzy.MRU') > 0
+        # fuzzy.MRU()
       # To remove the <80><fd>a added by gvim
-      if has('win32') && has('gui_running')
-        feedkeys("\<c-u>")
-      endif
+      # if has('win32') && has('gui_running')
+        # feedkeys("\<c-u>")
+      # endif
     endif
   endif
 enddef
@@ -359,8 +361,6 @@ exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 # 'i"' is interpreted as 'inside "'
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
-# Manual fuzzy
-nnoremap <space> :e **/*
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
