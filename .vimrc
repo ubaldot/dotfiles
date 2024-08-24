@@ -240,7 +240,7 @@ Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-# Plug 'girishji/scope.vim'
+Plug 'girishji/scope.vim'
 # Plug 'Donaldttt/fuzzyy'
 Plug 'ubaldot/fuzzyy'
 Plug 'Konfekt/vim-compilers'
@@ -278,19 +278,26 @@ g:everforest_background = 'medium'
 colorscheme everforest
 
 # scope.vim
-#
-# import autoload 'scope/fuzzy.vim'
-# if executable('fd')
-#   nnoremap <c-s> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
-# else
-#   nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
-# endif
-# nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
-# nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
-# nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
+if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
+  import autoload 'scope/fuzzy.vim'
+  if executable('fd')
+    nnoremap <c-s> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
+  else
+    nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
+  endif
+  nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
+  nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
+  nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
+
+  highlight default link ScopeMenuMatch Normal
+  highlight default link ScopeMenuSubtle Normal
+  # import autoload 'scope/popup.vim' as sp
+  # sp.OptionsSet({highlight: 'Normal'})
+  # sp.OptionsSet({ScopeMenuSubtle: 'Normal'})
+endif
 
 # Manual fuzzy
-nnoremap <c-s> :e **/*
+# nnoremap <c-s> :e **/*
 
 # fuzzyy setup
 g:enable_fuzzyy_keymaps = false
