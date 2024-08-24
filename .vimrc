@@ -100,7 +100,11 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=.*/,docs
+set wildignore+=.*/,**/.*,**/**cache**,**/*.o
+set wildignore+=.[^v]*
+set wildignore+=.v[^i]*
+set wildignore+=.vi[^m]*
+set wildignore+=.vim[^/]*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+="-"
