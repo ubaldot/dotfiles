@@ -305,6 +305,7 @@ nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
 nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
 nnoremap <c-p>g <cmd>FuzzyGrep<cr>
+nnoremap <c-p>c <cmd>FuzzyCmdHistory<cr>
 
 g:fuzzyy_window_layout = {
   FuzzyFiles: { preview: false },
