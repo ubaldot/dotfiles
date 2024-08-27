@@ -100,7 +100,7 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=**/*cache*/*,*.o,**/*miniforge*/*
+set wildignore+=**/*cache*/*,*.o,**/*miniforge*/*,**/*ipynb_*/*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+="-"
@@ -299,6 +299,10 @@ endif
 g:enable_fuzzyy_keymaps = false
 g:fuzzyy_dropdown = true
 g:fuzzyy_menu_matched_hl = 'WarningMsg'
+g:fuzzyy_files_ignore_file = ['*.beam', '*.so', '*.exe', '*.dll', '*.dump',
+    '*.core', '*.swn', '*.swp', '*.ipynb']
+g:fuzzyy_files_ignore_dir = ['*cache*', '.github', '.git', '.hg', '.svn', '.rebar', '.eunit']
+
 nnoremap <c-p> <cmd>FuzzyFiles<cr>
 nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
