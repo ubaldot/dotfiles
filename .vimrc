@@ -287,9 +287,10 @@ if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
 
   highlight default link ScopeMenuMatch Normal
   highlight default link ScopeMenuSubtle Normal
-  # import autoload 'scope/popup.vim' as sp
-  # sp.OptionsSet({highlight: 'Normal'})
-  # sp.OptionsSet({ScopeMenuSubtle: 'Normal'})
+
+  fuzzy.OptionsSet({
+      mru_rel_path: true
+  })
 endif
 
 # Manual fuzzy
@@ -300,16 +301,21 @@ g:enable_fuzzyy_keymaps = false
 g:fuzzyy_dropdown = true
 g:fuzzyy_menu_matched_hl = 'WarningMsg'
 nnoremap <c-p> <cmd>FuzzyFiles<cr>
-# nnoremap <c-p> :Fuzzy<tab>
 nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
 nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
-nnoremap <c-p>g <cmd>FuzzyGrep<cr>
 nnoremap <c-p>c <cmd>FuzzyCmdHistory<cr>
+
+if has('win32')
+  nnoremap <c-p>g <c-u>:Scope Grep<space>
+else
+  nnoremap <c-p>g <cmd>FuzzyGrep<cr>
+endif
 
 g:fuzzyy_window_layout = {
   FuzzyFiles: { preview: false },
-  FuzzyMRUFiles: { preview: false }
+  FuzzyMRUFiles: { preview: false },
+  FuzzyBuffers: { preview: false }
 }
 
 def ShowRecentFiles()
@@ -319,12 +325,12 @@ def ShowRecentFiles()
   if len(readable_args) == 0
     if exists(':FuzzyMRUFiles') > 0
       execute('FuzzyMRUFiles')
-    # elseif exists('*fuzzy.MRU') > 0
-        # fuzzy.MRU()
+    elseif exists('*fuzzy.MRU') > 0
+        fuzzy.MRU()
       # To remove the <80><fd>a added by gvim
-      # if has('win32') && has('gui_running')
-        # feedkeys("\<c-u>")
-      # endif
+      if has('win32') && has('gui_running')
+        feedkeys("\<c-u>")
+      endif
     endif
   endif
 enddef
