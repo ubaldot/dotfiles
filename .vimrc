@@ -281,7 +281,7 @@ if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
   else
     nnoremap <c-s> <scriptcmd>fuzzy.File()<cr>
   endif
-  nnoremap <c-s>g <scriptcmd>fuzzy.Grep()<cr>
+  nnoremap <c-s>g <c-u>:Scope Grep<space>
   nnoremap <c-s>b <scriptcmd>fuzzy.Buffer()<cr>
   nnoremap <c-s>o <scriptcmd>fuzzy.MRU()<cr>
 
