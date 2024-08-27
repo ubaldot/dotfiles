@@ -237,8 +237,7 @@ Plug 'ubaldot/vim9-conversion-aid'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 Plug 'girishji/scope.vim'
-# Plug 'Donaldttt/fuzzyy'
-Plug 'ubaldot/fuzzyy'
+Plug 'Donaldttt/fuzzyy'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 plug#end()
@@ -305,12 +304,7 @@ nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
 nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
 nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
 nnoremap <c-p>c <cmd>FuzzyCmdHistory<cr>
-
-if has('win32')
-  nnoremap <c-p>g <c-u>:Scope Grep<space>
-else
-  nnoremap <c-p>g <cmd>FuzzyGrep<cr>
-endif
+nnoremap <c-p>g <cmd>FuzzyGrep<cr>
 
 g:fuzzyy_window_layout = {
   FuzzyFiles: { preview: false },
