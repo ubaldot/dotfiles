@@ -120,7 +120,8 @@ map <f1> <cmd>helpclose<cr>
 g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<cr>
-inoremap å `
+# inoremap å `
+cnoremap å ~
 
 
 # For using up and down in popup menu
