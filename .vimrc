@@ -300,11 +300,12 @@ colorscheme everforest
 # Manual fuzzy
 # nnoremap <c-s> :e **/*
 
-var use_scope = true
+var use_scope = false
+if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
+  import autoload 'scope/fuzzy.vim'
+endif
 if use_scope
   # scope.vim
-  if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
-    import autoload 'scope/fuzzy.vim'
     if executable('fd')
       nnoremap <c-p> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
     else
@@ -320,10 +321,7 @@ if use_scope
     fuzzy.OptionsSet({
       mru_rel_path: true
     })
-  endif
-
 else
-
   # fuzzyy setup
   g:enable_fuzzyy_keymaps = false
   g:fuzzyy_dropdown = true
