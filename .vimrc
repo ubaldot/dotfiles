@@ -147,27 +147,19 @@ nmap <c-ä> <c-]>
 nnoremap x "_x
 
 # Change to repo root, ~ or /.
+#
+#
 def GoToGitRoot()
-  var cwd = $'{expand('%:p:h')}'
-  exe $'cd {cwd}'
-  while true
-    if exists('+shellslash') && !&shellslash
-      # on windows, need to handle backslash
-      cwd->substitute('\\', '/', 'g')
-    endif
-
-    if !empty(glob($'{cwd}/.git'))
-        || cwd == expand('~')
-        || cwd == '/'
-        || cwd == 'C:\'
-        pwd
-      return
-    else
-      cd ..
-      cwd = getcwd()
-    endif
-  endwhile
+  # Change dir to the current buffer location and if you are in a git repo,
+  # then change dir to the git repo root.
+  exe $'cd {expand('%:p:h')}'
+  var git_root = system('git rev-parse --show-toplevel')
+  if v:shell_error == 0
+     exe $'cd {git_root}'
+  endif
+  pwd
 enddef
+
 noremap cd <scriptcmd>GoToGitRoot()<cr>
 
 # Opposite of J, i.e. split from current cursor position
