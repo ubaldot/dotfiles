@@ -159,7 +159,7 @@ def GoToGitRoot()
     if !empty(glob($'{cwd}/.git'))
         || cwd == expand('~')
         || cwd == '/'
-        || cwd == 'C:'
+        || cwd == 'C:\'
         pwd
       return
     else
