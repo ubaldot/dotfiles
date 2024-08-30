@@ -1,5 +1,22 @@
 vim9script
 
+def g:SearchAndReplaceRisky(pattern: string, search: string, replacement: string)
+
+  # var grep_cmd = g:os == "Windows" ? 'FILL_ME' : $'grep -rl "{search}" --include \{pattern}'
+  # exe $"{grep_cmd}"
+  # exe $'cfdo :%s/{search}/{replacement}/gci'
+  if g:os != 'Windows'
+    exe $'find {pattern} -type f -exec sed -i 's/{search}/{replacement}/g'
+  else
+  endif
+enddef
+
+def g:SearchAndReplaceSlow(pattern: string, search: string, replacement: string, options: string = 'gci')
+  exe $'vimgrep /{search}/gj {pattern}'
+  exe $'cfdo :%s/{search}/{replacement}/{options}'
+  # Then do :wall to save all or :cfdo u to undo.
+enddef
+
 if has("win64") || has("win32") || has("win16")
   g:os = "Windows"
 else
@@ -156,7 +173,7 @@ def GoToGitRoot()
   exe $'cd {expand('%:p:h')}'
   var git_root = system('git rev-parse --show-toplevel')
   if v:shell_error == 0
-     exe $'cd {git_root}'
+    exe $'cd {git_root}'
   endif
   pwd
 enddef
@@ -299,21 +316,21 @@ if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
 endif
 if use_scope
   # scope.vim
-    if executable('fd')
-      nnoremap <c-p> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
-    else
-      nnoremap <c-p> <scriptcmd>fuzzy.File()<cr>
-    endif
-    nnoremap <c-p>g <c-u>:Scope Grep<space>
-    nnoremap <c-p>b <scriptcmd>fuzzy.Buffer()<cr>
-    nnoremap <c-p>o <scriptcmd>fuzzy.MRU()<cr>
+  if executable('fd')
+    nnoremap <c-p> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
+  else
+    nnoremap <c-p> <scriptcmd>fuzzy.File()<cr>
+  endif
+  nnoremap <c-p>g <c-u>:Scope Grep<space>
+  nnoremap <c-p>b <scriptcmd>fuzzy.Buffer()<cr>
+  nnoremap <c-p>o <scriptcmd>fuzzy.MRU()<cr>
 
-    highlight default link ScopeMenuMatch Normal
-    highlight default link ScopeMenuSubtle Normal
+  highlight default link ScopeMenuMatch Normal
+  highlight default link ScopeMenuSubtle Normal
 
-    fuzzy.OptionsSet({
-      mru_rel_path: true
-    })
+  fuzzy.OptionsSet({
+    mru_rel_path: true
+  })
 else
   # fuzzyy setup
   g:enable_fuzzyy_keymaps = false
@@ -446,7 +463,7 @@ g:replica_display_range  = false
 g:replica_console_width = &columns / 2
 # g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {
-       python: " --config ~/.jupyter/jupyter_console_config.py"}
+  python: " --config ~/.jupyter/jupyter_console_config.py"}
 nmap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
 # g:writegood_compiler = "vale"
 # g:writegood_options = "--config=$HOME/vale.ini"
