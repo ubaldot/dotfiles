@@ -4,6 +4,22 @@ export def Echoerr(msg: string)
   echohl ErrorMsg | echom $'{msg}' | echohl None
 enddef
 
+# Search and replace in files. :call SearchAndReplace
+def g:SearchAndReplaceRisky(pattern: string, search: string, replacement: string)
+  if g:os != 'Windows'
+    exe printf('!find %s -type f -exec sed -i ''s/%s/%s/g'' {} \;', pattern, search, replacement)
+  else
+    # TODO: Command for Windows
+  endif
+enddef
+
+def g:SearchAndReplaceSlow(pattern: string, search: string, replacement: string, options: string = 'gci')
+  exe $'vimgrep /{search}/gj {pattern}'
+  exe $'cfdo :%s/{search}/{replacement}/{options}'
+  # Then do :wall to save all or :cfdo u to undo.
+enddef
+
+
 # Remove trailing white spaces at the end of each line and at the end of the file
 export def TrimWhitespace()
     var currwin = winsaveview()

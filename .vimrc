@@ -1,22 +1,5 @@
 vim9script
 
-def g:SearchAndReplaceRisky(pattern: string, search: string, replacement: string)
-
-  # var grep_cmd = g:os == "Windows" ? 'FILL_ME' : $'grep -rl "{search}" --include \{pattern}'
-  # exe $"{grep_cmd}"
-  # exe $'cfdo :%s/{search}/{replacement}/gci'
-  if g:os != 'Windows'
-    exe $'find {pattern} -type f -exec sed -i 's/{search}/{replacement}/g'
-  else
-  endif
-enddef
-
-def g:SearchAndReplaceSlow(pattern: string, search: string, replacement: string, options: string = 'gci')
-  exe $'vimgrep /{search}/gj {pattern}'
-  exe $'cfdo :%s/{search}/{replacement}/{options}'
-  # Then do :wall to save all or :cfdo u to undo.
-enddef
-
 if has("win64") || has("win32") || has("win16")
   g:os = "Windows"
 else
