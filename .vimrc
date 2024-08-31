@@ -43,11 +43,11 @@ else
 endif
 
 # Windows
-if executable('cmd.exe')
-  g:start_cmd = "explorer.exe"
-# Linux/BSD
-elseif executable("xdg-open")
+if executable("xdg-open")
   g:start_cmd = "xdg-open"
+# Linux/BSD
+elseif executable('cmd.exe')
+  g:start_cmd = "explorer.exe"
 # MacOS
 elseif executable("open")
   g:start_cmd = "open"

@@ -3,6 +3,9 @@ vim9script
 
 setlocal foldmethod=indent
 
+# Usage: make .
+compiler pytest
+
 # Autocmd to format with black.
 augroup BLACK
     autocmd! * <buffer>
@@ -33,6 +36,9 @@ enddef
 
 # Call black to format 120 line length
 command! -buffer Black120 Black(120)
+
+# pytest
+command! -buffer Pytest execute('!coverage run --branch -m pytest .')
 
 # Manim
 if has("mac")
