@@ -36,5 +36,9 @@ def MarkdownRender(format = "html")
     exe open_file_cmd
 enddef
 
+def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
+  return ['html', 'docx', 'pdf', 'txt', 'jira', 'csv', 'ipynb', 'latex', 'odt', 'rtf']
+enddef
+
 # Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc
-command! -nargs=? -buffer MarkdownRender MarkdownRender(<f-args>)
+command! -nargs=? -buffer -complete=customlist,MarkdownRenderCompleteList MarkdownRender MarkdownRender(<f-args>)
