@@ -4,9 +4,9 @@ import g:dotvim .. "/lib/myfunctions.vim"
 setlocal iskeyword-=_
 
 # Bold, italic, strikethrough
-xnoremap <buffer> <silent> bb <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
-xnoremap <buffer> <silent> ii <esc><ScriptCmd>myfunctions.Surround('_', '_')<cr>
-xnoremap <buffer> <silent> ss <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
+xnoremap <buffer> <silent> <c-b> <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
+xnoremap <buffer> <silent> <c-i> <esc><ScriptCmd>myfunctions.Surround('_', '_')<cr>
+xnoremap <buffer> <silent> <c-s> <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
 
 if executable('pandoc')
   compiler pandoc
@@ -22,13 +22,18 @@ endif
 
 def MarkdownRender(format = "html")
     var input_file = expand('%:p')
-    var output_file = expand('%:p:r') .. "." .. format
+    var output_file = $'{expand('%:p:r')}.{format}'
     var css_style = ""
     if format ==# 'html'
         css_style = "-c ~/dotfiles/my_css_style.css"
     endif
     exe "make " .. input_file  .. " -o " ..  output_file .. " -s " .. css_style
-    silent exe $'!{g:start_cmd} {shellescape(expand("%:r"))}.{format}'
+
+    var open_file_cmd = $'!{g:start_cmd} {shellescape(output_file)}'
+    if g:os == "Linux"
+      open_file_cmd = $'{open_file_cmd} > /dev/null 2>&1 &'
+    endif
+    exe open_file_cmd
 enddef
 
 # Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc
