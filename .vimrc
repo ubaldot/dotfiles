@@ -134,7 +134,8 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
-xnoremap " <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
+# Otherwise I cannot paste in registers
+# xnoremap " <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
 xnoremap ' <esc><ScriptCmd>myfunctions.Surround("'", "'")<cr>
 xnoremap ( <esc><ScriptCmd>myfunctions.Surround('(', ')')<cr>
 xnoremap [ <esc><ScriptCmd>myfunctions.Surround('[', ']')<cr>
@@ -187,7 +188,7 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
 # Wipe buffer
-nnoremap <c-b><c-w> <cmd>bw!<cr>
+nnoremap bw <cmd>bw!<cr>
 # nnoremap bw <cmd>bw!<cr>
 
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>

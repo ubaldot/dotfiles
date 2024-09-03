@@ -11,7 +11,7 @@ else
   g:vimspector_base_dir = g:dotvim .. "/plugins/vimspector"
 endif
 
-command! VimspectorLaunch call feedkeys('\<Plug>VimspectorContinue', 'xt')
+command! VimspectorLaunch feedkeys('\<Plug>VimspectorContinue', 't')
 
 # C/C++
 # For all defrecs framework
