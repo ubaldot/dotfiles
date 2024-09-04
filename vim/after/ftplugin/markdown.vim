@@ -27,13 +27,11 @@ def MarkdownRender(format = "html")
     if format ==# 'html'
         css_style = "-c ~/dotfiles/my_css_style.css"
     endif
-    exe "make " .. input_file  .. " -o " ..  output_file .. " -s " .. css_style
+    silent exe $"make {input_file} -o {output_file} -s {css_style}"
 
-    var open_file_cmd = $'!{g:start_cmd} {shellescape(output_file)}'
-    if g:os == "Linux"
-      open_file_cmd = $'{open_file_cmd} > /dev/null 2>&1 &'
-    endif
-    exe open_file_cmd
+    var open_file_cmd = $'{g:start_cmd} {shellescape(output_file)}'->substitute("'", "", "g")
+    # echom open_file_cmd
+    job_start(open_file_cmd)
 enddef
 
 def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
