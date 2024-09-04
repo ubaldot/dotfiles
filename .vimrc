@@ -173,7 +173,7 @@ nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
 # nnoremap <leader>b <Cmd>ls!<cr>:b
 nnoremap <s-tab> <cmd>bprev <cr>
-nnoremap <c-tab> :b <tab>
+# nnoremap <c-tab> :b <tab>
 nnoremap <leader>b :b <tab>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
@@ -245,7 +245,6 @@ Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'yegappan/lsp'
 Plug 'ubaldot/vim-highlight-yanked'
-# Plug 'ubaldot/vim-open-recent'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
@@ -253,10 +252,12 @@ Plug 'ubaldot/vim-manim'
 Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 Plug 'ubaldot/vim-extended-view'
+Plug 'ubaldot/vim-poptools'
+# Plug 'ubaldot/vim-open-recent'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-Plug 'girishji/scope.vim'
-Plug 'Donaldttt/fuzzyy'
+# Plug 'girishji/scope.vim'
+# Plug 'Donaldttt/fuzzyy'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 plug#end()
@@ -291,75 +292,93 @@ g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
 
-# Fuzzy search
-# Manual fuzzy
-# nnoremap <c-s> :e **/*
+# vim-poptools
 
-var use_scope = false
-if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
-  import autoload 'scope/fuzzy.vim'
-endif
-if use_scope
-  # scope.vim
-  if executable('fd')
-    nnoremap <c-p> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
-  else
-    nnoremap <c-p> <scriptcmd>fuzzy.File()<cr>
-  endif
-  nnoremap <c-p>g <c-u>:Scope Grep<space>
-  nnoremap <c-p>b <scriptcmd>fuzzy.Buffer()<cr>
-  nnoremap <c-p>o <scriptcmd>fuzzy.MRU()<cr>
-
-  highlight default link ScopeMenuMatch Normal
-  highlight default link ScopeMenuSubtle Normal
-
-  fuzzy.OptionsSet({
-    mru_rel_path: true
-  })
-else
-  # fuzzyy setup
-  g:enable_fuzzyy_keymaps = false
-  g:fuzzyy_dropdown = true
-  g:fuzzyy_menu_matched_hl = 'WarningMsg'
-  g:fuzzyy_files_ignore_file = ['*.beam', '*.so', '*.exe', '*.dll', '*.dump',
-    '*.core', '*.swn', '*.swp', '*.ipynb']
-  g:fuzzyy_files_ignore_dir = ['*cache*', '.github', '.git', '.hg', '.svn', '.rebar', '.eunit']
-
-  nnoremap <c-p> <cmd>FuzzyFiles<cr>
-  nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
-  nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
-  nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
-  nnoremap <c-p>c <cmd>FuzzyCmdHistory<cr>
-  nnoremap <c-p>g <cmd>FuzzyGrep<cr>
-
-  g:fuzzyy_window_layout = {
-    FuzzyFiles: { preview: false },
-    FuzzyMRUFiles: { preview: false },
-    FuzzyBuffers: { preview: false }
-  }
-endif
+nnoremap <c-p> <cmd>PopupFindFile<cr>
+nnoremap <c-tab> <cmd>PopupBuffers<cr>
+nnoremap <c-p>h <cmd>PopupCmdHistory<cr>
+xnoremap <c-p>h <esc>PopupCmdHistory<cr>
+nnoremap <c-p>d <cmd>PopupFindDir<cr>
+nnoremap <c-p>o <cmd>PopupRecentFiles<cr>
 
 def ShowRecentFiles()
   var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
-    !empty(x) && filereadable(x)
-  )
+         !empty(x) && filereadable(x)
+        )
   if len(readable_args) == 0
-    if use_scope && exists('*fuzzy.MRU') > 0
-      fuzzy.MRU()
-      # To remove the <80><fd>a added by gvim
-      if has('win32') && has('gui_running')
-        feedkeys("\<c-u>")
-      endif
-    elseif exists(':FuzzyMRUFiles') > 0
-      execute('FuzzyMRUFiles')
-    endif
+    execute('PopupRecentFiles')
   endif
 enddef
 
 augroup OpenRecent
-  autocmd!
-  autocmd VimEnter * ShowRecentFiles()
+    autocmd!
+    autocmd VimEnter * ShowRecentFiles()
 augroup END
+# var use_scope = false
+# if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
+#   import autoload 'scope/fuzzy.vim'
+# endif
+# if use_scope
+#   # scope.vim
+#   if executable('fd')
+#     nnoremap <c-p> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
+#   else
+#     nnoremap <c-p> <scriptcmd>fuzzy.File()<cr>
+#   endif
+#   nnoremap <c-p>g <c-u>:Scope Grep<space>
+#   nnoremap <c-p>b <scriptcmd>fuzzy.Buffer()<cr>
+#   nnoremap <c-p>o <scriptcmd>fuzzy.MRU()<cr>
+
+#   highlight default link ScopeMenuMatch Normal
+#   highlight default link ScopeMenuSubtle Normal
+
+#   fuzzy.OptionsSet({
+#     mru_rel_path: true
+#   })
+# else
+#   # fuzzyy setup
+#   g:enable_fuzzyy_keymaps = false
+#   g:fuzzyy_dropdown = true
+#   g:fuzzyy_menu_matched_hl = 'WarningMsg'
+#   g:fuzzyy_files_ignore_file = ['*.beam', '*.so', '*.exe', '*.dll', '*.dump',
+#     '*.core', '*.swn', '*.swp', '*.ipynb']
+#   g:fuzzyy_files_ignore_dir = ['*cache*', '.github', '.git', '.hg', '.svn', '.rebar', '.eunit']
+
+#   nnoremap <c-p> <cmd>FuzzyFiles<cr>
+#   nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
+#   nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
+#   nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
+#   nnoremap <c-p>c <cmd>FuzzyCmdHistory<cr>
+#   nnoremap <c-p>g <cmd>FuzzyGrep<cr>
+
+#   g:fuzzyy_window_layout = {
+#     FuzzyFiles: { preview: false },
+#     FuzzyMRUFiles: { preview: false },
+#     FuzzyBuffers: { preview: false }
+#   }
+# endif
+
+# def ShowRecentFiles()
+#   var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
+#     !empty(x) && filereadable(x)
+#   )
+#   if len(readable_args) == 0
+#     if use_scope && exists('*fuzzy.MRU') > 0
+#       fuzzy.MRU()
+#       # To remove the <80><fd>a added by gvim
+#       if has('win32') && has('gui_running')
+#         feedkeys("\<c-u>")
+#       endif
+#     elseif exists(':FuzzyMRUFiles') > 0
+#       execute('FuzzyMRUFiles')
+#     endif
+#   endif
+# enddef
+
+# augroup OpenRecent
+#   autocmd!
+#   autocmd VimEnter * ShowRecentFiles()
+# augroup END
 
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
@@ -367,7 +386,7 @@ g:vim9_conversion_aid_fix_let = true
 # vim-open-recent
 # g:vim_open_change_dir = true
 # g:vim_open_at_empty_startup = false
-
+# nnoremap <c-p>o <scriptcmd>OpenRecent<cr>
 
 # Plugin settings
 # TODO: You may want to use a popup_create and pick
