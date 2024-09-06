@@ -100,7 +100,7 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=**/*cache*/*,*.o,**/*miniforge*/*,**/*ipynb_*/*
+set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+="-"
@@ -188,8 +188,8 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
 # Wipe buffer
-nnoremap bw <cmd>bw!<cr>
 # nnoremap bw <cmd>bw!<cr>
+nnoremap <c-b><c-w> <cmd>bw!<cr>
 
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
 
