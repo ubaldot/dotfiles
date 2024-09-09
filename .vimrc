@@ -293,20 +293,25 @@ g:everforest_background = 'medium'
 colorscheme everforest
 
 # vim-poptools
+#
+g:poptools_config = {}
+g:poptools_config['preview_recent_files'] = false
+g:poptools_config['preview_buffer'] = false
 
-nnoremap <c-p> <cmd>PopupFindFile<cr>
-nnoremap <c-tab> <cmd>PopupBuffers<cr>
-nnoremap <c-p>h <cmd>PopupCmdHistory<cr>
-xnoremap <c-p>h <esc>PopupCmdHistory<cr>
-nnoremap <c-p>d <cmd>PopupFindDir<cr>
-nnoremap <c-p>o <cmd>PopupRecentFiles<cr>
+nnoremap <c-p> <cmd>PoptoolsFindFile<cr><cr>
+nnoremap <c-p>f <cmd>PoptoolsFindFile<cr>
+nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
+nnoremap <c-p>h <cmd>PoptoolsCmdHistory<cr>
+xnoremap <c-p>h <esc>PoptoolsCmdHistory<cr>
+nnoremap <c-p>d <cmd>PoptoolsFindDir<cr>
+nnoremap <c-p>o <cmd>PoptoolsRecentFiles<cr>
 
 def ShowRecentFiles()
   var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
          !empty(x) && filereadable(x)
         )
   if len(readable_args) == 0
-    execute('PopupRecentFiles')
+    execute('PoptoolsRecentFiles')
   endif
 enddef
 
