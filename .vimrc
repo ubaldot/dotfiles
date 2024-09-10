@@ -257,7 +257,7 @@ Plug 'ubaldot/vim-poptools'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 # Plug 'girishji/scope.vim'
-# Plug 'Donaldttt/fuzzyy'
+Plug 'Donaldttt/fuzzyy'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 plug#end()

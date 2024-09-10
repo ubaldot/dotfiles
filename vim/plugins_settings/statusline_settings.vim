@@ -91,13 +91,15 @@ augroup END
 # Left side
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
 set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
-# set statusline+=%#WildMenu#\ \ %{b:gitbranch}\ %*
+# Current file
 set statusline+=%#StatusLine#\ %t(%n)%m%*
+# Current function
 set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
 # Right side
 set statusline+=%=
-set statusline+=%#StatusLine#\ %y\ %*
-set statusline+=%#StatusLineNC#\ col:%c\ %*
+set statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
+set statusline+=%#StatusLineNC#\ %y\ %*
+set statusline+=%#StatusLine#\ col:%c\ %*
 # Add some conditionals here bitch!
 # set statusline+=%#Visual#\ W:\ %{get(b:,'lsp_warns','NA')}\ %*
 # set statusline+=%#CurSearch#\ E:\ %{get(b:,'lsp_errors','NA')}\ %*
