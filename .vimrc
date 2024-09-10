@@ -297,6 +297,7 @@ colorscheme everforest
 g:poptools_config = {}
 g:poptools_config['preview_recent_files'] = false
 g:poptools_config['preview_buffer'] = false
+# g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr><cr>
 nnoremap <c-p>f <cmd>PoptoolsFindFile<cr>
