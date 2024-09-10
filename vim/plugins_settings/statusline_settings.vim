@@ -84,6 +84,10 @@ augroup CONDA_ENV
     autocmd VimEnter * Set_g_conda_env()
 augroup END
 
+def ShowFileFormat(ff: string)
+  return $'[{ff}]'
+enddef
+
 # Anatomy of the statusline:
 # Start of highlighting	- Dynamic content - End of highlighting
 # %#IsModified#	- %{&mod?expand('%'):''} - %*
@@ -91,14 +95,17 @@ augroup END
 # Left side
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
 set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
-# Current file
-set statusline+=%#StatusLine#\ %t(%n)%m%*
+set statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
 # Current function
 set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
 # Right side
 set statusline+=%=
-set statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
-set statusline+=%#StatusLineNC#\ %y\ %*
+# Current file
+# set statusline+=%#StatusLine#\ %t(%n)%m%*
+# filetype
+set statusline+=%#StatusLine#\ %y%*
+# Fileformat
+set statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
 set statusline+=%#StatusLine#\ col:%c\ %*
 # Add some conditionals here bitch!
 # set statusline+=%#Visual#\ W:\ %{get(b:,'lsp_warns','NA')}\ %*
