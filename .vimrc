@@ -239,6 +239,8 @@ augroup END
 # ----------------
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
+# Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+# Plug 'junegunn/fzf.vim' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lifepillar/vim-solarized8'
 Plug 'lambdalisue/fern.vim'
@@ -257,7 +259,7 @@ Plug 'ubaldot/vim-poptools'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 # Plug 'girishji/scope.vim'
-Plug 'Donaldttt/fuzzyy'
+# Plug 'Donaldttt/fuzzyy'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 plug#end()
@@ -300,6 +302,7 @@ g:poptools_config['preview_buffer'] = false
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr><cr>
+nnoremap <c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>f <cmd>PoptoolsFindFile<cr>
 nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
 nnoremap <c-p>h <cmd>PoptoolsCmdHistory<cr>
