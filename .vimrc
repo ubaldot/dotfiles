@@ -297,14 +297,15 @@ colorscheme everforest
 # vim-poptools
 #
 g:poptools_config = {}
-g:poptools_config['preview_recent_files'] = false
-g:poptools_config['preview_buffer'] = false
+# g:poptools_config['preview_recent_files'] = false
+# g:poptools_config['preview_buffer'] = false
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr><cr>
 nnoremap <c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>f <cmd>PoptoolsFindFile<cr>
-nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
+nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
+nnoremap <c-p>b <cmd>PoptoolsBuffers<cr>
 nnoremap <c-p>h <cmd>PoptoolsCmdHistory<cr>
 xnoremap <c-p>h <esc>PoptoolsCmdHistory<cr>
 nnoremap <c-p>d <cmd>PoptoolsFindDir<cr>
