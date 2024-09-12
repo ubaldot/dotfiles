@@ -54,11 +54,6 @@ def SearchAndReplaceInFiles()
 enddef
 
 def SearchAndReplace()
-  var range = input("Range: ", '%')
-  # TODO the following does not work
-  # if range !~ "\v(\d+,\d+|%)"
-  #   return
-  # endif
   var search = input("\nString to search: ")
   if empty(search)
     echom ""
@@ -70,13 +65,20 @@ def SearchAndReplace()
     return
   endif
   var opts = input("\nSubstitute options: ", 'gci')
+  var range = input("Range: ", '%')
+  # echom "\n"
+  # echom range
+  # if range !~ "\(%\)"
+  #   echom "  NOK"
+  # else
+  #   echom "  OK"
+  # endif
   exe $':{range}s/{search}/{replacement}/{opts}'
 enddef
 
 command! SearchAndReplace SearchAndReplace()
 command! SearchAndReplaceInFiles SearchAndReplaceInFiles()
 
-# Remove trailing white spaces at the end of each line and at the end of the file
 export def TrimWhitespace()
   var currwin = winsaveview()
   var save_cursor = getpos(".")

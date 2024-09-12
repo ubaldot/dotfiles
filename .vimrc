@@ -21,18 +21,27 @@ enddef
 
 
 if has('unix') && IsWSL()
+  # Paste
   def WslPut(above: bool = false)
-     var copied_text = system('powershell.exe Get-Clipboard')->substitute("\r", '', 'g' )
-     setreg("p", copied_text)
-     if !above
-       norm! "pp
-     else
-       norm! "pP
-     endif
+    var copied_text = system('powershell.exe Get-Clipboard')->substitute("\r", '', 'g' )
+    setreg("p", copied_text)
+    if !above
+      norm! "pp
+    else
+      norm! "pP
+    endif
   enddef
 
-  noremap "pp <scriptcmd>WslPut()<cr>
-  noremap "pP <scriptcmd>WslPut(true)<cr>
+
+  noremap "+p <scriptcmd>WslPut()<cr>
+  noremap "+P <scriptcmd>WslPut(true)<cr>
+
+  # Yank
+  augroup WSLYank
+    autocmd!
+    # autocmd TextYankPost * if v:event.operator ==# 'y' | system('clip.exe', @0) | endif
+    autocmd TextYankPost * if v:event.operator ==# 'y' | system('clip.exe', getreg('0')) | endif
+  augroup END
 endif
 
 # Set clipboard on WSL
@@ -44,8 +53,10 @@ endif
 #       '*': 'clip.exe',
 #     },
 #     paste: {
-#       '+': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
-#       '*': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+#       '+': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard
+#       -Raw).tostring().replace("`r", ""))',
+#       '*': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard
+#       -Raw).tostring().replace("`r", ""))',
 #     },
 #     'cache_enabled': 0,
 #   }
@@ -122,7 +133,7 @@ set encoding=utf-8
 set langmenu=en_US.UTF-8
 # set langmap=ö[,ä]
 set belloff=all
-# set clipboard^=unnamed,unnamedplus
+set clipboard^=unnamed,unnamedplus
 set termguicolors
 set autoread
 set number
@@ -340,6 +351,9 @@ g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
 
+# g:hlyanked_save_yanks = false
+
+
 # vim-poptools
 g:poptools_config = {}
 g:poptools_config['preview_recent_files'] = false
@@ -358,16 +372,16 @@ nnoremap <c-p>o <cmd>PoptoolsRecentFiles<cr>
 
 def ShowRecentFiles()
   var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
-         !empty(x) && filereadable(x)
-        )
+    !empty(x) && filereadable(x)
+  )
   if len(readable_args) == 0
     execute('PoptoolsRecentFiles')
   endif
 enddef
 
 augroup OpenRecent
-    autocmd!
-    autocmd VimEnter * ShowRecentFiles()
+  autocmd!
+  autocmd VimEnter * ShowRecentFiles()
 augroup END
 # var use_scope = false
 # if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
@@ -395,9 +409,11 @@ augroup END
 #   g:enable_fuzzyy_keymaps = false
 #   g:fuzzyy_dropdown = true
 #   g:fuzzyy_menu_matched_hl = 'WarningMsg'
-#   g:fuzzyy_files_ignore_file = ['*.beam', '*.so', '*.exe', '*.dll', '*.dump',
+#   g:fuzzyy_files_ignore_file = ['*.beam', '*.so', '*.exe', '*.dll',
+#   '*.dump',
 #     '*.core', '*.swn', '*.swp', '*.ipynb']
-#   g:fuzzyy_files_ignore_dir = ['*cache*', '.github', '.git', '.hg', '.svn', '.rebar', '.eunit']
+#   g:fuzzyy_files_ignore_dir = ['*cache*', '.github', '.git', '.hg',
+#   '.svn', '.rebar', '.eunit']
 
 #   nnoremap <c-p> <cmd>FuzzyFiles<cr>
 #   nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
@@ -464,108 +480,128 @@ exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
-# source "~/vim_official/vim/runtime/pack/dist/opt/comment/plugin/comment.vim"
+# source
+# "~/vim_official/vim/runtime/pack/dist/opt/comment/plugin/comment.vim"
 g:termdebug_config = {}
 exe "source " .. g:dotvim .. "/plugins_settings/microdebugger_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 
 # TODO; remove me
-# exe "source ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
+# exe "source
+# ~/vim_official/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim"
 # 'i"' is interpreted as 'inside "'
 nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
-g:manim_flags = {'low_quality': $"-pql {manim_common_flags}",
-  'high_quality': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
-  'dry_run': $'--dry_run {manim_common_flags}',
-  'transparent': $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
-g:manim_default_flag = keys(g:manim_flags)[-1]
+g:manim_flags = {
+  low_quality: $"-pql {manim_common_flags}",
+  high_quality: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
+  dry_run: $'--dry_run {manim_common_flags}',
+  transparent: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"}
+    g:manim_default_flag = keys(g:manim_flags)[-1]
 
-if g:os == "Darwin"
-  augroup CloseQuickTime
-    autocmd!
-    autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
-  augroup END
-endif
-
-# Manim commands
-# To make docs go to manim/docs and run make html. Be sure that all the sphinx
-# extensions packages are installed.
-# TODO Make it working with Windows
-
-# command ManimDocs silent :!open -a safari.app
-#             \ ~/Documents/manimce-latest/index.html
-
-command ManimNew :enew | :0read ~/.manim/new_manim.txt
-command ManimHelpVMobjs exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_vmobjects.txt"
-command ManimHelpTex exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_tex.txt"
-command ManimHelpUpdaters exe "HelpMe " .. g:dotvim ..  "/helpme_files/manim_updaters.txt"
-command ManimHelpTransform exe "HelpMe " .. g:dotvim .. "/helpme_files/manim_transform.txt"
-
-
-# HelpMe files for my poor memory
-command! HelpmeBasic exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_basic.txt"
-command! HelpmeScript exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_scripting.txt"
-command! HelpmeGlobal exe "HelpMe ".. g:dotvim .. "/helpme_files/vim_global.txt"
-command! HelpmeExCommands exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_excommands.txt"
-command! HelpmeSubstitute exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_substitute.txt"
-command! HelpmeUnitTests exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_unit_tests.txt"
-command! HelpmeAdvanced exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_advanced.txt"
-command! HelpmeDiffMerge exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_merge_diff.txt"
-command! HelpmeCoding exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_coding.txt"
-command! HelpmeClosures exe "HelpMe " .. g:dotvim .. "/helpme_files/python_closures.txt"
-command! HelpmeDebug exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_debug.txt"
-command! HelpmeVimspector exe "HelpMe " .. g:dotvim .. "/helpme_files/vim_vimspector.txt"
-
-# vim-replica stuff
-# ----------------------------------
-g:replica_console_position = "L"
-g:replica_display_range  = false
-g:replica_console_width = &columns / 2
-# g:replica_python_options = "-Xfrozen_modules=off"
-g:replica_jupyter_console_options = {
-  python: " --config ~/.jupyter/jupyter_console_config.py"}
-nmap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
-# g:writegood_compiler = "vale"
-# g:writegood_options = "--config=$HOME/vale.ini"
-
-# Outline. <F8> is overriden by vimspector
-nnoremap <silent> <F8> <Plug>OutlineToggle
-
-
-# Bunch of commands
-# -----------------------
-augroup remove_trailing_whitespaces
-  autocmd!
-  autocmd BufWritePre * {
-    if !&binary
-      myfunctions.TrimWhitespace()
+    if g:os == "Darwin"
+      augroup CloseQuickTime
+        autocmd!
+        autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
+      augroup END
     endif
-  }
-augroup END
 
-# git add -u && git commit -m "."
-command! GitCommitDot myfunctions.CommitDot()
-command! GitPushDot myfunctions.PushDot()
-# Merge and diff
-command! -nargs=? Diff myfunctions.Diff(<q-args>)
-nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
-nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
-nnoremap <expr> gn &diff ? ']c' : 'gn'
-nnoremap <expr> gp &diff ? '[c' : 'gp'
-# nnoremap gn &diff ? 'lib.NextChange()' : 'gn'
-# nnoremap gp &diff ? 'lib.PrevChange()' : 'gp'
+    # Manim commands
+    # To make docs go to manim/docs and run make html. Be sure that all the
+    # sphinx
+    # extensions packages are installed.
+    # TODO Make it working with Windows
 
-command! ColorsToggle myfunctions.ColorsToggle()
+    # command ManimDocs silent :!open -a safari.app
+    #             \ ~/Documents/manimce-latest/index.html
 
-# Utils commands
-command! -nargs=1 -complete=command -range Redir
-      \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
+    command ManimNew :enew | :0read ~/.manim/new_manim.txt
+    command ManimHelpVMobjs exe "HelpMe " .. g:dotvim ..
+          \ "/helpme_files/manim_vmobjects.txt"
+    command ManimHelpTex exe "HelpMe " .. g:dotvim ..
+          \ "/helpme_files/manim_tex.txt"
+    command ManimHelpUpdaters exe "HelpMe " .. g:dotvim ..
+          \ "/helpme_files/manim_updaters.txt"
+    command ManimHelpTransform exe "HelpMe " .. g:dotvim
+          \ .. "/helpme_files/manim_transform.txt"
 
-# Example: :HH 62, execute the 62 element of :history
-command! -nargs=1 HH execute histget("cmd", <args>)
+
+    # HelpMe files for my poor memory
+    command! HelpmeBasic exe "HelpMe " .. g:dotvim
+      \ "/helpme_files/vim_basic.txt"
+    command! HelpmeScript exe "HelpMe "\ g:dotvim
+      \ "/helpme_files/vim_scripting.txt"
+    command! HelpmeGlobal exe "HelpMe "\ g:dotvim
+      \ "/helpme_files/vim_global.txt"
+    command! HelpmeExCommands exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_excommands.txt"
+    command! HelpmeSubstitute exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_substitute.txt"
+    command! HelpmeUnitTests exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_unit_tests.txt"
+    command! HelpmeAdvanced exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_advanced.txt"
+    command! HelpmeDiffMerge exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_merge_diff.txt"
+    command! HelpmeCoding exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_coding.txt"
+    command! HelpmeClosures exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/python_closures.txt"
+    command! HelpmeDebug exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_debug.txt"
+    command! HelpmeVimspector exe "HelpMe " \ g:dotvim
+      \ "/helpme_files/vim_vimspector.txt"
+
+    # vim-replica stuff
+    # ----------------------------------
+    g:replica_console_position = "L"
+    g:replica_display_range  = false
+    g:replica_console_width = &columns / 2
+    # g:replica_python_options = "-Xfrozen_modules=off"
+    g:replica_jupyter_console_options = {
+      python: " --config ~/.jupyter/jupyter_console_config.py"}
+    nmap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
+    # g:writegood_compiler = "vale"
+    # g:writegood_options = "--config=$HOME/vale.ini"
+
+    # Outline. <F8> is overriden by vimspector
+    nnoremap <silent> <F8> <Plug>OutlineToggle
+
+
+    # Bunch of commands
+    # -----------------------
+    augroup remove_trailing_whitespaces
+      autocmd!
+      autocmd BufWritePre * {
+        if !&binary
+          myfunctions.TrimWhitespace()
+        endif
+      }
+    augroup END
+
+    # git add -u && git commit -m "."
+    command! GitCommitDot myfunctions.CommitDot()
+    command! GitPushDot myfunctions.PushDot()
+    # Merge and diff
+    command! -nargs=? Diff myfunctions.Diff(<q-args>)
+    nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
+    nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
+    nnoremap <expr> gn &diff ? ']c' : 'gn'
+    nnoremap <expr> gp &diff ? '[c' : 'gp'
+    # nnoremap gn &diff ? 'lib.NextChange()' : 'gn'
+    # nnoremap gp &diff ? 'lib.PrevChange()' : 'gp'
+
+    command! ColorsToggle myfunctions.ColorsToggle()
+
+    # Utils commands
+    command! -nargs=1 -complete=command -range Redir
+          \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
+
+    # Example: :HH 62, execute the 62 element of :history
+    command! -nargs=1 HH execute histget("cmd", <args>)
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
