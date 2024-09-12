@@ -6,6 +6,51 @@ else
   g:os = substitute(system('uname'), '\n', '', '')
 endif
 
+# For WSL conditionals
+def IsWSL(): bool
+  if has("unix")
+    if filereadable("/proc/version") # avoid error on Android
+      var lines = readfile("/proc/version")
+      if lines[0] =~ "microsoft"
+        return true
+      endif
+    endif
+  endif
+  return false
+enddef
+
+
+if has('unix') && IsWSL()
+  def WslPut(above: bool = false)
+     var copied_text = system('powershell.exe Get-Clipboard')->substitute("\r", '', 'g' )
+     setreg("p", copied_text)
+     if !above
+       norm! "pp
+     else
+       norm! "pP
+     endif
+  enddef
+
+  noremap "pp <scriptcmd>WslPut()<cr>
+  noremap "pP <scriptcmd>WslPut(true)<cr>
+endif
+
+# Set clipboard on WSL
+# if has('unix') && IsWSL()
+#   g:clipboard = {
+#     name: 'WslClipboard',
+#     copy: {
+#       '+': 'clip.exe',
+#       '*': 'clip.exe',
+#     },
+#     paste: {
+#       '+': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+#       '*': 'powershell.exe -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+#     },
+#     'cache_enabled': 0,
+#   }
+# endif
+
 if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
@@ -77,7 +122,7 @@ set encoding=utf-8
 set langmenu=en_US.UTF-8
 # set langmap=ö[,ä]
 set belloff=all
-set clipboard^=unnamed,unnamedplus
+# set clipboard^=unnamed,unnamedplus
 set termguicolors
 set autoread
 set number
@@ -262,6 +307,7 @@ Plug 'girishji/easyjump.vim'
 # Plug 'Donaldttt/fuzzyy'
 Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
+Plug 'qadzek/link.vim'
 plug#end()
 # filetype plugin indent on
 syntax on
@@ -295,17 +341,16 @@ g:everforest_background = 'medium'
 colorscheme everforest
 
 # vim-poptools
-#
 g:poptools_config = {}
-# g:poptools_config['preview_recent_files'] = false
-# g:poptools_config['preview_buffer'] = false
+g:poptools_config['preview_recent_files'] = false
+g:poptools_config['preview_buffer'] = false
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr><cr>
 nnoremap <c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>f <cmd>PoptoolsFindFile<cr>
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
-nnoremap <c-p>b <cmd>PoptoolsBuffers<cr>
+nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
 nnoremap <c-p>h <cmd>PoptoolsCmdHistory<cr>
 xnoremap <c-p>h <esc>PoptoolsCmdHistory<cr>
 nnoremap <c-p>d <cmd>PoptoolsFindDir<cr>
@@ -392,6 +437,10 @@ augroup END
 
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
+g:vim9_conversion_aid_fix_asl = true
+
+# vim-outline
+g:outline_autoclose = false
 
 # vim-open-recent
 # g:vim_open_change_dir = true
