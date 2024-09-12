@@ -6,7 +6,7 @@ enddef
 
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
-def SearchAndReplace()
+def SearchAndReplaceInFiles()
   var search = input("String to search: ")
   if empty(search)
     echom ""
@@ -41,25 +41,40 @@ def SearchAndReplace()
     echom $"\n{cmd}"
     # exe cmd
   else
-    var vimgrep_opts = input("\nVimgrep options (default 'gj'): ")
-    if empty(vimgrep_opts)
-      vimgrep_opts = 'gj'
-    endif
-    var substitute_opts = input("\nSubstitute options (default 'gci'): ")
-    if empty(substitute_opts)
-      substitute_opts = 'gci'
-    endif
+    var vimgrep_opts = input("\nVimgrep options: ", 'gj')
+    var substitute_opts = input("\nSubstitute options: ", 'gci')
     var cmd = $'vimgrep /{search}/{vimgrep_opts} **/{pattern}'
     echom $"\n{cmd}"
     exe cmd
     cmd = $'cfdo :%s/{search}/{replacement}/{substitute_opts}'
     echom $"\n{cmd}"
     exe cmd
-    # Then do :wall to save all or :cfdo u to undo.
+    echom "Type ':wall' to save all or ':cfdo' u to undo"
   endif
 enddef
 
+def SearchAndReplace()
+  var range = input("Range: ", '%')
+  # TODO the following does not work
+  # if range !~ "\v(\d+,\d+|%)"
+  #   return
+  # endif
+  var search = input("\nString to search: ")
+  if empty(search)
+    echom ""
+    return
+  endif
+  var replacement = input("\nReplacement: ")
+  if empty(replacement)
+    echom ""
+    return
+  endif
+  var opts = input("\nSubstitute options: ", 'gci')
+  exe $':{range}s/{search}/{replacement}/{opts}'
+enddef
+
 command! SearchAndReplace SearchAndReplace()
+command! SearchAndReplaceInFiles SearchAndReplaceInFiles()
 
 # Remove trailing white spaces at the end of each line and at the end of the file
 export def TrimWhitespace()
