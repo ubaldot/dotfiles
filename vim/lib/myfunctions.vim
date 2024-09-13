@@ -10,6 +10,7 @@ var match_id = 0
 export def SearchAndReplaceInFiles()
   augroup SEARCH_HI | autocmd!
     autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | match_id = matchadd('IncSearch', getcmdline()) | redraw!
+    autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id = 0 | endif
   augroup END
   var search = input("String to search: ")
   if empty(search)
@@ -18,14 +19,12 @@ export def SearchAndReplaceInFiles()
     augroup! SEARCH_HI
     return
   endif
+  autocmd! SEARCH_HI
+  augroup! SEARCH_HI
   if match_id > 0
     matchdelete(match_id)
   endif
   var replacement = input("\nReplacement: ")
-  if empty(replacement)
-    echom ""
-    return
-  endif
   var pattern = input("\nIn files: ")
   if empty(pattern)
     echom ""
@@ -65,6 +64,7 @@ enddef
 def SearchAndReplace()
   augroup SEARCH_HI | autocmd!
     autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | match_id = matchadd('IncSearch', getcmdline()) | redraw!
+    autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id = 0 | endif
   augroup END
   var search = input("String to search: ")
   if empty(search)
@@ -73,16 +73,15 @@ def SearchAndReplace()
     augroup! SEARCH_HI
     return
   endif
+  autocmd! SEARCH_HI
+  augroup! SEARCH_HI
   if match_id > 0
     matchdelete(match_id)
   endif
+  # redraw!
   var replacement = input("\nReplacement: ")
-  if empty(replacement)
-    echom ""
-    return
-  endif
   var opts = input("\nSubstitute options: ", 'gci')
-  var range = input("Range: ", '%')
+  var range = input("\nRange: ", '%')
   echom "\n"
   echom range
   if range !~ "\(%\)"
