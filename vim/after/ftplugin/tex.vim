@@ -6,7 +6,7 @@ compiler latexmk
 def LatexRender(filename: string = '')
   var target_file = empty(filename) ? expand('%') : filename
   silent! exe "!pkill zathura"
-  var open_file_cmd = $'zathura -x "set-zoom 3.0" {fnamemodify(target_file, ':r')}.pdf'
+  var open_file_cmd = $'{g:start_cmd} {fnamemodify(target_file, ':r')}.pdf'
   # Build and open
   &l:makeprg = $'xelatex {fnamemodify(target_file, ':r')}.tex'
   silent make
@@ -20,3 +20,11 @@ def LatexFiles(A: any, L: any, P: any): list<string>
 enddef
 
 command! -nargs=? -buffer -complete=customlist,LatexFiles LatexRender LatexRender(<f-args>)
+
+export def g:GetExtremes(): list<number>
+    # var lower = search('\v\s*(\\begin\{\w+\}|\\end\{\w+\})', 'ncbW')
+    var lower = search('\v\s*\\begin\{\w+\}', 'ncbW')
+    var environment = getline(lower)->matchstr('{\w\+}')
+    var upper = search($'\s*\\end{environment}', 'ncW')
+    return [lower, upper]
+enddef
