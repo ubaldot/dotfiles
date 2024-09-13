@@ -51,6 +51,11 @@ var lspServers = [
         args: clangd_args,
         debug: true,
     },
+    {
+        name: 'texlab',
+        filetype: ['tex'],
+        path: 'texlab',
+    },
 ]
 
 autocmd VimEnter * g:LspAddServer(lspServers)

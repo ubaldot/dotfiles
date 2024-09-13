@@ -6,11 +6,20 @@ enddef
 
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
+var match_id = 0
 export def SearchAndReplaceInFiles()
+  augroup SEARCH_HI | autocmd!
+    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | match_id = matchadd('IncSearch', getcmdline()) | redraw!
+  augroup END
   var search = input("String to search: ")
   if empty(search)
     echom ""
+    autocmd! SEARCH_HI
+    augroup! SEARCH_HI
     return
+  endif
+  if match_id > 0
+    matchdelete(match_id)
   endif
   var replacement = input("\nReplacement: ")
   if empty(replacement)
@@ -53,29 +62,39 @@ export def SearchAndReplaceInFiles()
   endif
 enddef
 
-# def SearchAndReplace()
-#   var search = input("String to search: ")
-#   if empty(search)
-#     echom ""
-#     return
-#   endif
-#   var replacement = input("\nReplacement: ")
-#   if empty(replacement)
-#     echom ""
-#     return
-#   endif
-#   var opts = input("\nSubstitute options: ", 'gci')
-#   var range = input("Range: ", '%')
-  # echom "\n"
-  # echom range
-  # if range !~ "\(%\)"
-  #   echom "  NOK"
-  # else
-  #   echom "  OK"
-  # endif
-#   exe $':{range}s/{search}/{replacement}/{opts}'
-# enddef
+def SearchAndReplace()
+  augroup SEARCH_HI | autocmd!
+    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | match_id = matchadd('IncSearch', getcmdline()) | redraw!
+  augroup END
+  var search = input("String to search: ")
+  if empty(search)
+    echom ""
+    autocmd! SEARCH_HI
+    augroup! SEARCH_HI
+    return
+  endif
+  if match_id > 0
+    matchdelete(match_id)
+  endif
+  var replacement = input("\nReplacement: ")
+  if empty(replacement)
+    echom ""
+    return
+  endif
+  var opts = input("\nSubstitute options: ", 'gci')
+  var range = input("Range: ", '%')
+  echom "\n"
+  echom range
+  if range !~ "\(%\)"
+    echom "  NOK"
+  else
+    echom "  OK"
+  endif
+  exe $':{range}s/{search}/{replacement}/{opts}'
+enddef
 
+command SearchAndReplace SearchAndReplace()
+command SearchAndReplaceInFiles SearchAndReplaceInFiles()
 
 export def TrimWhitespace()
   var currwin = winsaveview()
