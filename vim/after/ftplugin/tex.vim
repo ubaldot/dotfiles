@@ -25,7 +25,7 @@ def LatexRenderMac(filename: string = '')
   silent make
 
   # Open pdf
-  var open_file_cmd = $'open -a Skim.app {fnamemodify(target_file, ':r')}.pdf'
+  var open_file_cmd = $'open -a Skim.app {fnamemodify(target_file, ':p:r')}.pdf'
   silent exe $"!{open_file_cmd}"
 enddef
 
