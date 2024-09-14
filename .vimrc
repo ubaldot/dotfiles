@@ -225,7 +225,8 @@ nnoremap <c-j> <c-w>j
 
 # search
 nnoremap <c-s> :%s/
-nnoremap <c-s><c-s> <scriptcmd>myfunctions.SearchAndReplaceInFiles()<cr>
+nnoremap <c-s><c-f> <scriptcmd>myfunctions.SearchAndReplaceInFiles()<cr>
+nnoremap <c-s><c-s> <scriptcmd>myfunctions.SearchAndReplace()<cr>
 
 # Wipe buffer
 # nnoremap bw <cmd>bw!<cr>

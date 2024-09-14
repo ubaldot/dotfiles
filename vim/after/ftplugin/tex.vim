@@ -33,9 +33,11 @@ def GetExtremes(): list<number>
   # more
   if begin_env !=# end_env
     # search UP
+    cursor(line('.'), 1)
     var curr_begin_line = search($'^\s*\\begin{end_env}', 'nbW')
     # If cannot find UP, search DOWN
     if curr_begin_line == 0
+      cursor(line('.'), 1)
       end_line = search($'^\s*\\end{begin_env}', 'cnW')
     else
       begin_line = curr_begin_line
