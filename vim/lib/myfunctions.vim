@@ -7,9 +7,9 @@ enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
 var match_id = 0
-export def SearchAndReplaceInFiles()
+def SearchReplacement(): list<string>
   augroup SEARCH_HI | autocmd!
-    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | match_id = matchadd('IncSearch', getcmdline()) | redraw!
+    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | search(getcmdline(), 'w') | match_id = matchadd('IncSearch', getcmdline()) | redraw!
     autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id = 0 | endif
   augroup END
   var search = input("String to search: ")
@@ -17,7 +17,7 @@ export def SearchAndReplaceInFiles()
     echom ""
     autocmd! SEARCH_HI
     augroup! SEARCH_HI
-    return
+    return []
   endif
   autocmd! SEARCH_HI
   augroup! SEARCH_HI
@@ -25,12 +25,19 @@ export def SearchAndReplaceInFiles()
     matchdelete(match_id)
   endif
   var replacement = input("\nReplacement: ")
-  var pattern = input("\nIn files: ")
+  return [search, replacement]
+enddef
+
+export def SearchAndReplaceInFiles()
+  var search_replacement = SearchReplacement()
+  var search = search_replacement[0]
+  var replacement = search_replacement[1]
+  var pattern = input("\nIn files: ", '*.')
   if empty(pattern)
     echom ""
     return
   endif
-  var risky = input("\nRisky: ")
+  var risky = input("\nRisky: ", 'n')
   if risky !~ "[yes]" &&  risky !~ "[no]"
     echom "Adios!"
     return
@@ -61,39 +68,21 @@ export def SearchAndReplaceInFiles()
   endif
 enddef
 
-def SearchAndReplace()
-  augroup SEARCH_HI | autocmd!
-    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | match_id = matchadd('IncSearch', getcmdline()) | redraw!
-    autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id = 0 | endif
-  augroup END
-  var search = input("String to search: ")
-  if empty(search)
-    echom ""
-    autocmd! SEARCH_HI
-    augroup! SEARCH_HI
-    return
-  endif
-  autocmd! SEARCH_HI
-  augroup! SEARCH_HI
-  if match_id > 0
-    matchdelete(match_id)
-  endif
-  # redraw!
-  var replacement = input("\nReplacement: ")
+export def SearchAndReplace()
+  var search_replacement = SearchReplacement()
+  var search = search_replacement[0]
+  var replacement = search_replacement[1]
   var opts = input("\nSubstitute options: ", 'gci')
   var range = input("\nRange: ", '%')
   echom "\n"
   echom range
-  if range !~ "\(%\)"
-    echom "  NOK"
-  else
-    echom "  OK"
-  endif
+  # if range !~ "\(%\)"
+  #   echom "  NOK"
+  # else
+  #   echom "  OK"
+  # endif
   exe $':{range}s/{search}/{replacement}/{opts}'
 enddef
-
-command SearchAndReplace SearchAndReplace()
-command SearchAndReplaceInFiles SearchAndReplaceInFiles()
 
 export def TrimWhitespace()
   var currwin = winsaveview()
