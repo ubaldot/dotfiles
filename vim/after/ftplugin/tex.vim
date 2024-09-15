@@ -14,6 +14,12 @@ if !empty(getcompletion('latexmk', 'compiler'))
 endif
 
 def LatexRenderCommon(filename: string = ''): string
+  # Return a string which is the pdf filename, e.g. example.pdf
+  if !executable('latexmk')
+    echoerr "'latexmk' not installed!"
+    return ''
+  endif
+
   # Save the .tex file, compile, and return the .pdf name (fullpath)
   write
   var target_file = empty(filename) ? expand('%:p') : fnamemodify(filename, ':p')
@@ -23,24 +29,33 @@ def LatexRenderCommon(filename: string = ''): string
     exe $'cd {fnamemodify(target_file, ':h')}'
   endif
   # Build and open
-  # &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
   &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {target_file}'
   silent make
   return $'{fnamemodify(target_file, ':r')}.pdf'
 enddef
 
+def ResizeAndMovePdf(job: any, exit_status: number, pdf_name: string)
+  echom 'exit_status: ' .. exit_status
+  if exit_status == 0
+    echom "YEAH"
+    # Resize and position windows
+    if executable('xdotool')
+      job_start($'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 100')
+    endif
+  else
+    echom "Cannot resize pdf window! Do you have 'xdotool' installed?"
+  endif
+enddef
+
 def LatexRenderAndOpenLinux()
-  if executable('zathura')
-    echoerr "zathura not installed!"
+  if !executable('zathura')
+    echoerr "'zathura' not installed!"
     return
   endif
-  var open_file_cmd = $'zathura {LatexRenderCommon()}'
-  job_start(open_file_cmd)
+  var pdf_name = LatexRenderCommon()
+  var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura {pdf_name}'
+  job_start(open_file_cmd, {exit_cb: (job, exit_status) => ResizeAndMovePdf(job, exit_status, pdf_name)})
 
-  # Resize and position windows
-  if executable('xdotool')
-    #
-  endif
 enddef
 
 def LatexRenderAndOpenMac(filename: string = '')
@@ -48,11 +63,6 @@ def LatexRenderAndOpenMac(filename: string = '')
   var open_file_cmd = $'open -a Skim.app {LatexRenderCommon()}'
   silent exe $"!{open_file_cmd}"
 enddef
-
-def LatexFilesCompletion(A: any, L: any, P: any): list<string>
-  return getcompletion('\w*.tex', 'file')
-enddef
-command! -nargs=? -buffer -complete=customlist,LatexFilesCompletion LatexRender LatexRender(<f-args>)
 
 def GetExtremes(): list<number>
   # var begin_line = search('\v\s*(\\begin\{\w+\}|\\end\{\w+\})', 'ncbW')
@@ -140,12 +150,28 @@ def ForwardSyncMac()
   exe $"silent !/Applications/Skim.app/Contents/SharedSupport/displayline {line('.')} {expand('%:p:r')}.pdf"
 enddef
 
+def ForwardSyncLinux()
+    var filename_root = expand('%:p:r')
+    var forward_sync_cmd = $'zathura --config-dir=$HOME/.config/zathura --synctex-forward {line('.')}:1:{filename_root}.tex {filename_root}.pdf'
+    job_start(forward_sync_cmd)
+    var win_id = system($'xdotool search --onlyvisible --name {filename_root}.pdf')
+    exe $'!xdotool windowactivate {filename_root}'
+enddef
+
 var ForwardSync: func
 var LatexRender: func
 if g:os == "Darwin"
   ForwardSync = ForwardSyncMac
   LatexRender = LatexRenderAndOpenMac
+elseif g:os ==# "Linux" || g:os ==# 'WSL'
+  ForwardSync = ForwardSyncLinux
+  LatexRender = LatexRenderAndOpenLinux
 endif
+
+def LatexFilesCompletion(A: any, L: any, P: any): list<string>
+  return getcompletion('\w*.tex', 'file')
+enddef
+command! -nargs=? -buffer -complete=customlist,LatexFilesCompletion LatexRender LatexRender(<f-args>)
 
 nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 nnoremap <buffer> <F5> <Scriptcmd>ForwardSync()<cr>
