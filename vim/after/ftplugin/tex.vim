@@ -2,24 +2,31 @@ vim9script
 
 # It requires:
 # MacOs: Skim.app
-# Linux: zathura
-# latexmk. It builds with xelatex.
+# Linux: zathura, xdotool
+# latexmk.
 
+# TODO: add checks for xdtools
 # Compiler sprcify
 compiler latexmk
 sign define ChangeEnv linehl=CursorLine
+var latex_engine = 'xelatex'
 
 def LatexRenderLinux(filename: string = '')
   if executable('zathura')
     echoerr "zathura not installed!"
     return
   endif
+  write
   var target_file = empty(filename) ? expand('%') : filename
+
+  # You must be in the same file directory
+  if getcwd() != fnamemodify(target_file, ':h')
+    exe $'cd {fnamemodify(target_file, ':h')}'
+  endif
   silent! exe "!pkill zathura"
   var open_file_cmd = $'zathura {fnamemodify(target_file, ':r')}.pdf'
   # Build and open
-  &l:makeprg = $'xelatex -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':p:r')}.tex'
-  # &l:makeprg = $'latexmk -pdf -xelatex="xelatex -synctex=1 -interaction=nonstopmode" {fnamemodify(target_file, ':p:r')}.tex'
+  &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
   silent make
   job_start(open_file_cmd)
 enddef
@@ -33,7 +40,7 @@ def LatexRenderMac(filename: string = '')
     exe $'cd {fnamemodify(target_file, ':h')}'
   endif
   # Build
-  &l:makeprg = $'latexmk -pdf -xelatex -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
+  &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
   silent make
 
   # Open Skim
