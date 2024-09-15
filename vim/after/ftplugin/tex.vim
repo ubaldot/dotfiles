@@ -101,13 +101,15 @@ enddef
 def HighlightOuterEnvironment()
   var cur_pos = getcurpos()
   var extremes = GetExtremes()
-  exe $"sign place 1 line={extremes[0]} name=ChangeEnv buffer={bufnr('%')}"
-  exe $"sign place 2 line={extremes[1]} name=ChangeEnv buffer={bufnr('%')}"
-  redraw
-  setpos('.', cur_pos)
-  sleep 600m
-  exe $"sign unplace 1 buffer={bufnr('%')}"
-  exe $"sign unplace 2 buffer={bufnr('%')}"
+  if extremes[0] != 0 && extremes[1] != 0
+    exe $"sign place 1 line={extremes[0]} name=ChangeEnv buffer={bufnr('%')}"
+    exe $"sign place 2 line={extremes[1]} name=ChangeEnv buffer={bufnr('%')}"
+    redraw
+    setpos('.', cur_pos)
+    sleep 600m
+    exe $"sign unplace 1 buffer={bufnr('%')}"
+    exe $"sign unplace 2 buffer={bufnr('%')}"
+  endif
 enddef
 
 def ChangeEnvironment()
@@ -147,4 +149,4 @@ nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 nnoremap <buffer> <F5> <Scriptcmd>ForwardSync()<cr>
 nnoremap <buffer> <c-l>c <Scriptcmd>ChangeEnvironment()<cr>
 nnoremap <buffer> <c-l>d <Scriptcmd>DeleteEnvironment()<cr>
-nnoremap <buffer> <c-l> <Scriptcmd>HighlightOuterEnvironment()<cr>
+nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
