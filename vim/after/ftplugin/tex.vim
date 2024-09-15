@@ -5,46 +5,45 @@ vim9script
 # Linux: zathura, xdotool
 # latexmk.
 
-# TODO: add checks for xdtools
+# TODO: add checks for xodtools
 # Compiler sprcify
 compiler latexmk
 sign define ChangeEnv linehl=CursorLine
 var latex_engine = 'xelatex'
 
-def LatexRenderLinux(filename: string = '')
+def LatexRenderCommon(filename: string = ''): string
+  # Save the .tex file, compile, and return the .pdf name (fullpath)
+  write
+  var target_file = empty(filename) ? expand('%:p') : fnamemodify(filename, ':p')
+
+  # You must be in the same source file directory to build
+  if getcwd() != fnamemodify(target_file, ':h')
+    exe $'cd {fnamemodify(target_file, ':h')}'
+  endif
+  # Build and open
+  # &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
+  &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {target_file}'
+  silent make
+  return $'{fnamemodify(target_file, ':r')}.pdf'
+enddef
+
+def LatexRenderAndOpenLinux()
   if executable('zathura')
     echoerr "zathura not installed!"
     return
   endif
-  write
-  var target_file = empty(filename) ? expand('%') : filename
-
-  # You must be in the same file directory
-  if getcwd() != fnamemodify(target_file, ':h')
-    exe $'cd {fnamemodify(target_file, ':h')}'
-  endif
-  silent! exe "!pkill zathura"
-  var open_file_cmd = $'zathura {fnamemodify(target_file, ':r')}.pdf'
-  # Build and open
-  &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
-  silent make
+  var open_file_cmd = $'zathura {LatexRenderCommon()}'
   job_start(open_file_cmd)
+
+  # Resize and position windows
+  if executable('xdotool')
+    #
+  endif
 enddef
 
-def LatexRenderMac(filename: string = '')
-  write
-  var target_file = empty(filename) ? expand('%:p') : filename
-
-  # You must be in the same file directory
-  if getcwd() != fnamemodify(target_file, ':h')
-    exe $'cd {fnamemodify(target_file, ':h')}'
-  endif
-  # Build
-  &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
-  silent make
-
+def LatexRenderAndOpenMac(filename: string = '')
   # Open Skim
-  var open_file_cmd = $'open -a Skim.app {fnamemodify(target_file, ':r')}.pdf'
+  var open_file_cmd = $'open -a Skim.app {LatexRenderCommon()}'
   silent exe $"!{open_file_cmd}"
 enddef
 
@@ -141,7 +140,7 @@ var ForwardSync: func
 var LatexRender: func
 if g:os == "Darwin"
   ForwardSync = ForwardSyncMac
-  LatexRender = LatexRenderMac
+  LatexRender = LatexRenderAndOpenMac
 endif
 
 nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
