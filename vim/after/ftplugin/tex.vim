@@ -1,5 +1,11 @@
 vim9script
 
+# It requires:
+# MacOs: Skim.app
+# Linux: zathura
+# latexmk. It builds with xelatex.
+
+# Compiler sprcify
 compiler latexmk
 sign define ChangeEnv linehl=CursorLine
 
@@ -13,19 +19,25 @@ def LatexRenderLinux(filename: string = '')
   var open_file_cmd = $'zathura {fnamemodify(target_file, ':r')}.pdf'
   # Build and open
   &l:makeprg = $'xelatex -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':p:r')}.tex'
+  # &l:makeprg = $'latexmk -pdf -xelatex="xelatex -synctex=1 -interaction=nonstopmode" {fnamemodify(target_file, ':p:r')}.tex'
   silent make
   job_start(open_file_cmd)
 enddef
 
 def LatexRenderMac(filename: string = '')
-  var target_file = empty(filename) ? expand('%') : filename
+  write
+  var target_file = empty(filename) ? expand('%:p') : filename
+
+  # You must be in the same file directory
+  if getcwd() != fnamemodify(target_file, ':h')
+    exe $'cd {fnamemodify(target_file, ':h')}'
+  endif
   # Build
-  silent exe '!osascript -e ''tell application "Skim" to quit'''
-  &l:makeprg = $'xelatex -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
+  &l:makeprg = $'latexmk -pdf -xelatex -synctex=1 -interaction=nonstopmode {fnamemodify(target_file, ':r')}.tex'
   silent make
 
-  # Open pdf
-  var open_file_cmd = $'open -a Skim.app {fnamemodify(target_file, ':p:r')}.pdf'
+  # Open Skim
+  var open_file_cmd = $'open -a Skim.app {fnamemodify(target_file, ':r')}.pdf'
   silent exe $"!{open_file_cmd}"
 enddef
 
@@ -81,10 +93,12 @@ def DeleteEnvironment()
 enddef
 
 def HighlightOuterEnvironment()
+  var cur_pos = getcurpos()
   var extremes = GetExtremes()
   exe $"sign place 1 line={extremes[0]} name=ChangeEnv buffer={bufnr('%')}"
   exe $"sign place 2 line={extremes[1]} name=ChangeEnv buffer={bufnr('%')}"
   redraw
+  setpos('.', cur_pos)
   sleep 600m
   exe $"sign unplace 1 buffer={bufnr('%')}"
   exe $"sign unplace 2 buffer={bufnr('%')}"
@@ -95,7 +109,8 @@ def ChangeEnvironment()
   var extremes = GetExtremes()
   cursor(extremes[0], 1)
   norm! ^
-  exe $"sign place 1 line={line('.')} name=ChangeEnv buffer={bufnr('%')}"
+  exe $"sign place 1 line={extremes[0]} name=ChangeEnv buffer={bufnr('%')}"
+  exe $"sign place 2 line={extremes[1]} name=ChangeEnv buffer={bufnr('%')}"
   redraw
 
   # Replacement
@@ -107,6 +122,7 @@ def ChangeEnvironment()
     endfor
   endif
   exe $"sign unplace 1 buffer={bufnr('%')}"
+  exe $"sign unplace 2 buffer={bufnr('%')}"
 enddef
 
 # Synctex stuff
@@ -123,6 +139,6 @@ endif
 
 nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 nnoremap <buffer> <F5> <Scriptcmd>ForwardSync()<cr>
-nnoremap <buffer> <c-l><c-l> <Scriptcmd>ChangeEnvironment()<cr>
-nnoremap <buffer> <c-k><c-k> <Scriptcmd>DeleteEnvironment()<cr>
-nnoremap <buffer> <c-j><c-j> <Scriptcmd>HighlightOuterEnvironment()<cr>
+nnoremap <buffer> <c-l>c <Scriptcmd>ChangeEnvironment()<cr>
+nnoremap <buffer> <c-l>d <Scriptcmd>DeleteEnvironment()<cr>
+nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
