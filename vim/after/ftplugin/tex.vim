@@ -120,7 +120,7 @@ def ChangeEnvironment()
   redraw
 
   # Replacement
-  var new_env = input('enter new environment: ')
+  var new_env = input('Enter new environment name: ')
   if !empty(new_env)
     var old_env = getline(extremes[0])->matchstr('{\zs\w\+\ze}')
     for line_nr in extremes
@@ -147,4 +147,4 @@ nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 nnoremap <buffer> <F5> <Scriptcmd>ForwardSync()<cr>
 nnoremap <buffer> <c-l>c <Scriptcmd>ChangeEnvironment()<cr>
 nnoremap <buffer> <c-l>d <Scriptcmd>DeleteEnvironment()<cr>
-nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
+nnoremap <buffer> <c-l> <Scriptcmd>HighlightOuterEnvironment()<cr>
