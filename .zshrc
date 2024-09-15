@@ -97,7 +97,7 @@ alias docker-om='docker run -it --rm -v "$HOME:$HOME" -e "HOME=$HOME" -w "$PWD" 
 # fzf stuff
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 source ~/.fzf-git/fzf-git.sh
-export FZF_COMPLETION_TRIGGER=''
+# export FZF_COMPLETION_TRIGGER=''
 
 # LaTeX
 export PATH="/usr/local/texlive/2024/bin/universal-darwin/:$PATH"

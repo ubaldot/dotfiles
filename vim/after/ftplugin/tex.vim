@@ -1,15 +1,17 @@
 vim9script
 
 # It requires:
+# All: latexmk
 # MacOs: Skim.app
 # Linux: zathura, xdotool
-# latexmk.
 
-# TODO: add checks for xodtools
-# Compiler sprcify
-compiler latexmk
 sign define ChangeEnv linehl=CursorLine
 var latex_engine = 'xelatex'
+
+# This is only needed for the 'errorformat'
+if index(getcompletion('', 'compiler'), 'latexmk') != -1
+  compiler latexmk
+endif
 
 def LatexRenderCommon(filename: string = ''): string
   # Save the .tex file, compile, and return the .pdf name (fullpath)
