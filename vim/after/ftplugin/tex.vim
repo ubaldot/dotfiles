@@ -9,7 +9,7 @@ sign define ChangeEnv linehl=CursorLine
 var latex_engine = 'xelatex'
 
 # This is only needed for the 'errorformat'
-if index(getcompletion('', 'compiler'), 'latexmk') != -1
+if !empty(getcompletion('latexmk', 'compiler'))
   compiler latexmk
 endif
 
