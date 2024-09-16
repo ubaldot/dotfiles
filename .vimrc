@@ -113,7 +113,7 @@ augroup END
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
-# set langmap=ö[,ä]
+set langmap=ö[,ä]
 set belloff=all
 set clipboard^=unnamed,unnamedplus
 set termguicolors
