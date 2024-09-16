@@ -13,7 +13,7 @@ if !empty(getcompletion('latexmk', 'compiler'))
   compiler latexmk
 endif
 
-def LatexRenderCommon(filename: string = ''): string
+def LatexBuildCommon(filename: string = ''): string
   # Return a string which is the pdf filename, e.g. example.pdf
   if !executable('latexmk')
     echoerr "'latexmk' not installed!"
@@ -34,33 +34,42 @@ def LatexRenderCommon(filename: string = ''): string
   return $'{fnamemodify(target_file, ':r')}.pdf'
 enddef
 
-def ResizeAndMovePdf(job: any, exit_status: number, pdf_name: string)
-  echom 'exit_status: ' .. exit_status
-  if exit_status == 0
-    echom "YEAH"
-    # Resize and position windows
-    if executable('xdotool')
-      job_start($'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 100')
-    endif
-  else
-    echom "Cannot resize pdf window! Do you have 'xdotool' installed?"
-  endif
-enddef
+# def ResizeAndMovePdf(job: any, exit_status: number, pdf_name: string)
+#   echom 'exit_status: ' .. exit_status
+#   if exit_status == 0
+#     echom "YEAH"
+#   else
+#     # Resize and position windows
+#     if executable('xdotool')
+#       var move_and_resize_cmd = $'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 0'
+#       silent system(move_and_resize_cmd)
+#     else
+#       echom "Cannot resize pdf window! Do you have 'xdotool' installed?"
+#   endif
+# enddef
 
 def LatexRenderAndOpenLinux()
   if !executable('zathura')
     echoerr "'zathura' not installed!"
     return
   endif
-  var pdf_name = LatexRenderCommon()
-  var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura {pdf_name}'
-  job_start(open_file_cmd, {exit_cb: (job, exit_status) => ResizeAndMovePdf(job, exit_status, pdf_name)})
 
+  var pdf_name = LatexBuildCommon()
+
+  # If a zathura window with the pdf_name is already open don't fork the
+  # process
+  silent! exe "!pkill zathura"
+  # var fork = empty(system($'xdotool search --onlyvisible --name {pdf_name}')) ? '--fork' : ''
+  var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura --fork {pdf_name}'
+  var move_and_resize_cmd = $'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 0'
+  silent system(open_file_cmd)
+  sleep 100m
+  silent system(move_and_resize_cmd)
 enddef
 
 def LatexRenderAndOpenMac(filename: string = '')
   # Open Skim
-  var open_file_cmd = $'open -a Skim.app {LatexRenderCommon()}'
+  var open_file_cmd = $'open -a Skim.app {LatexBuildCommon()}'
   silent exe $"!{open_file_cmd}"
 enddef
 
@@ -154,8 +163,9 @@ def ForwardSyncLinux()
     var filename_root = expand('%:p:r')
     var forward_sync_cmd = $'zathura --config-dir=$HOME/.config/zathura --synctex-forward {line('.')}:1:{filename_root}.tex {filename_root}.pdf'
     job_start(forward_sync_cmd)
-    var win_id = system($'xdotool search --onlyvisible --name {filename_root}.pdf')
-    exe $'!xdotool windowactivate {filename_root}'
+    var win_activate_cmd = $'xdotool search --onlyvisible --name {filename_root}.pdf windowactivate'
+    # exe $'!xdotool windowactivate {filename_root}'
+    system(win_activate_cmd)
 enddef
 
 var ForwardSync: func
