@@ -1,12 +1,49 @@
 vim9script
 
+# TODO:
+# - xdotool don't work on WSL
+# - Backwards search don't work with zathura and WSL
+# - pywinctl does not work on WSL
+
 # It requires:
-# All: latexmk
+# All: latexmk, python3 and pywinget
 # MacOs: Skim.app
 # Linux: zathura, xdotool
+#
+# OS detection
+var os = ''
+def IsWSL(): bool
+  if has("unix")
+    if filereadable("/proc/version") # avoid error on Android
+      var lines = readfile("/proc/version")
+      if lines[0] =~ "microsoft"
+        return true
+      endif
+    endif
+  endif
+  return false
+enddef
+
+if has("win64") || has("win32") || has("win16")
+  os = "Windows"
+elseif IsWSL()
+  os = 'WSL'
+else
+  os = substitute(system('uname'), '\n', '', '')
+endif
 
 sign define ChangeEnv linehl=CursorLine
+
+# global vars
 var latex_engine = 'xelatex'
+
+def Echoerr(msg: string)
+  echohl ErrorMsg | echom $'{msg}' | echohl None
+enddef
+
+def Echowarn(msg: string)
+  echohl WarningMsg | echom $'{msg}' | echohl None
+enddef
 
 # This is only needed for the 'errorformat'
 if !empty(getcompletion('latexmk', 'compiler'))
@@ -21,7 +58,7 @@ def LatexBuildCommon(filename: string = ''): string
   endif
 
   # Save the .tex file, compile, and return the .pdf name (fullpath)
-  write
+  silent write
   var target_file = empty(filename) ? expand('%:p') : fnamemodify(filename, ':p')
 
   # You must be in the same source file directory to build
@@ -29,12 +66,34 @@ def LatexBuildCommon(filename: string = ''): string
     exe $'cd {fnamemodify(target_file, ':h')}'
   endif
   # Build and open
-  &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -interaction=nonstopmode {target_file}'
+  &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -quiet -interaction=nonstopmode {target_file}'
   silent make
   return $'{fnamemodify(target_file, ':r')}.pdf'
 enddef
 
-def LatexRenderAndOpenLinux()
+def MoveAndResizeWin(pdf_name: string)
+  # TODO: to finish
+  g:pdf_name = pdf_name
+  python3 << END
+import pywinctl as gw
+import vim
+
+title = vim.eval('g:pdf_name')
+#
+windows = gw.getWindowsWithTitle(title)
+if windows:
+  window = windows[0]
+  window.resizeTo(800, 600)
+  window.moveTo(100, 100)
+  window.activate()
+  else:
+  print(f"No window found with title: {title}")
+END
+  unlet g:pdf_name
+enddef
+
+
+def LatexRenderLinux()
   if !executable('zathura')
     echoerr "'zathura' not installed!"
     return
@@ -47,12 +106,34 @@ def LatexRenderAndOpenLinux()
   # process.
   # silent! exe "!pkill zathura"
   # var fork = empty(system($'xdotool search --onlyvisible --name {pdf_name}')) ? '--fork' : ''
-  var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura --fork {pdf_name}'
+  var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura/zathurarc --fork {pdf_name}'
   var move_and_resize_cmd = $'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 0'
   silent job_start(open_file_cmd)
+  # TODO This wait is a bit ugly. Consider using a callback instead.
   sleep 100m
   silent job_start(move_and_resize_cmd)
 enddef
+
+
+def LatexRenderWin()
+  # if !executable('sumatra')
+  #   echoerr $"'zathura' not installed!"
+  #   return
+  # endif
+
+  var pdf_name = LatexBuildCommon()
+  # TODO opencmd
+
+  if has('python3')
+    silent exe '!python3 -c "import pywinctl"'
+    if !v:shell_error
+      silent MoveAndResizeWin(pdf_name)
+    endif
+  else
+    Echowarn("You need Vim with 'python3' support and 'pywinctl' package installed")
+  endif
+enddef
+
 
 def LatexRenderAndOpenMac(filename: string = '')
   # Open Skim
@@ -88,7 +169,6 @@ enddef
 
 def JumpTag()
   var extremes = GetExtremes()
-  echom extremes
   if line('.') == extremes[1]
     cursor(extremes[0], 1)
     norm! ^
@@ -120,7 +200,7 @@ def HighlightOuterEnvironment()
   endif
 enddef
 
-def ChangeEnvironment()
+def ChangeLatexEnvironment()
   # Positioning
   var extremes = GetExtremes()
   cursor(extremes[0], 1)
@@ -147,35 +227,43 @@ def ForwardSyncMac()
 enddef
 
 def ForwardSyncLinux()
-    var filename_root = expand('%:p:r')
-    var forward_sync_cmd = $'zathura --config-dir=$HOME/.config/zathura --synctex-forward {line('.')}:1:{filename_root}.tex {filename_root}.pdf'
-    job_start(forward_sync_cmd)
-    var win_activate_cmd = $'xdotool search --onlyvisible --name {filename_root}.pdf windowactivate'
-    # exe $'!xdotool windowactivate {filename_root}'
-    system(win_activate_cmd)
+  var filename_root = expand('%:p:r')
+  var forward_sync_cmd = $'zathura --config-dir=$HOME/.config/zathurarc --synctex-forward {line('.')}:1:{filename_root}.tex {filename_root}.pdf'
+  job_start(forward_sync_cmd)
+  var win_activate_cmd = $'xdotool search --onlyvisible --name {filename_root}.pdf windowactivate'
+  # exe $'!xdotool windowactivate {filename_root}'
+  system(win_activate_cmd)
+enddef
+
+def ForwardSyncWin()
+   # TODO : ALL!
 enddef
 
 var ForwardSync: func
 var LatexRender: func
-if g:os == "Darwin"
+if os == "Darwin"
   ForwardSync = ForwardSyncMac
   LatexRender = LatexRenderAndOpenMac
-elseif g:os ==# "Linux" || g:os ==# 'WSL'
+elseif os ==# "Linux" || os ==# 'WSL'
   ForwardSync = ForwardSyncLinux
-  LatexRender = LatexRenderAndOpenLinux
+  LatexRender = LatexRenderLinux
+else
+  ForwardSync = ForwardSyncWin
+  LatexRender = LatexRenderWin
 endif
 
 
-def g:BackwardSearch(line: number, filename: string)
+def g:BackwardSync(line: number, filename: string)
   # exe $'edit {filename}'
   exe $'buffer {bufnr(fnamemodify(filename, ':.'))}'
   cursor(line, 1)
-  echom $"filename: {filename}, line: {line}"
+  # echom $"filename: {filename}, line: {line}"
   exe $"sign place 4 line={line} name=ChangeEnv buffer={bufnr(fnamemodify(filename, ':.'))}"
   autocmd! InsertEnter * ++once exe $"sign unplace 4 buffer={bufnr('%')}"
 enddef
 
 
+# ----------- Outline fetaure
 def LatexOutline()
   var outline = getline(1, '$') ->filter('v:val =~ "^\\\\\\w*section"')
     ->map((idx, val) => substitute(val, '\\section{\(.*\)}', '\1', ''))
@@ -223,10 +311,10 @@ def Outline2Buffer(bufname: string)
   var line = getline(line('.'))
   if line =~ '^\S'
     line = printf('\\section{%s}', line)
-    # echom line
+  # echom line
   elseif line =~ '^  '
     line = printf('\\subsection{%s}', trim(line))
-    # echom line
+  # echom line
   elseif line =~ '^    '
     line = printf('\\subsubsection{%s}', trim(line))
     # echom line
@@ -245,6 +333,6 @@ command! -buffer LatexOutline silent LatexOutline()
 
 nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 nnoremap <buffer> <F5> <Scriptcmd>ForwardSync()<cr>
-nnoremap <buffer> <c-l>c <Scriptcmd>ChangeEnvironment()<cr>
+nnoremap <buffer> <c-l>c <Scriptcmd>ChangeLatexEnvironment()<cr>
 nnoremap <buffer> <c-l>d <Scriptcmd>DeleteEnvironment()<cr>
 nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
