@@ -58,7 +58,7 @@ def LatexBuildCommon(filename: string = ''): string
   endif
 
   # Save the .tex file, compile, and return the .pdf name (fullpath)
-  silent write
+  write
   var target_file = empty(filename) ? expand('%:p') : fnamemodify(filename, ':p')
 
   # You must be in the same source file directory to build
@@ -67,7 +67,7 @@ def LatexBuildCommon(filename: string = ''): string
   endif
   # Build and open
   &l:makeprg = $'latexmk -pdf -{latex_engine} -synctex=1 -quiet -interaction=nonstopmode {target_file}'
-  silent make
+  make!
   return $'{fnamemodify(target_file, ':r')}.pdf'
 enddef
 
@@ -123,15 +123,17 @@ def LatexRenderWin()
 
   var pdf_name = LatexBuildCommon()
   # TODO opencmd
+  var open_file_cmd = $'SumatraPDF.exe -reuse-instance {pdf_name}'
+  system($'powershell -NoProfile -ExecutionPolicy Bypass -Command "{open_file_cmd}"')
 
-  if has('python3')
-    silent exe '!python3 -c "import pywinctl"'
-    if !v:shell_error
-      silent MoveAndResizeWin(pdf_name)
-    endif
-  else
-    Echowarn("You need Vim with 'python3' support and 'pywinctl' package installed")
-  endif
+  # if has('python3')
+  #   silent exe '!python3 -c "import pywinctl"'
+  #   if !v:shell_error
+  #     silent MoveAndResizeWin(pdf_name)
+  #   endif
+  # else
+  #   Echowarn("You need Vim with 'python3' support and 'pywinctl' package installed")
+  # endif
 enddef
 
 
@@ -236,7 +238,8 @@ def ForwardSyncLinux()
 enddef
 
 def ForwardSyncWin()
-   # TODO : ALL!
+  var filename = expand('%:p')
+  system($'SumatraPDF.exe -reuse-instance -forward-search {filename} {line(".")}')
 enddef
 
 var ForwardSync: func
@@ -254,7 +257,7 @@ endif
 
 
 def g:BackwardSync(line: number, filename: string)
-  # exe $'edit {filename}'
+  silent exe $"sign unplace 4 buffer={bufnr('%')}"
   exe $'buffer {bufnr(fnamemodify(filename, ':.'))}'
   cursor(line, 1)
   # echom $"filename: {filename}, line: {line}"
