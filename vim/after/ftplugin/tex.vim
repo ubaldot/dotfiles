@@ -98,14 +98,13 @@ enddef
 #   unlet g:pdf_name
 # enddef
 
-def LatexRenderLinux()
+def LatexRenderLinux(filename: string = '')
   if !executable('zathura')
     echoerr "'zathura' not installed!"
     return
   endif
 
-  var pdf_name = LatexBuildCommon()
-  # TODO: at the moment we close and re-open zathura window.
+  var pdf_name = LatexBuildCommon(filename)
   if executable('xdotool')
     silent system($'xdotool search --onlyvisible --name {pdf_name} windowclose')
   else
@@ -122,18 +121,16 @@ def LatexRenderLinux()
   endif
 enddef
 
-def LatexRenderWin()
-  # if !executable('sumatra')
-  #   echoerr $"'zathura' not installed!"
-  #   return
-  # endif
+def LatexRenderWin(filename: string = '')
+  if !executable('SumatraPDF')
+    echoerr $"'SumatraPDF.exe' not found!"
+    return
+  endif
 
-  var pdf_name = LatexBuildCommon()
-  # TODO opencmd
+  var pdf_name = LatexBuildCommon(filename)
   var open_file_cmd = $'SumatraPDF.exe {pdf_name}'
   system($'powershell -NoProfile -ExecutionPolicy Bypass -Command "{open_file_cmd}"')
 enddef
-
 
 def LatexRenderAndOpenMac(filename: string = '')
   # Open Skim
@@ -178,7 +175,7 @@ def JumpTag()
   endif
 enddef
 
-def DeleteEnvironment()
+def DeleteLatexEnvironment()
   var extremes = GetExtremes()
   HighlightOuterEnvironment()
   # Obs! The number of line changes after the first deletion
@@ -222,41 +219,35 @@ def ChangeLatexEnvironment()
 enddef
 
 # Synctex stuff
-def ForwardSyncMac()
-  exe $"silent !/Applications/Skim.app/Contents/SharedSupport/displayline {line('.')} {expand('%:p:r')}.pdf"
-enddef
-
-def ForwardSyncLinux()
+def ForwardSearch()
   var filename_root = expand('%:p:r')
+  if os ==# "Darwin"
+    exe $"silent !/Applications/Skim.app/Contents/SharedSupport/displayline {line('.')} {filename_root}.pdf"
+  elseif os ==# 'Windows'
+    system($'SumatraPDF.exe -forward-search {filename_root}.tex {line(".")} {filename_root}.pdf')
+  else
   var forward_sync_cmd = $'zathura --config-dir=$HOME/.config/zathurarc --synctex-forward {line('.')}:1:{filename_root}.tex {filename_root}.pdf'
-  job_start(forward_sync_cmd)
-  var win_activate_cmd = $'xdotool search --onlyvisible --name {filename_root}.pdf windowactivate'
-  # exe $'!xdotool windowactivate {filename_root}'
-  system(win_activate_cmd)
+    job_start(forward_sync_cmd)
+  endif
 enddef
 
-def ForwardSyncWin()
-  var filename = expand('%:p')
-  system($'SumatraPDF.exe -forward-search {filename} {line(".")}')
-enddef
-
-var ForwardSync: func
 var LatexRender: func
 if os == "Darwin"
-  ForwardSync = ForwardSyncMac
   LatexRender = LatexRenderAndOpenMac
 elseif os ==# "Linux" || os ==# 'WSL'
-  ForwardSync = ForwardSyncLinux
   LatexRender = LatexRenderLinux
 else
-  ForwardSync = ForwardSyncWin
   LatexRender = LatexRenderWin
 endif
 
-
-def g:BackwardSync(line: number, filename: string)
-  # For the backwards sync in SumatraPDF use the following:
-  # gvim --servername gvim --remote-send ":call BackwardSync(%l, '%f')<cr>"
+def g:BackwardSearch(line: number, filename: string)
+  # For backward search in zathura you need a ~/.config/zathura/zathurarc file
+  # with  the following lines:
+  # set synctex true
+  # set synctex-editor-command "gvim --servername gvim --remote-send ':call BackwardSearch(%{line}, %{input})<cr>'"
+  #
+  # For backward search in SumatraPDF use the following:
+  # gvim --servername gvim --remote-send ":call BackwardSearch(%l, '%f')<cr>"
   # echom $"filename: {filename}, line: {line}"
   silent exe $"sign unplace 4 buffer={bufnr('%')}"
   exe $'buffer {bufnr(fnamemodify(filename, ':.'))}'
@@ -266,7 +257,15 @@ def g:BackwardSync(line: number, filename: string)
 enddef
 
 # ----------- Outline fetaure
-def LatexOutline()
+def LatexOutlineToggle()
+  if bufwinid('Outline') != -1
+    win_execute(bufwinid('Outline'), 'close')
+  else
+    LatexOutlineOpen()
+  endif
+enddef
+
+def LatexOutlineOpen()
   var outline = getline(1, '$') ->filter('v:val =~ "^\\\\\\w*section"')
     ->map((idx, val) => substitute(val, '\\section{\(.*\)}', '\1', ''))
     ->map((idx, val) => substitute(val, '\\subsection{\(.*\)}', '  \1', ''))
@@ -309,32 +308,64 @@ def LatexOutline()
   endif
 enddef
 
+def CountIndexInstances(line: string): number
+  var linenr = 99
+  var num_occurrences = 0
+  while linenr != 0
+    linenr = search(line, 'bW')
+    num_occurrences = num_occurrences + 1
+  endwhile
+  return num_occurrences
+enddef
+
 def Outline2Buffer(bufname: string)
   var line = getline(line('.'))
+  var num_jumps = 1
   if line =~ '^\S'
+    num_jumps = CountIndexInstances(line)
     line = printf('\\section{%s}', line)
   # echom line
   elseif line =~ '^  '
+    num_jumps = CountIndexInstances(line)
     line = printf('\\subsection{%s}', trim(line))
   # echom line
   elseif line =~ '^    '
+    num_jumps = CountIndexInstances(line)
     line = printf('\\subsubsection{%s}', trim(line))
     # echom line
   endif
   close
   exe $'buffer {bufname}'
-  search(line, 'cw')
+
+  # Start from top and search
+  cursor(1, 1)
+  for ii in range(num_jumps)
+    search(line, 'W')
+  endfor
 enddef
 
-# API
+# Commands and mappings
 def LatexFilesCompletion(A: any, L: any, P: any): list<string>
   return getcompletion('\w*.tex', 'file')
 enddef
 command! -nargs=? -buffer -complete=customlist,LatexFilesCompletion LatexRender LatexRender(<f-args>)
-command! -buffer LatexOutline silent LatexOutline()
+command! -buffer LatexOutlineToggle LatexOutlineToggle()
 
 nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
-nnoremap <buffer> <F5> <Scriptcmd>ForwardSync()<cr>
-nnoremap <buffer> <c-l>c <Scriptcmd>ChangeLatexEnvironment()<cr>
-nnoremap <buffer> <c-l>d <Scriptcmd>DeleteEnvironment()<cr>
-nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
+# noremap <unique> <script> <buffer> <Plug>ForwardSearch <Scriptcmd>ForwardSearch()<cr>
+# noremap <unique> <script> <buffer> <Plug>ChangeLatexEnvironment <Scriptcmd>ChangeLatexEnvironment()<cr>
+# noremap <unique> <script> <buffer> <Plug>DeleteLatexEnvironment <Scriptcmd>DeleteLatexEnvironment()<cr>
+# noremap <unique> <script> <buffer> <Plug>HighlightOuterEnvironment <Scriptcmd>HighlightOuterEnvironment()<cr>
+
+if !hasmapto('<Plug>ForwardSearch')
+  nnoremap <buffer> <F5> <Scriptcmd>ForwardSearch()<cr>
+endif
+if !hasmapto('<Plug>ChangeLatexEnvironment')
+  nnoremap <buffer> <c-l>c <Scriptcmd>ChangeLatexEnvironment()<cr>
+endif
+if !hasmapto('<Plug>DeleteLatexEnvironment')
+  nnoremap <buffer> <c-l>d <Scriptcmd>DeleteLatexEnvironment()<cr>
+endif
+if !hasmapto('<Plug>HighlightOuterEnvironment')
+  nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
+endif
