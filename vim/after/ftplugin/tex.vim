@@ -3,12 +3,17 @@ vim9script
 # TODO:
 # - xdotool don't work on WSL
 # - Backwards search don't work with zathura and WSL
-# - pywinctl does not work on WSL
+# - pywinctl does not work on WSL OLD
+# - SumatraPDF backwards search
+# - "Press enter to continue" on Windows (but in general)
+# - Ouline keep track of the number of jumps
+# - Sumatra-3-4-1 need to be renamed to SumatraPDF.exe.
+# - Use commands rather than mappings
 
 # It requires:
 # All: latexmk, python3 and pywinget
 # MacOs: Skim.app
-# Linux: zathura, xdotool
+# Linux: zathura, xdotool (optional)
 #
 # OS detection
 var os = ''
@@ -71,27 +76,26 @@ def LatexBuildCommon(filename: string = ''): string
   return $'{fnamemodify(target_file, ':r')}.pdf'
 enddef
 
-def MoveAndResizeWin(pdf_name: string)
-  # TODO: to finish
-  g:pdf_name = pdf_name
-  python3 << END
-import pywinctl as gw
-import vim
+# def MoveAndResizeWin(pdf_name: string)
+#   # TODO: to finish
+#   g:pdf_name = pdf_name
+#   python3 << END
+# import pywinctl as gw
+# import vim
 
-title = vim.eval('g:pdf_name')
-#
-windows = gw.getWindowsWithTitle(title)
-if windows:
-  window = windows[0]
-  window.resizeTo(800, 600)
-  window.moveTo(100, 100)
-  window.activate()
-  else:
-  print(f"No window found with title: {title}")
-END
-  unlet g:pdf_name
-enddef
-
+# title = vim.eval('g:pdf_name')
+# #
+# windows = gw.getWindowsWithTitle(title)
+# if windows:
+#   window = windows[0]
+#   window.resizeTo(800, 600)
+#   window.moveTo(100, 100)
+#   window.activate()
+#   else:
+#   print(f"No window found with title: {title}")
+# END
+#   unlet g:pdf_name
+# enddef
 
 def LatexRenderLinux()
   if !executable('zathura')
@@ -101,19 +105,21 @@ def LatexRenderLinux()
 
   var pdf_name = LatexBuildCommon()
   # TODO: at the moment we close and re-open zathura window.
-  silent system($'xdotool search --onlyvisible --name {pdf_name} windowclose')
-  # In case the xdotool windowsclose does not work, just kill the zathura
-  # process.
-  # silent! exe "!pkill zathura"
+  if executable('xdotool')
+    silent system($'xdotool search --onlyvisible --name {pdf_name} windowclose')
+  else
+    silent! exe "!pkill zathura"
+  endif
   # var fork = empty(system($'xdotool search --onlyvisible --name {pdf_name}')) ? '--fork' : ''
   var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura/zathurarc --fork {pdf_name}'
   var move_and_resize_cmd = $'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 0'
   silent job_start(open_file_cmd)
   # TODO This wait is a bit ugly. Consider using a callback instead.
-  sleep 100m
-  silent job_start(move_and_resize_cmd)
+  if executable('xdotool')
+    sleep 100m
+    silent job_start(move_and_resize_cmd)
+  endif
 enddef
-
 
 def LatexRenderWin()
   # if !executable('sumatra')
@@ -125,15 +131,6 @@ def LatexRenderWin()
   # TODO opencmd
   var open_file_cmd = $'SumatraPDF.exe -reuse-instance {pdf_name}'
   system($'powershell -NoProfile -ExecutionPolicy Bypass -Command "{open_file_cmd}"')
-
-  # if has('python3')
-  #   silent exe '!python3 -c "import pywinctl"'
-  #   if !v:shell_error
-  #     silent MoveAndResizeWin(pdf_name)
-  #   endif
-  # else
-  #   Echowarn("You need Vim with 'python3' support and 'pywinctl' package installed")
-  # endif
 enddef
 
 
@@ -264,7 +261,6 @@ def g:BackwardSync(line: number, filename: string)
   exe $"sign place 4 line={line} name=ChangeEnv buffer={bufnr(fnamemodify(filename, ':.'))}"
   autocmd! InsertEnter * ++once exe $"sign unplace 4 buffer={bufnr('%')}"
 enddef
-
 
 # ----------- Outline fetaure
 def LatexOutline()
