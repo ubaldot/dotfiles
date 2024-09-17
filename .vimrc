@@ -55,7 +55,7 @@ else
   g:null_device = "/dev/null"
   g:dotvim = $HOME .. "/.vim"
   &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-  if g:os == 'Linux'
+  if g:os == 'Linux' || g:os == 'WSL'
     &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
   else
     &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
