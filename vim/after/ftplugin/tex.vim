@@ -41,6 +41,7 @@ sign define ChangeEnv linehl=CursorLine
 
 # global vars
 var latex_engine = 'xelatex'
+latex_engine = 'pdflatex'
 
 def Echoerr(msg: string)
   echohl ErrorMsg | echom $'{msg}' | echohl None
@@ -129,7 +130,7 @@ def LatexRenderWin()
 
   var pdf_name = LatexBuildCommon()
   # TODO opencmd
-  var open_file_cmd = $'SumatraPDF.exe -reuse-instance {pdf_name}'
+  var open_file_cmd = $'SumatraPDF.exe {pdf_name}'
   system($'powershell -NoProfile -ExecutionPolicy Bypass -Command "{open_file_cmd}"')
 enddef
 
@@ -236,7 +237,7 @@ enddef
 
 def ForwardSyncWin()
   var filename = expand('%:p')
-  system($'SumatraPDF.exe -reuse-instance -forward-search {filename} {line(".")}')
+  system($'SumatraPDF.exe -forward-search {filename} {line(".")}')
 enddef
 
 var ForwardSync: func
@@ -254,10 +255,12 @@ endif
 
 
 def g:BackwardSync(line: number, filename: string)
+  # For the backwards sync in SumatraPDF use the following:
+  # gvim --servername gvim --remote-send ":call BackwardSync(%l, '%f')<cr>"
+  # echom $"filename: {filename}, line: {line}"
   silent exe $"sign unplace 4 buffer={bufnr('%')}"
   exe $'buffer {bufnr(fnamemodify(filename, ':.'))}'
   cursor(line, 1)
-  # echom $"filename: {filename}, line: {line}"
   exe $"sign place 4 line={line} name=ChangeEnv buffer={bufnr(fnamemodify(filename, ':.'))}"
   autocmd! InsertEnter * ++once exe $"sign unplace 4 buffer={bufnr('%')}"
 enddef
