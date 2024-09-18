@@ -113,11 +113,11 @@ def LatexRenderLinux(filename: string = '')
   # var fork = empty(system($'xdotool search --onlyvisible --name {pdf_name}')) ? '--fork' : ''
   var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura/zathurarc --fork {pdf_name}'
   var move_and_resize_cmd = $'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 0'
-  silent job_start(open_file_cmd)
+  job_start(open_file_cmd)
   # TODO This wait is a bit ugly. Consider using a callback instead.
   if executable('xdotool')
     sleep 100m
-    silent job_start(move_and_resize_cmd)
+    job_start(move_and_resize_cmd)
   endif
 enddef
 
@@ -129,7 +129,9 @@ def LatexRenderWin(filename: string = '')
 
   var pdf_name = LatexBuildCommon(filename)
   var open_file_cmd = $'SumatraPDF.exe {pdf_name}'
-  system($'powershell -NoProfile -ExecutionPolicy Bypass -Command "{open_file_cmd}"')
+  # system($'powershell -NoProfile -ExecutionPolicy Bypass -Command "{open_file_cmd}"')
+  job_start($'powershell -NoProfile -ExecutionPolicy Bypass -Command "{open_file_cmd}"')
+  redraw
 enddef
 
 def LatexRenderAndOpenMac(filename: string = '')
