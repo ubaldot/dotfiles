@@ -583,6 +583,12 @@ command! -nargs=1 -complete=command -range Redir
 # Example: :HH 62, execute the 62 element of :history
 command! -nargs=1 HH execute histget("cmd", <args>)
 
+
+# Activity log
+#
+command! LLogNewDay exe $'!echo "=={strftime('= %b %d %y ==========')}" >> ~/work_log.txt'
+command! LLogOpen exe 'edit ~/work_log.txt'
+
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
 # YouTube.
