@@ -285,10 +285,10 @@ enddef
 
 command! Prettify Prettify()
 
-augroup PRETTIER
-  autocmd!
-  autocmd BufWritePre * if index(prettier_supported_filetypes, &filetype) != -1 | Prettify() | endif
-augroup END
+# augroup PRETTIER
+#   autocmd!
+#   autocmd BufWritePre * if index(prettier_supported_filetypes, &filetype) != -1 | Prettify() | endif
+# augroup END
 # --------------------------------------------------------------
 
 export def QuitWindow()
