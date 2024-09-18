@@ -114,6 +114,7 @@ def LatexRenderLinux(filename: string = '')
   var open_file_cmd = $'zathura --config-dir=$HOME/.config/zathura/zathurarc --fork {pdf_name}'
   var move_and_resize_cmd = $'xdotool search --onlyvisible --name {pdf_name} windowsize 900 1000 windowmove 1000 0'
   job_start(open_file_cmd)
+  redraw
   # TODO This wait is a bit ugly. Consider using a callback instead.
   if executable('xdotool')
     sleep 100m
@@ -352,6 +353,7 @@ def LatexFilesCompletion(A: any, L: any, P: any): list<string>
 enddef
 command! -nargs=? -buffer -complete=customlist,LatexFilesCompletion LatexRender LatexRender(<f-args>)
 command! -buffer LatexOutlineToggle LatexOutlineToggle()
+nnoremap <buffer> <F8> <ScriptCmd>LatexOutlineToggle()<cr>
 
 nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 # noremap <unique> <script> <buffer> <Plug>ForwardSearch <Scriptcmd>ForwardSearch()<cr>
