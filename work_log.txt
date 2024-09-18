@@ -1,0 +1,13 @@
+Legend:
+------
+* Done that day
++ Done in a later day
+- Decided against on a later day
+
+=== Sep 18 24 ==========
+* Updated SumatraPDF docs
+* Added redraw in ./vim/after/tex.vim
+* Done this
+* Updated ~/dotfiles/push_*/pull_* to include this file
+- Add "which folder" in PoptoolsFindFile
+-
