@@ -15,6 +15,13 @@ vim9script
 # MacOs: Skim.app
 # Linux: zathura, xdotool (optional)
 #
+
+# global vars
+var latex_engine = 'xelatex'
+if exists('g:textools_config')
+  latex_engine = get('g:textools_config', 'latex_engine', 'xelatex') : 'xelatex'
+endif
+
 # OS detection
 var os = ''
 def IsWSL(): bool
@@ -38,10 +45,6 @@ else
 endif
 
 sign define ChangeEnv linehl=CursorLine
-
-# global vars
-var latex_engine = 'xelatex'
-latex_engine = 'pdflatex'
 
 def Echoerr(msg: string)
   echohl ErrorMsg | echom $'{msg}' | echohl None
@@ -124,7 +127,7 @@ enddef
 
 def LatexRenderWin(filename: string = '')
   if !executable('SumatraPDF')
-    echoerr $"'SumatraPDF.exe' not found!"
+    echoerr "'SumatraPDF.exe' not found! Is SumatraPDF executable renamed as 'SumatraPDF.exe'?"
     return
   endif
 
@@ -137,6 +140,10 @@ enddef
 
 def LatexRenderAndOpenMac(filename: string = '')
   # Open Skim
+  if !exists(glob('/Applications/Skim.app'))
+    echoerr "'Skim.app not found!'"
+    return
+  endif
   var open_file_cmd = $'open -a Skim.app {LatexBuildCommon()}'
   silent exe $"!{open_file_cmd}"
 enddef
