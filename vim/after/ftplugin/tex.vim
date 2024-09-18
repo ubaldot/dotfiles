@@ -279,8 +279,8 @@ def LatexOutlineOpen()
   var outline = getline(1, '$') ->filter('v:val =~ "^\\\\\\w*section"')
     ->map((idx, val) => substitute(val, '\\section{\(.*\)}', '\1', ''))
     ->map((idx, val) => substitute(val, '\\subsection{\(.*\)}', '  \1', ''))
-    ->map((idx, val) => substitute(val, '\\subsection{\(.*\)}', '    \1', ''))
-    ->map((idx, val) => substitute(val, '\\subsection{\(.*\)}', '      \1', ''))
+    ->map((idx, val) => substitute(val, '\\subsubsection{\(.*\)}', '    \1', ''))
+    ->map((idx, val) => substitute(val, '\\subsubsubsection{\(.*\)}', '      \1', ''))
   # echom outline
   win_execute(win_getid(), 'vertical split' )
 
@@ -341,7 +341,11 @@ def Outline2Buffer(bufname: string)
   # echom line
   elseif line =~ '^    '
     num_jumps = CountIndexInstances(line)
-    line = printf('\\subsubsection{%s}', trim(line))
+    line = printf('\\subsubsubsection{%s}', trim(line))
+    # echom line
+  elseif line =~ '^      '
+    num_jumps = CountIndexInstances(line)
+    line = printf('\\subsubsubsection{%s}', trim(line))
     # echom line
   endif
   close
@@ -360,7 +364,6 @@ def LatexFilesCompletion(A: any, L: any, P: any): list<string>
 enddef
 command! -nargs=? -buffer -complete=customlist,LatexFilesCompletion LatexRender LatexRender(<f-args>)
 command! -buffer LatexOutlineToggle LatexOutlineToggle()
-nnoremap <buffer> <F8> <ScriptCmd>LatexOutlineToggle()<cr>
 
 nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 # noremap <unique> <script> <buffer> <Plug>ForwardSearch <Scriptcmd>ForwardSearch()<cr>
@@ -368,15 +371,22 @@ nnoremap <buffer> % <ScriptCmd>JumpTag()<cr>
 # noremap <unique> <script> <buffer> <Plug>DeleteLatexEnvironment <Scriptcmd>DeleteLatexEnvironment()<cr>
 # noremap <unique> <script> <buffer> <Plug>HighlightOuterEnvironment <Scriptcmd>HighlightOuterEnvironment()<cr>
 
-if !hasmapto('<Plug>ForwardSearch')
-  nnoremap <buffer> <F5> <Scriptcmd>ForwardSearch()<cr>
+var use_default_mappings = true
+if exists('g:textools_config')
+  use_default_mappings = get('g:textools_config', 'use_default_mappings', true)
 endif
-if !hasmapto('<Plug>ChangeLatexEnvironment')
-  nnoremap <buffer> <c-l>c <Scriptcmd>ChangeLatexEnvironment()<cr>
-endif
-if !hasmapto('<Plug>DeleteLatexEnvironment')
-  nnoremap <buffer> <c-l>d <Scriptcmd>DeleteLatexEnvironment()<cr>
-endif
-if !hasmapto('<Plug>HighlightOuterEnvironment')
-  nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
+
+if use_default_mappings
+  if !hasmapto('<Plug>ForwardSearch')
+    nnoremap <buffer> <F5> <Scriptcmd>ForwardSearch()<cr>
+  endif
+  if !hasmapto('<Plug>ChangeLatexEnvironment')
+    nnoremap <buffer> <c-l>c <Scriptcmd>ChangeLatexEnvironment()<cr>
+  endif
+  if !hasmapto('<Plug>DeleteLatexEnvironment')
+    nnoremap <buffer> <c-l>d <Scriptcmd>DeleteLatexEnvironment()<cr>
+  endif
+  if !hasmapto('<Plug>HighlightOuterEnvironment')
+    nnoremap <buffer> <c-l>h <Scriptcmd>HighlightOuterEnvironment()<cr>
+  endif
 endif
