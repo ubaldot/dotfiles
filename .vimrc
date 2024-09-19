@@ -24,11 +24,12 @@ endif
 
 if has('unix') && g:os == 'WSL' && !has('+clipboard')
   # Yank
-  augroup WSLYank
-    autocmd!
-    # autocmd TextYankPost * if v:event.operator ==# 'y' | system('clip.exe', @0) | endif
-    autocmd TextYankPost * if v:event.operator ==# 'y' | system('clip.exe', getreg('0')) | endif
-  augroup END
+  if !has('gui_running')
+    augroup WSLYank
+      autocmd!
+      autocmd TextYankPost * if v:event.operator ==# 'y' | system('clip.exe', getreg('0')) | endif
+    augroup END
+  endif
 
   # Paste
   def WslPut(above: bool = false)
