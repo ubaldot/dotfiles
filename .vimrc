@@ -13,6 +13,7 @@ def IsWSL(): bool
   return false
 enddef
 
+
 if has("win64") || has("win32") || has("win16")
   g:os = "Windows"
 elseif IsWSL()
@@ -77,8 +78,14 @@ endif
 import g:dotvim .. "/lib/myfunctions.vim"
 
 # Set cursor
-&t_SI = "\e[6 q"
-&t_EI = "\e[2 q"
+
+if &term =~ '\v(xterm|rxvt|alacritty)'
+  &t_SI = "\e[6 q"
+  &t_EI = "\e[2 q"
+  &t_ti = "\e[6 q\e[?1049h"
+  &t_te = "\e[5 q\e[?1049l"
+endif
+autocmd VimEnter * silent !echo -ne "\e[2 q"
 
 augroup ReloadVimScripts
   autocmd!
@@ -586,7 +593,7 @@ command! -nargs=1 HH execute histget("cmd", <args>)
 
 # Activity log
 #
-command! LLogNewDay exe $'!echo "=={strftime('= %b %d %y ==========')}" >> ~/work_log.txt'
+command! LLogNewDay exe $'!printf "\n=={strftime('= %b %d %y ==========')}" >> ~/work_log.txt'
 command! LLogOpen exe 'edit ~/work_log.txt'
 
 # vip = visual inside paragraph
