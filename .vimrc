@@ -80,13 +80,10 @@ import g:dotvim .. "/lib/myfunctions.vim"
 
 # Set cursor
 
-if &term =~ '\v(xterm|rxvt|alacritty)'
-  &t_SI = "\e[6 q"
-  &t_EI = "\e[2 q"
-  &t_ti = "\e[6 q\e[?1049h"
-  &t_te = "\e[5 q\e[?1049l"
-endif
-autocmd VimEnter * silent !echo -ne "\e[2 q"
+&t_SI = "\e[6 q"
+&t_EI = "\e[2 q"
+# &t_ti = "\e[6 q\e[?1049h"
+# &t_te = "\e[5 q\e[?1049l"
 
 augroup ReloadVimScripts
   autocmd!
@@ -306,6 +303,7 @@ Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 Plug 'ubaldot/vim-extended-view'
 Plug 'ubaldot/vim-poptools'
+Plug 'ubaldot/vim-latex-tools'
 # Plug 'ubaldot/vim-open-recent'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
@@ -315,7 +313,7 @@ Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
 Plug 'qadzek/link.vim'
 plug#end()
-# filetype plugin indent on
+filetype plugin indent on
 syntax on
 
 # Bundled plugins
@@ -353,7 +351,8 @@ g:poptools_config['preview_buffer'] = false
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
-nnoremap <c-p>b <cmd>PoptoolsBuffers<cr>
+nnoremap <c-p><c-p> <cmd>PoptoolsGrepInBuffer<cr>
+nnoremap <c-p>å <cmd>PoptoolsBuffers<cr>
 nnoremap <c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
 nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
@@ -545,9 +544,9 @@ command! HelpmeVimspector exe "HelpMe " \ g:dotvim
 
 # vim-replica stuff
 # ----------------------------------
-g:replica_console_position = "L"
+g:replica_console_position = "J"
 g:replica_display_range  = false
-g:replica_console_width = &columns / 2
+g:replica_console_height = &lines / 6
 # g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
