@@ -15,7 +15,7 @@ cd "$DOTFILES_DIR"
 
 git pull
 # Copy dotfiles
-files=("work_log.txt" "commands.md" ".zshrc" ".zprofile" ".bash_prompt" ".vimrc" ".gvimrc" "pull_dotfiles.sh" "push_dotfiles.sh" "my_css_style.css")
+files=(".zshrc" ".zprofile" ".bash_prompt" ".vimrc" ".gvimrc" "pull_dotfiles.sh" "push_dotfiles.sh" "my_css_style.css")
 for file in "${files[@]}"; do
     # Copy files from ~/dotfiles to ~
         rsync -av "$DOTFILES_DIR/$file" "$HOME_DIR"
