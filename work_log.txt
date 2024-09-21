@@ -1,13 +1,39 @@
 Legend:
 ------
-* Done that day
-+ Done in a later day
-- Decided against on a later day
+* Done
+- To Do
 
 === Sep 18 24 ==========
 * Updated SumatraPDF docs
 * Added redraw in ./vim/after/tex.vim
-* Done this
+* Updated config through dict in vim-tex-tools
+* Created work_log.txt
 * Updated ~/dotfiles/push_*/pull_* to include this file
-- Add "which folder" in PoptoolsFindFile
--
+* Wrote README.md for the vim-tex-tools
+- Poptools: add matchfuzzypos(). Then release vim-latex-tools
+* Improve vim-outline search mechanism (and eventually include LaTeX)
+* Improve title of vim-outline window
+* Added markdown and updated README
+- Update CV
+- Dandan: gross mass estimation situation
+* Double checked ExtendedView.
+
+=== Sep 19 24 ==========
+- Cannot see the cursor when the background is dark
+* Update vim-outline help file.
+* Global dictionaries don't sound like a good idea in vim-outline
+* interactive check added to validation.py
+* Cleaned up manual tests.
+- reproducible builds
+- Variable oil pump model
+* Make a LaTeX plugin
+* Add "which folder" in PoptoolsFindFile
+
+=== Sep 20 24 ==========
+* Fix the Search thing in poptools
+* Test LaTeX thing on MacOs
+* PyWinCtl use from WSL
+- vim-outline dispatch
+- poptools win/linux custom commands for grep
+- Talk to R. for Br1 abroad period..
+* Added trim function to Validation session and added tests
