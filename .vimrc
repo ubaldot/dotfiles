@@ -350,8 +350,8 @@ g:poptools_config['preview_recent_files'] = false
 g:poptools_config['preview_buffer'] = false
 # g:poptools_config['preview_syntax'] = false
 
-nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
-nnoremap <c-p><c-p> <cmd>PoptoolsGrepInBuffer<cr>
+nnoremap <c-p><c-p> <cmd>PoptoolsFindFile<cr>
+nnoremap <c-p> <cmd>PoptoolsGrepInBuffer<cr>
 nnoremap <c-p>å <cmd>PoptoolsBuffers<cr>
 nnoremap <c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
