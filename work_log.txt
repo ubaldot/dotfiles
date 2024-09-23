@@ -34,6 +34,15 @@ Legend:
 * Test LaTeX thing on MacOs
 * PyWinCtl use from WSL
 - vim-outline dispatch
-- poptools win/linux custom commands for grep
+- poptools win/linux allow custom commands for grep
 - Talk to R. for Br1 abroad period..
 * Added trim function to Validation session and added tests
+
+=== Sep 23 24 ==========
+* Create whiteness_level function
+- ExtendedView: Good for 80 columns people.
+* Introduce dataclasses
+* Removed xcorr, acorr_norm, xcorr_norm, _append_correlation_tensor
+* Collapsed xcorr and XCorrelation into a class Xcorrelation with two methods:
+  plot() and whiteness_level() => making it an attribute!
+- Refactored (especially validation module)
