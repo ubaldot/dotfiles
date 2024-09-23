@@ -5,16 +5,19 @@ vim9script
 # This json-like style to encode configs like
 # pylsp.plugins.pycodestyle.enabled = true
 var pylsp_config = {
-    'pylsp': {
-        'plugins': {
-            'pycodestyle': {
-                'enabled': false},
-            'pyflakes': {
-                'enabled': true},
-            'pydocstyle': {
-                'enabled': false},
-            'autopep8': {
-                'enabled': false}, }, }, }
+  'pylsp': {
+    'ConfigurationSources': 'flake8',
+    'plugins': {
+      'pycodestyle': {
+        'enabled': false},
+      'pyflakes': {
+        'enabled': true},
+      'pydocstyle': {
+        'enabled': false},
+      'mccabe': {
+        'enabled': false},
+      'autopep8': {
+        'enabled': false}, }, }, }
 
 
 # clangd env setup
@@ -24,38 +27,38 @@ var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=nev
 
 var is_avap = true
 if is_avap
-    clangd_name = 'avap'
-    var project_root = '/home/yt75534/avap_example'
-    clangd_path = $'{project_root}/clangd_in_docker.sh'
-    clangd_args = []
-    set makeprg=./avap-util/scripts/enter-container.sh\ build_avap\ linux
+  clangd_name = 'avap'
+  var project_root = '/home/yt75534/avap_example'
+  clangd_path = $'{project_root}/clangd_in_docker.sh'
+  clangd_args = []
+  set makeprg=./avap-util/scripts/enter-container.sh\ build_avap\ linux
 
-	# au! BufReadPost quickfix  setlocal modifiable
-	# 	\ | silent exe ':%s/^\/app/\/home\/yt75534\/avap_example/g'
-	# 	\ | setlocal nomodifiable
+  # au! BufReadPost quickfix  setlocal modifiable
+  # 	\ | silent exe ':%s/^\/app/\/home\/yt75534\/avap_example/g'
+  # 	\ | setlocal nomodifiable
 
 endif
 
 var lspServers = [
-    {
-        name: 'pylsp',
-        filetype: ['python'],
-        path: 'pylsp',
-        workspaceConfig: pylsp_config,
-        args: ['--check-parent-process', '-v'],
-    },
-    {
-        name: clangd_name,
-        filetype: ['c', 'cpp'],
-        path: clangd_path,
-        args: clangd_args,
-        debug: true,
-    },
-    {
-        name: 'texlab',
-        filetype: ['tex'],
-        path: 'texlab',
-    },
+  {
+    name: 'pylsp', # This is a dummy name
+    filetype: ['python'],
+    path: 'pylsp', # This is the executable name
+    workspaceConfig: pylsp_config,
+    args: ['--check-parent-process', '-v'],
+  },
+  {
+    name: clangd_name,
+    filetype: ['c', 'cpp'],
+    path: clangd_path,
+    args: clangd_args,
+    debug: true,
+  },
+  {
+    name: 'texlab',
+    filetype: ['tex'],
+    path: 'texlab',
+  },
 ]
 
 autocmd VimEnter * g:LspAddServer(lspServers)
