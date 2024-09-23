@@ -8,6 +8,11 @@ var pylsp_config = {
   'pylsp': {
     'ConfigurationSources': 'flake8',
     'plugins': {
+      'pylsp_mypy': {
+         'enabled': true,
+         'live_mode': true,
+         'strict': false,
+         'exclude': ["tests/*", "manual_tests/*", "docs/*"]},
       'pycodestyle': {
         'enabled': false},
       'pyflakes': {

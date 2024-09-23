@@ -4,7 +4,14 @@ vim9script
 setlocal foldmethod=indent
 
 # Usage: make .
-compiler pytest
+if executable('pytest')
+  compiler pytest
+endif
+
+if exists(':LspHover') != 0
+  &l:keywordprg = ':LspHover'
+endif
+
 
 # Autocmd to format with black.
 augroup BLACK
