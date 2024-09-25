@@ -230,6 +230,7 @@ nnoremap <c-j> <c-w>j
 
 # search
 nnoremap <c-s> :%s/
+xnoremap <c-s> :s/
 command! SearchAndReplace myfunctions.SearchAndReplace()
 command! SearchAndReplaceInFiles myfunctions.SearchAndReplaceInFiles()
 nnoremap <c-s><c-f> <scriptcmd>myfunctions.SearchAndReplaceInFiles()<cr>
@@ -350,10 +351,10 @@ g:poptools_config['preview_recent_files'] = false
 g:poptools_config['preview_buffer'] = false
 # g:poptools_config['preview_syntax'] = false
 
-nnoremap <c-p><c-p> <cmd>PoptoolsFindFile<cr>
-nnoremap <c-p> <cmd>PoptoolsGrepInBuffer<cr>
+nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
+nnoremap <c-g> <cmd>PoptoolsGrepInBuffer<cr>
 nnoremap <c-p>å <cmd>PoptoolsBuffers<cr>
-nnoremap <c-g> <cmd>PoptoolsGrep<cr>
+nnoremap <c-g><c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
 nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
 nnoremap <c-p>h <cmd>PoptoolsCmdHistory<cr>
