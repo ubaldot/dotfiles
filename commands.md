@@ -27,15 +27,21 @@
 
 **Contribute to Vim**
 
-TODO
-
-**tests**
-
-TODO
+- Fork and clone repo
+- Always create a branch! This will be tried to be merged into the main Vim
+- branch
+- You have to build Vim locally: for doing that go to ./src and run make
+- Tests are in testdir
+- To see what happens, open vim --clean and :call test\_whatever to see what
+  happens
+- From shell run make test or something similar (TODO)
 
 **LSP**
 
 If yegapan/lsp does not work, disable vim_conda_activate LSP:
+Set `:LspServer debug on` and `:LspServer restart`
+   Now you can see all the messages and the error messages with `:LspServer
+   debug messages/error`. You can start a LSP with verbosity on.
 
 **clang-tidy**
 
