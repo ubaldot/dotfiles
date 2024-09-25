@@ -24,7 +24,7 @@ Legend:
 * Global dictionaries don't sound like a good idea in vim-outline
 * interactive check added to validation.py
 * Cleaned up manual tests.
-- reproducible builds
+* reproducible builds
 - Variable oil pump model
 * Make a LaTeX plugin
 * Add "which folder" in PoptoolsFindFile
@@ -35,7 +35,7 @@ Legend:
 * PyWinCtl use from WSL
 - vim-outline dispatch
 - poptools win/linux allow custom commands for grep
-- Talk to R. for Br1 abroad period..
+* Talk to R. for Br1 abroad period..
 * Added trim function to Validation session and added tests
 
 === Sep 23 24 ==========
@@ -45,4 +45,24 @@ Legend:
 * Removed xcorr, acorr_norm, xcorr_norm, _append_correlation_tensor
 * Collapsed xcorr and XCorrelation into a class Xcorrelation with two methods:
   plot() and whiteness_level() => making it an attribute!
-- Refactored (especially validation module)
+* Refactored (especially validation module)
+
+=== Sep 24 24 ==========
+* Debug validation module
+* Test for validation module
+- Test for whiteness with weights
+- Raises
+* removed from __future__ import annotations
+- Many deepcopy()
+- Docstrings
+- numerical values of the various correlations: checked!
+- tutorial
+* Evaluation metrics extended
+* Statistics for autocorrelation with lag = 0
+
+=== Sep 25 24 ==========
+* Re-enabled mypy
+* weights imply the number of lags
+* Support for all platforms (win, linux, macos) and all python from 3.10
+  onwards.
+- Release on conda and pip
