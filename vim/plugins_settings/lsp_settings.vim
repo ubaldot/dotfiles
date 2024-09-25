@@ -50,7 +50,8 @@ var lspServers = [
     filetype: ['python'],
     path: 'pylsp', # This is the executable name
     workspaceConfig: pylsp_config,
-    args: ['--check-parent-process', '-v'],
+    debug: true,
+    args: ['--check-parent-process', '-vv'],
   },
   {
     name: clangd_name,
