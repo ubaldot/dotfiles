@@ -55,7 +55,8 @@ Legend:
 * removed from __future__ import annotations
 - Many deepcopy()
 - Docstrings
-- numerical values of the various correlations: checked!
+- Check numerical values of the various correlations and add tests.
+- remove nlags but extract them from local_weight.
 - tutorial
 * Evaluation metrics extended
 * Statistics for autocorrelation with lag = 0
