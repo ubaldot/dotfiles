@@ -67,3 +67,4 @@ Legend:
 * Support for all platforms (win, linux, macos) and all python from 3.10
   onwards.
 - Release on conda and pip
+- add @property to set read-only attributes
