@@ -50,13 +50,11 @@ Legend:
 === Sep 24 24 ==========
 * Debug validation module
 * Test for validation module
-- Test for whiteness with weights
 - Raises
 * removed from __future__ import annotations
 - Many deepcopy()
 - Docstrings
 - Check numerical values of the various correlations and add tests.
-- remove nlags but extract them from local_weight.
 - tutorial
 * Evaluation metrics extended
 * Statistics for autocorrelation with lag = 0
@@ -67,4 +65,19 @@ Legend:
 * Support for all platforms (win, linux, macos) and all python from 3.10
   onwards.
 - Release on conda and pip
-- add @property to set read-only attributes
+
+=== Sep 26 24 ==========
+- add tests for the statistics
+* add tests for various input arguments
+* remove nlags but extract them from local_weight.
+
+* add @property to set read-only attributes
+- R = dmv.XCorrelation("", signal_list[0]["samples"], nlags=23,
+  local_weights=np.ones(10)) in test
+
+=== Sep 27 24 ==========
+* How to detect LaTeX
+* Add input autocorrelation to vs.validation_results
+* Moved correlation pre-commputed values into fixtures
+- Test for whiteness with weights
+- heatmap
