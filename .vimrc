@@ -551,7 +551,9 @@ g:replica_console_height = &lines / 6
 # g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
-nmap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
+nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
+nnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
+xnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
 # g:writegood_compiler = "vale"
 # g:writegood_options = "--config=$HOME/vale.ini"
 
