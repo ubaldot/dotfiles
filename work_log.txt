@@ -91,3 +91,4 @@ Legend:
 - compute_statistics: refactor & test
 - Heatmap
   - test for validate_models()
+* Remove NUM_DECIMAL, explain how to reduce precision in printed values
