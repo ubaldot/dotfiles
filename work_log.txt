@@ -15,7 +15,7 @@ Legend:
 * Improve title of vim-outline window
 * Added markdown and updated README
 - Update CV
-- Dandan: gross mass estimation situation
+* Dandan: gross mass estimation situation
 * Double checked ExtendedView.
 
 === Sep 19 24 ==========
@@ -54,7 +54,6 @@ Legend:
 * removed from __future__ import annotations
 - Many deepcopy()
 - Docstrings
-- Check numerical values of the various correlations and add tests.
 - tutorial
 * Evaluation metrics extended
 * Statistics for autocorrelation with lag = 0
@@ -72,7 +71,7 @@ Legend:
 * remove nlags but extract them from local_weight.
 
 * add @property to set read-only attributes
-- R = dmv.XCorrelation("", signal_list[0]["samples"], nlags=23,
+* R = dmv.XCorrelation("", signal_list[0]["samples"], nlags=23,
   local_weights=np.ones(10)) in test
 
 === Sep 27 24 ==========
@@ -80,4 +79,15 @@ Legend:
 * Add input autocorrelation to vs.validation_results
 * Moved correlation pre-commputed values into fixtures
 - Test for whiteness with weights
-- heatmap
+
+=== Sep 28 24 ==========
+* poptools - can't jump to correct location during GrepInBuffer
+- test poptools Grep for windows command
+- vim-latex-tools video
+- Outline, slam :g to the Outline window
+
+=== Sep 29 24 ==========
+* __repr_
+- compute_statistics: refactor & test
+- Heatmap
+  - test for validate_models()
