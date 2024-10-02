@@ -187,7 +187,7 @@ enddef
 nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # Otherwise I cannot paste in registers
-# xnoremap " <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
+xnoremap " <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
 xnoremap ' <esc><ScriptCmd>myfunctions.Surround("'", "'")<cr>
 xnoremap ( <esc><ScriptCmd>myfunctions.Surround('(', ')')<cr>
 xnoremap [ <esc><ScriptCmd>myfunctions.Surround('[', ']')<cr>
@@ -239,12 +239,10 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
 # search
-nnoremap <c-s> q:i%s/
-xnoremap <c-s> :s/
-command! SearchAndReplace myfunctions.SearchAndReplace()
-command! SearchAndReplaceInFiles myfunctions.SearchAndReplaceInFiles()
-nnoremap <c-s><c-f> <scriptcmd>myfunctions.SearchAndReplaceInFiles()<cr>
-nnoremap <c-s><c-s> <scriptcmd>myfunctions.SearchAndReplace()<cr>
+nnoremap <c-s> <cmd>SearchAndReplace<cr>
+xnoremap <c-s> "ty<cmd>exe $"SearchAndReplace {getreg('t')}"<cr>
+nnoremap <c-s><c-s> <cmd>SearchAndReplaceInFiles<cr>
+xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
 
 # Wipe buffer
 # nnoremap bw <cmd>bw!<cr>
@@ -362,6 +360,9 @@ g:poptools_config['preview_buffer'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
 nnoremap <c-g> <cmd>PoptoolsGrepInBuffer<cr>
+# Copy in the selected text into t register ad leave it. Who cares about the t
+# register?
+xnoremap <c-g> "ty<cmd>exe $"PoptoolsGrepInBuffer {getreg('t')}"<cr>
 nnoremap <c-p>å <cmd>PoptoolsBuffers<cr>
 nnoremap <c-g><c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
