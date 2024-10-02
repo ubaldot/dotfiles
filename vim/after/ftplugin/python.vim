@@ -25,8 +25,10 @@ def Black(textwidth: number)
     # --quiet.
     if executable('black') && &filetype == 'python'
                 var win_view = winsaveview()
+                # var cur_pos = getcursorcharpos()
                 exe $":%!black - --line-length {textwidth}
                       \ --stdin-filename {shellescape(expand("%"))} --quiet"
+                # setcharpos('.', cur_pos)
                 winrestview(win_view)
     else
         echom "black not installed!"
@@ -65,3 +67,72 @@ nnoremap <buffer> <c-n> ?\<self.next_section\><cr>
 
 # For replica
 # nmap <buffer> <c-enter> <Plug>ReplicaSendCell<cr>j
+
+# ========== FOLD ==============
+# Syntax tweaks for Python files
+# Adds folding for classes and functions
+
+&l:foldcolumn = 2
+if &l:foldmethod != 'diff'
+  &l:foldmethod = 'expr'
+endif
+
+def MyFoldExpr(): string
+  # Check if the current line contains 'def' or 'class'
+  var fold_level = '='
+  if getline(v:lnum - 1) =~ '^\s*\(def\|class\)'
+  # if getline(v:lnum ) =~ '^\s*\(def\|class\)'
+    fold_level = '>1'
+  # Check if the next line contains 'def' or 'class' to close the fold
+  # elseif getline(v:lnum + 1) =~ '^\s*\(def\|class\)'
+  elseif getline(v:lnum + 1) =~ '^\s*\(def\|class\)'
+    fold_level = '<1'
+  else
+    fold_level = '='
+  endif
+  return fold_level
+enddef
+
+&l:foldexpr = 'MyFoldExpr()'
+# def PythonFoldLevel(lineno: number): string
+#   # very primitive at the moment, but actually works quite well in practice
+#   var line = getline(lineno)
+#   if line == ''
+#     line = getline(lineno + 1)
+#     if line =~ '^\(def\|class\)\>'
+#       return '0'
+#     elseif line =~ '^@'
+#       return '0'
+#     elseif line =~ '^    \(def\|class\|#\)\>'
+#       return '1'
+#     else
+#       var lvl = foldlevel(lineno + 1)
+#       return lvl >= 0 ? nr2char(lvl) : '-1'
+#     endif
+#   elseif line =~ '^\(def\|class\)\>'
+#     return '  1'
+#   elseif line =~ '^@'   # multiline decorator maybe
+#     return '  1'
+#   elseif line =~ '^    \(def\|class\)\>'
+#     return '  2'
+#   elseif line =~ '^[^] #)]'
+#     # a non-blank character at the first column stops a fold, except
+#     # for '#', so that comments in the middle of functions don't break folds,
+#     # and ')', so that I can have multiline function signatures like
+#     #
+#     #     def fn(
+#     #         arg1,
+#     #         arg2,
+#     #     ):
+#     #         ...
+#     return '0'
+#   elseif line =~ '^# \|^#$' # except when they're proper comments and not commentd-out code (for which I use ##
+#     return '0'
+#   elseif line =~ '^    [^ )]' # end method folds except watch for black-style signatures
+#     return '1'
+#   else
+#     var lvl = foldlevel(lineno - 1)
+#     return lvl >= 0 ? nr2char(lvl) : '='
+#   endif
+# enddef
+# &l:foldexpr = PythonFoldLevel(v:lnum)

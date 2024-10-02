@@ -176,6 +176,16 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
+def ToggleCmdWindow()
+  if empty(getcmdwintype())
+    feedkeys("q:", "n")
+  else
+    quit
+  endif
+enddef
+
+nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
+
 # Otherwise I cannot paste in registers
 # xnoremap " <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
 xnoremap ' <esc><ScriptCmd>myfunctions.Surround("'", "'")<cr>
@@ -229,7 +239,7 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
 # search
-nnoremap <c-s> :%s/
+nnoremap <c-s> q:i%s/
 xnoremap <c-s> :s/
 command! SearchAndReplace myfunctions.SearchAndReplace()
 command! SearchAndReplaceInFiles myfunctions.SearchAndReplaceInFiles()
@@ -260,13 +270,11 @@ tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
 # tnoremap <s-tab> <cmd>bnext<cr>
 tnoremap <s-tab> <c-w>:b <tab>
-
 tnoremap <c-w>q <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
 tnoremap <c-w>c <ScriptCmd>myfunctions.Quit_term_popup(false)<cr>
-
 nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
 tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
-
+tnoremap <c-r> <c-w>"
 command! Terminal myfunctions.OpenMyTerminal()
 # Open terminal below all windows
 if g:os == "Windows"
@@ -310,9 +318,10 @@ Plug 'ubaldot/vim-latex-tools'
 Plug 'girishji/easyjump.vim'
 # Plug 'girishji/scope.vim'
 # Plug 'Donaldttt/fuzzyy'
-Plug 'Konfekt/vim-compilers'
+# Plug 'Konfekt/vim-compilers'
 Plug 'puremourning/vimspector'
-Plug 'qadzek/link.vim'
+# Plug 'qadzek/link.vim'
+# Plug 'tmhedberg/SimpylFold'
 plug#end()
 filetype plugin indent on
 syntax on
