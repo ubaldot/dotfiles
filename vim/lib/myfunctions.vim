@@ -7,12 +7,12 @@ enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
 var match_id = 0
-def SearchReplacement(): list<string>
+def SearchReplacementHelper(search_user: string = ''): list<string>
   augroup SEARCH_HI | autocmd!
     autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | search(getcmdline(), 'w') | match_id = matchadd('IncSearch', getcmdline()) | redraw!
     autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id = 0 | endif
   augroup END
-  var search = input("String to search: ")
+  var search = empty(search_user) ? input("String to search: ") : search_user
   if empty(search)
     echom ""
     autocmd! SEARCH_HI
@@ -24,21 +24,29 @@ def SearchReplacement(): list<string>
   if match_id > 0
     matchdelete(match_id)
   endif
-  var replacement = input("\nReplacement: ")
+  echo ""
+  echo $"string to search: {search}"
+  var replacement = input("Replacement: ")
+  if empty(replacement)
+    return []
+  endif
   return [search, replacement]
 enddef
 
-export def SearchAndReplaceInFiles()
-  var search_replacement = SearchReplacement()
+def SearchAndReplaceInFiles(search_user: string = '')
+  var search_replacement = SearchReplacementHelper(search_user)
   var search = search_replacement[0]
   var replacement = search_replacement[1]
+  if empty(search_replacement)
+    return
+  endif
   var pattern = input("\nIn files: ", '*.')
   if empty(pattern)
     echom ""
     return
   endif
   var risky = input("\nRisky: ", 'n')
-  if risky !~ "[yes]" &&  risky !~ "[no]"
+  if risky !~ "[yes]" &&  risky !~ "[no]" && empty(risky)
     echom "Adios!"
     return
   endif
@@ -58,6 +66,10 @@ export def SearchAndReplaceInFiles()
   else
     var vimgrep_opts = input("\nVimgrep options: ", 'gj')
     var substitute_opts = input("\nSubstitute options: ", 'gci')
+    if empty(substitute_opts)
+      echo ''
+      return
+    endif
     var cmd = $'vimgrep /{search}/{vimgrep_opts} **/{pattern}'
     echom $"\n{cmd}"
     exe cmd
@@ -68,13 +80,30 @@ export def SearchAndReplaceInFiles()
   endif
 enddef
 
-export def SearchAndReplace()
-  var search_replacement = SearchReplacement()
+def SearchAndReplace(search_user: string = '')
+  var search_replacement = SearchReplacementHelper(search_user)
+  if empty(search_replacement)
+    return
+  endif
   var search = search_replacement[0]
+  if empty(search)
+    return
+  endif
   var replacement = search_replacement[1]
+  if empty(replacement)
+    echo ''
+    return
+  endif
   var opts = input("\nSubstitute options: ", 'gci')
+  if empty(opts)
+    echo ''
+    return
+  endif
   var range = input("\nRange: ", '%')
-  echom "\n"
+  if empty(range)
+    echo ''
+    return
+  endif
   echom range
   # if range !~ "\(%\)"
   #   echom "  NOK"
@@ -84,6 +113,10 @@ export def SearchAndReplace()
   exe $':{range}s/{search}/{replacement}/{opts}'
 enddef
 
+command! -nargs=? SearchAndReplace SearchAndReplace(<f-args>)
+command! -nargs=? SearchAndReplaceInFiles SearchAndReplaceInFiles(<f-args>)
+
+# =======================
 export def TrimWhitespace()
   var currwin = winsaveview()
   var save_cursor = getpos(".")
