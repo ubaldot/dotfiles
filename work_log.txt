@@ -92,3 +92,6 @@ Legend:
 - Heatmap
   - test for validate_models()
 * Remove NUM_DECIMAL, explain how to reduce precision in printed values
+
+=== Oct 02 24 ==========
+- vim-seeknshift (map <c-s>)

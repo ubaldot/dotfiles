@@ -179,8 +179,8 @@ cnoremap <c-n> <down>
 def ToggleCmdWindow()
   if empty(getcmdwintype())
     feedkeys("q:", "n")
-  else
-    quit
+  # else
+  #   quit
   endif
 enddef
 
