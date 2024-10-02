@@ -13,6 +13,13 @@ def SearchReplacementHelper(search_user: string = ''): list<string>
     autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id = 0 | endif
   augroup END
   var search = empty(search_user) ? input("String to search: ") : search_user
+  if !empty(search_user)
+    if match_id > 0
+      matchdelete(match_id)
+    endif
+    match_id = matchadd('IncSearch', search_user)
+    redraw!
+  endif
   if empty(search)
     echom ""
     autocmd! SEARCH_HI
@@ -25,8 +32,7 @@ def SearchReplacementHelper(search_user: string = ''): list<string>
     matchdelete(match_id)
   endif
   echo ""
-  echo $"string to search: {search}"
-  var replacement = input("Replacement: ")
+  var replacement = input("\nReplacement: ")
   if empty(replacement)
     return []
   endif
@@ -61,8 +67,7 @@ def SearchAndReplaceInFiles(search_user: string = '')
       #       \  (Get-Content $_.FullName) -replace ''{search}'', ''{replacement}'' | Set-Content $_.FullName
       #       \\}"'
     endif
-    echom $"\n{cmd}"
-    # exe cmd
+    echo $"\n{cmd}"
   else
     var vimgrep_opts = input("\nVimgrep options: ", 'gj')
     var substitute_opts = input("\nSubstitute options: ", 'gci')
@@ -71,12 +76,12 @@ def SearchAndReplaceInFiles(search_user: string = '')
       return
     endif
     var cmd = $'vimgrep /{search}/{vimgrep_opts} **/{pattern}'
-    echom $"\n{cmd}"
+    echo $"\n{cmd}"
     exe cmd
     cmd = $'cfdo :%s/{search}/{replacement}/{substitute_opts}'
-    echom $"\n{cmd}"
+    echo $"\n{cmd}"
     exe cmd
-    echom "Type ':wall' to save all or ':cfdo' u to undo"
+    echo "Type ':wall' to save all or ':cfdo' u to undo"
   endif
 enddef
 
