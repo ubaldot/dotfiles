@@ -95,3 +95,7 @@ Legend:
 
 === Oct 02 24 ==========
 - vim-seeknshift (map <c-s>)
+
+=== Oct 04 24 ==========
+- abs_norm
+* str2list
