@@ -146,7 +146,7 @@ set wildmenu wildoptions=pum
 set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*
 set completeopt-=preview
 set textwidth=78
-set iskeyword+="-"
+set iskeyword+=-
 set formatoptions+=w,n,p
 set diffopt+=vertical
 set wildcharm=<tab>
@@ -156,7 +156,7 @@ set concealcursor=nvc
 # set path+=**
 # set cursorline
 
-# Some key bindings
+# Some key ""bindings""
 # ----------------------
 map <f1> <cmd>helpclose<cr>
 # map! <f1> <nop>
@@ -164,7 +164,6 @@ g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<cr>
 # inoremap å `
-cnoremap å ~
 
 
 # For using up and down in popup menu
@@ -175,28 +174,32 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 # Remap {['command-line']} stuff
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
+cnoremap å ~
 
 def ToggleCmdWindow()
   if empty(getcmdwintype())
     feedkeys("q:", "n")
-  # else
-  #   quit
+  else
+    var cmd = getline('.')
+    quit
+    feedkeys($":{cmd}", "n")
   endif
 enddef
 
-nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
+nnoremap <c-c> <ScriptCmd>"ToggleCmdWindow"()<cr>
 
 # Otherwise I cannot paste in registers
-xnoremap " <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
-xnoremap ' <esc><ScriptCmd>myfunctions.Surround("'", "'")<cr>
-xnoremap ( <esc><ScriptCmd>myfunctions.Surround('(', ')')<cr>
-xnoremap [ <esc><ScriptCmd>myfunctions.Surround('[', ']')<cr>
-xnoremap { <esc><ScriptCmd>myfunctions.Surround('{', '}')<cr>
+xnoremap <leader>" <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
+xnoremap <leader>' <esc><ScriptCmd>myfunctions.Surround("'", "'")<cr>
+xnoremap <leader>( <esc><ScriptCmd>myfunctions.Surround('(', ')')<cr>
+xnoremap <leader>[ <esc><ScriptCmd>myfunctions.Surround('[', ']')<cr>
+xnoremap <leader>{ <esc><ScriptCmd>myfunctions.Surround('{', '}')<cr>
+xnoremap <leader>< <esc><ScriptCmd>myfunctions.Surround('<', '>')<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
-nmap <c-ö> <c-[>
-nmap <c-ä> <c-]>
+# nmap <c-ö> <c-[>
+# nmap <c-ä> <c-]>
 # Avoid polluting registers
 nnoremap x "_x
 
