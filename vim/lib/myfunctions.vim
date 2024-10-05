@@ -33,13 +33,11 @@ def SearchReplacementHelper(search_user: string = ''): list<string>
   endif
   echo ""
   var replacement = input("\nReplacement: ")
-  if empty(replacement)
-    return []
-  endif
   return [search, replacement]
 enddef
 
 def SearchAndReplaceInFiles(search_user: string = '')
+  echo "Search & replace in files\n"
   var search_replacement = SearchReplacementHelper(search_user)
   var search = search_replacement[0]
   var replacement = search_replacement[1]
@@ -53,7 +51,6 @@ def SearchAndReplaceInFiles(search_user: string = '')
   endif
   var risky = input("\nRisky: ", 'n')
   if risky !~ "[yes]" &&  risky !~ "[no]" && empty(risky)
-    echom "Adios!"
     return
   endif
 
@@ -81,11 +78,14 @@ def SearchAndReplaceInFiles(search_user: string = '')
     cmd = $'cfdo :%s/{search}/{replacement}/{substitute_opts}'
     echo $"\n{cmd}"
     exe cmd
-    echo "Type ':wall' to save all or ':cfdo' u to undo"
+    echo "\nType ':wall' to save all or ':cfdo' u to undo"
   endif
 enddef
 
+# TODO: cannot distinguish when user hit esc or cr. Perhaps you want to use
+# cmdleave?
 def SearchAndReplace(search_user: string = '')
+  echo "Search & replace in current buffer\n"
   var search_replacement = SearchReplacementHelper(search_user)
   if empty(search_replacement)
     return
@@ -95,10 +95,6 @@ def SearchAndReplace(search_user: string = '')
     return
   endif
   var replacement = search_replacement[1]
-  if empty(replacement)
-    echo ''
-    return
-  endif
   var opts = input("\nSubstitute options: ", 'gci')
   if empty(opts)
     echo ''
@@ -109,7 +105,7 @@ def SearchAndReplace(search_user: string = '')
     echo ''
     return
   endif
-  echom range
+  # echom range
   # if range !~ "\(%\)"
   #   echom "  NOK"
   # else
@@ -444,7 +440,7 @@ endif
 
 # Some mappings to learn
 # noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
-
+#
 # TODO: separate leading and trailing chars
 export def Surround(pre: string, post: string)
   # var [line_start, column_start] = getpos("v")[1 : 2]
@@ -497,6 +493,51 @@ export def Surround(pre: string, post: string)
   endif
 enddef
 
+
+# TODO: Require more work!
+# def SurroundPendingOperator(pre_string: string, post_string: string, type: string)
+
+#   var pre_string_len = strlen(pre_string)
+#   var post_string_len = strlen(post_string)
+#   var leading_pos = getpos("'[")
+#   var trailing_pos = getpos("']")
+#   # To account of the chars added
+#   var offset = 0
+
+#   # Get chars
+#   var leading_string = getline(leading_pos[1])[leading_pos[2] - pre_string_len ]
+#   var trailing_string = getline(trailing_pos[1])[trailing_pos[2] - pre_string_len - 2]
+
+#   # echom $"{leading_pos[1]},{leading_pos[2] - 2}, {trailing_pos[1]},{trailing_pos[2] - 2}"
+#   echom $"leading_string: {leading_string}, trailing_string: {trailing_string}"
+
+#   # I am at the leading position
+#   cursor(leading_pos[1], leading_pos[2])
+#   if leading_string == pre_string
+#     execute($"normal! {pre_string_len}X")
+#     offset = -pre_string_len
+#   else
+#     execute($"normal! i{pre_string}")
+#     offset = pre_string_len
+#   endif
+
+#   # Some chars have been added if you are working on the same line
+#   if leading_pos[1] == trailing_pos[1]
+#     cursor(trailing_pos[1], trailing_pos[2] + offset)
+#   else
+#     cursor(trailing_pos[1], trailing_pos[2])
+#   endif
+
+#   # Fix trailing char
+#   cursor(leading_pos[1], leading_pos[2])
+#   if trailing_chars == post_string
+#     execute($"normal! l{post_string_len}x")
+#   else
+#     execute($"normal! a{post_string}")
+#   endif
+# enddef
+
+# nnoremap g" <ScriptCmd>&operatorfunc = (type) => Surround('"', '"', type)<cr>g@
 # HOW TO WRITE FUNCTION THAT ALLOW COMMAND TO HAVE DOUBLE COMPLETION.
 # noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
 #

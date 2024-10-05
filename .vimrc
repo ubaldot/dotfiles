@@ -242,7 +242,8 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
 
 # search
-nnoremap <c-s> <cmd>SearchAndReplace<cr>
+# nnoremap <c-s> <cmd>SearchAndReplace<cr>
+nnoremap <c-s> :%s/
 xnoremap <c-s> "ty<cmd>exe $"SearchAndReplace {getreg('t')}"<cr>
 nnoremap <c-s><c-s> <cmd>SearchAndReplaceInFiles<cr>
 xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
