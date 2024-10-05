@@ -178,7 +178,7 @@ cnoremap å ~
 
 def ToggleCmdWindow()
   if empty(getcmdwintype())
-    feedkeys("q:", "n")
+    feedkeys("q:i", "n")
   else
     var cmd = getline('.')
     quit
@@ -186,7 +186,7 @@ def ToggleCmdWindow()
   endif
 enddef
 
-nnoremap <c-c> <ScriptCmd>"ToggleCmdWindow"()<cr>
+nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # Otherwise I cannot paste in registers
 xnoremap <leader>" <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
