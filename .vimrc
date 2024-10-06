@@ -259,8 +259,8 @@ nnoremap <c-d> <cmd>bw!<cr>
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
 
 # location list
-nnoremap ]l :lnext<CR>
-nnoremap [l :lprevious<CR>
+nnoremap äl :lnext<CR>
+nnoremap öl :lprevious<CR>
 
 # super quick search and replace:
 # nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
