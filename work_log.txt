@@ -99,3 +99,9 @@ Legend:
 === Oct 04 24 ==========
 - abs_norm
 * str2list
+
+=== Okt 06 24 ==========
+- Downsampled XCorrelation (and refactored)
+- User can select number of lags and if downsampling the ACF
+- Promote Signal to classdata and lift functions from Dataset.
+- Stiff models
