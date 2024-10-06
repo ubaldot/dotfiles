@@ -107,12 +107,13 @@ augroup END
 # augroup END
 # -------------------------------------------
 
+
+
 # Open help pages in vertical split
 augroup vimrc_help
   autocmd!
   autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
 augroup END
-
 # Internal vim variables aka 'options'
 # Set terminal with 256 colors
 set scrolloff=8
@@ -250,7 +251,8 @@ xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
 
 # Wipe buffer
 # nnoremap bw <cmd>bw!<cr>
-nnoremap <c-b><c-w> <cmd>bw!<cr>
+# nnoremap <c-b><c-w> <cmd>bw!<cr>
+nnoremap <c-d> <cmd>bw!<cr>
 
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
 
