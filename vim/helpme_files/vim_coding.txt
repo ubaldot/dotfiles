@@ -1,10 +1,10 @@
 LSP shortcuts
 -------------
 
-<leader>p LspDiagPrev
-<leader>n LspDiagNext
+äd LspDiagPrev
+öd LspDiagNext
 <leader>i LspGotoImpl
 <leader>g LspGotoDefinition
 <leader>d LspDiagCurrent
-<leader>k LspHover
+K LspHover
 <leader>r LspPeekReferences
