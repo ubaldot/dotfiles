@@ -120,6 +120,8 @@ set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
 set langmap=ö[,ä]
+nnoremap <C-ö> <C-[>
+nnoremap <C-ä> <C-]>
 set belloff=all
 set clipboard^=unnamed,unnamedplus
 set termguicolors
@@ -255,6 +257,10 @@ xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
 nnoremap <c-d> <cmd>bw!<cr>
 
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
+
+# location list
+nnoremap ]l :lnext<CR>
+nnoremap [l :lprevious<CR>
 
 # super quick search and replace:
 # nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
@@ -595,8 +601,8 @@ command! GitPushDot myfunctions.PushDot()
 command! -nargs=? Diff myfunctions.Diff(<q-args>)
 nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
 nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
-nnoremap <expr> gn &diff ? ']c' : 'gn'
-nnoremap <expr> gp &diff ? '[c' : 'gp'
+# nnoremap <expr> gn &diff ? ']c' : 'gn'
+# nnoremap <expr> gp &diff ? '[c' : 'gp'
 # nnoremap gn &diff ? 'lib.NextChange()' : 'gn'
 # nnoremap gp &diff ? 'lib.PrevChange()' : 'gp'
 

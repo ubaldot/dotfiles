@@ -73,10 +73,12 @@ var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
 autocmd VimEnter * g:LspOptionsSet(lspOpts)
 highlight link LspDiagLine NONE
 
-nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
-nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+nnoremap <silent> öd <Cmd>LspDiag prevWrap<cr>
+nnoremap <silent> äd <Cmd>LspDiag nextWrap<cr>
+nnoremap <silent> <leader>p <Cmd>LspDiag prevWrap<cr>
+nnoremap <silent> <leader>n <Cmd>LspDiag nextWrap<cr>
+nnoremap <silent> <leader>dd <Cmd>LspDiag show<cr>
 nnoremap <silent> <leader>d <Cmd>LspDiag current<cr>
 nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
-nnoremap <silent> <leader>k <Cmd>LspHover<cr>
 nnoremap <silent> <leader>g <Cmd>LspGotoDefinition<cr>
 nnoremap <silent> <leader>r <Cmd>LspShowReferences<cr>
