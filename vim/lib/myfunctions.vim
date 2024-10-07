@@ -163,15 +163,11 @@ def DiffInternal(commit_id: string)
   #
   # Usage: :Diff 12jhu23
   # To exit, just wipe the scratch buffer.
-  var path = expand('%:p:h')
-  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
 
   var curr_winid = win_getid()
   vertical new
   var scratch_winid = win_getid()
   win_execute(scratch_winid, "setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile")
-
-  echom $" commit_id: {commit_id}"
 
   if empty(commit_id)
     # Read from disk
@@ -180,13 +176,7 @@ def DiffInternal(commit_id: string)
     # Get lines from repo
     var file_lines = systemlist($"git show {commit_id}:{expand('#:.')}")
     map(file_lines, (idx, val) => substitute(val, '\r', '', ''))
-    if v:shell_error != 0
-      echo file_lines
-      close
-      return
-    else
-      appendbufline(winbufnr(scratch_winid), 0, file_lines)
-    endif
+    appendbufline(winbufnr(scratch_winid), 0, file_lines)
   endif
 
   setwinvar(scratch_winid, '&filetype', getbufvar('#', '&filetype'))
@@ -203,11 +193,12 @@ enddef
 export def GitLog(num_commits: number = 20)
   var path = expand('%:p:h')
   var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  exe $"cd {git_root}"
   if v:shell_error != 0
     Echoerr('Not a git repo')
     return
   endif
-  var log_list = systemlist($'cd {git_root} && git log --oneline --decorate -n {num_commits}')
+  var log_list = systemlist($'git log --oneline --decorate -n {num_commits}')
   map(log_list, (idx, val) => substitute(val, '\r', '', ''))
   below new
   w:scratch = 1
@@ -217,7 +208,7 @@ export def GitLog(num_commits: number = 20)
   matchadd('Type', '(\_.\{-})')
 enddef
 
-command! -nargs=? GitLog GitLog(<f-args>)
+command! -nargs=? GitLog GitLog(<args>)
 
 export def GitDiff()
   var filename = expand('%:p')
@@ -288,9 +279,8 @@ def DiffComplete(A: any, L: any, P: any): list<string>
   var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
   if v:shell_error != 0
     return []
-  else
-    return systemlist($'cd {git_root} && git log --oneline --decorate -n 20')
   endif
+  return systemlist($'cd {git_root} && git log --oneline --decorate -n 20')
 enddef
 
 command! -nargs=? -complete=customlist,DiffComplete Diff Diff(<f-args>)

@@ -105,3 +105,6 @@ Legend:
 - User can select number of lags and if downsampling the ACF
 - Promote Signal to classdata and lift functions from Dataset.
 - Stiff models
+
+=== Oct 07 24 ==========
+- Fixed GitDiff functions
