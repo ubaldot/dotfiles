@@ -181,6 +181,36 @@ export def Diff(spec: string)
   diffthis
 enddef
 
+export def GitLog(num_commits: number = 10)
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  var log_list = systemlist($'cd {git_root} && git log --oneline --decorate -n {num_commits}')
+  below new
+  w:scratch = 1
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+  setline(1, log_list)
+  # matchadd('Removed', '^\w*\s')
+  matchadd('Directory', '^\w*\s')
+  # matchadd('ModeMsg', '(\_.\{-})')
+  matchadd('Type', '(\_.\{-})')
+enddef
+
+command! -nargs=? GitLog GitLog(<f-args>)
+
+export def GitDiff()
+  var filename = expand('%:p')
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  var diff_list = systemlist($"cd {git_root} && git diff HEAD -- {filename}")
+  vnew
+  w:scratch = 1
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+  setline(1, diff_list)
+  matchadd("Removed", '^-.*')
+  matchadd("Type", '^+.*')
+enddef
+command! GitDiff GitDiff()
+
 export def Redir(cmd: string, rng: number, start: number, end: number)
   # Used to redirect the output from the terminal in a scratch buffer
   #
@@ -195,8 +225,8 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
   var output = []
   if cmd =~ '^!'
     var cmd_filt = cmd =~ ' %'
-          \ ? matchstr(substitute(cmd, ' %', ' ' .. shellescape(escape(expand('%:p'), '\')), ''), '^!\zs.*')
-          \ : matchstr(cmd, '^!\zs.*')
+           ? matchstr(substitute(cmd, ' %', ' ' .. shellescape(escape(expand('%:p'), '\')), ''), '^!\zs.*')
+           : matchstr(cmd, '^!\zs.*')
     if rng == 0
       output = systemlist(cmd_filt)
     else
@@ -205,10 +235,11 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
       output = systemlist(cmd_filt .. " <<< $" .. cleaned_lines)
     endif
   else
-    var tmp: string
-    redir => tmp
-    execute cmd
-    redir END
+    var tmp = execute(cmd)
+    # var tmp: string
+    # redir => tmp
+    # execute cmd
+    # redir END
     output = split(tmp, "\n")
   endif
   vnew
