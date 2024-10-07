@@ -156,42 +156,64 @@ export def PushDot()
 enddef
 
 
-export def Diff(spec: string)
+def DiffInternal(commit_id: string)
   # For comparing:
   #   1. Your open buffer VS its last saved version (no args)
   #   2. Your open buffer with a given commit
   #
   # Usage: :Diff 12jhu23
   # To exit, just wipe the scratch buffer.
-  vertical new
-  setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile
-  var cmd = bufname('#')
-  if !empty(spec)
-    cmd = "!git -C " .. shellescape(fnamemodify(finddir('.git', '.;'), ':p:h:h')) .. " show " .. spec .. ":#"
-  endif
-  execute "read " .. cmd
-  silent :0d _
-  &filetype = getbufvar('#', '&filetype')
-  augroup Diff
-    autocmd!
-    autocmd BufWipeout <buffer> diffoff!
-  augroup END
-  diffthis
-  wincmd p
-  diffthis
-enddef
-
-export def GitLog(num_commits: number = 10)
   var path = expand('%:p:h')
   var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+
+  var curr_winid = win_getid()
+  vertical new
+  var scratch_winid = win_getid()
+  win_execute(scratch_winid, "setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile")
+
+  echom $" commit_id: {commit_id}"
+
+  if empty(commit_id)
+    # Read from disk
+    execute $"read {expand('#')}"
+  else
+    # Get lines from repo
+    var file_lines = systemlist($"git show {commit_id}:{expand('#:.')}")
+    map(file_lines, (idx, val) => substitute(val, '\r', '', ''))
+    if v:shell_error != 0
+      echo file_lines
+      close
+      return
+    else
+      appendbufline(winbufnr(scratch_winid), 0, file_lines)
+    endif
+  endif
+
+  setwinvar(scratch_winid, '&filetype', getbufvar('#', '&filetype'))
+  augroup Diff
+    autocmd!
+    autocmd WinClosed scratch_winid diffoff!
+  augroup END
+  diffthis
+  win_gotoid(curr_winid)
+  diffthis
+  win_gotoid(scratch_winid)
+enddef
+
+export def GitLog(num_commits: number = 20)
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  if v:shell_error != 0
+    Echoerr('Not a git repo')
+    return
+  endif
   var log_list = systemlist($'cd {git_root} && git log --oneline --decorate -n {num_commits}')
+  map(log_list, (idx, val) => substitute(val, '\r', '', ''))
   below new
   w:scratch = 1
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
   setline(1, log_list)
-  # matchadd('Removed', '^\w*\s')
   matchadd('Directory', '^\w*\s')
-  # matchadd('ModeMsg', '(\_.\{-})')
   matchadd('Type', '(\_.\{-})')
 enddef
 
@@ -201,7 +223,12 @@ export def GitDiff()
   var filename = expand('%:p')
   var path = expand('%:p:h')
   var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  if v:shell_error != 0
+    Echoerr('Not a git repo')
+    return
+  endif
   var diff_list = systemlist($"cd {git_root} && git diff HEAD -- {filename}")
+  map(diff_list, (idx, val) => substitute(val, '\r', '', ''))
   vnew
   w:scratch = 1
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
@@ -236,10 +263,6 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
     endif
   else
     var tmp = execute(cmd)
-    # var tmp: string
-    # redir => tmp
-    # execute cmd
-    # redir END
     output = split(tmp, "\n")
   endif
   vnew
@@ -247,6 +270,30 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
   setline(1, output)
 enddef
+
+export def Diff(log_line: string = '')
+  var commit_id = ''
+  if !empty(log_line) && log_line != '--'
+    commit_id = matchstr(log_line, '^\w\+')
+  elseif !empty(log_line) && log_line == '--'
+    commit_id = 'HEAD'
+  else
+    commit_id = log_line
+  endif
+  DiffInternal(commit_id)
+enddef
+
+def DiffComplete(A: any, L: any, P: any): list<string>
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  if v:shell_error != 0
+    return []
+  else
+    return systemlist($'cd {git_root} && git log --oneline --decorate -n 20')
+  endif
+enddef
+
+command! -nargs=? -complete=customlist,DiffComplete Diff Diff(<f-args>)
 
 
 var color_is_shown = false
