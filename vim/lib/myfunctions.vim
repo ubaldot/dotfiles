@@ -363,7 +363,7 @@ def UpdateGitStatus()
   var unmerged_list = systemlist('git ls-files --unmerged')
 
   # Create status buffer
-  set modifiable
+  setlocal modifiable
   exe ":%d _"
   # Append title
   appendbufline(git_status_bufname, 0, instructions)
@@ -398,7 +398,7 @@ def UpdateGitStatus()
     map(section_name, 'matchadd("ErrorMsg", v:val)')
     map(untracked_list, 'matchadd("Error", v:val)')
   endif
-  set nomodifiable
+  setlocal nomodifiable
 enddef
 
 var git_status_bufname = 'Git-status'
@@ -456,7 +456,7 @@ def UpdateLsFiles()
   var lsfiles_list = systemlist($'git ls-files')
   map(lsfiles_list, (idx, val) => substitute(val, '\r', '', ''))
 
-  set modifiable
+  setlocal modifiable
   var win_view = winsaveview()
   exe ":%d _"
   appendbufline(bufnr(), 0, instructions + lsfiles_list)
@@ -464,7 +464,7 @@ def UpdateLsFiles()
   matchadd('WarningFloat', '\%2l')
   matchadd('ModeMsg', 'Tracked files:')
   winrestview(win_view)
-  set nomodifiable
+  setlocal nomodifiable
 enddef
 
 var git_lsfiles_bufname = 'Git-ls-files'

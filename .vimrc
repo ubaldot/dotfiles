@@ -364,6 +364,9 @@ g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 colorscheme everforest
 
+# vim-git-essentials
+nnoremap git <Cmd>GitStatus<cr>
+
 # vim-poptools
 g:poptools_config = {}
 g:poptools_config['preview_recent_files'] = false
