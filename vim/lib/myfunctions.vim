@@ -216,7 +216,6 @@ export def GitLog(num_commits: number = 20)
   win_execute(log_winid, 'nnoremap <buffer> <silent> <enter> <ScriptCmd>w:GitCheckout(getline("."))<cr>')
 enddef
 
-
 command! -nargs=? GitLog GitLog(<args>)
 
 export def GitCheckout(log_line: string = '')
@@ -319,18 +318,17 @@ command! -nargs=0 GitCommitNoVerify GitCommit(true)
 command! -nargs=0 GitPush execute('git push')
 
 def GitCommitManagement(key: string)
-  var instructions = ['Key bindings:', '  Stage: s (S for all)', '  Unstage: u (U for all)', '']
-  var item = getline('.')->substitute('.*:\s*', '', '')
-  # Needed for unstaging correct lines
-  var staged_files = systemlist("git diff --cached --name-only")
+  # Pick everything after the first 3 characters (git status --short used the
+  # first 3 chars for the status
+  var item = getline('.')->substitute('^...', '', '')->trim()
   var shell_msg = ''
   if key ==# 's'
     shell_msg = system($"git add {item}")
   elseif key ==# 'S'
     shell_msg = system($"git add -u")
   elseif key ==# 'u'
-    # Avoid to try to unstage lines that don't represent a blob
-    if index(staged_files, item) != -1
+    # Avoid to try to unstage lines that don't represent a file
+    if index(systemlist($'git diff --cached --name-only'), item) != -1
       shell_msg = system($"git reset {item}")
     endif
   elseif key ==# 'U'
@@ -338,22 +336,57 @@ def GitCommitManagement(key: string)
   endif
   # If no error update window
   if v:shell_error == 0
-    set modifiable
     var win_view = winsaveview()
-    exe ":%d _"
-    var status_list = systemlist($'git status')
-    map(status_list, (idx, val) => substitute(val, '\r', '', ''))
-    appendbufline(bufnr(), 0, instructions + status_list)
+    UpdateGitStatus()
     winrestview(win_view)
-    set nomodifiable
   else
     echo shell_msg
   endif
 enddef
 
+def UpdateGitStatus()
+  var instructions = ['Key bindings:', '  Stage: s (S for all)', '  Unstage: u (U for all)']
+
+  var all_files = systemlist('git status --short')
+  var staged_list = copy(all_files)->filter('v:val =~ "^\\w\\s"')
+  var unstaged_list = copy(all_files)->filter('v:val =~ "^[ \\w]\\w\\s"')
+  var untracked_list = copy(all_files)->filter('v:val =~ "^??"')
+
+  # Create status buffer
+  set modifiable
+  exe ":%d _"
+  # Append title
+  appendbufline(git_status_bufname, 0, instructions)
+  matchadd('WarningMsg', '\%1l\.*')
+  matchadd('Type', '\%2l\_.*\%3l')
+
+  # Add staged files and color them
+  var start_line = line('.')
+  var section_name = ["Changes to be committed:"]
+  var num_lines = len(section_name + staged_list)
+  appendbufline(git_status_bufname, start_line, section_name + staged_list)
+  matchadd('Directory', $'\%{start_line + len(section_name) + 1}l\_.*\%{start_line + num_lines}l')
+  # map(section_name, 'matchadd("ModeMsg", v:val)')
+  # matchadd('ModeMsg', section_name[0])
+
+  # Add staged files and color them
+  start_line += num_lines
+  section_name = ['', "Changes not staged for commit:"]
+  num_lines = len( section_name + unstaged_list)
+  appendbufline(git_status_bufname, start_line, section_name + unstaged_list)
+  matchadd('Error', $'\%{start_line + len(section_name) + 1}l\_.*\%{start_line + num_lines}l')
+
+  # Add staged files and color them
+  start_line += num_lines
+  section_name = ['', "Untracked files:"]
+  num_lines = len(untracked_list + section_name)
+  appendbufline(git_status_bufname, start_line, section_name + untracked_list)
+  matchadd('Error', $'\%{start_line + len(section_name) + 1}l\_.*\%{start_line + num_lines}l')
+  set nomodifiable
+enddef
+
 var git_status_bufname = 'Git-status'
 def GitStatus()
-  var instructions = ['Key bindings:', '  Stage: s (S for all)', '  Unstage: u (U for all)', '']
   var path = expand('%:p:h')
   var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
   exe $"cd {git_root}"
@@ -361,22 +394,14 @@ def GitStatus()
     Echoerr('Not a git repo')
     return
   endif
-  var status_list = systemlist($'git status')
-  map(status_list, (idx, val) => substitute(val, '\r', '', ''))
-  # status_list_cleaned = CleanStatusList()
-
+  # Create sctarch buffer
   below new
   var status_winid = win_getid()
   w:scratch = 1
   silent exe $"file {git_status_bufname}"
-  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile modifiable
-  setline(1, instructions + status_list)
-  matchadd('WarningMsg', '\%1l\.*')
-  matchadd('Type', '\%2l\_.*\%3l')
-  matchadd('Directory', '^Changes to be committed:$')
-  matchadd('Error', '^Changes not staged for commit:$')
-  matchadd('Error', '^Untracked files:$')
-  set nomodifiable
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+
+  UpdateGitStatus()
 
   # Add
   setwinvar(win_id2win(status_winid), "GitCommitManagement", GitCommitManagement)
@@ -386,7 +411,6 @@ def GitStatus()
   win_execute(status_winid, 'nnoremap <buffer> <silent> U <ScriptCmd>w:GitCommitManagement("U")<cr>')
   win_execute(status_winid, 'xnoremap <buffer> <silent> s :call w:GitCommitManagement("s")<cr>')
   win_execute(status_winid, 'xnoremap <buffer> <silent> u :call w:GitCommitManagement("u")<cr>')
-
 enddef
 
 command! -nargs=0 GitStatus GitStatus()
@@ -400,17 +424,28 @@ def GitLsFilesManagement(key: string)
   endif
   # If no error update window
   if v:shell_error == 0
-    set modifiable
     var win_view = winsaveview()
-    exe ":%d _"
-    var status_list = systemlist($'git ls-files')
-    map(status_list, (idx, val) => substitute(val, '\r', '', ''))
-    appendbufline(bufnr(), 0, status_list)
+    UpdateLsFiles()
     winrestview(win_view)
-    set nomodifiable
   else
     echo shell_msg
   endif
+enddef
+
+def UpdateLsFiles()
+  var instructions = ['Key bindings:', "  Untrack file: 'u'", '', 'Tracked files:']
+  var lsfiles_list = systemlist($'git ls-files')
+  map(lsfiles_list, (idx, val) => substitute(val, '\r', '', ''))
+
+  set modifiable
+  var win_view = winsaveview()
+  exe ":%d _"
+  appendbufline(bufnr(), 0, instructions + lsfiles_list)
+  matchadd('WarningMsg', '\%1l')
+  matchadd('WarningFloat', '\%2l')
+  matchadd('ModeMsg', 'Tracked files:')
+  winrestview(win_view)
+  set nomodifiable
 enddef
 
 var git_lsfiles_bufname = 'Git-ls-files'
@@ -430,9 +465,8 @@ def GitLsFiles()
   var lsfiles_winid = win_getid()
   w:scratch = 1
   silent exe $"file {git_lsfiles_bufname}"
-  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile modifiable
-  setline(1, lsfiles_list)
-  set nomodifiable
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+  UpdateLsFiles()
 
   # Add
   setwinvar(win_id2win(lsfiles_winid), "GitLsFilesManagement", GitLsFilesManagement)
