@@ -325,14 +325,22 @@ def GitCommitManagement(key: string)
   if key ==# 's'
     shell_msg = system($"git add {item}")
   elseif key ==# 'S'
-    shell_msg = system($"git add -u")
+    shell_msg = system("git add -u")
   elseif key ==# 'u'
     # Avoid to try to unstage lines that don't represent a file
     if index(systemlist($'git diff --cached --name-only'), item) != -1
       shell_msg = system($"git reset {item}")
     endif
   elseif key ==# 'U'
-    shell_msg = system($"git reset")
+    shell_msg = system("git reset")
+  elseif key ==# 'c'
+    var commit_msg = input('Insert commit message: ')
+    shell_msg = system($"git commit -m {commit_msg}")
+  elseif key ==# 'cc'
+    var commit_msg = input('Insert commit message: ')
+    shell_msg = system($"git commit -m {commit_msg} --no-verify")
+  elseif key ==# 'p'
+    shell_msg = system("git push")
   endif
   # If no error update window
   if v:shell_error == 0
@@ -345,43 +353,51 @@ def GitCommitManagement(key: string)
 enddef
 
 def UpdateGitStatus()
-  var instructions = ['Key bindings:', '  Stage: s (S for all)', '  Unstage: u (U for all)']
+  var instructions = ['Instructions:', "  Stage: 's' ('S' for all)", "  Unstage: 'u' ('U' for all)", "  Commit: 'c'", "  Commit (--no-verify): 'cc'", "  Push: 'p'"]
 
   var all_files = systemlist('git status --short')
   var staged_list = copy(all_files)->filter('v:val =~ "^\\w\\s"')
-  var unstaged_list = copy(all_files)->filter('v:val =~ "^[ \\w]\\w\\s"')
+  var unstaged_list = copy(all_files)->filter("v:val =~ '[^\\s^\\w]\\w\\s'")
   var untracked_list = copy(all_files)->filter('v:val =~ "^??"')
+
+  var unmerged_list = systemlist('git ls-files --unmerged')
 
   # Create status buffer
   set modifiable
   exe ":%d _"
   # Append title
   appendbufline(git_status_bufname, 0, instructions)
-  matchadd('WarningMsg', '\%1l\.*')
-  matchadd('Type', '\%2l\_.*\%3l')
+  matchadd("WarningMsg", instructions[0])
+  map(instructions[1 : ], 'matchadd("WarningFloat", v:val)')
 
   # Add staged files and color them
   var start_line = line('.')
   var section_name = ["Changes to be committed:"]
   var num_lines = len(section_name + staged_list)
   appendbufline(git_status_bufname, start_line, section_name + staged_list)
-  matchadd('Directory', $'\%{start_line + len(section_name) + 1}l\_.*\%{start_line + num_lines}l')
-  # map(section_name, 'matchadd("ModeMsg", v:val)')
-  # matchadd('ModeMsg', section_name[0])
+  map(staged_list, 'matchadd("Directory", v:val)')
 
   # Add staged files and color them
   start_line += num_lines
   section_name = ['', "Changes not staged for commit:"]
   num_lines = len( section_name + unstaged_list)
   appendbufline(git_status_bufname, start_line, section_name + unstaged_list)
-  matchadd('Error', $'\%{start_line + len(section_name) + 1}l\_.*\%{start_line + num_lines}l')
+  map(unstaged_list, 'matchadd("Error", v:val)')
 
   # Add staged files and color them
   start_line += num_lines
   section_name = ['', "Untracked files:"]
   num_lines = len(untracked_list + section_name)
   appendbufline(git_status_bufname, start_line, section_name + untracked_list)
-  matchadd('Error', $'\%{start_line + len(section_name) + 1}l\_.*\%{start_line + num_lines}l')
+  map(untracked_list, 'matchadd("Error", v:val)')
+
+  if !empty(unmerged_list)
+    start_line += num_lines
+    section_name = ['(CONFLICTS) unmerged files need merge:']
+    appendbufline(git_status_bufname, start_line, section_name + unmerged_list)
+    map(section_name, 'matchadd("ErrorMsg", v:val)')
+    map(untracked_list, 'matchadd("Error", v:val)')
+  endif
   set nomodifiable
 enddef
 
@@ -409,6 +425,9 @@ def GitStatus()
   win_execute(status_winid, 'nnoremap <buffer> <silent> S <ScriptCmd>w:GitCommitManagement("S")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> u <ScriptCmd>w:GitCommitManagement("u")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> U <ScriptCmd>w:GitCommitManagement("U")<cr>')
+  win_execute(status_winid, 'nnoremap <buffer> <silent> c <ScriptCmd>w:GitCommitManagement("c")<cr>')
+  win_execute(status_winid, 'nnoremap <buffer> <silent> cc <ScriptCmd>w:GitCommitManagement("cc")<cr>')
+  win_execute(status_winid, 'nnoremap <buffer> <silent> p <ScriptCmd>w:GitCommitManagement("p")<cr>')
   win_execute(status_winid, 'xnoremap <buffer> <silent> s :call w:GitCommitManagement("s")<cr>')
   win_execute(status_winid, 'xnoremap <buffer> <silent> u :call w:GitCommitManagement("u")<cr>')
 enddef
