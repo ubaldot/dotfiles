@@ -200,31 +200,48 @@ export def GitLog(num_commits: number = 20)
     Echoerr('Not a git repo')
     return
   endif
-  var log_list = systemlist($'git log --oneline --decorate -n {num_commits}')
+  # var log_list = systemlist($'git log --oneline --decorate -n {num_commits}')
+  var log_list = systemlist($'git log --oneline --decorate -n {num_commits} --pretty=format:"%h %d %s %ad" --date=relative')
   map(log_list, (idx, val) => substitute(val, '\r', '', ''))
   below new
   var log_winid = win_getid()
   w:scratch = 1
   silent exe $"file {git_log_bufname}"
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
-  setline(1, log_list)
+  if exists('+winfixbuf')
+    win_execute(log_winid, 'setlocal winfixbuf' )
+  endif
+  var instructions = ["Press '<enter>' to checkout a commit, '<esc>' to quit", '']
+  setline(1, instructions + log_list)
   matchadd('Directory', '^\w*\s')
   matchadd('Type', '(\_.\{-})')
+  matchadd('WarningMsg', instructions[0])
 
   # Add
   setwinvar(win_id2win(log_winid), "GitCheckoutCommit", GitCheckoutCommit)
   win_execute(log_winid, 'nnoremap <buffer> <silent> <enter> <ScriptCmd>w:GitCheckoutCommit(getline("."))<cr>')
+  win_execute(log_winid, 'nnoremap <buffer> <silent> <esc> <cmd>close!<cr>')
 enddef
 
 command! -nargs=? GitLog GitLog(<args>)
 
-export def GitCheckoutComit(log_line: string = '')
+export def GitCheckoutCommit(log_line: string = '')
+
   if empty(log_line)
     GitLog()
   else
+    # if bufexists(git_status_bufname)
+    #   exe $":{bufwinnr(git_status_bufname)}close!"
+    # endif
     var commit_id = LogLineToCommitID(log_line)
-    exe $"!git checkout {commit_id}"
-    exe $":{bufwinnr(git_log_bufname)}close!"
+    system($"git checkout {commit_id}")
+    if bufexists(git_log_bufname)
+      exe $":{bufwinnr(git_log_bufname)}close!"
+    endif
+
+    if bufexists(git_status_bufname)
+      UpdateGitStatus()
+    endif
   endif
 enddef
 
@@ -249,7 +266,11 @@ export def GitCheckoutBranch(branch_name: string = '')
     endif
   else
     var branch_name_cleaned = branch_name->substitute('*\s', '', '')
-    exe $"!git checkout {branch_name_cleaned}"
+    silent exe $"!git checkout {branch_name_cleaned}"
+  endif
+
+  if bufexists(git_status_bufname) != 0
+    UpdateGitStatus()
   endif
 enddef
 
@@ -298,7 +319,8 @@ def LogComplete(A: any, L: any, P: any): list<string>
   if v:shell_error != 0
     return []
   endif
-  return systemlist($'cd {git_root} && git log --oneline --decorate -n 20')
+  var num_commits = 20
+  return systemlist($'git log --oneline --decorate -n {num_commits} --pretty=format:"%h %d %s %ad" --date=relative')
 enddef
 
 command! -nargs=? -complete=customlist,LogComplete GitDiff GitDiff(<f-args>)
@@ -316,6 +338,40 @@ enddef
 command! -nargs=0 GitCommit GitCommit()
 command! -nargs=0 GitCommitNoVerify GitCommit(true)
 command! -nargs=0 GitPush execute('git push')
+
+var git_help_bufname = 'git_help'
+def GitStatusHelp()
+  # Create sctarch buffer
+  below new
+  var help_winid = win_getid()
+  w:scratch = 1
+  silent exe $"file {git_help_bufname}"
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+  if exists('+winfixbuf')
+    win_execute(help_winid, 'setlocal winfixbuf' )
+  endif
+
+
+  var instructions = ['Instructions:',
+      "  s: stage",
+      "  S: stage all ('git add -u')",
+      "  u: un-stage",
+      "  U: un-stage all",
+      "  c: commit",
+      "  cc: commit ('git commit -m \"<your_message>\" --no-verify)'",
+      "  p: push",
+      "  <esc>: Quit"]
+
+  # Append title
+  appendbufline(git_help_bufname, 0, instructions)
+  matchadd("WarningMsg", instructions[0])
+  map(instructions[1 : ], 'matchadd("WarningFloat", v:val)')
+  setlocal nomodifiable
+
+  win_execute(help_winid, 'nnoremap <buffer> <silent> <esc> <cmd>close!<cr>')
+  win_execute(help_winid, 'nnoremap <buffer> <silent> ? <cmd>close!<cr>')
+enddef
+
 
 def GitCommitManagement(key: string)
   # Pick everything after the first 3 characters (git status --short used the
@@ -341,6 +397,8 @@ def GitCommitManagement(key: string)
     shell_msg = system($"git commit -m {commit_msg} --no-verify")
   elseif key ==# 'p'
     shell_msg = system("git push")
+  elseif key ==# '?'
+    GitStatusHelp()
   endif
   # If no error update window
   if v:shell_error == 0
@@ -353,8 +411,29 @@ def GitCommitManagement(key: string)
 enddef
 
 def UpdateGitStatus()
-  var instructions = ['Instructions:', "  Stage: 's' ('S' for all)", "  Unstage: 'u' ('U' for all)", "  Commit: 'c'", "  Commit (--no-verify): 'cc'", "  Push: 'p'"]
+  var instructions = ["Hit '?' for help or '<esc>' to quit"]
 
+  # Branch management
+  var branch_local_remote = systemlist('git branch -vv')->filter('v:val =~ "^*"')[0]
+
+  var local_branch_list = branch_local_remote->split('')
+  var local_branch = ''
+  var remote_branch = 'None'
+
+  var firstline_branch = ''
+  if join(copy(local_branch_list[1 : 4])) =~ '^(HEAD detached at '
+    local_branch = join(local_branch_list[1 : 4])
+    firstline_branch = $"Current branch: {local_branch}"
+    remote_branch = 'None'
+  else
+    local_branch = local_branch_list[1]
+    firstline_branch = $"Current branch: {local_branch}"
+    remote_branch = branch_local_remote->substitute('.*\[\(.*\)\].*', '\1', '')
+  endif
+
+  var branch_info = [firstline_branch, $'Remote branch: {remote_branch}', '']
+
+  # Other files management
   var all_files = systemlist('git status --short')
   var staged_list = copy(all_files)->filter('v:val =~ "^\\w\\s"')
   var unstaged_list = copy(all_files)->filter("v:val =~ '[^\\s^\\w]\\w\\s'")
@@ -368,13 +447,22 @@ def UpdateGitStatus()
   # Append title
   appendbufline(git_status_bufname, 0, instructions)
   matchadd("WarningMsg", instructions[0])
-  map(instructions[1 : ], 'matchadd("WarningFloat", v:val)')
+
+  # branch_info
+  var start_line = line('.')
+  var section_name = branch_info
+  var num_lines = len(section_name)
+  appendbufline(git_status_bufname, start_line, section_name)
+  map(section_name[: -1], 'matchadd("ModeMsg", v:val)')
+  matchadd("Directory", local_branch)
+  matchadd("Directory", remote_branch)
 
   # Add staged files and color them
-  var start_line = line('.')
-  var section_name = ["Changes to be committed:"]
-  var num_lines = len(section_name + staged_list)
+  start_line += num_lines
+  section_name = ["Changes to be committed:"]
+  num_lines = len(section_name + staged_list)
   appendbufline(git_status_bufname, start_line, section_name + staged_list)
+  matchadd("ModeMsg", section_name[0])
   map(staged_list, 'matchadd("Directory", v:val)')
 
   # Add staged files and color them
@@ -382,6 +470,8 @@ def UpdateGitStatus()
   section_name = ['', "Changes not staged for commit:"]
   num_lines = len( section_name + unstaged_list)
   appendbufline(git_status_bufname, start_line, section_name + unstaged_list)
+  matchadd("ModeMsg", section_name[1])
+  # map(section_name[1 :], 'matchadd("Title", v:val)')
   map(unstaged_list, 'matchadd("Error", v:val)')
 
   # Add staged files and color them
@@ -389,13 +479,16 @@ def UpdateGitStatus()
   section_name = ['', "Untracked files:"]
   num_lines = len(untracked_list + section_name)
   appendbufline(git_status_bufname, start_line, section_name + untracked_list)
+  # map(section_name[1 : ], 'matchadd("Title", v:val)')
+  matchadd("ModeMsg", section_name[1])
   map(untracked_list, 'matchadd("Error", v:val)')
 
   if !empty(unmerged_list)
     start_line += num_lines
     section_name = ['(CONFLICTS) unmerged files need merge:']
     appendbufline(git_status_bufname, start_line, section_name + unmerged_list)
-    map(section_name, 'matchadd("ErrorMsg", v:val)')
+    # map(section_name[1 :], 'matchadd("ErrorMsg", v:val)')
+    matchadd("Title", section_name[1])
     map(untracked_list, 'matchadd("Error", v:val)')
   endif
   setlocal nomodifiable
@@ -416,18 +509,24 @@ def GitStatus()
   w:scratch = 1
   silent exe $"file {git_status_bufname}"
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
+  if exists('+winfixbuf')
+    win_execute(status_winid, 'setlocal winfixbuf' )
+  endif
 
   UpdateGitStatus()
 
   # Add
   setwinvar(win_id2win(status_winid), "GitCommitManagement", GitCommitManagement)
+  win_execute(status_winid, 'nnoremap <buffer> <silent> <esc> <cmd>close!<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> s <ScriptCmd>w:GitCommitManagement("s")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> S <ScriptCmd>w:GitCommitManagement("S")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> u <ScriptCmd>w:GitCommitManagement("u")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> U <ScriptCmd>w:GitCommitManagement("U")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> c <ScriptCmd>w:GitCommitManagement("c")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> cc <ScriptCmd>w:GitCommitManagement("cc")<cr>')
+  win_execute(status_winid, 'nnoremap <buffer> <silent> ? :call w:GitCommitManagement("?")<cr>')
   win_execute(status_winid, 'nnoremap <buffer> <silent> p <ScriptCmd>w:GitCommitManagement("p")<cr>')
+
   win_execute(status_winid, 'xnoremap <buffer> <silent> s :call w:GitCommitManagement("s")<cr>')
   win_execute(status_winid, 'xnoremap <buffer> <silent> u :call w:GitCommitManagement("u")<cr>')
 enddef
