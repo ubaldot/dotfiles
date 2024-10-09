@@ -212,13 +212,13 @@ export def GitLog(num_commits: number = 20)
   matchadd('Type', '(\_.\{-})')
 
   # Add
-  setwinvar(win_id2win(log_winid), "GitCheckout", GitCheckout)
-  win_execute(log_winid, 'nnoremap <buffer> <silent> <enter> <ScriptCmd>w:GitCheckout(getline("."))<cr>')
+  setwinvar(win_id2win(log_winid), "GitCheckoutCommit", GitCheckoutCommit)
+  win_execute(log_winid, 'nnoremap <buffer> <silent> <enter> <ScriptCmd>w:GitCheckoutCommit(getline("."))<cr>')
 enddef
 
 command! -nargs=? GitLog GitLog(<args>)
 
-export def GitCheckout(log_line: string = '')
+export def GitCheckoutComit(log_line: string = '')
   if empty(log_line)
     GitLog()
   else
@@ -228,7 +228,7 @@ export def GitCheckout(log_line: string = '')
   endif
 enddef
 
-command! -nargs=? -complete=customlist,LogComplete GitCheckout GitCheckout(<f-args>)
+command! -nargs=? -complete=customlist,LogComplete GitCheckoutCommit GitCheckoutCommit(<f-args>)
 
 def GitBranchComplete(A: any, L: any, P: any): list<string>
   var path = expand('%:p:h')
@@ -239,7 +239,7 @@ def GitBranchComplete(A: any, L: any, P: any): list<string>
   return systemlist($'cd {git_root} && git branch')
 enddef
 
-export def GitBranch(branch_name: string = '')
+export def GitCheckoutBranch(branch_name: string = '')
   if empty(branch_name)
     var curr_branch = trim(system("git branch --show-current"))
     if empty(curr_branch)
@@ -253,10 +253,10 @@ export def GitBranch(branch_name: string = '')
   endif
 enddef
 
-command! -nargs=? -complete=customlist,GitBranchComplete GitBranch GitBranch(<f-args>)
+command! -nargs=? -complete=customlist,GitBranchComplete GitCheckoutBranch GitCheckoutBranch(<f-args>)
 
 
-export def GitDiff()
+export def GitDiffAll()
   var filename = expand('%:p')
   var path = expand('%:p:h')
   var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
@@ -273,7 +273,7 @@ export def GitDiff()
   matchadd("Removed", '^-.*')
   matchadd("Type", '^+.*')
 enddef
-command! GitDiff GitDiff()
+command! GitDiffAll GitDiffAll()
 
 def LogLineToCommitID(log_line: string = ''): string
   var commit_id = ''
@@ -287,7 +287,7 @@ def LogLineToCommitID(log_line: string = ''): string
   return commit_id
 enddef
 
-export def Diff(log_line: string = '')
+export def GitDiff(log_line: string = '')
   var commit_id = LogLineToCommitID(log_line)
   DiffInternal(commit_id)
 enddef
@@ -301,7 +301,7 @@ def LogComplete(A: any, L: any, P: any): list<string>
   return systemlist($'cd {git_root} && git log --oneline --decorate -n 20')
 enddef
 
-command! -nargs=? -complete=customlist,LogComplete Diff Diff(<f-args>)
+command! -nargs=? -complete=customlist,LogComplete GitDiff GitDiff(<f-args>)
 
 export def GitCommit(no_verify: bool = false)
   var message = input("Enter commit message: ")
