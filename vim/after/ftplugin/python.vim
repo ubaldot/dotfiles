@@ -23,24 +23,25 @@ def Black(textwidth: number)
     # If black is not available, then the buffer content will be canceled upon
     # write. To avoid appending stdout and stderr to the buffer we use
     # --quiet.
+    var win_view = winsaveview()
     if executable('black') && &filetype == 'python'
-                var win_view = winsaveview()
                 # var cur_pos = getcursorcharpos()
                 exe $":%!black - --line-length {textwidth}
                       \ --stdin-filename {shellescape(expand("%"))} --quiet"
                 # setcharpos('.', cur_pos)
-                winrestview(win_view)
     else
         echom "black not installed!"
     endif
 
     if v:shell_error != 0
       undo
+      winrestview(win_view)
       # throw prevents writing on disk
       # throw "'black' errors!"
       # redraw!
       echoerr "'black' errors!"
     endif
+    winrestview(win_view)
 enddef
 
 # Call black to format 120 line length

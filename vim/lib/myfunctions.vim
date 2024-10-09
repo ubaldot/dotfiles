@@ -190,6 +190,8 @@ def DiffInternal(commit_id: string)
   win_gotoid(scratch_winid)
 enddef
 
+# TODO: add the various v:shell_error
+var git_log_bufname = "Git-log"
 export def GitLog(num_commits: number = 20)
   var path = expand('%:p:h')
   var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
@@ -201,14 +203,59 @@ export def GitLog(num_commits: number = 20)
   var log_list = systemlist($'git log --oneline --decorate -n {num_commits}')
   map(log_list, (idx, val) => substitute(val, '\r', '', ''))
   below new
+  var log_winid = win_getid()
   w:scratch = 1
+  silent exe $"file {git_log_bufname}"
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
   setline(1, log_list)
   matchadd('Directory', '^\w*\s')
   matchadd('Type', '(\_.\{-})')
+
+  # Add
+  setwinvar(win_id2win(log_winid), "GitCheckout", GitCheckout)
+  win_execute(log_winid, 'nnoremap <buffer> <silent> <enter> <ScriptCmd>w:GitCheckout(getline("."))<cr>')
 enddef
 
+
 command! -nargs=? GitLog GitLog(<args>)
+
+export def GitCheckout(log_line: string = '')
+  if empty(log_line)
+    GitLog()
+  else
+    var commit_id = LogLineToCommitID(log_line)
+    exe $"!git checkout {commit_id}"
+    exe $":{bufwinnr(git_log_bufname)}close!"
+  endif
+enddef
+
+command! -nargs=? -complete=customlist,LogComplete GitCheckout GitCheckout(<f-args>)
+
+def GitBranchComplete(A: any, L: any, P: any): list<string>
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  if v:shell_error != 0
+    return []
+  endif
+  return systemlist($'cd {git_root} && git branch')
+enddef
+
+export def GitBranch(branch_name: string = '')
+  if empty(branch_name)
+    var curr_branch = trim(system("git branch --show-current"))
+    if empty(curr_branch)
+      echo $'[(HEAD detached at {trim(system("git rev-parse --short HEAD"))})]'
+    else
+      echo curr_branch
+    endif
+  else
+    var branch_name_cleaned = branch_name->substitute('*\s', '', '')
+    exe $"!git checkout {branch_name_cleaned}"
+  endif
+enddef
+
+command! -nargs=? -complete=customlist,GitBranchComplete GitBranch GitBranch(<f-args>)
+
 
 export def GitDiff()
   var filename = expand('%:p')
@@ -229,6 +276,175 @@ export def GitDiff()
 enddef
 command! GitDiff GitDiff()
 
+def LogLineToCommitID(log_line: string = ''): string
+  var commit_id = ''
+  if !empty(log_line) && log_line != '--'
+    commit_id = matchstr(log_line, '^[a-f0-9]*')
+  elseif !empty(log_line) && log_line == '--'
+    commit_id = 'HEAD'
+  else
+    commit_id = log_line
+  endif
+  return commit_id
+enddef
+
+export def Diff(log_line: string = '')
+  var commit_id = LogLineToCommitID(log_line)
+  DiffInternal(commit_id)
+enddef
+
+def LogComplete(A: any, L: any, P: any): list<string>
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  if v:shell_error != 0
+    return []
+  endif
+  return systemlist($'cd {git_root} && git log --oneline --decorate -n 20')
+enddef
+
+command! -nargs=? -complete=customlist,LogComplete Diff Diff(<f-args>)
+
+export def GitCommit(no_verify: bool = false)
+  var message = input("Enter commit message: ")
+  var no_verify_str = no_verify ? '--no-verify' : ''
+  var shell_msg = system($"git commit -m '{message}' {no_verify_str}")
+  silent $":{git_status_bufname}close!"
+  if v:shell_error != 0
+    echo shell_msg
+  endif
+enddef
+
+command! -nargs=0 GitCommit GitCommit()
+command! -nargs=0 GitCommitNoVerify GitCommit(true)
+command! -nargs=0 GitPush execute('git push')
+
+def GitCommitManagement(key: string)
+  var instructions = ['Key bindings:', '  Stage: s (S for all)', '  Unstage: u (U for all)', '']
+  var item = getline('.')->substitute('.*:\s*', '', '')
+  # Needed for unstaging correct lines
+  var staged_files = systemlist("git diff --cached --name-only")
+  var shell_msg = ''
+  if key ==# 's'
+    shell_msg = system($"git add {item}")
+  elseif key ==# 'S'
+    shell_msg = system($"git add -u")
+  elseif key ==# 'u'
+    # Avoid to try to unstage lines that don't represent a blob
+    if index(staged_files, item) != -1
+      shell_msg = system($"git reset {item}")
+    endif
+  elseif key ==# 'U'
+    shell_msg = system($"git reset")
+  endif
+  # If no error update window
+  if v:shell_error == 0
+    set modifiable
+    var win_view = winsaveview()
+    exe ":%d _"
+    var status_list = systemlist($'git status')
+    map(status_list, (idx, val) => substitute(val, '\r', '', ''))
+    appendbufline(bufnr(), 0, instructions + status_list)
+    winrestview(win_view)
+    set nomodifiable
+  else
+    echo shell_msg
+  endif
+enddef
+
+var git_status_bufname = 'Git-status'
+def GitStatus()
+  var instructions = ['Key bindings:', '  Stage: s (S for all)', '  Unstage: u (U for all)', '']
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  exe $"cd {git_root}"
+  if v:shell_error != 0
+    Echoerr('Not a git repo')
+    return
+  endif
+  var status_list = systemlist($'git status')
+  map(status_list, (idx, val) => substitute(val, '\r', '', ''))
+  # status_list_cleaned = CleanStatusList()
+
+  below new
+  var status_winid = win_getid()
+  w:scratch = 1
+  silent exe $"file {git_status_bufname}"
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile modifiable
+  setline(1, instructions + status_list)
+  matchadd('WarningMsg', '\%1l\.*')
+  matchadd('Type', '\%2l\_.*\%3l')
+  matchadd('Directory', '^Changes to be committed:$')
+  matchadd('Error', '^Changes not staged for commit:$')
+  matchadd('Error', '^Untracked files:$')
+  set nomodifiable
+
+  # Add
+  setwinvar(win_id2win(status_winid), "GitCommitManagement", GitCommitManagement)
+  win_execute(status_winid, 'nnoremap <buffer> <silent> s <ScriptCmd>w:GitCommitManagement("s")<cr>')
+  win_execute(status_winid, 'nnoremap <buffer> <silent> S <ScriptCmd>w:GitCommitManagement("S")<cr>')
+  win_execute(status_winid, 'nnoremap <buffer> <silent> u <ScriptCmd>w:GitCommitManagement("u")<cr>')
+  win_execute(status_winid, 'nnoremap <buffer> <silent> U <ScriptCmd>w:GitCommitManagement("U")<cr>')
+  win_execute(status_winid, 'xnoremap <buffer> <silent> s :call w:GitCommitManagement("s")<cr>')
+  win_execute(status_winid, 'xnoremap <buffer> <silent> u :call w:GitCommitManagement("u")<cr>')
+
+enddef
+
+command! -nargs=0 GitStatus GitStatus()
+
+def GitLsFilesManagement(key: string)
+  var item = getline('.')
+  # Needed for unstaging correct lines
+  var shell_msg = ''
+  if key ==# 'u'
+    shell_msg = system($"git rm --cached {item}")
+  endif
+  # If no error update window
+  if v:shell_error == 0
+    set modifiable
+    var win_view = winsaveview()
+    exe ":%d _"
+    var status_list = systemlist($'git ls-files')
+    map(status_list, (idx, val) => substitute(val, '\r', '', ''))
+    appendbufline(bufnr(), 0, status_list)
+    winrestview(win_view)
+    set nomodifiable
+  else
+    echo shell_msg
+  endif
+enddef
+
+var git_lsfiles_bufname = 'Git-ls-files'
+def GitLsFiles()
+  var path = expand('%:p:h')
+  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
+  exe $"cd {git_root}"
+  if v:shell_error != 0
+    Echoerr('Not a git repo')
+    return
+  endif
+  var lsfiles_list = systemlist($'git ls-files')
+  map(lsfiles_list, (idx, val) => substitute(val, '\r', '', ''))
+  # lsfiles_list_cleaned = CleanStatusList()
+
+  below new
+  var lsfiles_winid = win_getid()
+  w:scratch = 1
+  silent exe $"file {git_lsfiles_bufname}"
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile modifiable
+  setline(1, lsfiles_list)
+  set nomodifiable
+
+  # Add
+  setwinvar(win_id2win(lsfiles_winid), "GitLsFilesManagement", GitLsFilesManagement)
+  win_execute(lsfiles_winid, 'nnoremap <buffer> <silent> u <ScriptCmd>w:GitLsFilesManagement("u")<cr>')
+  win_execute(lsfiles_winid, 'xnoremap <buffer> <silent> u :call w:GitLsFilesManagement("u")<cr>')
+
+enddef
+
+command! -nargs=0 GitLsFiles GitLsFiles()
+ # ============== END GIT ==================
+
+
 export def Redir(cmd: string, rng: number, start: number, end: number)
   # Used to redirect the output from the terminal in a scratch buffer
   #
@@ -243,8 +459,8 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
   var output = []
   if cmd =~ '^!'
     var cmd_filt = cmd =~ ' %'
-           ? matchstr(substitute(cmd, ' %', ' ' .. shellescape(escape(expand('%:p'), '\')), ''), '^!\zs.*')
-           : matchstr(cmd, '^!\zs.*')
+      ? matchstr(substitute(cmd, ' %', ' ' .. shellescape(escape(expand('%:p'), '\')), ''), '^!\zs.*')
+      : matchstr(cmd, '^!\zs.*')
     if rng == 0
       output = systemlist(cmd_filt)
     else
@@ -262,28 +478,6 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
   setline(1, output)
 enddef
 
-export def Diff(log_line: string = '')
-  var commit_id = ''
-  if !empty(log_line) && log_line != '--'
-    commit_id = matchstr(log_line, '^\w\+')
-  elseif !empty(log_line) && log_line == '--'
-    commit_id = 'HEAD'
-  else
-    commit_id = log_line
-  endif
-  DiffInternal(commit_id)
-enddef
-
-def DiffComplete(A: any, L: any, P: any): list<string>
-  var path = expand('%:p:h')
-  var git_root = trim(system($'cd {path} && git rev-parse --show-toplevel'))
-  if v:shell_error != 0
-    return []
-  endif
-  return systemlist($'cd {git_root} && git log --oneline --decorate -n 20')
-enddef
-
-command! -nargs=? -complete=customlist,DiffComplete Diff Diff(<f-args>)
 
 
 var color_is_shown = false
