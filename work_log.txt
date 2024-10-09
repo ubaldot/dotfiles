@@ -108,3 +108,9 @@ Legend:
 
 === Oct 07 24 ==========
 - Fixed GitDiff functions
+
+=== Oct 09 24 ==========
+- git create new branch
+- git track remote branch
+- ALP, when you start typing reduce the list
+- git reset --hard <commit-id>
