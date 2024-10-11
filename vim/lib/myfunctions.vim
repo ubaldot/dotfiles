@@ -155,18 +155,21 @@ export def PushDot()
   exe "!git add -u && git commit -m '.' && git push"
 enddef
 
-
-def DiffInternal(commit_id: string)
+def DiffInternal(commit_id: string): number
   # For comparing:
   #   1. Your open buffer VS its last saved version (no args)
   #   2. Your open buffer with a given commit
   #
   # Usage: :Diff 12jhu23
-  # To exit, just wipe the scratch buffer.
+  # To exit, just close the scratch buffer window
 
+  # I could use :tab split but may users have buffers in the tabline and it
+  # could not work well.
+  tab split
   var curr_winid = win_getid()
   vertical new
   var scratch_winid = win_getid()
+
   win_execute(scratch_winid, "setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile")
 
   if empty(commit_id)
@@ -175,19 +178,27 @@ def DiffInternal(commit_id: string)
   else
     # Get lines from repo
     var file_lines = systemlist($"git show {commit_id}:{expand('#:.')}")
+    if v:shell_error != 0
+      Echoerr("Not in a git repository")
+      close
+      tabclose
+      return -1
+    endif
     map(file_lines, (idx, val) => substitute(val, '\r', '', ''))
     appendbufline(winbufnr(scratch_winid), 0, file_lines)
   endif
 
   setwinvar(scratch_winid, '&filetype', getbufvar('#', '&filetype'))
-  augroup Diff
-    autocmd!
-    autocmd WinClosed scratch_winid diffoff!
-  augroup END
+  # augroup Diff
+  #   autocmd!
+  #   autocmd WinClosed <buffer> tabclose
+  # augroup END
   diffthis
   win_gotoid(curr_winid)
   diffthis
   win_gotoid(scratch_winid)
+  autocmd WinClosed <buffer> ++once tabclose
+  return 0
 enddef
 
 # TODO: add the various v:shell_error
