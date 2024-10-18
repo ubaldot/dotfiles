@@ -86,7 +86,7 @@ def MyFoldExpr(): string
     fold_level = '>1'
   # Check if the next line contains 'def' or 'class' to close the fold
   # elseif getline(v:lnum + 1) =~ '^\s*\(def\|class\)'
-  elseif getline(v:lnum + 1) =~ '^\s*\(def\|class\)'
+  elseif getline(v:lnum + 1) =~ '^\s*\(def\|class\|return\)'
     fold_level = '<1'
   else
     fold_level = '='

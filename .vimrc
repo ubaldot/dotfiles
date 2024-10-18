@@ -13,7 +13,6 @@ def IsWSL(): bool
   return false
 enddef
 
-
 if has("win64") || has("win32") || has("win16")
   g:os = "Windows"
 elseif IsWSL()
@@ -32,17 +31,14 @@ if has('unix') && g:os == 'WSL' && !has('+clipboard')
   endif
 
   # Paste
-  def WslPut(above: bool = false)
-    var copied_text = system('powershell.exe -NoProfile -ExecutionPolicy Bypass Get-Clipboard')->substitute("\r", '', 'g' )
-    setreg("p", copied_text)
-    if !above
-      norm! "pp
-    else
-      norm! "pP
-    endif
+  def g:WslPut(above: bool = false)
+    # var copied_text = systemlist('powershell.exe -NoProfile -ExecutionPolicy Bypass Get-Clipboard | sed ''s/\r$//''')
+    var linenr = above ? line('.') - 1 : line('.')
+    appendbufline(bufnr(), linenr, split(getreg('+'), '\n'))
+    exe ":%s/\\r$//g"
   enddef
-  noremap "+p <scriptcmd>WslPut()<cr>
-  noremap "+P <scriptcmd>WslPut(true)<cr>
+  nnoremap "+p <scriptcmd>g:WslPut()<cr>
+  nnoremap "+P <scriptcmd>g:WslPut(true)<cr>
 endif
 
 if g:os == "Windows" || g:os =~ "^MINGW64"
@@ -85,7 +81,7 @@ import g:dotvim .. "/lib/myfunctions.vim"
 # &t_ti = "\e[6 q\e[?1049h"
 # &t_te = "\e[5 q\e[?1049l"
 
-augroup ReloadVimScripts
+augroup RELOAD_VIMS_CRIPTS
   autocmd!
   autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
     exe "source %"
@@ -323,6 +319,7 @@ Plug 'ubaldot/vim9-conversion-aid'
 Plug 'ubaldot/vim-extended-view'
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-latex-tools'
+Plug 'ubaldot/vim-git-master'
 # Plug 'ubaldot/vim-open-recent'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
