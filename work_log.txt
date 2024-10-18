@@ -101,7 +101,7 @@ Legend:
 * str2list
 
 === Okt 06 24 ==========
-- Downsampled XCorrelation (and refactored)
+* Downsampled XCorrelation (and refactored)
 - User can select number of lags and if downsampling the ACF
 - Promote Signal to classdata and lift functions from Dataset.
 - Stiff models
@@ -114,3 +114,46 @@ Legend:
 - git track remote branch
 - ALP, when you start typing reduce the list
 - git reset --hard <commit-id>
+
+=== Oct 11 24 ==========
+- Added tabnew in git plugin
+* Start from debugging ValidationSession initializer (get good dataframe and
+  create a new ValidationSession object (copy from unit-tests))
+
+=== Oct 14 24 ==========
+* Debugged XCorrelation with uneven lags. (Add tests, clean up code)
+- Manually check the API through test_manual.py and update the test-cases.
+- Update __repr__
+- Make a test with the weights.
+* Fixed vs.plot_residuals() (also colors)
+
+=== Oct 15 24 ==========
+- Output with TRL associated.
+- Fuel cell power split: who does what?
+* Debug XCorrelation_tests. The number of lags is wrong.
+- validate_models() test.
+* Test_XCorrelation()
+* tests: different number of lags.
+* test_initializers_with_params
+
+=== Oct 16 24 ==========
+- test estimate_whiteness, compute_statistics
+=> Start with XCorrelation_test.py script!!!
+
+=== Oct 17 24 ==========
+* Downloaded newer app (avap_example is deprecated), start using gdb from
+  inside the docker. Most likely I will add a couple of PR today.
+- branch names for avap: add gdbserver and update README.md (deprecated) in
+  avap example.
+
+=== Oct 18 24 ==========
+- Check the stories with very long lesd time and clean.
+- Some storied connected to Features are not
+- Stories length less than 1 PI.
+- Avoid dependencies between stories
+- Initiative = roadmap item: fix start and end dates
+- Milestones shall be connected to initiatives. You can see them in
+  Confluence in another view.
+- Retro: on-going discussion for the seat in the office space.
+- VSCode debug: get env variables for launch.json. PROJECT_ROOT_HOST and
+  EXEC_NAME
