@@ -618,8 +618,9 @@ command! -nargs=1 HH execute histget("cmd", <args>)
 
 # Activity log
 #
-command! LLogNewDay silent exe $'!printf "\n=={strftime('= %b %d %y ==========')}" >> ~/work_log.txt' | exe "LLogOpen"
-command! LLogOpen exe 'edit ~/work_log.txt' | norm! G
+var work_log_path = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
+command! LLogNewDay silent exe $'!printf "\n=={strftime('= %b %d %y ==========')}" >> {work_log_path}' | exe "LLogOpen"
+command! LLogOpen exe $'edit {work_log_path}' | norm! G
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
