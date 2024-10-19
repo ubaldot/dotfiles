@@ -30,15 +30,16 @@ if has('unix') && g:os == 'WSL' && !has('+clipboard')
     augroup END
   endif
 
-  # Paste
-  def g:WslPut(above: bool = false)
-    # var copied_text = systemlist('powershell.exe -NoProfile -ExecutionPolicy Bypass Get-Clipboard | sed ''s/\r$//''')
-    var linenr = above ? line('.') - 1 : line('.')
-    appendbufline(bufnr(), linenr, split(getreg('+'), '\n'))
-    exe ":%s/\\r$//g"
+  def WslPut(above: bool = false)
+    var start_linenr = above ? line('.') - 1 : line('.')
+    var copied_text = split(getreg('+'), '\n')
+    var end_linenr = start_linenr + len(copied_text)
+    appendbufline(bufnr(), start_linenr, copied_text)
+    silent! exe $":{start_linenr},{end_linenr}s/\\r$//g"
   enddef
-  nnoremap "+p <scriptcmd>g:WslPut()<cr>
-  nnoremap "+P <scriptcmd>g:WslPut(true)<cr>
+
+  nnoremap "+p <scriptcmd>WslPut()<cr>
+  nnoremap "+P <scriptcmd>WslPut(true)<cr> # Paste
 endif
 
 if g:os == "Windows" || g:os =~ "^MINGW64"
@@ -541,29 +542,29 @@ command ManimHelpTransform exe "HelpMe " .. g:dotvim
 
 # HelpMe files for my poor memory
 command! HelpmeBasic exe "HelpMe " .. g:dotvim
-  \ "/helpme_files/vim_basic.txt"
+      \ "/helpme_files/vim_basic.txt"
 command! HelpmeScript exe "HelpMe "\ g:dotvim
-  \ "/helpme_files/vim_scripting.txt"
+      \ "/helpme_files/vim_scripting.txt"
 command! HelpmeGlobal exe "HelpMe "\ g:dotvim
-  \ "/helpme_files/vim_global.txt"
+      \ "/helpme_files/vim_global.txt"
 command! HelpmeExCommands exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_excommands.txt"
+      \ "/helpme_files/vim_excommands.txt"
 command! HelpmeSubstitute exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_substitute.txt"
+      \ "/helpme_files/vim_substitute.txt"
 command! HelpmeUnitTests exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_unit_tests.txt"
+      \ "/helpme_files/vim_unit_tests.txt"
 command! HelpmeAdvanced exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_advanced.txt"
+      \ "/helpme_files/vim_advanced.txt"
 command! HelpmeDiffMerge exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_merge_diff.txt"
+      \ "/helpme_files/vim_merge_diff.txt"
 command! HelpmeCoding exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_coding.txt"
+      \ "/helpme_files/vim_coding.txt"
 command! HelpmeClosures exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/python_closures.txt"
+      \ "/helpme_files/python_closures.txt"
 command! HelpmeDebug exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_debug.txt"
+      \ "/helpme_files/vim_debug.txt"
 command! HelpmeVimspector exe "HelpMe " \ g:dotvim
-  \ "/helpme_files/vim_vimspector.txt"
+      \ "/helpme_files/vim_vimspector.txt"
 
 # vim-replica stuff
 # ----------------------------------
