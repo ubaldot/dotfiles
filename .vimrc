@@ -1,5 +1,8 @@
 vim9script
 
+# For avap dev
+g:is_avap = true
+
 # OS detection
 def IsWSL(): bool
   if has("unix")
@@ -103,8 +106,6 @@ augroup END
 #     autocmd CmdlineEnter : setcmdline('vim9cmd ')
 # augroup END
 # -------------------------------------------
-
-
 
 # Open help pages in vertical split
 augroup vimrc_help
