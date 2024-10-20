@@ -24,7 +24,7 @@ endif
 if has('unix') && g:os == 'WSL' && !has('+clipboard')
   # Yank
   if !has('gui_running')
-    augroup WSLYank
+    augroup WSL_YANK
       autocmd!
       autocmd TextYankPost * if v:event.operator ==# 'y' | system('clip.exe', getreg('0')) | endif
     augroup END
@@ -82,7 +82,7 @@ import g:dotvim .. "/lib/myfunctions.vim"
 # &t_ti = "\e[6 q\e[?1049h"
 # &t_te = "\e[5 q\e[?1049l"
 
-augroup RELOAD_VIMS_CRIPTS
+augroup RELOAD_VIM_SCRIPTS
   autocmd!
   autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
     exe "source %"
@@ -321,7 +321,6 @@ Plug 'ubaldot/vim-extended-view'
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-latex-tools'
 Plug 'ubaldot/vim-git-master'
-# Plug 'ubaldot/vim-open-recent'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 # Plug 'girishji/scope.vim'
@@ -338,7 +337,7 @@ syntax on
 packadd comment
 packadd! termdebug
 
-augroup SetHeadersAsCfiletype
+augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
   autocmd BufRead,BufNewFile *.h set filetype=c
 augroup END
@@ -394,7 +393,7 @@ def ShowRecentFiles()
   endif
 enddef
 
-augroup OpenRecent
+augroup OPEN_RECENT
   autocmd!
   autocmd VimEnter * ShowRecentFiles()
 augroup END
@@ -514,7 +513,7 @@ g:manim_flags = {
 g:manim_default_flag = keys(g:manim_flags)[-1]
 
 if g:os == "Darwin"
-  augroup CloseQuickTime
+  augroup CLOSE_QUICKTIME
     autocmd!
     autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
   augroup END
@@ -586,7 +585,7 @@ nnoremap <silent> <F8> <Plug>OutlineToggle
 
 # Bunch of commands
 # -----------------------
-augroup remove_trailing_whitespaces
+augroup REMOVE_TRAILING_WHITESPACES
   autocmd!
   autocmd BufWritePre * {
     if !&binary
