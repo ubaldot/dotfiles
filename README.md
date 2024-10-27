@@ -1,32 +1,22 @@
 # dotfiles
-Repo to keep track of my configs files. The process could be optimized but so
-far so good (it is still better than manually copy and paste).
+Repo to keep track of my dot files.
 
 # Usage
-Download the `clone_*` scripts with the following commands:
+- Clone this repo in any folder (e.g. `~\dotfiles`).
+- Create symbolic links. Examples:
 
 ```
-# https
-curl -o /tmp/clone_dotfiles_https.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_https.sh
+ln -s /home/ubaldot/dotfiles/.zshrc /home/ubaldot/.zshrc
+ln -s /home/ubaldot/dotfiles/vim/after/ftplugin/c.vim
+/home/ubaldot/.vim/after/ftplugin/c.vim
 ```
 
+For Windows, you can use `powershell`:
+
 ```
-# ssh
-curl -o /tmp/clone_dotfiles_ssh.sh https://raw.githubusercontent.com/ubaldot/dotfiles/main/clone_dotfiles_ssh.sh
+New-Item -ItemType SymbolicLink -Path "C:\Users\ubaldot\.zshrc" -Target "C:\Users\ubaldot\dotfiles\.zshrc"
+New-Item -ItemType SymbolicLink -Path "C:\Users\ubaldot\.vim\after\ftplugin\c.vim" -Target "C:\Users\ubaldot\dotfiles\vim\after\ftplugin\c.vim"
 ```
 
-and run `/tmp/clone_dotfiles_ssh.sh` (or `/tmp/clone_dotfiles_https.sh`).
-The scripts will clone this repo and copy the various files in the correct
-place.
-
-Once done you can use the `~/dotfiles/push_dotfiles.sh` and `~/dotfiles/pull_dotfiles.sh` scripts to keep your files updated.
-
-Note that you need to `chmod u+x /tmp/clone_dotfiles*` and you may need to `dos2unix
-/tmp/clone_dotfiles*` to run the script.
-
-# Windows
-
-If you plan to use Windows natively (i.e. no WSL), then you must still use WSL for running a `clone_dotfiles_*.sh` script
-and you must pass the argument `win`, e.g. `/tmp/clone_dotfiles_https.sh win` and your C: drive must be mounted in `/mnt/c`.
-The same for the `push_/pull_` scripts, you shall use e.g. `pull_dotfiles.sh
-win`.
+To automatically push and pull you can use the scripts `push_dotfile.sh` and
+`pull_dotfiles.sh`.
