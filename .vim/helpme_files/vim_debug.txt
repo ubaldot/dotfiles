@@ -1,0 +1,65 @@
+Start the debugger with arm-none-eabi-gdb -x ../gdb_init_commands.txt
+
+Use :Debug that is mine customized version of :Termdebug
+
+You can build the .elf file, then Termdebug myfile.elf and then monitor system
+halt and then (gdb) load
+
+LAYOUT
+- lay next
+- file filename.c:1
+
+MAPPINGS (Termdebug)
+--------------------
+CC <Cmd>Continue<CR>
+B <Cmd>Break<CR>
+C <Cmd>Clear<CR>
+S <Cmd>Step<CR>
+O <Cmd>Over<CR>
+F <Cmd>Finish<CR>
+
+You can also use mouse right click to set/clear breakpoints!
+
+MAPPING (vimspector)
+--------------------
+<F5> - Launch debugger/Continue
+<F9> - Toggle breakpoints
+<F10> - Step Over
+<F11> - Step Into
+<F12> - Step Out
+
+
+COMMANDS
+- break <symbol/line>, (e.g. break blink_main.c:blink_main)
+- delete <breakpoint number>, (delete with no args for deleting all breakpoints)
+- info breakpoints, shall all the breakpoints
+- clear <line number>, delete all breakpoints
+- enable/disable <breakpoint>
+- run/continue, (you need a breakpoint first)
+- next/nexti, advance one line or step over (nexti for assembler)
+- step, step into function. Don't use on e.g. printf, use next instead.
+- finish, continue until the function finishes
+- refresh, when the view get messy
+
+- print <what>, e.g.
+    print (*((volatile uint32_t *)0x40002C00) >> 7) & 0x01
+  for checking bit 7 status of register 0x40002C00.
+
+- bits in binary form
+    p/t 0x40002C00
+
+- x/nfu <address>, u = b:byte, h:half-word, w:word, g:giant word
+  x/i $pc show the ASM instruction on the program counter.
+
+- info <breakpoints, registers, threads, locals, globals, args>
+    info breakpoints (show all active breakpoints)
+
+OPENOCD COMMANDS
+- monitor <command>, to use openocd commands
+- monitor (reset) halt /monitor resume
+
+For more, google gdb cheatsheet or this:
+
+https://static.linaro.org/connect/lvc21/presentations/lvc21-308.pdf
+
+or google openocd general commands.

@@ -1,0 +1,59 @@
+TESTING (you can also set an alias in the pyproject.toml)
+coverage run --branch -m pytest .
+coverage run --branch -m pytest .\tests\test_dataset.py
+coverage run --branch -m pytest .\tests\test_dataset.py -k "not plot and not open_tutorial"
+coverage run --branch -m pytest  tests/test_dataset.py::Test_Dataset_raise::test__validate_name_value_tuples_raise[MIMO]
+
+coverage report -m
+
+GIT STUFF
+git difftool move_fix_sampling_periods .\src\dymoval\dataset.py
+- or use :Diff
+
+CONDA
+mamba create -n nameofmyenv python=3.10
+conda env update --name env_name --file environment.yml # In case the environment.yml has an env name in it.
+conda list --explicit > bio-env.txt
+conda env remove --name bio-env
+conda env create --file bio-env.txt
+conda env list
+conda remove --name bio-env <package1> <package2>
+conda env export > environment_droplet.yml
+conda env export --name machine-learning-env --file environment.yml
+conda env export --name machine-learning-env --from-history --file environment.yml
+conda env update --prefix ./env --file environment.yml  --prune (prune to remove dependencies no longer needed)
+
+REBUILDS
+conda-lock -f environment.yml
+pip freeze > pip-freeze.txt
+conda-lock install --name YOURENV conda-lock.yml
+
+HATCH (it builds both the sdist and the wheels packages)
+- It publish on pypi, you have to configure your ~/.pypirc file for easy access.
+
+hatch build
+hatch publish
+
+CONDA BUILDS (you first need your package to be published on PyPI.)
+- You nees a skeleton which include few files, but you can automatically create one from pypi with
+conda skeleton pypi --recursive dymoval
+
+- Given that conda skeleton won't work if your project don't have a setup.py, I am temporaly using grayskull.
+- Once you have your skeleton, place it to a folder called dymoval. Then,
+
+conda-build dymoval
+
+- Convert to all other platforms MacOS, Linux, etc.
+conda convert -f --platform all C:\Users\jsmith\miniconda\conda-bld\win-64\click-7.0-py37_0.tar.bz2
+-o outputdir\
+
+- Read the following for uploading packages.
+https://docs.conda.io/projects/conda-build/en/latest/user-guide/tutorials/build-pkgs-skeleton.html#before-you-start
+
+
+DOCS
+cd docs
+make clean
+sphinx-apidoc -f -n -o ./docs/source ../src/dymoval/
+make html
+cd ..

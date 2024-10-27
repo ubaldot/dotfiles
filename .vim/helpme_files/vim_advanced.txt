@@ -1,0 +1,49 @@
+ADVANCED
+--------
+* Mappings
+  maps execute literally the sequence of keystrokes that you write after:
+
+     nnoremap gp jj$xx
+     nnoremap ff <cmd>MyCommand<cr>
+
+  But sometimes you want to get the result of an expression. If you write
+    nnoremap fr lib.MyFunction()
+
+  then Vim executes literally the keystrokes 'l', 'i', 'b', ... that is not
+  what you want. Hence, you use <expr>
+
+    nnoremap <expr> fr lib.MyFunction()
+
+  Note that sometimes you have to quote expressions
+
+     nnoremap <expr> ff '<cmd>MyCommand<cr>'
+     nnoremap <expr> ff $'{v:count}MyCommand<cr>'
+
+
+* options are builtin variables (you use set for setting them. e.g. set foldmethod = ...).
+To see their value you use ?, e.g. :set foldmethod? or :verbose set foldmethod?
+To access their value in a script you do e.g. &commentstrings
+
+* To see all the options :options
+
+* ! overwrite any existing, e.g. def! foo() overwrite any other definition of foo() or command! Bar overwrite any other Bar names
+* At startup vim silently load defaults.vim
+
+* (legacy) Place custom functions in
+
+    ~/.vim/autoload/myfunctions.vim
+    call myfunctions#foo()
+
+* Put your functions wherever you want and just use import/export mechanism. :h import
+* Place filetype specific stuff in ftplugin
+* Plugins for the builtin plugin manager shall be placed in
+
+    $HOME/.vim/pack/bundle/start/ # Automatically started plugins
+    $HOME/.vim/pack/bundle/opt/ # Manually started plugins
+
+  to start a plugin in opt just run :packadd foo (lazy load)
+  Otherwise just use a plugin manager.
+
+* Plugin folder is started at vim start
+* autoload starts when something inside there is called
+* The vimrc is firstly loaded, then the plugins. :scriptnames to see the order.

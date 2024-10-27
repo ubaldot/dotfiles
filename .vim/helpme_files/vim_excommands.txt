@@ -1,0 +1,46 @@
+EX COMMANDS
+-----------
+A general command has the form
+
+:[range]cmd
+
+range specifies the lines where cmd shall be executed.
+
+EXAMPLES
+--------
+  :%y             yank the whole file
+  :%normal @a     run macro a through all the file
+  :10,15normal $x remove last character from line 10 to line 15
+  :'a,'by z  copy from marker a to marker b into z register
+  :23,39norm >> Indent lines 23-39
+
+RANGES
+------
+  :13,15          from line 13 to line 15
+  :13,+3          from line 13 to line 13+3
+  :'t,$           from marker t to the end of file
+  :.,+5           from current line to current line+5
+  :.,$            from current line to the end
+
+Ranges are always of the form "from line1 to line2" (sequential).
+To create ranges of arbitrary lines, use :g (global)
+
+TIPS
+----
+* To escape <cr> in the Ex mode (for example when using :s/) you must use \r,
+  e.g. :s/\s/\r/g replace the space with a new line.
+* To access :history run :<c-f>
+* to replace stuff in specific "geometrical" positions (for example,
+to remove the commas at the end of each line) use [range]normal, e.g.
+
+  :%normal $x   # deletes the last character of every line
+
+Otherwise, use macros, e.g.
+
+  qa05xjq (remove first 5 chars in current line and move to next line)
+  :10,20normal @a
+
+* to replace stuff that follow a certain pattern (no matter where
+these guys are located), for example remove all " in a file,
+then use :s (substitute)
+* to create custom ranges, use :g (global)

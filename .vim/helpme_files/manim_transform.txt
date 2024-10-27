@@ -1,0 +1,25 @@
+TRANSFORM VS REPLACEMENT TRANSFORM
+----------------------------------
+=> In both cases mob1 <- mob2.
+=> In Transform we always refer always to the first object that just changed shape.
+=> In ReplacementTransform we must refer to the second object that overwrite the first object.
+
+Example
+self.play(mn.Transform(c, s))  # c takes the shape of s, we continue with c
+self.remove(s)
+
+self.play(mn.ReplacementTransform(c, s))  # c takes the shape of s, we continue with s
+self.remove(c)
+(OBS! c is actually replaced!)
+
+=> If s is invisible there is not much difference
+=> If both c and s are visible, then there is a lot of difference!
+
+MOVE_TO VS SHIFT
+----------------
+move_to: absolute position
+
+  cos_x.move_to(mn.DOWN) # Move to [0,-1,0]
+  cos_x_shift_to(mn.DOWN) # Move to cos_x.get_center() + mn.DOWN
+
+Remember that also exist next_to and align_to.
