@@ -48,10 +48,12 @@ endif
 if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
-  g:dotvim = $HOME .. "\\vimfiles"
+  # g:dotvim = $HOME .. "\\vimfiles"
+	g:dotvim = $HOME .. "\\.vim"
   # source $VIMRUNTIME/mswin.vim
   # For mingw64
-  set runtimepath+=C:/Users/yt75534/vimfiles
+  # set runtimepath+=C:/Users/yt75534/vimfiles
+  set runtimepath+=C:/Users/yt75534/.vim
 else
   g:tmp = "/tmp"
   g:null_device = "/dev/null"

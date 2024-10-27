@@ -2,21 +2,9 @@
 Repo to keep track of my dot files.
 
 # Usage
-- Clone this repo in any folder (e.g. `~\dotfiles`).
-- Create symbolic links. Examples:
+- Clone this repo in your home folder.
+- Run the script `create_symlinks.py`
 
-```
-ln -s /home/ubaldot/dotfiles/.zshrc /home/ubaldot/.zshrc
-ln -s /home/ubaldot/dotfiles/vim/after/ftplugin/c.vim
-/home/ubaldot/.vim/after/ftplugin/c.vim
-```
-
-For Windows, you can use `powershell`:
-
-```
-New-Item -ItemType SymbolicLink -Path "C:\Users\ubaldot\.zshrc" -Target "C:\Users\ubaldot\dotfiles\.zshrc"
-New-Item -ItemType SymbolicLink -Path "C:\Users\ubaldot\.vim\after\ftplugin\c.vim" -Target "C:\Users\ubaldot\dotfiles\vim\after\ftplugin\c.vim"
-```
-
-To automatically push and pull you can use the scripts `push_dotfile.sh` and
-`pull_dotfiles.sh`.
+The scrit `create_symlinks.py` create a 1-1 symlink for every file contained
+in `~/dotfiles` folder. The target folder for the symlinks is `~`. The script
+works for Windows/Linux/Macos.
