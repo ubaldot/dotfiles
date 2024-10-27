@@ -72,7 +72,8 @@ function set_virtualenv () {
   if test -z "$CONDA_DEFAULT_ENV" ; then
       PYTHON_VIRTUALENV=""
   else
-      PYTHON_VIRTUALENV="${WHITE}(`basename \"$CONDA_DEFAULT_ENV\"`)${COLOR_NONE} "
+      # PYTHON_VIRTUALENV="${WHITE}(`basename \"$CONDA_DEFAULT_ENV\"`)${COLOR_NONE} "
+      PYTHON_VIRTUALENV="${BLUE}(`basename \"$CONDA_DEFAULT_ENV\"`)${COLOR_NONE} "
   fi
 }
 
