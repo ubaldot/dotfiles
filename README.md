@@ -5,7 +5,7 @@ Repo to keep track of my dot files.
 - Clone this repo in your home folder.
 - Run `python create_symlinks.py`.
 
-The scrit `create_symlinks.py` create a 1-1 symlink in `~` for every file contained
+The script `create_symlinks.py` create a 1-1 symlink in `~` for every file contained
 in `~/dotfiles` folder. The script works for Windows/Linux/Macos.
 
 When you create a new dotfile, manually move it to `~\dotfiles` folder and add it
