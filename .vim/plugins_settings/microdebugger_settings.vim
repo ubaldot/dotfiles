@@ -7,9 +7,9 @@ if g:is_avap
   g:termdebug_config['command'] = ['gdb', '-ex', 'shell sleep 5', '-ex', 'target extended-remote localhost:1234',
     '-ex', 'set substitute-path /app /home/yt75534/avap_vcm_hardware_info']
 
-  g:microdebugger_openocd_command = ['./avap-util/scripts/run_gdbserver_docker.sh']
+  g:microdebugger_server_command = ['./avap-util/scripts/run_gdbserver_docker.sh']
 
-  g:microdebugger_aux_windows = ['openocd',  'variables']
+  g:microdebugger_aux_windows = ['server',  'variables']
   g:microdebugger_gdb_win_height = 8
   g:microdebugger_mappings = { C: '<Cmd>Continue<CR><cmd>call TermDebugSendCommand("display")<cr>',
     B: '<Cmd>Break<CR><cmd>call TermDebugSendCommand("display")<cr>',
