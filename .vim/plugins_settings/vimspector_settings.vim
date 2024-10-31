@@ -22,12 +22,15 @@ var gdb_stuff_path = fnamemodify(getcwd(), ":h") .. "/gdb_stuff"
 # STM32F4xx
 var stm32f4xx_runCommand = [$'{gdb_stuff_path}/openocd_stm32f4x_stlink.sh']
 if g:os == "Windows"
-  stm32f4xx_runCommand = ['cmd.exe', '/c', $'{gdb_stuff_path}\\openocd_stm32f4x_stlink.bat']
+  stm32f4xx_runCommand = ['cmd.exe', '/c',
+    $'{gdb_stuff_path}\\openocd_stm32f4x_stlink.bat']
 endif
 
 # AVAP
-var gdb_in_docker_cmd = "/home/yt75534/avap_vcm_hardware_info/avap-util/scripts/run_gdbserver_docker.sh"
-var avap_exec_fullpath = "/home/yt75534/avap_vcm_hardware_info/build/gcc9_linux_x86_64-docker/Debug/opt/volvo_avap_vcmhardwareinfo/bin/volvo_avap_vcmhardwareinfo"
+var gdb_in_docker_cmd =
+  "/home/yt75534/avap_vcm_hardware_info/avap-util/scripts/run_gdbserver_docker.sh"
+var avap_exec_fullpath =
+  "/home/yt75534/avap_vcm_hardware_info/build/gcc9_linux_x86_64-docker/Debug/opt/volvo_avap_vcmhardwareinfo/bin/volvo_avap_vcmhardwareinfo"
 
 # Mappings
 g:vimspector_mappings = { C: '<Plug>VimspectorContinue',
@@ -47,7 +50,8 @@ def SetupVimspectorMappings()
       if !empty(mapcheck(key, "n"))
         existing_mappings[key] = maparg(key, 'n', false, true)
       endif
-      exe 'nnoremap <expr> ' .. key .. " " .. $"$'{g:vimspector_mappings[key]}'"
+      exe 'nnoremap <expr> ' .. key .. " "
+        .. $"$'{g:vimspector_mappings[key]}'"
     endfor
   endif
 enddef
@@ -124,37 +128,6 @@ g:vimspector_adapters = {
     },
     "delay": "5000m",
   },
-
-  # Cpp in container
-  "avap-container": {
-    # "port": "${port}",
-    "launch": {
-      "remote": {
-        "container": "pippo", # Docker container id or name to exec into to.
-
-        # Command to launch the debuggee and attach the debugger;
-        # %CMD% replaced with the remote-cmdLine configured in the launch
-        # configuration. (mandatory)
-        "runCommand": [
-          "gdbserver", "-once", "--no-startup-with-shell",
-          "--disable-randomization", "0.0.0.0:1234",
-          "/app/build/gcc9_linux_x86_64-docker/Debug/opt/volvo_avap_vcmhardwareinfo/bin/volvo_avap_vcmhardwareinfo",
-        ],
-
-      # Optional alternative to runCommand (if you need to run multiple
-      # commands)
-      # "runCommands":  [
-      #   [ /* first command */ ],
-      #   [ /* second command */ ]
-      # ]
-
-      },
-
-      # optional delay to wait after running runCommand(s). This is often
-      # needed because of the way docker handles TCP
-      "delay": "1000m" # format as per :help sleep
-    },
-  }
 }
 
 ##################################
@@ -162,7 +135,8 @@ g:vimspector_adapters = {
 ##################################
 g:vimspector_configurations = {
   # PYTHON
-  # For debugpy configuration, see here: https://code.visualstudio.com/docs/python/debugging
+  # For debugpy configuration, see here:
+  # https://code.visualstudio.com/docs/python/debugging
   # May be replaced once "Python run generic script (NOK)"
   # will reckon virtual environments
   "Remote: launch and attach (slow)": {
@@ -191,7 +165,8 @@ g:vimspector_configurations = {
   },
 
   "Simple debugger": {
-    # For debugpy configuration, see here: https://code.visualstudio.com/docs/python/debugging
+    # For debugpy configuration, see here:
+    # https://code.visualstudio.com/docs/python/debugging
     # Launch current file with debugy. It doed not recognize virtual
     # environments. Opened a issue on debugpy.
     adapter: "debugpy",
@@ -212,7 +187,7 @@ g:vimspector_configurations = {
         enable: true
       },
     }
-  },
+},
 
 
   # Embedded C
@@ -242,29 +217,6 @@ g:vimspector_configurations = {
       MImode: "gdb",
       # MIDebuggerPath: debugger_path .. debugger,
       MIDebuggerPath: exepath('gdb'),
-      miDebuggerServerAddress: "localhost:1234",
-      console: "integratedTerminal"
-    },
-  },
-  # AVAP
-  # Debug into a docker running a gdb instance. We pipe the output.
-  # We could also connect remotely if the docker runs a gdbserver.
-  "Docker C++ Debug with gdb": {
-    adapter: "vscode-cpptools",
-    filetypes: ["c", "cpp"],
-    # "remote-request": "launch",
-    configuration: {
-      name: "Docker C++ Debug with gdb",
-      type: "cppdbg",
-      request: "launch",
-      program: avap_exec_fullpath,
-      args: [],
-      stopAtEntry: false,
-      # cwd: "/app",
-      environment: [],
-      externalConsole: false,
-      MIMode: "gdb",
-      miDebuggerPath: "/usr/bin/gdb", # Path to gdb inside the container
       setupCommands: [
       {
         description: "Enable pretty-printing for gdb",
@@ -272,38 +224,11 @@ g:vimspector_configurations = {
         ignoreFailures: true,
       }
       ],
-      sourceFileMap: {
-        "/home/yt75534/avap_vcm_hardware_info/volvo_avap_vcmhardwareinfo/app": "${workspaceFolder}"
-      },
-      pipeTransport: {
-        pipeCwd: "${workspaceFolder}",
-        pipeProgram: "/home/yt5534/avap_vcm_hardware_info/gdb_in_docker.sh",
-        pipeArgs: [
-          "sh",
-          "-c",
-        ],
-        debuggerPath: "/usr/bin/gdb/",
-      },
+      miDebuggerServerAddress: "localhost:1234",
+      console: "integratedTerminal"
     },
   },
-
-  # CPP in container
-  #
-  "avap-in-container": {
-      "adapter": "avap-container",
-      "remote-request": "launch",
-      # "remote-cmdLine": [
-      #   "${RemoteRoot}/${fileBasename}", "*${args}"
-      # ],
-
-      "configuration": {
-        "request": "attach",
-        "pathMappings": [
-          {
-            "localRoot": "/home/yt75534/avap_vcm_hardware_info",
-            "remoteRoot": "/app"
-          }
-        ]
-      }
-    },
+  # AVAP
+  # Debug into a docker running a gdb instance. We pipe the output.
+  # We could also connect remotely if the docker runs a gdbserver.
 }
