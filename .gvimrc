@@ -20,7 +20,7 @@ if g:os == "Windows"
      fontsize_tail = ":cANSI:qDRAFT"
      set guioptions-=T
     # Open gvim in full-screen
-    au GUIEnter * simalt ~x
+    # au GUIEnter * simalt ~x
 elseif g:os == "Darwin"
      fontsize = 12
      fontsize_tail = ""

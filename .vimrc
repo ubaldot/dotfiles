@@ -397,10 +397,10 @@ def ShowRecentFiles()
   endif
 enddef
 
-augroup OPEN_RECENT
-  autocmd!
-  autocmd VimEnter * ShowRecentFiles()
-augroup END
+# augroup OPEN_RECENT
+#   autocmd!
+#   autocmd VimEnter * ShowRecentFiles()
+# augroup END
 # var use_scope = false
 # if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
 #   import autoload 'scope/fuzzy.vim'
