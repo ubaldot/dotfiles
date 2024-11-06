@@ -28,7 +28,7 @@ elseif g:os == "Darwin"
      fontsize_tail = ""
      fontface = "FiraCode-Regular:h"
 else
-    fontsize = 14
+    fontsize = 10
      set guioptions-=T
      set lines=48
      set columns=180

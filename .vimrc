@@ -278,6 +278,7 @@ tnoremap <c-h> <c-w>h
 tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
+tnoremap <c-tab> <cmd>PoptolsBuffers<cr>
 # tnoremap <s-tab> <cmd>bnext<cr>
 tnoremap <s-tab> <c-w>:b <tab>
 tnoremap <c-w>q <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
@@ -355,18 +356,20 @@ augroup END
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 17 < hour
+if hour < 7 || 16 < hour
   set background=dark
+  colorscheme everforest
 else
   set background=light
+  colorscheme wildcharm
 endif
 # set background=dark
 g:everforest_background = 'medium'
 # colorscheme solarized8_flat
-colorscheme everforest
+# colorscheme everforest
 
 # vim-git-essentials
-nnoremap git <Cmd>GitStatus<cr>
+nnoremap git <Cmd>GitMasterStatus<cr>
 
 # vim-poptools
 g:poptools_config = {}
@@ -573,7 +576,8 @@ command! HelpmeVimspector exe "HelpMe " \ g:dotvim
 # ----------------------------------
 g:replica_console_position = "J"
 g:replica_display_range  = false
-g:replica_console_height = &lines / 6
+g:replica_console_height = &lines / 4
+g:replica_console_height = 20
 # g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
