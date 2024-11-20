@@ -340,8 +340,10 @@ syntax on
 
 # Bundled plugins
 packadd comment
-packadd! termdebug
-# source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
+g:termdebug_config = {}
+# g:termdebug_config['debug'] = true
+# packadd! termdebug
+source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
@@ -502,7 +504,6 @@ exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
-g:termdebug_config = {}
 exe "source " .. g:dotvim .. "/plugins_settings/microdebugger_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 

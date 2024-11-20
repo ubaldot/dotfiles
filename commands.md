@@ -33,12 +33,13 @@
 - You have to build Vim locally: for doing that go to ./src and run make
 - Tests are in testdir
 - To see what happens, open vim --clean and :call test\_whatever to see what
-  happens
-- From shell run make test or something similar (TODO)
+  happens (OBS! You must first build vim with make and you have to cd to
+  src/testdir first)
+- From shell run make test\_termdebug or something similar (TODO)
 
 **LSP**
 
-If yegapan/lsp does not work, disable vim_conda_activate LSP:
+If yegapan/lsp does not work, disable vim\_conda\_activate LSP:
 Set `:LspServer debug on` and `:LspServer restart`
    Now you can see all the messages and the error messages with `:LspServer
    debug messages/error`. You can start a LSP with verbosity on.
@@ -135,13 +136,22 @@ and add a new line under [remote "origin"]:
 # conda
 
 First thing to do is config (.condarc).
+    custom\_multichannels:
+      conda-forge:
+        - https://prefix.dev/conda-forge
+    channels:
+      - conda-forge
+    channel\_priority: strict
 
-    conda update --name base --channel conda-forge --yes
-    conda config --set channel_priority strict
-    conda install -n base conda-libmamba-solver
-    conda config --set solver libmamba
-    conda config --set solver classic
-    conda conda config --add <channels>
+Then, you have to set the following env-var:
+
+
+    export REQUESTS\_CA\_BUNDLE=/etc/ssl/certs/your\_certificate.pem
+
+On Windows you have to set the environment variable through System/Env var,
+... etc.
+
+
 
 **common commands**:
 
