@@ -256,23 +256,28 @@ var prettier_supported_filetypes = ['markdown', 'markdown.txtfmt', 'json', 'yaml
 export def Prettify(a: number, b: number)
   # If prettier is not available, then the buffer content will be canceled upon
   # write
-  if !empty(&filetype) && (index(prettier_supported_filetypes, &filetype) != 0)
-    var win_view = winsaveview()
+  var win_view = winsaveview()
+  if !empty(&filetype) && (index(prettier_supported_filetypes, &filetype) != -1)
     exe $":{a},{b}!prettier --prose-wrap always
           \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
-    winrestview(win_view)
-
-    # Undo if prettier detects errors or if it is not installed
+    # Undo if the formatter progs detects errors or if it is not installed
     if v:shell_error != 0
       silent! undo
-      echoerr "'prettier' not installed or it returned errors!"
+      echoerr "'prettier' is not installed or it returned errors"
     endif
 
+  elseif &filetype ==# 'rst'
+    exe $":{a},{b}!rstfmt -w {&l:textwidth}"
+
+    if v:shell_error != 0
+      silent! undo
+      echoerr "'rstfmt' is not installed or it returned errors"
+    endif
   else
     FormatWithoutMoving(a, b)
-    echo $"'{&filetype}' filetype is not in the 'prettier_supported_filetypes' list."
+    echo $"'{&filetype}' filetype is not supported."
   endif
-
+  winrestview(win_view)
 enddef
 
 # --------------------------------------------------------------

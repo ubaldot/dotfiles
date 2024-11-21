@@ -64,8 +64,14 @@ var lspServers = [
     filetype: ['tex'],
     path: 'texlab',
   },
+  {
+    name: 'esbonio',
+    filetype: ['rst'],
+    path: 'python',
+    args: ['-m', 'esbonio'],
+    workspaceConfig: {esbonio: {logging: {level: "debug"}}}
+  },
 ]
-
 autocmd VimEnter * g:LspAddServer(lspServers)
 
 var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}

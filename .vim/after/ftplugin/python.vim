@@ -13,20 +13,21 @@ if exists(':LspHover') != 0
 endif
 
 
-# Autocmd to format with black.
-augroup BLACK
+# Autocmd to format with ruff
+
+augroup RUFF
     autocmd! * <buffer>
-    autocmd BufWritePre <buffer> Black(&l:textwidth)
+    autocmd BufWritePre <buffer> Ruff(&l:textwidth)
 augroup END
 
-def Black(textwidth: number)
+def Ruff(textwidth: number)
     # If black is not available, then the buffer content will be canceled upon
     # write. To avoid appending stdout and stderr to the buffer we use
     # --quiet.
     var win_view = winsaveview()
-    if executable('black') && &filetype == 'python'
+    if executable('ruff') && &filetype == 'python'
                 # var cur_pos = getcursorcharpos()
-                exe $":%!black - --line-length {textwidth}
+                silent exe $":%!ruff format --line-length {textwidth}
                       \ --stdin-filename {shellescape(expand("%"))} --quiet"
                 # setcharpos('.', cur_pos)
     else
@@ -35,7 +36,6 @@ def Black(textwidth: number)
 
     if v:shell_error != 0
       undo
-      winrestview(win_view)
       # throw prevents writing on disk
       # throw "'black' errors!"
       # redraw!
@@ -44,8 +44,7 @@ def Black(textwidth: number)
     winrestview(win_view)
 enddef
 
-# Call black to format 120 line length
-command! -buffer Black120 Black(120)
+command! -buffer Ruff Ruff(120)
 
 # pytest
 command! -buffer Pytest execute('!coverage run --branch -m pytest .')
