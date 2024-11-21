@@ -48,11 +48,7 @@ endif
 if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
-  # g:dotvim = $HOME .. "\\vimfiles"
 	g:dotvim = $HOME .. "\\.vim"
-  # source $VIMRUNTIME/mswin.vim
-  # For mingw64
-  # set runtimepath+=C:/Users/yt75534/vimfiles
   set runtimepath+=C:/Users/yt75534/.vim
 else
   g:tmp = "/tmp"
@@ -94,20 +90,6 @@ augroup RELOAD_VIM_SCRIPTS
     echo expand('%:t') .. " reloaded."
   }
 augroup END
-
-# ---- Activate the following autocmd only during plugin writing -----
-# For plugin writing
-# augroup CommandWindowOpen
-#     autocmd!
-#     autocmd CmdwinEnter * map <buffer> <cr> <cr>q:
-# augroup END
-
-
-# augroup Vim9AutoCmdLine
-#     autocmd!
-#     autocmd CmdlineEnter : setcmdline('vim9cmd ')
-# augroup END
-# -------------------------------------------
 
 # Open help pages in vertical split
 augroup vimrc_help
@@ -162,16 +144,11 @@ set concealcursor=nvc
 # Some key ""bindings""
 # ----------------------
 map <f1> <cmd>helpclose<cr>
-# map! <f1> <nop>
 g:mapleader = ","
 map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
 map <leader>vv <Cmd>e $MYVIMRC<cr>
-# inoremap å `
-
 
 # For using up and down in popup menu
-# inoremap <expr><Down> pumvisible() ? "\<C-n>" : "\<Down>"
-# inoremap <expr><Up> pumvisible() ? "\<C-p>" : "\<Up>"
 inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 
 # Remap {['command-line']} stuff
@@ -207,8 +184,6 @@ xnoremap <leader>< <esc><ScriptCmd>myfunctions.Surround('<', '>')<cr>
 nnoremap x "_x
 
 # Change to repo root, ~ or /.
-#
-#
 def GoToGitRoot()
   # Change dir to the current buffer location and if you are in a git repo,
   # then change dir to the git repo root.
@@ -223,19 +198,17 @@ noremap cd <scriptcmd>GoToGitRoot()<cr>
 
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
-# noremap <silent> <c-v> :call system("clip.exe", getreg("0"))<cr>
 # <ScriptCmd> allows remapping to functions without the need of defining
 # them as g:.
 nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
-# nnoremap <leader>b <Cmd>ls!<cr>:b
 nnoremap <s-tab> <cmd>bprev <cr>
-# nnoremap <c-tab> :b <tab>
 nnoremap <leader>b :b <tab>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
+#
 # Switch window
 nnoremap <c-h> <c-w>h
 nnoremap <c-down> <c-e>
@@ -252,18 +225,15 @@ nnoremap <c-s><c-s> <cmd>SearchAndReplaceInFiles<cr>
 xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
 
 # Wipe buffer
-# nnoremap bw <cmd>bw!<cr>
-# nnoremap <c-b><c-w> <cmd>bw!<cr>
 nnoremap <c-d> <cmd>bw!<cr>
 
 nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
+nnoremap Q <ScriptCmd>myfunctions.Prettify()<cr>
 
 # location list
 nnoremap äl :lnext<CR>
 nnoremap öl :lprevious<CR>
 
-# super quick search and replace:
-# nnoremap <Space><Space> :%s/\<<C-r>=expand("<cword>")<cr>\>/
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
@@ -307,10 +277,7 @@ augroup END
 # ----------------
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
-# Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-# Plug 'junegunn/fzf.vim' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-Plug 'lifepillar/vim-solarized8'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'yegappan/lsp'
@@ -327,14 +294,9 @@ Plug 'ubaldot/vim-latex-tools'
 Plug 'ubaldot/vim-git-master'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-# Plug 'girishji/scope.vim'
-# Plug 'Donaldttt/fuzzyy'
-# Plug 'Konfekt/vim-compilers'
 # Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector'
 Plug 'habamax/vim-rst'
-# Plug 'qadzek/link.vim'
-# Plug 'tmhedberg/SimpylFold'
 plug#end()
 filetype plugin indent on
 syntax on
@@ -342,19 +304,13 @@ syntax on
 # Bundled plugins
 packadd comment
 g:termdebug_config = {}
-# g:termdebug_config['debug'] = true
-# packadd! termdebug
-source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
+packadd! termdebug
+# source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
   autocmd BufRead,BufNewFile *.h set filetype=c
 augroup END
-# Conda activate at startup
-# augroup CondaActivate
-#     autocmd!
-#     autocmd VimEnter * :CondaActivate myenv
-# augroup END
 
 # Plugins settings
 # -----------------
@@ -404,78 +360,6 @@ def ShowRecentFiles()
   endif
 enddef
 
-# augroup OPEN_RECENT
-#   autocmd!
-#   autocmd VimEnter * ShowRecentFiles()
-# augroup END
-# var use_scope = false
-# if filereadable($'{g:dotvim}/plugins/scope.vim/plugin/scope.vim')
-#   import autoload 'scope/fuzzy.vim'
-# endif
-# if use_scope
-#   # scope.vim
-#   if executable('fd')
-#     nnoremap <c-p> <scriptcmd>fuzzy.File('fd -tf --follow')<cr>
-#   else
-#     nnoremap <c-p> <scriptcmd>fuzzy.File()<cr>
-#   endif
-#   nnoremap <c-p>g <c-u>:Scope Grep<space>
-#   nnoremap <c-p>b <scriptcmd>fuzzy.Buffer()<cr>
-#   nnoremap <c-p>o <scriptcmd>fuzzy.MRU()<cr>
-
-#   highlight default link ScopeMenuMatch Normal
-#   highlight default link ScopeMenuSubtle Normal
-
-#   fuzzy.OptionsSet({
-#     mru_rel_path: true
-#   })
-# else
-#   # fuzzyy setup
-#   g:enable_fuzzyy_keymaps = false
-#   g:fuzzyy_dropdown = true
-#   g:fuzzyy_menu_matched_hl = 'WarningMsg'
-#   g:fuzzyy_files_ignore_file = ['*.beam', '*.so', '*.exe', '*.dll',
-#   '*.dump',
-#     '*.core', '*.swn', '*.swp', '*.ipynb']
-#   g:fuzzyy_files_ignore_dir = ['*cache*', '.github', '.git', '.hg',
-#   '.svn', '.rebar', '.eunit']
-
-#   nnoremap <c-p> <cmd>FuzzyFiles<cr>
-#   nnoremap <c-p>w <cmd>FuzzyInBuffer<cr>
-#   nnoremap <c-p>b <cmd>FuzzyBuffer<cr>
-#   nnoremap <c-p>o <cmd>FuzzyMRUFiles<cr>
-#   nnoremap <c-p>c <cmd>FuzzyCmdHistory<cr>
-#   nnoremap <c-p>g <cmd>FuzzyGrep<cr>
-
-#   g:fuzzyy_window_layout = {
-#     FuzzyFiles: { preview: false },
-#     FuzzyMRUFiles: { preview: false },
-#     FuzzyBuffers: { preview: false }
-#   }
-# endif
-
-# def ShowRecentFiles()
-#   var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
-#     !empty(x) && filereadable(x)
-#   )
-#   if len(readable_args) == 0
-#     if use_scope && exists('*fuzzy.MRU') > 0
-#       fuzzy.MRU()
-#       # To remove the <80><fd>a added by gvim
-#       if has('win32') && has('gui_running')
-#         feedkeys("\<c-u>")
-#       endif
-#     elseif exists(':FuzzyMRUFiles') > 0
-#       execute('FuzzyMRUFiles')
-#     endif
-#   endif
-# enddef
-
-# augroup OpenRecent
-#   autocmd!
-#   autocmd VimEnter * ShowRecentFiles()
-# augroup END
-
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
@@ -483,13 +367,7 @@ g:vim9_conversion_aid_fix_asl = true
 # vim-outline
 g:outline_autoclose = false
 
-# vim-open-recent
-# g:vim_open_change_dir = true
-# g:vim_open_at_empty_startup = false
-# nnoremap <c-p>o <scriptcmd>OpenRecent<cr>
-
 # Plugin settings
-# TODO: You may want to use a popup_create and pick
 # Open plugin settings
 var Open_special = (textobject) => {
   var filename = g:dotvim .. myfunctions.GetTextObject(textobject)
@@ -579,14 +457,11 @@ g:replica_console_position = "J"
 g:replica_display_range  = false
 g:replica_console_height = &lines / 4
 g:replica_console_height = 20
-# g:replica_python_options = "-Xfrozen_modules=off"
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
 nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
 nnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
 xnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
-# g:writegood_compiler = "vale"
-# g:writegood_options = "--config=$HOME/vale.ini"
 
 # Outline. <F8> is overriden by vimspector
 nnoremap <silent> <F8> <Plug>OutlineToggle
@@ -610,20 +485,12 @@ command! GitPushDot myfunctions.PushDot()
 command! -nargs=? Diff myfunctions.Diff(<q-args>)
 nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
 nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
-# nnoremap <expr> gn &diff ? ']c' : 'gn'
-# nnoremap <expr> gp &diff ? '[c' : 'gp'
-# nnoremap gn &diff ? 'lib.NextChange()' : 'gn'
-# nnoremap gp &diff ? 'lib.PrevChange()' : 'gp'
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
 # Utils commands
 command! -nargs=1 -complete=command -range Redir
       \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
-
-# Example: :HH 62, execute the 62 element of :history
-command! -nargs=1 HH execute histget("cmd", <args>)
-
 
 # Activity log
 #

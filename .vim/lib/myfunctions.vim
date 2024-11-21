@@ -244,7 +244,7 @@ def Highlight()
 enddef
 
 # --------- General formatting function -----------------
-export def FormatWithoutMoving()
+def FormatWithoutMoving()
   var view = winsaveview()
   silent normal! gggqG
   winrestview(view)
@@ -252,7 +252,7 @@ enddef
 
 # ------------- Prettier --------------------
 var prettier_supported_filetypes = ['markdown', 'markdown.txtfmt', 'json', 'yaml', 'html', 'css']
-def Prettify()
+export def Prettify()
   # If prettier is not available, then the buffer content will be canceled upon
   # write
   if executable('prettier') && (index(prettier_supported_filetypes, &filetype) != -1)
@@ -263,6 +263,7 @@ def Prettify()
           \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
     winrestview(win_view)
   else
+    FormatWithoutMoving()
     echom $"'prettier' is not installed OR '{&filetype}' filetype is not supported"
   endif
 
