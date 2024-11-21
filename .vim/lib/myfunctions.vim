@@ -244,44 +244,37 @@ def Highlight()
 enddef
 
 # --------- General formatting function -----------------
-def FormatWithoutMoving()
+def FormatWithoutMoving(a: number, b: number)
+  var interval = b - a + 1
   var view = winsaveview()
-  silent normal! gggqG
+  silent exe $":norm! {a}gg{interval}gqq"
   winrestview(view)
 enddef
 
 # ------------- Prettier --------------------
 var prettier_supported_filetypes = ['markdown', 'markdown.txtfmt', 'json', 'yaml', 'html', 'css']
-export def Prettify()
+export def Prettify(a: number, b: number)
   # If prettier is not available, then the buffer content will be canceled upon
   # write
-  if executable('prettier') && (index(prettier_supported_filetypes, &filetype) != -1)
+  if !empty(&filetype) && (index(prettier_supported_filetypes, &filetype) != 0)
     var win_view = winsaveview()
-    # exe $":%!prettier 2>{g:null_device} --prose-wrap always
-    #             \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
-    exe $":%!prettier --prose-wrap always
+    exe $":{a},{b}!prettier --prose-wrap always
           \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
     winrestview(win_view)
+
+    # Undo if prettier detects errors or if it is not installed
+    if v:shell_error != 0
+      silent! undo
+      echoerr "'prettier' not installed or it returned errors!"
+    endif
+
   else
-    FormatWithoutMoving()
-    echom $"'prettier' is not installed OR '{&filetype}' filetype is not supported"
+    FormatWithoutMoving(a, b)
+    echo $"'{&filetype}' filetype is not in the 'prettier_supported_filetypes' list."
   endif
 
-  if v:shell_error != 0
-    silent! undo
-    # throw prevents to write on disk
-    # throw "'prettier' errors!"
-    # redraw!
-    echoerr "'prettier' errors!"
-  endif
 enddef
 
-command! Prettify Prettify()
-
-# augroup PRETTIER
-#   autocmd!
-#   autocmd BufWritePre * if index(prettier_supported_filetypes, &filetype) != -1 | Prettify() | endif
-# augroup END
 # --------------------------------------------------------------
 
 export def QuitWindow()

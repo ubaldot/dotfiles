@@ -132,7 +132,7 @@ set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+=-
-set formatoptions+=w,n,p
+set formatoptions+=wnp
 set diffopt+=vertical
 set wildcharm=<tab>
 set conceallevel=2
@@ -227,8 +227,10 @@ xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
 # Wipe buffer
 nnoremap <c-d> <cmd>bw!<cr>
 
-nnoremap g= <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
-nnoremap Q <ScriptCmd>myfunctions.Prettify()<cr>
+# Formatting
+command! -range=% Prettify myfunctions.Prettify(<line1>, <line2>)
+nnoremap Q <ScriptCmd>myfunctions.Prettify(1, line('$'))<cr>
+xnoremap Q <esc><ScriptCmd>myfunctions.Prettify(line("'<"), line("'>"))<cr>
 
 # location list
 nnoremap äl :lnext<CR>
@@ -296,9 +298,9 @@ Plug 'ubaldot/vim-git-master'
 Plug 'girishji/easyjump.vim'
 # Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector'
-Plug 'habamax/vim-rst'
+# Plug 'habamax/vim-rst'
 plug#end()
-filetype plugin indent on
+filetype plugin on
 syntax on
 
 # Bundled plugins

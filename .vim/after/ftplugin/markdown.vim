@@ -20,7 +20,7 @@ endif
 #   # &l:guifont = "FiraCode-Regular:h" .. fontsize
 # endif
 
-def MarkdownRender(format = "html")
+export def MarkdownRender(format = "html")
     var input_file = expand('%:p')
     var output_file = $'{expand('%:p:r')}.{format}'
     var css_style = ""
@@ -34,7 +34,7 @@ def MarkdownRender(format = "html")
     job_start(open_file_cmd)
 enddef
 
-def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
+export def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
   return ['html', 'docx', 'pdf', 'txt', 'jira', 'csv', 'ipynb', 'latex', 'odt', 'rtf']
 enddef
 
