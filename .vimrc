@@ -332,6 +332,7 @@ Plug 'girishji/easyjump.vim'
 # Plug 'Konfekt/vim-compilers'
 # Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector'
+Plug 'habamax/vim-rst'
 # Plug 'qadzek/link.vim'
 # Plug 'tmhedberg/SimpylFold'
 plug#end()

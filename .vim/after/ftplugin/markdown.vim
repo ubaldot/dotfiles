@@ -4,9 +4,9 @@ import g:dotvim .. "/lib/myfunctions.vim"
 setlocal iskeyword-=_
 
 # Bold, italic, strikethrough
-xnoremap <buffer> <silent> <c-b> <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
-xnoremap <buffer> <silent> <c-i> <esc><ScriptCmd>myfunctions.Surround('_', '_')<cr>
-xnoremap <buffer> <silent> <c-s> <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
+xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
+xnoremap <buffer> <silent> <leader>* <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
+xnoremap <buffer> <silent> <leader>~ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
 
 if executable('pandoc')
   compiler pandoc
