@@ -294,11 +294,11 @@ Plug 'ubaldot/vim-extended-view'
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-latex-tools'
 Plug 'ubaldot/vim-git-master'
-Plug 'ubaldot/vim-conda-activate'
+# Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector'
-Plug 'habamax/vim-rst'
+# Plug 'habamax/vim-rst'
 plug#end()
 filetype plugin on
 filetype indent on
@@ -319,7 +319,7 @@ augroup END
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 16 < hour
+if hour < 7 || 15 < hour
   set background=dark
   colorscheme everforest
 else
