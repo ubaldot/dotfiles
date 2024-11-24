@@ -8,12 +8,20 @@ xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**',
 xnoremap <buffer> <silent> <leader>* <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
 xnoremap <buffer> <silent> <leader>~ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
 
+&l:formatprg = $"prettier --prose-wrap always --print-width {&l:textwidth}
+          \ --stdin-filepath {shellescape(expand('%'))}"
+
+# Autocmd to format with ruff
+augroup MARKDOWN_FORMAT_ON_SAVE
+    autocmd! * <buffer>
+    autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
+augroup END
+
 if executable('pandoc')
   compiler pandoc
 else
   echoerr "'pandoc' not installed. 'MarkdownRender' won't work"
 endif
-
 
 # if has('gui')
 #   var fontsize = str2nr(matchstr(&guifont, '\v:h\zs(\d*)')) + 2

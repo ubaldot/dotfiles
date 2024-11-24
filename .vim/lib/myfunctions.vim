@@ -263,7 +263,7 @@ export def FormatWithoutMoving(a: number = 0, b: number = 0)
   winrestview(view)
 enddef
 
-var prettier_supported_filetypes = ['markdown', 'json', 'yaml', 'html', 'css']
+var prettier_supported_filetypes = ['json', 'yaml', 'html', 'css']
 def SetFormatter()
   if !empty(&filetype)
       && index(prettier_supported_filetypes, &filetype) != -1
