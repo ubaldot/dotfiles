@@ -228,9 +228,9 @@ xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
 nnoremap <c-d> <cmd>bw!<cr>
 
 # Formatting
-command! -range=% Prettify myfunctions.Prettify(<line1>, <line2>)
-nnoremap Q <ScriptCmd>myfunctions.Prettify(1, line('$'))<cr>
-xnoremap Q <esc><ScriptCmd>myfunctions.Prettify(line("'<"), line("'>"))<cr>
+# command! -range=% Prettify myfunctions.Prettify(<line1>, <line2>)
+nnoremap Q <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
+xnoremap Q <esc><ScriptCmd>myfunctions.FormatWithoutMoving(line("'<"), line("'>"))<cr>
 
 # location list
 nnoremap äl :lnext<CR>

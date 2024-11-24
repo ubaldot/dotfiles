@@ -4,6 +4,9 @@ export def Echoerr(msg: string)
   echohl ErrorMsg | echom $'{msg}' | echohl None
 enddef
 
+export def Echowarn(msg: string)
+  echohl WarningMsg | echom $'{msg}' | echohl None
+enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
 var match_id = 0
@@ -244,41 +247,58 @@ def Highlight()
 enddef
 
 # --------- General formatting function -----------------
-def FormatWithoutMoving(a: number, b: number)
-  var interval = b - a + 1
+export def FormatWithoutMoving(a: number = 0, b: number = 0)
   var view = winsaveview()
-  silent exe $":norm! {a}gg{interval}gqq"
+  if a == 0 && b == 0
+    exe $":norm! gggqG"
+  else
+    var interval = b - a + 1
+    exe $":norm! {a}gg{interval}gqq"
+  endif
   winrestview(view)
 enddef
 
-# ------------- Prettier --------------------
-var prettier_supported_filetypes = ['markdown', 'markdown.txtfmt', 'json', 'yaml', 'html', 'css']
-export def Prettify(a: number, b: number)
-  # If prettier is not available, then the buffer content will be canceled upon
-  # write
-  var win_view = winsaveview()
-  if !empty(&filetype) && (index(prettier_supported_filetypes, &filetype) != -1)
-    exe $":{a},{b}!prettier --prose-wrap always
-          \ --print-width {&l:textwidth} --stdin-filepath {shellescape(expand("%"))}"
-    # Undo if the formatter progs detects errors or if it is not installed
-    if v:shell_error != 0
-      silent! undo
-      echoerr "'prettier' is not installed or it returned errors"
-    endif
-
-  elseif &filetype ==# 'rst'
-    exe $":{a},{b}!rstfmt -w {&l:textwidth}"
-
-    if v:shell_error != 0
-      silent! undo
-      echoerr "'rstfmt' is not installed or it returned errors"
-    endif
-  else
-    FormatWithoutMoving(a, b)
-    echo $"'{&filetype}' filetype is not supported."
+def Prettify(format_cmd: string = ""): number
+  # Set format command
+  var cmd = $"prettier --prose-wrap always --print-width {&l:textwidth} --stdin-filepath {shellescape(expand('%'))}"
+  if !empty(format_cmd)
+    cmd = format_cmd
   endif
-  winrestview(win_view)
+
+  # Command run is shown in :messages
+  Echowarn(cmd)
+
+  # Set lines interval to filter
+  var a = v:lnum
+  var b = v:lnum + v:count - 1
+  exe $":{a},{b}!{cmd}"
+
+  # Undo if the formatter progs detects errors or if it is not installed
+  if v:shell_error != 0
+    undo
+    # echoerr $"'{cmd->matchstr('^\s*\S*\s')}' is not installed or it returned errors"
+  endif
+  return 0
 enddef
+
+var prettier_supported_filetypes = ['markdown', 'json', 'yaml', 'html', 'css']
+def SetFormatter()
+  # 1. If b:format_cmd is supported use that one
+  # 2. Otherwis 'prettier' if ft is supported
+  # 3. Otherwise use whatever it was set.
+  if exists('b:format_cmd')
+    b:Prettify_func = () => Prettify(b:format_cmd)
+    &l:formatexpr = "b:Prettify_func()"
+  elseif !empty(&filetype)
+      && index(prettier_supported_filetypes, &filetype) != -1
+    &l:formatexpr = "Prettify()"
+  endif
+enddef
+
+augroup PRETTIFY
+  autocmd!
+  autocmd BufEnter * SetFormatter()
+augroup END
 
 # --------------------------------------------------------------
 
