@@ -14,6 +14,7 @@ else
   echoerr "'pandoc' not installed. 'MarkdownRender' won't work"
 endif
 
+
 # if has('gui')
 #   var fontsize = str2nr(matchstr(&guifont, '\v:h\zs(\d*)')) + 2
 #   &l:guifont = "HackNF-Regular:h" .. string(fontsize)
@@ -21,21 +22,23 @@ endif
 # endif
 
 export def MarkdownRender(format = "html")
-    var input_file = expand('%:p')
-    var output_file = $'{expand('%:p:r')}.{format}'
-    var css_style = ""
-    if format ==# 'html'
-        css_style = "-c ~/dotfiles/my_css_style.css"
-    endif
-    silent exe $"make {input_file} -o {output_file} -s {css_style}"
+  var input_file = expand('%:p')
+  var output_file = $'{expand('%:p:r')}.{format}'
+  var css_style = ""
+  if format ==# 'html'
+    css_style = "-c ~/dotfiles/my_css_style.css"
+  endif
+  silent exe $"make {input_file} -o {output_file} -s {css_style}"
 
-    var open_file_cmd = $'{g:start_cmd} {shellescape(output_file)}'->substitute("'", "", "g")
-    # echom open_file_cmd
-    job_start(open_file_cmd)
+  var open_file_cmd = $'{g:start_cmd}
+  {shellescape(output_file)}'->substitute("'", "", "g")
+  # echom open_file_cmd
+  job_start(open_file_cmd)
 enddef
 
 export def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
-  return ['html', 'docx', 'pdf', 'txt', 'jira', 'csv', 'ipynb', 'latex', 'odt', 'rtf']
+  return ['html', 'docx', 'pdf', 'txt', 'jira', 'csv', 'ipynb', 'latex',
+    'odt', 'rtf']
 enddef
 
 # Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc

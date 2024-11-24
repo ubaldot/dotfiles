@@ -250,48 +250,26 @@ enddef
 export def FormatWithoutMoving(a: number = 0, b: number = 0)
   var view = winsaveview()
   if a == 0 && b == 0
-    exe $":norm! gggqG"
+    silent exe $":norm! gggqG"
   else
     var interval = b - a + 1
-    exe $":norm! {a}gg{interval}gqq"
+    silent exe $":norm! {a}gg{interval}gqq"
+  endif
+
+  if v:shell_error != 0
+    undo
+    echoerr $"'{&l:formatprg->matchstr('^\s*\S*')}' returned errors."
   endif
   winrestview(view)
 enddef
 
-def Prettify(format_cmd: string = ""): number
-  # Set format command
-  var cmd = $"prettier --prose-wrap always --print-width {&l:textwidth} --stdin-filepath {shellescape(expand('%'))}"
-  if !empty(format_cmd)
-    cmd = format_cmd
-  endif
-
-  # Command run is shown in :messages
-  Echowarn(cmd)
-
-  # Set lines interval to filter
-  var a = v:lnum
-  var b = v:lnum + v:count - 1
-  exe $":{a},{b}!{cmd}"
-
-  # Undo if the formatter progs detects errors or if it is not installed
-  if v:shell_error != 0
-    undo
-    # echoerr $"'{cmd->matchstr('^\s*\S*\s')}' is not installed or it returned errors"
-  endif
-  return 0
-enddef
-
 var prettier_supported_filetypes = ['markdown', 'json', 'yaml', 'html', 'css']
 def SetFormatter()
-  # 1. If b:format_cmd is supported use that one
-  # 2. Otherwis 'prettier' if ft is supported
-  # 3. Otherwise use whatever it was set.
-  if exists('b:format_cmd')
-    b:Prettify_func = () => Prettify(b:format_cmd)
-    &l:formatexpr = "b:Prettify_func()"
-  elseif !empty(&filetype)
+  if !empty(&filetype)
       && index(prettier_supported_filetypes, &filetype) != -1
-    &l:formatexpr = "Prettify()"
+    var cmd = $"prettier --prose-wrap always --print-width {&l:textwidth}
+          \ --stdin-filepath {shellescape(expand('%'))}"
+    &l:formatprg = cmd
   endif
 enddef
 

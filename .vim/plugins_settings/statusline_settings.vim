@@ -14,6 +14,8 @@ def Set_b_gitbranch()
     var branch_name = trim(system($'git -C {expand("%:h")} rev-parse --abbrev-ref HEAD 2>{g:null_device}'))
     if v:shell_error != 0
         branch_name = '(no repo)'
+        # clean up v:shell_error
+        system('ls')
     else
         branch_name = substitute(branch_name, '\n', '', '')
     endif

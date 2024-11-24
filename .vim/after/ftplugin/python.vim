@@ -2,7 +2,7 @@ vim9script
 # Tell vim where is Python. OBS: this is independent of the plugins!
 
 setlocal foldmethod=indent
-# import g:dotvim .. "/lib/myfunctions.vim"
+import g:dotvim .. "/lib/myfunctions.vim"
 
 # Usage: make .
 if executable('pytest')
@@ -17,12 +17,13 @@ if exists(':LspHover') != 0
   &l:keywordprg = ':LspHover'
 endif
 
-b:format_cmd = $"ruff format --line-length {&l:textwidth} --stdin-filename {shellescape(expand("%"))} --quiet"
+&l:formatprg = $"ruff format --line-length {&l:textwidth}
+      \ --stdin-filename {shellescape(expand("%"))} --quiet"
 
 # Autocmd to format with ruff
-augroup RUFF
+augroup PYTHON_FORMAT_ON_SAVE
     autocmd! * <buffer>
-    autocmd BufWritePre <buffer> Ruff(&l:textwidth)
+    autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
 augroup END
 
 def Ruff(textwidth: number)
@@ -31,9 +32,10 @@ def Ruff(textwidth: number)
     # --quiet.
     var win_view = winsaveview()
     if executable('ruff') && &filetype == 'python'
-      silent exe $":%!{b:format_cmd}"
+      silent exe $":%!$ruff format --line-length {&l:textwidth}
+        \ --stdin-filename {shellescape(expand("%"))} --quiet"
     else
-        echom "black not installed!"
+        echom "'ruff' not installed!"
     endif
 
     if v:shell_error != 0
