@@ -248,6 +248,7 @@ enddef
 
 # --------- General formatting function -----------------
 export def FormatWithoutMoving(a: number = 0, b: number = 0)
+
   var view = winsaveview()
   if a == 0 && b == 0
     silent exe $":norm! gggqG"
@@ -259,14 +260,24 @@ export def FormatWithoutMoving(a: number = 0, b: number = 0)
   if v:shell_error != 0
     undo
     echoerr $"'{&l:formatprg->matchstr('^\s*\S*')}' returned errors."
+  else
+    # Display format command
+    redraw
+    if !empty(&l:formatprg)
+      Echowarn($'{&l:formatprg}')
+    else
+      Echowarn("'formatprg' is empty. Using default formatter.")
+    endif
   endif
   winrestview(view)
+
 enddef
 
 var prettier_supported_filetypes = ['json', 'yaml', 'html', 'css']
 def SetFormatter()
   if !empty(&filetype)
       && index(prettier_supported_filetypes, &filetype) != -1
+      && executable('prettier')
     var cmd = $"prettier --prose-wrap always --print-width {&l:textwidth}
           \ --stdin-filepath {shellescape(expand('%'))}"
     &l:formatprg = cmd

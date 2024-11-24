@@ -9,7 +9,16 @@ if executable('pytest')
   compiler pytest
 endif
 
-if !executable('ruff')
+if executable('ruff')
+  &l:formatprg = $"ruff format --line-length {&l:textwidth}
+        \ --stdin-filename {shellescape(expand("%"))} --quiet"
+
+  # Autocmd to format with ruff
+  augroup PYTHON_FORMAT_ON_SAVE
+      autocmd! * <buffer>
+      autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
+  augroup END
+else
    echoerr "'ruff' not installed!'"
 endif
 
@@ -17,14 +26,6 @@ if exists(':LspHover') != 0
   &l:keywordprg = ':LspHover'
 endif
 
-&l:formatprg = $"ruff format --line-length {&l:textwidth}
-      \ --stdin-filename {shellescape(expand("%"))} --quiet"
-
-# Autocmd to format with ruff
-augroup PYTHON_FORMAT_ON_SAVE
-    autocmd! * <buffer>
-    autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
-augroup END
 
 def Ruff(textwidth: number)
     # If black is not available, then the buffer content will be canceled upon

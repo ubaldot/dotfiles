@@ -8,14 +8,18 @@ xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**',
 xnoremap <buffer> <silent> <leader>* <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
 xnoremap <buffer> <silent> <leader>~ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
 
-&l:formatprg = $"prettier --prose-wrap always --print-width {&l:textwidth}
-          \ --stdin-filepath {shellescape(expand('%'))}"
+if executable('prettier')
+  &l:formatprg = $"prettier --prose-wrap always --print-width {&l:textwidth}
+            \ --stdin-filepath {shellescape(expand('%'))}"
 
-# Autocmd to format with ruff
-augroup MARKDOWN_FORMAT_ON_SAVE
-    autocmd! * <buffer>
-    autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
-augroup END
+  # Autocmd to format with ruff
+  augroup MARKDOWN_FORMAT_ON_SAVE
+      autocmd! * <buffer>
+      autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
+  augroup END
+else
+   echoerr "'prettier' not installed!'"
+endif
 
 if executable('pandoc')
   compiler pandoc
