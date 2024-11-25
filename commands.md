@@ -27,22 +27,22 @@
 
 **Contribute to Vim**
 
-- Fork and clone repo
-- Always create a branch! This will be tried to be merged into the main Vim
-- branch
-- You have to build Vim locally: for doing that go to ./src and run make
-- Tests are in testdir
-- To see what happens, open vim --clean and :call test\_whatever to see what
+* Fork and clone repo
+* Always create a branch! This will be tried to be merged into the main Vim
+* branch
+* You have to build Vim locally: for doing that go to ./src and run make
+* Tests are in testdir
+* To see what happens, open vim --clean and :call test_whatever to see what
   happens (OBS! You must first build vim with make and you have to cd to
   src/testdir first)
-- From shell run make test\_termdebug or something similar (TODO)
+* From shell run make test_termdebug or something similar (TODO)
 
 **LSP**
 
-If yegapan/lsp does not work, disable vim\_conda\_activate LSP:
-Set `:LspServer debug on` and `:LspServer restart`
-   Now you can see all the messages and the error messages with `:LspServer
-   debug messages/error`. You can start a LSP with verbosity on.
+If yegapan/lsp does not work, disable vim_conda_activate LSP: Set
+`:LspServer debug on` and `:LspServer restart` Now you can see all the
+messages and the error messages with `:LspServer debug messages/error`. You
+can start a LSP with verbosity on.
 
 **clang-tidy**
 
@@ -59,9 +59,9 @@ _-modernize-avoid-c-arrays, -modernize-use-nullptr,
 
 Finally, for each check, you can specify options:
 
-- { key: readability-identifier-naming.NamespaceCase, value: lower_case }
-- { key: readability-identifier-naming.ClassCase, value: CamelCase }
-- { key: readability-identifier-naming.StructCase, value: CamelCase }
+* { key: readability-identifier-naming.NamespaceCase, value: lower_case }
+* { key: readability-identifier-naming.ClassCase, value: CamelCase }
+* { key: readability-identifier-naming.StructCase, value: CamelCase }
 
 # pytest
 
@@ -135,23 +135,17 @@ and add a new line under [remote "origin"]:
 
 # conda
 
-First thing to do is config (.condarc).
-    custom\_multichannels:
-      conda-forge:
-        - https://prefix.dev/conda-forge
-    channels:
-      - conda-forge
-    channel\_priority: strict
+First thing to do is config (.condarc). custom_multichannels: conda-forge: -
+https://prefix.dev/conda-forge channels: - conda-forge channel_priority:
+strict
 
-Then, you have to set the following env-var:
-
+SSL: Then, you have to set the following environment variable:
 
     export REQUESTS\_CA\_BUNDLE=/etc/ssl/certs/your\_certificate.pem
 
 On Windows you have to set the environment variable through System/Env var,
-... etc.
-
-
+... etc. You can download the certificate from some of your Organization
+website.
 
 **common commands**:
 
