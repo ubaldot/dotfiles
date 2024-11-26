@@ -49,7 +49,8 @@ if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
 	g:dotvim = $HOME .. "\\.vim"
-  set runtimepath+=C:/Users/yt75534/.vim
+	g:dotvim = $HOME .. "\\vimfiles"
+  exe $"set runtimepath+={g:dotvim}"
 else
   g:tmp = "/tmp"
   g:null_device = "/dev/null"
@@ -429,30 +430,19 @@ command ManimHelpTransform exe "HelpMe " .. g:dotvim
 
 
 # HelpMe files for my poor memory
-command! HelpmeBasic exe "HelpMe " .. g:dotvim
-      \ "/helpme_files/vim_basic.txt"
-command! HelpmeScript exe "HelpMe "\ g:dotvim
-      \ "/helpme_files/vim_scripting.txt"
-command! HelpmeGlobal exe "HelpMe "\ g:dotvim
-      \ "/helpme_files/vim_global.txt"
-command! HelpmeExCommands exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_excommands.txt"
-command! HelpmeSubstitute exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_substitute.txt"
-command! HelpmeUnitTests exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_unit_tests.txt"
-command! HelpmeAdvanced exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_advanced.txt"
-command! HelpmeDiffMerge exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_merge_diff.txt"
-command! HelpmeCoding exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_coding.txt"
-command! HelpmeClosures exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/python_closures.txt"
-command! HelpmeDebug exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_debug.txt"
-command! HelpmeVimspector exe "HelpMe " \ g:dotvim
-      \ "/helpme_files/vim_vimspector.txt"
+var help_me_loc = $"{g:dotvim}/helpme_files/"
+command! HelpmeBasic exe $"HelpMe {help_me_loc}/vim_basic.txt"
+command! HelpmeScript exe $"HelpMe {help_me_loc}/vim_scripting.txt"
+command! HelpmeGlobal exe $"HelpMe {help_me_loc}/vim_global.txt"
+command! HelpmeExCommands exe $"HelpMe {help_me_loc}/vim_excommands.txt"
+command! HelpmeSubstitute exe $"HelpMe {help_me_loc}/vim_substitute.txt"
+command! HelpmeUnitTests exe $"HelpMe {help_me_loc}/vim_unit_tests.txt"
+command! HelpmeAdvanced exe $"HelpMe {help_me_loc}/vim_advanced.txt"
+command! HelpmeDiffMerge exe $"HelpMe {help_me_loc}/vim_merge_diff.txt"
+command! HelpmeCoding exe $"HelpMe {help_me_loc}/vim_coding.txt"
+command! HelpmeClosures exe $"HelpMe {help_me_loc}/python_closures.txt"
+command! HelpmeDebug exe $"HelpMe {help_me_loc}/vim_debug.txt"
+command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
 
 # vim-replica stuff
 # ----------------------------------
