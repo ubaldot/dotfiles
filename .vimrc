@@ -320,7 +320,7 @@ augroup END
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 15 < hour
+if hour < 7 || 14 < hour
   set background=dark
   colorscheme everforest
 else

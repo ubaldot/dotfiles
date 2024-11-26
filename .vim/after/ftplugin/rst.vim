@@ -2,12 +2,13 @@ vim9script
 
 import g:dotvim .. "/after/ftplugin/markdown.vim"
 setlocal iskeyword-=_
-setlocal indentexpr=""
 
 # Bold, italic, strikethrough
 xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
 xnoremap <buffer> <silent> <leader>* <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
 xnoremap <buffer> <silent> <leader>~ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
+
+inoremap ä `
 
 if executable('rstfmt')
   &l:formatprg = $"rstfmt -w {&l:textwidth}"

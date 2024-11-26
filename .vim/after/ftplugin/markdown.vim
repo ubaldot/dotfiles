@@ -8,6 +8,8 @@ xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**',
 xnoremap <buffer> <silent> <leader>* <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
 xnoremap <buffer> <silent> <leader>~ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
 
+inoremap ä `
+
 if executable('prettier')
   &l:formatprg = $"prettier --prose-wrap always --print-width {&l:textwidth}
             \ --stdin-filepath {shellescape(expand('%'))}"
