@@ -2,6 +2,7 @@ vim9script
 
 import g:dotvim .. "/after/ftplugin/markdown.vim"
 setlocal iskeyword-=_
+&l:tabstop = 3
 
 # Bold, italic, strikethrough
 xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>

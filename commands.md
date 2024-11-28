@@ -27,15 +27,15 @@
 
 **Contribute to Vim**
 
-* Fork and clone repo
-* Always create a branch! This will be tried to be merged into the main Vim
-* branch
-* You have to build Vim locally: for doing that go to ./src and run make
-* Tests are in testdir
-* To see what happens, open vim --clean and :call test_whatever to see what
+- Fork and clone repo
+- Always create a branch! This will be tried to be merged into the main Vim
+- branch
+- You have to build Vim locally: for doing that go to ./src and run make
+- Tests are in testdir
+- To see what happens, open vim --clean and :call test_whatever to see what
   happens (OBS! You must first build vim with make and you have to cd to
   src/testdir first)
-* From shell run make test_termdebug or something similar (TODO)
+- From shell run make test_termdebug or something similar (TODO)
 
 **LSP**
 
@@ -59,9 +59,9 @@ _-modernize-avoid-c-arrays, -modernize-use-nullptr,
 
 Finally, for each check, you can specify options:
 
-* { key: readability-identifier-naming.NamespaceCase, value: lower_case }
-* { key: readability-identifier-naming.ClassCase, value: CamelCase }
-* { key: readability-identifier-naming.StructCase, value: CamelCase }
+- { key: readability-identifier-naming.NamespaceCase, value: lower_case }
+- { key: readability-identifier-naming.ClassCase, value: CamelCase }
+- { key: readability-identifier-naming.StructCase, value: CamelCase }
 
 # pytest
 
@@ -321,10 +321,12 @@ To have conda build upload to anaconda.org automatically, use
 # Sphinx
 
     cd docs
-    make clean
     sphinx-apidoc -f -n -o ./docs/source ../src/dymoval/
-    make html
-    cd ..
+    sphinx-build -M html .\source\ .\build\
+
+You can also have a live preview:
+
+    sphinx-autobuild .\source .\_build
 
 # Manim dev
 

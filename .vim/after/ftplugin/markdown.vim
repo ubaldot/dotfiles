@@ -2,6 +2,7 @@ vim9script
 
 import g:dotvim .. "/lib/myfunctions.vim"
 setlocal iskeyword-=_
+&l:tabstop = 2
 
 # Bold, italic, strikethrough
 xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
@@ -44,8 +45,8 @@ export def MarkdownRender(format = "html")
   endif
   silent exe $"make {input_file} -o {output_file} -s {css_style}"
 
-  var open_file_cmd = $'{g:start_cmd}
-  {shellescape(output_file)}'->substitute("'", "", "g")
+  var open_file_cmd = $'{g:start_cmd} {shellescape(output_file)}'
+    ->substitute("'", "", "g")
   # echom open_file_cmd
   job_start(open_file_cmd)
 enddef

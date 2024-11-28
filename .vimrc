@@ -488,6 +488,9 @@ command! -nargs=1 -complete=command -range Redir
 # Activity log
 #
 var work_log_path = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
+if g:os == "Windows"
+  work_log_path = 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
+endif
 command! LLogNewDay silent exe $'!printf "\n=={strftime('= %b %d %y ==========')}" >> {work_log_path}' | exe "LLogOpen"
 command! LLogOpen exe $'edit {work_log_path}' | norm! G
 
