@@ -226,6 +226,9 @@ TL;DR Update version in pyproject.toml and then
 
 **release on conda-forge**
 
+1. To create a new package use staged-recipe repo
+2. To update an existing package, use dymoval-feedstock repo.
+
 Edit conda/meta.yml in this way:
 
 1. Update version
