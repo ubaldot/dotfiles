@@ -488,10 +488,11 @@ command! -nargs=1 -complete=command -range Redir
 # Activity log
 #
 var work_log_path = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
+var day_string = strftime("=== %b %d %y ==========")
 if g:os == "Windows"
   work_log_path = 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
 endif
-command! LLogNewDay silent exe $'!printf "\n=={strftime('= %b %d %y ==========')}" >> {work_log_path}' | exe "LLogOpen"
+command! LLogNewDay  exe "LLogOpen" | append(line('$'), $"\n{day_string}") | norm! G
 command! LLogOpen exe $'edit {work_log_path}' | norm! G
 
 # vip = visual inside paragraph
