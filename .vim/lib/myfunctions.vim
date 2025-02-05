@@ -459,6 +459,61 @@ export def Surround(pre: string, post: string)
   endif
 enddef
 
+# Better gx to open URLs.
+export def BetterGx()
+
+    # URL regexes
+    var rx_base = '\%(\%(http\|ftp\|irc\)s\?\|file\)://\S'
+    var rx_bare = rx_base .. '\+'
+    var rx_embd = rx_base .. '\{-}'
+
+    var URL = ""
+    var save_view = winsaveview()
+
+    # markdown URL [link text](http://ya.ru 'yandex search')
+    try
+        if searchpair('\[.\{-}\](', '', ')\zs', 'cbW', '', line('.')) > 0
+            URL = matchstr(getline('.')[col('.') - 1 : ], '\[.\{-}\](\zs' .. rx_embd .. '\ze\(\s\+.\{-}\)\?)')
+        endif
+    finally
+        winrestview(save_view)
+    endtry
+
+    # asciidoc URL http://yandex.ru[yandex search]
+    if empty(URL)
+        try
+            if searchpair(rx_bare .. '\[', '', '\]\zs', 'cbW', '', line('.')) > 0
+                URL = matchstr(getline('.')[col('.') - 1 : ], '\S\{-}\ze[')
+            endif
+        finally
+            winrestview(save_view)
+        endtry
+    endif
+
+    # HTML URL <a href='http://www.python.org'>Python is here</a>
+    #          <a href="http://www.python.org"/>
+    if empty(URL)
+        try
+            if searchpair(' < a\s\+href=', '', '\%(</a>\|/>\)\zs', 'cbW', '', line('.')) > 0
+                URL = matchstr(getline('.')[col('.') - 1 : ], 'href=["' .. "'" .. ']\?\zs\S\{-}\ze["' .. "'" .. ']\?/\?>')
+            endif
+        finally
+            winrestview(save_view)
+        endtry
+    endif
+
+    # barebone URL http://google.com
+    if empty(URL)
+        URL = matchstr(expand("<cfile>"), rx_bare)
+    endif
+
+    if !empty(URL)
+      silent exe $'!{g:start_cmd} {escape(URL, '#%!')}'
+    else
+      echo "Empty URL"
+    endif
+
+enddef
 
 # TODO: Require more work!
 # def SurroundPendingOperator(pre_string: string, post_string: string, type: string)

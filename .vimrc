@@ -197,6 +197,9 @@ def GoToGitRoot()
 enddef
 noremap cd <scriptcmd>GoToGitRoot()<cr>
 
+# Better gx
+nnoremap gx <ScriptCmd>myfunctions.BetterGx()<cr>
+
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
@@ -494,6 +497,7 @@ if g:os == "Windows"
 endif
 command! LLogNewDay  exe "LLogOpen" | append(line('$'), $"\n{day_string}") | norm! G
 command! LLogOpen exe $'edit {work_log_path}' | norm! G
+
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
