@@ -471,10 +471,9 @@ export def Surround(pre: string, post: string)
   endif
 enddef
 
-# Better gx to open URLs.
-export def BetterGx()
+export def Gx()
 
-  if !exists('g:start_cmd')
+  if !exists('g:start_cmd') && !exists(':Open')
     echohl Error
     echomsg "Can't find proper opener for an URL!"
     echohl None
@@ -487,54 +486,57 @@ export def BetterGx()
   var rx_embd = rx_base .. '\{-}'
 
   var URL = ""
-  var save_view = winsaveview()
 
   # markdown URL [link text](http://ya.ru 'yandex search')
-  try
-    if searchpair('\[.\{-}\](', '', ')\zs', 'cbW', '', line('.')) > 0
-      URL = matchstr(getline('.')[col('.') - 1 : ], '\[.\{-}\](\zs' .. rx_embd
-        .. '\ze\(\s\+.\{-}\)\?)')
-    endif
-  finally
-    winrestview(save_view)
-  endtry
+  var save_view = winsaveview()
+  defer winrestview(save_view)
+  if searchpair('\[.\{-}\](', '', ')\zs', 'cbW', '', line('.')) > 0
+    URL = matchstr(getline('.')[col('.') - 1 : ], '\[.\{-}\](\zs' .. rx_embd
+      .. '\ze\(\s\+.\{-}\)\?)')
+  endif
 
   # asciidoc URL http://yandex.ru[yandex search]
   if empty(URL)
-    try
-      if searchpair(rx_bare .. '\[', '', '\]\zs', 'cbW', '', line('.')) > 0
-        URL = matchstr(getline('.')[col('.') - 1 : ], '\S\{-}\ze[')
-      endif
-    finally
-      winrestview(save_view)
-    endtry
+    if searchpair(rx_bare .. '\[', '', '\]\zs', 'cbW', '', line('.')) > 0
+      URL = matchstr(getline('.')[col('.') - 1 : ], '\S\{-}\ze[')
+    endif
   endif
 
   # HTML URL <a href='http://www.python.org'>Python is here</a>
   #          <a href="http://www.python.org"/>
   if empty(URL)
-    try
-      if searchpair(' < a\s\+href=', '', '\%(</a>\|/>\)\zs', 'cbW', '',
-          line('.')) > 0
-        URL = matchstr(getline('.')[col('.') - 1 : ], 'href=["' .. "'"
-          .. ']\?\zs\S\{-}\ze["' .. "'" .. ']\?/\?>')
-      endif
-    finally
-      winrestview(save_view)
-    endtry
+    if searchpair('<a\s\+href=', '', '\%(</a>\|/>\)\zs', 'cbW', '', line('.'))
+        > 0
+      URL = matchstr(getline('.')[col('.') - 1 : ],
+        'href=["' .. "'" .. ']\?\zs\S\{-}\ze["' .. "'" .. ']\?/\?>')
+    endif
+  endif
+
+  # URL <http://google.com>
+  if empty(URL)
+    URL = matchstr(expand("<cWORD>"), $'^<\zs{rx_bare}\ze>$')
+  endif
+
+  # URL (http://google.com)
+  if empty(URL)
+    URL = matchstr(expand("<cWORD>"), $'^(\zs{rx_bare}\ze)$')
   endif
 
   # barebone URL http://google.com
   if empty(URL)
-    URL = matchstr(expand("<cfile>"), rx_bare)
+    URL = matchstr(expand("<cWORD>"), rx_bare)
   endif
 
-  if !empty(URL)
-    silent exe $'!{g:start_cmd} {escape(URL, '#%!')}'
+  if empty(URL)
+    echo "Invalid URL"
+    return
+  endif
+
+  if exists(":Open")
+    exe $"Open {escape(URL, '#%!')}"
   else
-    echo "Empty URL"
+    silent exe $'!{g:start_cmd} {escape(URL, '#%!')}'
   endif
-
 enddef
 
 # TODO: Require more work!

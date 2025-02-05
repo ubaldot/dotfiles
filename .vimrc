@@ -198,7 +198,7 @@ enddef
 noremap cd <scriptcmd>GoToGitRoot()<cr>
 
 # Better gx
-nnoremap gx <ScriptCmd>myfunctions.BetterGx()<cr>
+nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
