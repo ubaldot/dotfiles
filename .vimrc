@@ -495,9 +495,8 @@ var day_string = strftime("=== %b %d %y ==========")
 if g:os == "Windows"
   work_log_path = 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
 endif
-command! LLogNewDay  exe "LLogOpen" | append(line('$'), $"\n{day_string}") | norm! G
+command! LLogNewDay  exe "LLogOpen" | append(line('$'), day_string) | norm! G0r<cr>
 command! LLogOpen exe $'edit {work_log_path}' | norm! G
-
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to

@@ -12,8 +12,11 @@ enddef
 var match_id = 0
 def SearchReplacementHelper(search_user: string = ''): list<string>
   augroup SEARCH_HI | autocmd!
-    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif | search(getcmdline(), 'w') | match_id = matchadd('IncSearch', getcmdline()) | redraw!
-    autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id = 0 | endif
+    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif |
+    search(getcmdline(), 'w') | match_id = matchadd('IncSearch', getcmdline())
+      | redraw!
+    autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id
+    = 0 | endif
   augroup END
   var search = empty(search_user) ? input("String to search: ") : search_user
   if !empty(search_user)
@@ -60,11 +63,13 @@ def SearchAndReplaceInFiles(search_user: string = '')
   if risky[0] =~ "y"
     var cmd = 'Nothing'
     if g:os != 'Windows'
-      cmd = printf('!find %s -type f -exec sed -i ''s/%s/%s/g'' {} \;', pattern, search, replacement)
+      cmd = printf('!find %s -type f -exec sed -i ''s/%s/%s/g'' {} \;',
+        pattern, search, replacement)
     else
       # TODO: Command for Windows: to test
       # cmd = $'powershell -command "gci -Recurse -File | ForEach-Object \{
-      #       \  (Get-Content $_.FullName) -replace ''{search}'', ''{replacement}'' | Set-Content $_.FullName
+      #       \  (Get-Content $_.FullName) -replace ''{search}'',
+      #       ''{replacement}'' | Set-Content $_.FullName
       #       \\}"'
     endif
     echo $"\n{cmd}"
@@ -159,13 +164,15 @@ export def Redir(cmd: string, rng: number, start: number, end: number)
   var output = []
   if cmd =~ '^!'
     var cmd_filt = cmd =~ ' %'
-      ? matchstr(substitute(cmd, ' %', ' ' .. shellescape(escape(expand('%:p'), '\')), ''), '^!\zs.*')
+      ? matchstr(substitute(cmd, ' %', ' '
+      .. shellescape(escape(expand('%:p'), '\')), ''), '^!\zs.*')
       : matchstr(cmd, '^!\zs.*')
     if rng == 0
       output = systemlist(cmd_filt)
     else
       var joined_lines = join(getline(start, end), '\n')
-      var cleaned_lines = substitute(shellescape(joined_lines), "'\\\\''", "\\\\'", 'g')
+      var cleaned_lines = substitute(shellescape(joined_lines), "'\\\\''",
+        "\\\\'", 'g')
       output = systemlist(cmd_filt .. " <<< $" .. cleaned_lines)
     endif
   else
@@ -205,7 +212,8 @@ export def ColorsToggle(): void
         hlset([{name: col_tag, guibg: hex, guifg: "black"}])
         prop_type_add(col_tag, {highlight: col_tag})
       endif
-      add(b:prop_ids, prop_add(row, starts + 1, { length: ends - starts,  type: col_tag }))
+      add(b:prop_ids, prop_add(row, starts + 1, { length: ends - starts,
+        type: col_tag }))
       cnt += 1
       [hex, starts, ends] = matchstrpos(current, '#\x\{6\}', 0, cnt)
     endwhile
@@ -238,7 +246,8 @@ def Highlight()
   # prop is detected remove it.
   var no_prop = empty(prop_list(start_line, {'types': ['my_hl']}))
   if no_prop
-    prop_add(start_line, start_col, {'end_lnum': end_line, 'end_col': end_col, 'type': 'my_hl', 'id': b:prop_id})
+    prop_add(start_line, start_col, {'end_lnum': end_line, 'end_col': end_col,
+      'type': 'my_hl', 'id': b:prop_id})
     b:prop_id = b:prop_id + 1
   else
     var id = prop_list(start_line, {'types': ['my_hl']})[0]['id']
@@ -357,7 +366,8 @@ export def OpenMyTerminal()
     else
       os_shell = &shell
     endif
-    var buf_no = term_start(os_shell, {'term_name': my_term_name, 'hidden': 1, 'term_finish': 'close'})
+    var buf_no = term_start(os_shell, {'term_name': my_term_name, 'hidden': 1,
+      'term_finish': 'close'})
     # echom bufname(buf_no)
     setbufvar(bufname(buf_no), '&buflisted', 0)
     # win_execute(bufwinid(buf_no), 'setlocal nobuflisted')
@@ -395,7 +405,8 @@ enddef
 
 # Make vim to speak on macos
 if has('mac')
-  # <esc> is used in xnoremap because '<,'> are updated once you leave visual mode
+  # <esc> is used in xnoremap because '<,'> are updated once you leave visual
+  # mode
   xnoremap <leader>s <esc><ScriptCmd>TextToSpeech(line("'<"), line("'>"))<cr>
   command -range Say vim9cmd TextToSpeech(<line1>, <line2>)
 
@@ -429,7 +440,8 @@ export def Surround(pre: string, post: string)
     column_start = column_end
     column_end = tmp
   endif
-  var leading_chars = strcharpart(getline(line_start), column_start - 1 - pre_len, pre_len)
+  var leading_chars = strcharpart(getline(line_start), column_start - 1 -
+    pre_len, pre_len)
   var trailing_chars = strcharpart(getline(line_end), column_end, post_len)
 
   # echom "leading_chars: " .. leading_chars
@@ -462,61 +474,72 @@ enddef
 # Better gx to open URLs.
 export def BetterGx()
 
-    # URL regexes
-    var rx_base = '\%(\%(http\|ftp\|irc\)s\?\|file\)://\S'
-    var rx_bare = rx_base .. '\+'
-    var rx_embd = rx_base .. '\{-}'
+  if !exists('g:start_cmd')
+    echohl Error
+    echomsg "Can't find proper opener for an URL!"
+    echohl None
+    return
+  endif
 
-    var URL = ""
-    var save_view = winsaveview()
+  # URL regexes
+  var rx_base = '\%(\%(http\|ftp\|irc\)s\?\|file\)://\S'
+  var rx_bare = rx_base .. '\+'
+  var rx_embd = rx_base .. '\{-}'
 
-    # markdown URL [link text](http://ya.ru 'yandex search')
+  var URL = ""
+  var save_view = winsaveview()
+
+  # markdown URL [link text](http://ya.ru 'yandex search')
+  try
+    if searchpair('\[.\{-}\](', '', ')\zs', 'cbW', '', line('.')) > 0
+      URL = matchstr(getline('.')[col('.') - 1 : ], '\[.\{-}\](\zs' .. rx_embd
+        .. '\ze\(\s\+.\{-}\)\?)')
+    endif
+  finally
+    winrestview(save_view)
+  endtry
+
+  # asciidoc URL http://yandex.ru[yandex search]
+  if empty(URL)
     try
-        if searchpair('\[.\{-}\](', '', ')\zs', 'cbW', '', line('.')) > 0
-            URL = matchstr(getline('.')[col('.') - 1 : ], '\[.\{-}\](\zs' .. rx_embd .. '\ze\(\s\+.\{-}\)\?)')
-        endif
+      if searchpair(rx_bare .. '\[', '', '\]\zs', 'cbW', '', line('.')) > 0
+        URL = matchstr(getline('.')[col('.') - 1 : ], '\S\{-}\ze[')
+      endif
     finally
-        winrestview(save_view)
+      winrestview(save_view)
     endtry
+  endif
 
-    # asciidoc URL http://yandex.ru[yandex search]
-    if empty(URL)
-        try
-            if searchpair(rx_bare .. '\[', '', '\]\zs', 'cbW', '', line('.')) > 0
-                URL = matchstr(getline('.')[col('.') - 1 : ], '\S\{-}\ze[')
-            endif
-        finally
-            winrestview(save_view)
-        endtry
-    endif
+  # HTML URL <a href='http://www.python.org'>Python is here</a>
+  #          <a href="http://www.python.org"/>
+  if empty(URL)
+    try
+      if searchpair(' < a\s\+href=', '', '\%(</a>\|/>\)\zs', 'cbW', '',
+          line('.')) > 0
+        URL = matchstr(getline('.')[col('.') - 1 : ], 'href=["' .. "'"
+          .. ']\?\zs\S\{-}\ze["' .. "'" .. ']\?/\?>')
+      endif
+    finally
+      winrestview(save_view)
+    endtry
+  endif
 
-    # HTML URL <a href='http://www.python.org'>Python is here</a>
-    #          <a href="http://www.python.org"/>
-    if empty(URL)
-        try
-            if searchpair(' < a\s\+href=', '', '\%(</a>\|/>\)\zs', 'cbW', '', line('.')) > 0
-                URL = matchstr(getline('.')[col('.') - 1 : ], 'href=["' .. "'" .. ']\?\zs\S\{-}\ze["' .. "'" .. ']\?/\?>')
-            endif
-        finally
-            winrestview(save_view)
-        endtry
-    endif
+  # barebone URL http://google.com
+  if empty(URL)
+    URL = matchstr(expand("<cfile>"), rx_bare)
+  endif
 
-    # barebone URL http://google.com
-    if empty(URL)
-        URL = matchstr(expand("<cfile>"), rx_bare)
-    endif
-
-    if !empty(URL)
-      silent exe $'!{g:start_cmd} {escape(URL, '#%!')}'
-    else
-      echo "Empty URL"
-    endif
+  if !empty(URL)
+    silent exe $'!{g:start_cmd} {escape(URL, '#%!')}'
+  else
+    echo "Empty URL"
+  endif
 
 enddef
 
 # TODO: Require more work!
-# def SurroundPendingOperator(pre_string: string, post_string: string, type: string)
+# def SurroundPendingOperator(pre_string: string, post_string: string, type:
+# string)
 
 #   var pre_string_len = strlen(pre_string)
 #   var post_string_len = strlen(post_string)
@@ -526,11 +549,15 @@ enddef
 #   var offset = 0
 
 #   # Get chars
-#   var leading_string = getline(leading_pos[1])[leading_pos[2] - pre_string_len ]
-#   var trailing_string = getline(trailing_pos[1])[trailing_pos[2] - pre_string_len - 2]
+#   var leading_string = getline(leading_pos[1])[leading_pos[2] -
+#   pre_string_len ]
+#   var trailing_string = getline(trailing_pos[1])[trailing_pos[2] -
+#   pre_string_len - 2]
 
-#   # echom $"{leading_pos[1]},{leading_pos[2] - 2}, {trailing_pos[1]},{trailing_pos[2] - 2}"
-#   echom $"leading_string: {leading_string}, trailing_string: {trailing_string}"
+#   # echom $"{leading_pos[1]},{leading_pos[2] - 2},
+#   {trailing_pos[1]},{trailing_pos[2] - 2}"
+#   echom $"leading_string: {leading_string}, trailing_string:
+#   {trailing_string}"
 
 #   # I am at the leading position
 #   cursor(leading_pos[1], leading_pos[2])
@@ -558,15 +585,19 @@ enddef
 #   endif
 # enddef
 
-# nnoremap g" <ScriptCmd>&operatorfunc = (type) => Surround('"', '"', type)<cr>g@
+# nnoremap g" <ScriptCmd>&operatorfunc = (type) => Surround('"', '"',
+# type)<cr>g@
 # HOW TO WRITE FUNCTION THAT ALLOW COMMAND TO HAVE DOUBLE COMPLETION.
-# noremap <unique> <script> <Plug>Highlight2 <esc><ScriptCmd>Highlight('WildMenu')
+# noremap <unique> <script> <Plug>Highlight2
+# <esc><ScriptCmd>Highlight('WildMenu')
 #
 
 # Example of user-command with multiple args from different lists
-# command! -nargs=* -complete=customlist,FooCompleteNope Manim call Foo(<f-args>)
+# command! -nargs=* -complete=customlist,FooCompleteNope Manim call
+# Foo(<f-args>)
 
-# def FooComplete(current_arg: string, command_line: string, cursor_position: number): list<string>
+# def FooComplete(current_arg: string, command_line: string, cursor_position:
+# number): list<string>
 #   # split by whitespace to get the separate components:
 #   var parts = split(command_line, '\s\+')
 
@@ -574,7 +605,8 @@ enddef
 #     # then we're definitely finished with the first argument:
 #     return SecondCompletion(current_arg)
 #   elseif len(parts) > 1 && current_arg =~ '^\s*$'
-#     # then we've entered the first argument, but the current one is still blank:
+#     # then we've entered the first argument, but the current one is still
+#     blank:
 #     return SecondCompletion(current_arg)
 #   else
 #     # we're still on the first argument:
