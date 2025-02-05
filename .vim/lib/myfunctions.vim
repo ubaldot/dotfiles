@@ -420,8 +420,9 @@ endif
 #
 # TODO: separate leading and trailing chars
 export def Surround(pre: string, post: string)
-  # var [line_start, column_start] = getpos("v")[1 : 2]
-  # var [line_end, column_end] = getpos(".")[1 : 2]
+  # Usage:
+  #   Visual select text and hit <leader> + parenthesis
+  #
   var pre_len = strlen(pre)
   var post_len = strlen(post)
   var [line_start, column_start] = getpos("'<")[1 : 2]
@@ -473,7 +474,7 @@ enddef
 
 export def Gx()
 
-  if !exists('g:start_cmd') && !exists(':Open')
+  if exists('g:start_cmd') == 0 && exists(':Open') == 0
     echohl Error
     echomsg "Can't find proper opener for an URL!"
     echohl None
@@ -532,7 +533,7 @@ export def Gx()
     return
   endif
 
-  if exists(":Open")
+  if exists(":Open") != 0
     exe $"Open {escape(URL, '#%!')}"
   else
     silent exe $'!{g:start_cmd} {escape(URL, '#%!')}'

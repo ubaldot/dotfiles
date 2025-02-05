@@ -64,14 +64,16 @@ else
 endif
 
 # Windows
-if executable("xdg-open")
-  g:start_cmd = "xdg-open"
+if exists(':Open') == 0
+  if executable("xdg-open")
+    g:start_cmd = "xdg-open"
 # Linux/BSD
-elseif executable('cmd.exe')
-  g:start_cmd = "explorer.exe"
+  elseif executable('cmd.exe')
+    g:start_cmd = "explorer.exe"
 # MacOS
-elseif executable("open")
-  g:start_cmd = "open"
+  elseif executable("open")
+    g:start_cmd = "open"
+  endif
 endif
 # ------------------------
 
@@ -190,7 +192,8 @@ def GoToGitRoot()
   # then change dir to the git repo root.
   exe $'cd {expand('%:p:h')}'
   var git_root = system('git rev-parse --show-toplevel')
-  if v:shell_error == 0
+  # v:shell_error does not work in Windows, it returns 0
+  if v:shell_error == 0 && g:os != "Windows"
     exe $'cd {git_root}'
   endif
   pwd
@@ -261,6 +264,7 @@ tnoremap <c-w>q <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
 tnoremap <c-w>c <ScriptCmd>myfunctions.Quit_term_popup(false)<cr>
 nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
 tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
+tnoremap <c-d> <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
 tnoremap <c-r> <c-w>"
 command! Terminal myfunctions.OpenMyTerminal()
 # Open terminal below all windows
