@@ -136,6 +136,9 @@ export def TrimWhitespace()
 enddef
 
 export def GetTextObject(textobject: string): string
+  # You pass a text object like "inside word", etc. and it returns it.
+  # For example GetTextObjet('aw') it returns "around word".
+
   # backup the content of register t (arbitrary choice, YMMV)
   var oldreg = getreg("t")
   # silently yank the text covered by whatever text object
@@ -148,7 +151,6 @@ export def GetTextObject(textobject: string): string
   # return the content of given text object
   return text
 enddef
-
 
 export def Redir(cmd: string, rng: number, start: number, end: number)
   # Used to redirect the output from the terminal in a scratch buffer

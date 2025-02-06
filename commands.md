@@ -105,6 +105,8 @@ Track remote branch
 
 **ssh/https:**
 
+If you get any message from GitHub that authentication method has been changed from 2021, switch to ssh and then switch back again to https://
+
     git remote set-url origin git@github.com:ubaldot/vim-replica.git
     git remote set-url origin https://github.com/OWNER/REPOSITORY.git
 

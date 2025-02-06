@@ -164,7 +164,7 @@ g:vimspector_configurations = {
     }
   },
 
-  "Simple debugger": {
+  "Debugger for packages developlemt": {
     # For debugpy configuration, see here:
     # https://code.visualstudio.com/docs/python/debugging
     # Launch current file with debugy. It doed not recognize virtual
@@ -189,6 +189,30 @@ g:vimspector_configurations = {
     }
 },
 
+  "Debugger for scripts": {
+    # For debugpy configuration, see here:
+    # https://code.visualstudio.com/docs/python/debugging
+    # Launch current file with debugy. It doed not recognize virtual
+    # environments. Opened a issue on debugpy.
+    adapter: "debugpy",
+    filetypes: ["python"],
+    configuration: {
+      # If you use "attach" you must specify a processID if you run everything
+      # locally OR you should use remote-request: launch
+      request: "launch",
+      program: "${file}",
+      python: [exepath('python')],
+      type: "python",
+      cwd: "${fileDirname}",
+      stopOnEntry: true,
+      console: "integratedTerminal",
+      justMyCode: true,
+      runInTerminal: true,
+      autoReload: {
+        enable: true
+      },
+    }
+},
 
   # Embedded C
   # TODO: openocd does not close when vimspector closes
