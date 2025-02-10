@@ -221,6 +221,7 @@ def PullDotfiles()
   elseif !empty(git_pull_status) &&  git_pull_status[0] !~ "Already up to date"
     echoerr "dotfiles updated. Close and re-open Vim to update your environment."
   endif
+  echom "git_pull_status: " .. git_pull_status
 enddef
 
 # CAZZO
