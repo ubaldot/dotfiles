@@ -206,15 +206,13 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Auto push/pull dotfiles
 def PullDotfiles()
-    silent exe $'!git -C {$HOME}/dotfiles add -u'
-    silent exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
+    silent exe $'!git -C {$HOME}/dotfiles add -u --quiet'
+    silent exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes --quiet"'
     if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
       ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles"
   endif
 enddef
-
-# Stocazzo
 
 augroup DOTFILES_PULL
   autocmd!
@@ -224,6 +222,7 @@ augroup END
 def PushDotfiles()
   if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
       ->filter('v:val =~ "CONFLICT"'))
+    # Needed to prevent Vim to automatically quit
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
   else
     exe $'!git -C {$HOME}/dotfiles add -u'
