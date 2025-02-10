@@ -214,6 +214,8 @@ def PullDotfiles()
   endif
 enddef
 
+# Stocazzo
+
 augroup DOTFILES_PULL
   autocmd!
   autocmd VimEnter * PullDotfiles()
