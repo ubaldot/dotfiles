@@ -238,7 +238,7 @@ def PushDotfiles()
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
   # If I changed some dotfiles I want to push them to the remote
   elseif !empty(systemlist($'git -C {$HOME}/dotfiles status')
-        ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
+        ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed\\|Your branch is ahead"'))
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Auto pushing ~/dotfiles... "'
     exe $'!git -C {$HOME}/dotfiles push'
