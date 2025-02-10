@@ -542,7 +542,9 @@ export def Gx()
   endif
 enddef
 
-# Markdown studd
+# ======================================
+# My personal note taking plugin. Based on markdown
+# ======================================
 
 def MDIsLink(): bool
   # Compare foo with [foo]. If they match, then what is inside the [] it
@@ -551,19 +553,19 @@ def MDIsLink(): bool
   # Assume that a link (or a filename) cannot be broken into multiple lines
   var saved_curpos = getcurpos()
   var is_link = false
-  var alias_link = myfunctions.GetTextObject('iw')
+  var alias_link = GetTextObject('iw')
 
   # Handle singularity if the cursor is on '[' or ']'
   if alias_link == '['
     norm! l
-    alias_link = myfunctions.GetTextObject('iw')
+    alias_link = GetTextObject('iw')
   elseif alias_link == ']'
     norm! h
-    alias_link = myfunctions.GetTextObject('iw')
+    alias_link = GetTextObject('iw')
   endif
 
   # Check if foo and [foo] match and if there is a (bla bla) after ].
-  var alias_link_bracket = myfunctions.GetTextObject('a[')
+  var alias_link_bracket = GetTextObject('a[')
   if alias_link == alias_link_bracket[1 : -2]
     norm! f]
     if getline('.')[col('.')] == '('
@@ -587,9 +589,6 @@ def MDIsLink(): bool
   endif
   setpos('.', saved_curpos)
   return is_link
-  # TEST:
-  # echo (line[start] == '[' && line[nd] == ']') ? 'Word is surrounded by []'
-  # : 'Word is not [surrounoded]( by [] # )'
 enddef
 
 export def MDToggleMark()
@@ -604,7 +603,7 @@ enddef
 export def MDHandleLink()
   if MDIsLink()
     norm! f(l
-    var link = myfunctions.GetTextObject('i(')
+    var link = GetTextObject('i(')
     if filereadable(link)
       exe $'edit {link}'
     elseif exists(':Open')
@@ -615,7 +614,7 @@ export def MDHandleLink()
   else
     var link = input('Insert link: ', '', 'file')
     if !empty(link)
-      # Create link
+      # Create link, surround stuff
       norm! lbi[
       norm! ea]
       execute $'norm! a({link})'
@@ -627,87 +626,3 @@ export def MDHandleLink()
     endif
   endif
 enddef
-# TODO: Require more work!
-# def SurroundPendingOperator(pre_string: string, post_string: string, type:
-# string)
-
-#   var pre_string_len = strlen(pre_string)
-#   var post_string_len = strlen(post_string)
-#   var leading_pos = getpos("'[")
-#   var trailing_pos = getpos("']")
-#   # To account of the chars added
-#   var offset = 0
-
-#   # Get chars
-#   var leading_string = getline(leading_pos[1])[leading_pos[2] -
-#   pre_string_len ]
-#   var trailing_string = getline(trailing_pos[1])[trailing_pos[2] -
-#   pre_string_len - 2]
-
-#   # echom $"{leading_pos[1]},{leading_pos[2] - 2},
-#   {trailing_pos[1]},{trailing_pos[2] - 2}"
-#   echom $"leading_string: {leading_string}, trailing_string:
-#   {trailing_string}"
-
-#   # I am at the leading position
-#   cursor(leading_pos[1], leading_pos[2])
-#   if leading_string == pre_string
-#     execute($"normal! {pre_string_len}X")
-#     offset = -pre_string_len
-#   else
-#     execute($"normal! i{pre_string}")
-#     offset = pre_string_len
-#   endif
-
-#   # Some chars have been added if you are working on the same line
-#   if leading_pos[1] == trailing_pos[1]
-#     cursor(trailing_pos[1], trailing_pos[2] + offset)
-#   else
-#     cursor(trailing_pos[1], trailing_pos[2])
-#   endif
-
-#   # Fix trailing char
-#   cursor(leading_pos[1], leading_pos[2])
-#   if trailing_chars == post_string
-#     execute($"normal! l{post_string_len}x")
-#   else
-#     execute($"normal! a{post_string}")
-#   endif
-# enddef
-
-# nnoremap g" <ScriptCmd>&operatorfunc = (type) => Surround('"', '"',
-# type)<cr>g@
-# HOW TO WRITE FUNCTION THAT ALLOW COMMAND TO HAVE DOUBLE COMPLETION.
-# noremap <unique> <script> <Plug>Highlight2
-# <esc><ScriptCmd>Highlight('WildMenu')
-#
-
-# Example of user-command with multiple args from different lists
-# command! -nargs=* -complete=customlist,FooCompleteNope Manim call
-# Foo(<f-args>)
-
-# def FooComplete(current_arg: string, command_line: string, cursor_position:
-# number): list<string>
-#   # split by whitespace to get the separate components:
-#   var parts = split(command_line, '\s\+')
-
-#   if len(parts) > 2
-#     # then we're definitely finished with the first argument:
-#     return SecondCompletion(current_arg)
-#   elseif len(parts) > 1 && current_arg =~ '^\s*$'
-#     # then we've entered the first argument, but the current one is still
-#     blank:
-#     return SecondCompletion(current_arg)
-#   else
-#     # we're still on the first argument:
-#     return FirstCompletion(current_arg)
-#   endif
-# enddef
-
-# def FirstCompletion(arg: string): list<string>
-#     return ['pippo', 'pluto', 'stocazzo']->filter($'v:val =~ "^{arg}"')
-# enddef
-
-# def SecondCompletion(arg: string): list<string>
-#     return ['cazzo', 'figa']->filter($'v:val =~ "^{arg}"')
-# enddef
