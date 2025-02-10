@@ -226,11 +226,13 @@ augroup DOTFILES_PULL
 augroup END
 
 def PushDotfiles()
+  # Pull first, in case there has been some change in the remote
   if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
       ->filter('v:val =~ "CONFLICT"'))
     # Needed to prevent Vim to automatically quit
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
-  else
+  elseif !empty(systemlist($'git -C {$HOME}/dotfiles status')
+      ->filter('v:val =~ "Changes not staged for commit"'))
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Auto pushing ~/dotfiles... "'
     exe $'!git -C {$HOME}/dotfiles push'
