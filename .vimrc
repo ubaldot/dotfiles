@@ -215,7 +215,7 @@ def PullDotfiles()
 
   # Pull & merge eventual commit
   var git_pull_status = systemlist($'git -C {$HOME}/dotfiles pull')
-  if !empty(git_pull_status) ->filter('v:val =~ "CONFLICT"'))
+  if !empty(git_pull_status ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles"
   elseif git_pull_status[0] !~ "Already up to date."
     echo "dotfiles updated. Close and re-open Vim to update your environment."
