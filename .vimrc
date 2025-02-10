@@ -224,8 +224,6 @@ def PullDotfiles()
   echom "git_pull_status: " .. git_pull_status[0]
 enddef
 
-# CAZZO
-
 augroup DOTFILES_PULL
   autocmd!
   autocmd VimEnter * PullDotfiles()
