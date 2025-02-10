@@ -223,8 +223,6 @@ def PullDotfiles()
   endif
 enddef
 
-# CAZZO
-
 augroup DOTFILES_PULL
   autocmd!
   autocmd VimEnter * PullDotfiles()
