@@ -229,17 +229,28 @@ TL;DR Update version in pyproject.toml and then
 **release on conda-forge**
 
 1. To create a new package use staged-recipe repo
-2. To update an existing package, use dymoval-feedstock repo.
+2. To update an existing package, use dymoval-feedstock repo. Fork and add a
+   PR.
+3. DONT MERGE UNTIL THE CHECKS ARE COMPLETED!!!
 
 Edit conda/meta.yml in this way:
 
 1. Update version
-2. Cpy sha256 from pypi where you just upload the package and replace that
+2. Copy sha256 from pypi where you just upload the package and replace that
    number to meta.yml. On PYPI click on dowload files, view hashes (of the
    tar.gz file)
-3. run the following
+3. Check that the dependencies on the pyproject.toml and meta.yaml match.
+4. Install conda-smithy in your root environment.
 
-   conda build conda/
+   conda install -c conda-forge conda-smithy
+
+Commit all changes and from the root directory of the feedstock, type:
+
+    conda smithy rerender -c auto
+
+4 (OLD). run the following
+
+conda build conda/
 
 You must issue a PR Pull the repo in
 ~/Documents/github/ubaldot/staged-recipes/ make a branch with the package name

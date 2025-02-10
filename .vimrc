@@ -22,6 +22,7 @@ elseif IsWSL()
   g:os = 'WSL'
 else
   g:os = substitute(system('uname'), '\n', '', '')
+  language en_US.UTF-8
 endif
 
 if has('unix') && g:os == 'WSL' && !has('+clipboard')
