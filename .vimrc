@@ -207,7 +207,7 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 # Auto push/pull dotfiles
 def PullDotfiles()
     silent exe $'!git -C {$HOME}/dotfiles add -u --quiet'
-    silent exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes --quiet"'
+    silent exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
     if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
       ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles"
