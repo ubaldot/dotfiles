@@ -135,10 +135,10 @@ def HandleLink()
       norm! ea]
       execute $'norm! a({link})'
       norm! F]h
-      if link !~ '^https://'
-        exe $'edit {link}'
-        write
-      endif
+      # if link !~ '^https://'
+      #   exe $'edit {link}'
+      #   write
+      # endif
     endif
   endif
 enddef
