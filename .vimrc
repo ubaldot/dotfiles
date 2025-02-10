@@ -218,7 +218,7 @@ def PullDotfiles()
       ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles"
   endif
-  source $MYVIMRC
+  echo "dotfiles updated. Close and re-open Vim to update your environment."
 enddef
 
 augroup DOTFILES_PULL
