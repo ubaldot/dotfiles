@@ -215,6 +215,7 @@ def PullDotfiles()
 
   # Pull & merge eventual commit
   var git_pull_status = systemlist($'git -C {$HOME}/dotfiles pull')
+  echom git_pull_status
   if !empty(git_pull_status ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles"
   elseif !empty(git_pull_status ->filter('v:val !~ "Already up to date"'))
