@@ -206,9 +206,9 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Auto push/pull dotfiles
 def PullDotfiles()
-    # If there is any local change, commit them first
+    # If there is any local change, commit them first, then pull
     if !empty(systemlist($'git -C {$HOME}/dotfiles status')
-      ->filter('v:val =~ "Changes not staged for commit"'))
+        ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
       exe $'!git -C {$HOME}/dotfiles add -u'
       exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
     endif
@@ -218,6 +218,7 @@ def PullDotfiles()
       ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles"
   endif
+  source $MYVIMRC
 enddef
 
 augroup DOTFILES_PULL
@@ -231,8 +232,9 @@ def PushDotfiles()
       ->filter('v:val =~ "CONFLICT"'))
     # Needed to prevent Vim to automatically quit
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
+  # If I changed some dotfiles I want to push them to the remote
   elseif !empty(systemlist($'git -C {$HOME}/dotfiles status')
-      ->filter('v:val =~ "Changes not staged for commit"'))
+        ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Auto pushing ~/dotfiles... "'
     exe $'!git -C {$HOME}/dotfiles push'
