@@ -228,7 +228,7 @@ augroup DOTFILES_PULL
 augroup END
 
 def PushDotfiles()
-  # Pull first, in case there has been some change in the remote
+  # Pull first before pushing
   if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
       ->filter('v:val =~ "CONFLICT"'))
     # Needed to prevent Vim to automatically quit
