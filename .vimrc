@@ -206,9 +206,11 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Auto push/pull dotfiles
 def PullDotfiles()
-  if !empty(systemlist($'git -C {$HOME}/dotfiles status')
-      ->filter('v:val =~ "Your branch is behind"'))
-    exe $'!git -C {$HOME}/dotfiles pull'
+    exe $'!git -C {$HOME}/dotfiles add -u'
+    exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
+    if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
+      ->filter('v:val =~ "CONFLICT"'))
+    echoerr "You have conflicts in ~/dotfiles"
   endif
 enddef
 
@@ -222,7 +224,6 @@ def PushDotfiles()
       ->filter('v:val =~ "CONFLICT"'))
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
   else
-
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Auto push"'
     exe $'!git -C {$HOME}/dotfiles push'
