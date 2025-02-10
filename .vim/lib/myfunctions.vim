@@ -143,7 +143,7 @@ export def GetTextObject(textobject: string): string
   var oldreg = getreg("t")
   # silently yank the text covered by whatever text object
   # was given as argument into register t
-  execute 'silent normal "ty' .. textobject
+  noautocmd execute 'silent normal "ty' .. textobject
   # save the content of register t into a variable
   var text = getreg("t")
   # restore register t
