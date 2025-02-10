@@ -207,18 +207,20 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 # Auto push/pull dotfiles
 def PullDotfiles()
     # If there is any local change, commit them first, then pull
-    if !empty(systemlist($'git -C {$HOME}/dotfiles status')
-        ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
-      exe $'!git -C {$HOME}/dotfiles add -u'
-      exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
-    endif
-
-    # Pull & merge eventual commit
-    if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
-      ->filter('v:val =~ "CONFLICT"'))
-    echoerr "You have conflicts in ~/dotfiles"
+  if !empty(systemlist($'git -C {$HOME}/dotfiles status')
+      ->filter('v:val =~ "Changes not staged for commit\\|Changes to be
+    committed"'))
+    exe $'!git -C {$HOME}/dotfiles add -u'
+    exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
   endif
-  echo "dotfiles updated. Close and re-open Vim to update your environment."
+
+  # Pull & merge eventual commit
+  var git_pull_status = systemlist($'git -C {$HOME}/dotfiles pull')
+  if !empty(git_pull_status) ->filter('v:val =~ "CONFLICT"'))
+    echoerr "You have conflicts in ~/dotfiles"
+  elseif git_pull_status[0] !~ "Already up to date."
+    echo "dotfiles updated. Close and re-open Vim to update your environment."
+  endif
 enddef
 
 augroup DOTFILES_PULL
