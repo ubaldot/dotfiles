@@ -226,6 +226,8 @@ augroup DOTFILES_PULL
   autocmd VimEnter * PullDotfiles()
 augroup END
 
+# STOCAZZO
+
 def PushDotfiles()
   # Pull first, in case there has been some change in the remote
   if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
