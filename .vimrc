@@ -539,7 +539,7 @@ command! -nargs=1 -complete=command -range Redir
 # Activity log
 #
 var work_log_path = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
-var day_string = strftime("=== %b %d %y ==========")
+var day_string = strftime("## %b %d %y")
 if g:os == "Windows"
   work_log_path = 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
 endif

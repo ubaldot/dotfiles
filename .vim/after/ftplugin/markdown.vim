@@ -5,9 +5,9 @@ setlocal iskeyword-=_
 &l:tabstop = 2
 
 # Bold, italic, strikethrough
-xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
-xnoremap <buffer> <silent> <leader>* <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
-xnoremap <buffer> <silent> <leader>~ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
+xnoremap <buffer> <silent> <leader>b <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
+xnoremap <buffer> <silent> <leader>i <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
+xnoremap <buffer> <silent> <leader>s <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
 
 inoremap ä `
 
