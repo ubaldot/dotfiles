@@ -55,14 +55,15 @@ export def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
     'odt', 'rtf']
 enddef
 
-def IsLink()
-  # Compare foo with [foo]. If they match, then what is inside the [] it 
+def IsLink(): bool
+  # Compare foo with [foo]. If they match, then what is inside the [] it
   # possibly be a link. Next, it check if there is a (bla_bla) just after ].
   # Link alias must be words.
   # Assume that a link (or a filename) cannot be broken into multiple lines
   var saved_curpos = getcurpos()
+  var is_link = false
   var alias_link = myfunctions.GetTextObject('iw')
-  
+
   # Handle singularity if the cursor is on '[' or ']'
   if alias_link == '['
     norm! l
@@ -81,23 +82,26 @@ def IsLink()
       norm! l%
       var line_close_parenthesis = line('.')
       if line_open_parenthesis == line_close_parenthesis
-        echo "Is a link"
+        # echo "Is a link"
+        is_link = true
       else
-        echo "Is not a link"
+        # echo "Is not a link"
+        is_link = false
       endif
     else
-      echo "Is not a link"
+      is_link = false
+      # echo "Is not a link"
     endif
   else
-      echo "Is not a link"
+      is_link = false
+      # echo "Is not a link"
   endif
   setpos('.', saved_curpos)
+  return is_link
   # TEST:
   # echo (line[start] == '[' && line[nd] == ']') ? 'Word is surrounded by []'
   # : 'Word is not [surrounoded]( by [] # )'
 enddef
-
-nnoremap <buffer> <silent> <leader>ö <ScriptCmd>IsLink()<cr>
 
 def ToggleMark()
   var line = getline('.')
@@ -110,14 +114,24 @@ enddef
 nnoremap <buffer> <silent> <leader>x <ScriptCmd>ToggleMark()<cr>
 
 def HandleLink()
-  echom "pippo"
   if IsLink()
     norm! f(l
     var link = myfunctions.GetTextObject('i(')
-    exe $'Open {link}'
+    if filereadable(link)
+      exe $'edit {link}'
+    else
+      echoerr $"File {link} not readable"
+    endif
   else
-    var link = input('Insert link: ')
-    execute $'norm! bi[\<esc>ea]({link})'
+    var link = input('Insert link: ', '', 'file')
+    if !empty(link)
+      # Create link
+      norm! lbi[
+      norm! ea]
+      execute $'norm! a({link})'
+      norm! F]h
+      exe $'edit {link}'
+    endif
   endif
 enddef
 
