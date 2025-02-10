@@ -592,7 +592,7 @@ def MDIsLink(): bool
   # : 'Word is not [surrounoded]( by [] # )'
 enddef
 
-def MDToggleMark()
+export def MDToggleMark()
   var line = getline('.')
   if match(line, '\[\s*\]') != -1
     setline('.', substitute(line, '\[\s*\]', '[x]', ''))
@@ -601,7 +601,7 @@ def MDToggleMark()
   endif
 enddef
 
-def MDHandleLink()
+export def MDHandleLink()
   if MDIsLink()
     norm! f(l
     var link = myfunctions.GetTextObject('i(')
