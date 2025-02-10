@@ -204,6 +204,35 @@ noremap cd <scriptcmd>GoToGitRoot()<cr>
 # Better gx
 nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 
+# Auto push/pull dotfiles
+def PullDotfiles()
+  if !empty(systemlist($'git -C {$HOME}/dotfiles status')
+      ->filter('v:val =~ "Your branch is behind"'))
+    exe $'!git -C {$HOME}/dotfiles pull'
+  endif
+enddef
+
+augroup DOTFILES_PULL
+  autocmd!
+  autocmd VimEnter * PullDotfiles()
+augroup END
+
+def PushDotfiles()
+  if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
+      ->filter('v:val =~ "CONFLICT"'))
+    input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
+  else
+    exe $'!git -C {$HOME}/dotfiles add -u'
+    exe $'!git -C {$HOME}/dotfiles ci -m "Auto push"'
+    exe $'!git -C {$HOME}/dotfiles push'
+  endif
+enddef
+
+augroup DOTFILES_PUSH
+  autocmd!
+  autocmd VimLeavePre * PushDotfiles()
+augroup END
+
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
