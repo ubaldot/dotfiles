@@ -4,23 +4,26 @@ import g:dotvim .. "/lib/myfunctions.vim"
 &l:tabstop = 2
 
 # Bold, italic, strikethrough
-xnoremap <buffer> <silent> <leader>b <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
-xnoremap <buffer> <silent> <leader>i <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
-xnoremap <buffer> <silent> <leader>s <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
+xnoremap <buffer> <silent> <leader>b
+      \ <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
+xnoremap <buffer> <silent> <leader>i
+      \ <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
+xnoremap <buffer> <silent> <leader>s
+      \ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
 
 inoremap ä `
 
 if executable('prettier')
   &l:formatprg = $"prettier --prose-wrap always --print-width {&l:textwidth}
-            \ --stdin-filepath {shellescape(expand('%'))}"
+        \ --stdin-filepath {shellescape(expand('%'))}"
 
   # Autocmd to format with ruff
   augroup MARKDOWN_FORMAT_ON_SAVE
-      autocmd! * <buffer>
-      autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
+    autocmd! * <buffer>
+    autocmd BufWritePre <buffer> myfunctions.FormatWithoutMoving()
   augroup END
 else
-   echoerr "'prettier' not installed!'"
+  echoerr "'prettier' not installed!'"
 endif
 
 if executable('pandoc')
@@ -93,8 +96,8 @@ def IsLink(): bool
       # echo "Is not a link"
     endif
   else
-      is_link = false
-      # echo "Is not a link"
+    is_link = false
+    # echo "Is not a link"
   endif
   setpos('.', saved_curpos)
   return is_link
@@ -132,12 +135,17 @@ def HandleLink()
       norm! ea]
       execute $'norm! a({link})'
       norm! F]h
-      # exe $'edit {link}'
+      if link !~ '^https://'
+        exe $'edit {link}'
+        write
+      endif
     endif
   endif
 enddef
 
 nnoremap <buffer> <silent> <enter> <ScriptCmd>HandleLink()<cr>
+nnoremap <buffer> <silent> <backspace> <Cmd>buffer #<cr>
 
 # Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc
-command! -nargs=? -buffer -complete=customlist,MarkdownRenderCompleteList MarkdownRender MarkdownRender(<f-args>)
+command! -nargs=? -buffer -complete=customlist,MarkdownRenderCompleteList
+      \ MarkdownRender MarkdownRender(<f-args>)
