@@ -206,9 +206,10 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Auto push/pull dotfiles
 def PullDotfiles()
-    # If there is any local change, commit them first, then pull
+  # If there is any local change, commit them first, then pull
   if !empty(systemlist($'git -C {$HOME}/dotfiles status')
-      ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
+      ->filter('v:val =~ "Changes not staged for commit\\|Changes to be
+    committed"'))
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
   endif
