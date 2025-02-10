@@ -119,8 +119,10 @@ def HandleLink()
     var link = myfunctions.GetTextObject('i(')
     if filereadable(link)
       exe $'edit {link}'
+    elseif exists(':Open')
+      exe $'Open {link}'
     else
-      echoerr $"File {link} not readable"
+      exe $'!{g:start_cmd} -a safari.app {link}'
     endif
   else
     var link = input('Insert link: ', '', 'file')
@@ -130,7 +132,7 @@ def HandleLink()
       norm! ea]
       execute $'norm! a({link})'
       norm! F]h
-      exe $'edit {link}'
+      # exe $'edit {link}'
     endif
   endif
 enddef
