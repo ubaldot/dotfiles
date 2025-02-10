@@ -1,7 +1,6 @@
 vim9script
 
 import g:dotvim .. "/lib/myfunctions.vim"
-setlocal iskeyword-=_
 &l:tabstop = 2
 
 # Bold, italic, strikethrough
@@ -57,18 +56,15 @@ export def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
 enddef
 
 def IsLink()
-  norm! E
-  var end_char = getline('.')[col('.') - 2]
-  norm! B
-  var start_char = getline('.')[col('.') - 1]
-  echo start_char end_char
-  if start_char == '[' && end_char == ']'
+  var alias_link = myfunctions.GetTextObject('iw')
+  var alias_link_bracket = myfunctions.GetTextObject('a[')
+  if alias_link == alias_link_bracket[1 : -2]
     echo "Is a link"
   else
     echo "Is not a link"
   endif
   # echo (line[start] == '[' && line[end] == ']') ? 'Word is surrounded by []'
-  # : 'Word is not surrounded by []'
+  # : 'Word is not [surrounded]( by []'
 enddef
 
 nnoremap <buffer> <silent> <leader>ö <ScriptCmd>IsLink()<cr>
