@@ -56,18 +56,72 @@ export def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
 enddef
 
 def IsLink()
+  # Compare foo with [foo]. If they match, then what is inside the [] it 
+  # possibly be a link. Next, it check if there is a (bla_bla) just after ].
+  # Link alias must be words.
+  # Assume that a link (or a filename) cannot be broken into multiple lines
+  var saved_curpos = getcurpos()
   var alias_link = myfunctions.GetTextObject('iw')
+  
+  # Handle singularity if the cursor is on '[' or ']'
+  if alias_link == '['
+    norm! l
+    alias_link = myfunctions.GetTextObject('iw')
+  elseif alias_link == ']'
+    norm! h
+    alias_link = myfunctions.GetTextObject('iw')
+  endif
+
+  # Check if foo and [foo] match and if there is a (bla bla) after ].
   var alias_link_bracket = myfunctions.GetTextObject('a[')
   if alias_link == alias_link_bracket[1 : -2]
-    echo "Is a link"
+    norm! f]
+    if getline('.')[col('.')] == '('
+      var line_open_parenthesis = line('.')
+      norm! l%
+      var line_close_parenthesis = line('.')
+      if line_open_parenthesis == line_close_parenthesis
+        echo "Is a link"
+      else
+        echo "Is not a link"
+      endif
+    else
+      echo "Is not a link"
+    endif
   else
-    echo "Is not a link"
+      echo "Is not a link"
   endif
-  # echo (line[start] == '[' && line[end] == ']') ? 'Word is surrounded by []'
-  # : 'Word is not [surrounded]( by []'
+  setpos('.', saved_curpos)
+  # TEST:
+  # echo (line[start] == '[' && line[nd] == ']') ? 'Word is surrounded by []'
+  # : 'Word is not [surrounoded]( by [] # )'
 enddef
 
 nnoremap <buffer> <silent> <leader>ö <ScriptCmd>IsLink()<cr>
+
+def ToggleMark()
+  var line = getline('.')
+  if match(line, '\[\s*\]') != -1
+    setline('.', substitute(line, '\[\s*\]', '[x]', ''))
+  elseif match(line, '\[x\]') != -1
+    setline('.', substitute(line, '\[x\]', '[ ]', ''))
+  endif
+enddef
+nnoremap <buffer> <silent> <leader>x <ScriptCmd>ToggleMark()<cr>
+
+def HandleLink()
+  echom "pippo"
+  if IsLink()
+    norm! f(l
+    var link = myfunctions.GetTextObject('i(')
+    exe $'Open {link}'
+  else
+    var link = input('Insert link: ')
+    execute $'norm! bi[\<esc>ea]({link})'
+  endif
+enddef
+
+nnoremap <buffer> <silent> <enter> <ScriptCmd>HandleLink()<cr>
 
 # Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc
 command! -nargs=? -buffer -complete=customlist,MarkdownRenderCompleteList MarkdownRender MarkdownRender(<f-args>)
