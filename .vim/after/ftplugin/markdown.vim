@@ -57,11 +57,18 @@ export def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
 enddef
 
 def IsLink()
-   var word = expand('<cword>')
-   var line = getline('.')
-   var start = col('.') - len(word) - 1
-   var end = col('.')
-   echo (line[start] == '[' && line[end] == ']') ? 'Word is surrounded by []' : 'Word is not surrounded by []'
+  norm! E
+  var end_char = getline('.')[col('.') - 2]
+  norm! B
+  var start_char = getline('.')[col('.') - 1]
+  echo start_char end_char
+  if start_char == '[' && end_char == ']'
+    echo "Is a link"
+  else
+    echo "Is not a link"
+  endif
+  # echo (line[start] == '[' && line[end] == ']') ? 'Word is surrounded by []'
+  # : 'Word is not surrounded by []'
 enddef
 
 nnoremap <buffer> <silent> <leader>ö <ScriptCmd>IsLink()<cr>
