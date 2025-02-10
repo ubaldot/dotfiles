@@ -542,6 +542,91 @@ export def Gx()
   endif
 enddef
 
+# Markdown studd
+
+def MDIsLink(): bool
+  # Compare foo with [foo]. If they match, then what is inside the [] it
+  # possibly be a link. Next, it check if there is a (bla_bla) just after ].
+  # Link alias must be words.
+  # Assume that a link (or a filename) cannot be broken into multiple lines
+  var saved_curpos = getcurpos()
+  var is_link = false
+  var alias_link = myfunctions.GetTextObject('iw')
+
+  # Handle singularity if the cursor is on '[' or ']'
+  if alias_link == '['
+    norm! l
+    alias_link = myfunctions.GetTextObject('iw')
+  elseif alias_link == ']'
+    norm! h
+    alias_link = myfunctions.GetTextObject('iw')
+  endif
+
+  # Check if foo and [foo] match and if there is a (bla bla) after ].
+  var alias_link_bracket = myfunctions.GetTextObject('a[')
+  if alias_link == alias_link_bracket[1 : -2]
+    norm! f]
+    if getline('.')[col('.')] == '('
+      var line_open_parenthesis = line('.')
+      norm! l%
+      var line_close_parenthesis = line('.')
+      if line_open_parenthesis == line_close_parenthesis
+        # echo "Is a link"
+        is_link = true
+      else
+        # echo "Is not a link"
+        is_link = false
+      endif
+    else
+      is_link = false
+      # echo "Is not a link"
+    endif
+  else
+    is_link = false
+    # echo "Is not a link"
+  endif
+  setpos('.', saved_curpos)
+  return is_link
+  # TEST:
+  # echo (line[start] == '[' && line[nd] == ']') ? 'Word is surrounded by []'
+  # : 'Word is not [surrounoded]( by [] # )'
+enddef
+
+def MDToggleMark()
+  var line = getline('.')
+  if match(line, '\[\s*\]') != -1
+    setline('.', substitute(line, '\[\s*\]', '[x]', ''))
+  elseif match(line, '\[x\]') != -1
+    setline('.', substitute(line, '\[x\]', '[ ]', ''))
+  endif
+enddef
+
+def MDHandleLink()
+  if MDIsLink()
+    norm! f(l
+    var link = myfunctions.GetTextObject('i(')
+    if filereadable(link)
+      exe $'edit {link}'
+    elseif exists(':Open')
+      exe $'Open {link}'
+    else
+      exe $'!{g:start_cmd} -a safari.app {link}'
+    endif
+  else
+    var link = input('Insert link: ', '', 'file')
+    if !empty(link)
+      # Create link
+      norm! lbi[
+      norm! ea]
+      execute $'norm! a({link})'
+      norm! F]h
+      if link !~ '^https://'
+        exe $'edit {link}'
+        write
+      endif
+    endif
+  endif
+enddef
 # TODO: Require more work!
 # def SurroundPendingOperator(pre_string: string, post_string: string, type:
 # string)
