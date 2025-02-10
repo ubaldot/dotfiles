@@ -350,6 +350,7 @@ Plug 'ubaldot/vim-git-master'
 Plug 'girishji/easyjump.vim'
 Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector'
+# Plug 'vimwiki/vimwiki'
 # Plug 'habamax/vim-rst'
 plug#end()
 filetype plugin on

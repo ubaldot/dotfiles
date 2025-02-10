@@ -41,7 +41,7 @@ export def MarkdownRender(format = "html")
   var output_file = $'{expand('%:p:r')}.{format}'
   var css_style = ""
   if format ==# 'html'
-    css_style = "-c ~/dotfiles/my_css_style.css"
+    css_style = $"-c {$HOME}/dotfiles/my_css_style.css"
   endif
   silent exe $"make {input_file} -o {output_file} -s {css_style}"
 
@@ -55,6 +55,16 @@ export def MarkdownRenderCompleteList(A: any, L: any, P: any): list<string>
   return ['html', 'docx', 'pdf', 'txt', 'jira', 'csv', 'ipynb', 'latex',
     'odt', 'rtf']
 enddef
+
+def IsLink()
+   var word = expand('<cword>')
+   var line = getline('.')
+   var start = col('.') - len(word) - 1
+   var end = col('.')
+   echo (line[start] == '[' && line[end] == ']') ? 'Word is surrounded by []' : 'Word is not surrounded by []'
+enddef
+
+nnoremap <buffer> <silent> <leader>ö <ScriptCmd>IsLink()<cr>
 
 # Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc
 command! -nargs=? -buffer -complete=customlist,MarkdownRenderCompleteList MarkdownRender MarkdownRender(<f-args>)
