@@ -227,7 +227,7 @@ def PushDotfiles()
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
   else
     exe $'!git -C {$HOME}/dotfiles add -u'
-    exe $'!git -C {$HOME}/dotfiles ci -m "Auto push"'
+    exe $'!git -C {$HOME}/dotfiles ci -m "Auto pushing ~/dotfiles... "'
     exe $'!git -C {$HOME}/dotfiles push'
   endif
 enddef
