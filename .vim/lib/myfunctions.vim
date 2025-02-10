@@ -609,6 +609,7 @@ export def MDHandleLink()
     elseif exists(':Open')
       exe $'Open {link}'
     else
+      # TODO: I have :Open everywhere but on macos
       exe $'!{g:start_cmd} -a safari.app {link}'
     endif
   else
@@ -619,9 +620,10 @@ export def MDHandleLink()
       norm! ea]
       execute $'norm! a({link})'
       norm! F]h
+      # TODO do the next more robust.
       if link !~ '^https://'
         exe $'edit {link}'
-        write
+        # write
       endif
     endif
   endif
