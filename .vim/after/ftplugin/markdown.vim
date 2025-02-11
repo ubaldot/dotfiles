@@ -17,6 +17,10 @@ xnoremap <buffer> <silent> <leader>cc
   \ <esc>'<i<cr><esc><ScriptCmd>myfunctions.Surround('```', '```')<cr>
   \ k$2hi<cr><esc>
 
+if exists(':OutlineToggle') != 0
+  nnoremap <buffer> <silent> <leader>o <Cmd>OutlineToggle ^- [ <cr>
+endif
+
 inoremap ä `
 
 if executable('prettier')
@@ -41,8 +45,8 @@ export def Make(format = "html")
       css_style = $"-c {$HOME}/dotfiles/my_css_style.css"
     endif
 
-    &l:makeprg = $'pandoc --standalone --metadata title="{expand("%:t")}"' 
-                    .. $'--from=markdown --css={css_style} ' 
+    &l:makeprg = $'pandoc --standalone --metadata title="{expand("%:t")}"'
+                    .. $'--from=markdown --css={css_style} '
                     .. $'--output "{output_file}" "{input_file}"'
     make
     echom &l:makeprg
