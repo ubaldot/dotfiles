@@ -569,6 +569,7 @@ def MDIsLink(): bool
   if alias_link == alias_link_bracket[1 : -2]
     norm! f]
     if getline('.')[col('.')] == '('
+        || getline('.')[col('.')] == '['
       var line_open_parenthesis = line('.')
       norm! l%
       var line_close_parenthesis = line('.')
@@ -580,16 +581,18 @@ def MDIsLink(): bool
         is_link = false
       endif
     else
-      is_link = false
       # echo "Is not a link"
+      is_link = false
     endif
   else
-    is_link = false
     # echo "Is not a link"
+    is_link = false
   endif
   setpos('.', saved_curpos)
   return is_link
 enddef
+
+# nnoremap <leader>ö <scriptcmd>MDIsLink()<cr>
 
 export def MDToggleMark()
   var line = getline('.')
@@ -600,10 +603,10 @@ export def MDToggleMark()
   endif
 enddef
 
-export def MDHandleLink()
-  if MDIsLink()
-    norm! f(l
-    var link = GetTextObject('i(')
+def OpenLink()
+    norm! f[l
+    var link_id = GetTextObject('i[')
+    var link = links_dict[link_id]
     if filereadable(link)
       exe $'edit {link}'
     elseif exists(':Open')
@@ -612,19 +615,57 @@ export def MDHandleLink()
       # TODO: I have :Open everywhere but on macos
       exe $'!{g:start_cmd} -a safari.app {link}'
     endif
+enddef
+
+var links_dict = {}
+
+def GetLinkID(): number
+  var link = input('Insert link: ', '', 'file')
+  var link_line = search(link, 'nw')
+  var link_id = 0
+  if link_line == 0
+    # Entirely new link
+    link_id = keys(links_dict)->map('str2nr(v:val)')->max() + 1
+    links_dict[$'{link_id}'] = link
+    # If it is the first link ever, leave a blank line
+    if link_id == 1
+      append(line('$'), '' )
+    endif
+    append(line('$'), $'[{link_id}]: {link}' )
   else
-    var link = input('Insert link: ', '', 'file')
-    if !empty(link)
-      # Create link, surround stuff
-      norm! lbi[
-      norm! ea]
-      execute $'norm! a({link})'
-      norm! F]h
-      # TODO do the next more robust.
-      if link !~ '^https://'
-        exe $'edit {link}'
-        # write
-      endif
+    # Reuse existing link
+    var tmp = getline(link_line)->substitute('\v^\[(\d*)\].*', '\1', '')
+    link_id = str2nr(tmp)
+  endif
+  return link_id
+enddef
+
+def GenerateLinksDict()
+  var refs = getline(1, '$')->filter('v:val =~ "^\\[\\d\\+\\]:\\s"')
+  for item in refs
+     var key = matchstr(item, '\v^\[(\d+)\]', 1)
+     var value = matchstr(item, '\v\]:\s*(.*)')
+     links_dict[key] = value
+  endfor
+enddef
+
+export def MDHandleLink()
+  if empty(links_dict)
+    GenerateLinksDict()
+  endif
+  if MDIsLink()
+    OpenLink()
+  else
+    var link_id = GetLinkID()
+    # Surround stuff
+    norm! lbi[
+    norm! ea]
+    execute $'norm! a[{link_id}]'
+    norm! F]h
+    # TODO do the next more robust.
+    if links_dict[link_id] !~ '^https://' && !filereadable(links_dict[link_id])
+      exe $'edit {links_dict[link_id]}'
+      # write
     endif
   endif
 enddef
