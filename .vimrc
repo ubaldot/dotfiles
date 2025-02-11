@@ -2,6 +2,7 @@ vim9script
 
 # For avap dev
 g:is_avap = false
+var auto_update_dotfiles = false
 
 # OS detection
 def IsWSL(): bool
@@ -222,10 +223,6 @@ def PullDotfiles()
   endif
 enddef
 
-augroup DOTFILES_PULL
-  autocmd!
-  autocmd VimEnter * PullDotfiles()
-augroup END
 
 def PushDotfiles()
   # Pull first before pushing
@@ -242,10 +239,17 @@ def PushDotfiles()
   endif
 enddef
 
-augroup DOTFILES_PUSH
-  autocmd!
-  autocmd VimLeavePre * PushDotfiles()
-augroup END
+if auto_update_dotfiles
+  augroup DOTFILES_PUSH
+    autocmd!
+    autocmd VimLeavePre * PushDotfiles()
+  augroup END
+
+  augroup DOTFILES_PULL
+    autocmd!
+    autocmd VimEnter * PullDotfiles()
+  augroup END
+endif
 
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
