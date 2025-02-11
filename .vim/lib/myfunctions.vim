@@ -623,6 +623,11 @@ var links_dict = {}
 
 def GetLinkID(): number
   var link = input('Insert link: ', '', 'file')
+
+  # TODO: use full-path?
+  if !IsURL(link)
+    link = fnamemodify(link, ':p')
+  endif
   var link_line = search(link, 'nw')
   var link_id = 0
   if link_line == 0
@@ -640,6 +645,10 @@ def GetLinkID(): number
     link_id = str2nr(tmp)
   endif
   return link_id
+enddef
+
+def IsURL(link: string): bool
+  return link =~ '^https://'
 enddef
 
 def GenerateLinksDict()
@@ -665,7 +674,7 @@ export def MDHandleLink()
     execute $'norm! a[{link_id}]'
     norm! F]h
     # TODO do the next more robust.
-    if links_dict[link_id] !~ '^https://' && !filereadable(links_dict[link_id])
+    if !IsURL(links_dict[link_id]) && !filereadable(links_dict[link_id])
       exe $'edit {links_dict[link_id]}'
       # write
     endif
