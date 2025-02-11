@@ -650,12 +650,20 @@ def GetLinkID(): number
 enddef
 
 def IsURL(link: string): bool
-  return link =~ '^https://'
+  var url_prefixes = [ 'https://', 'http://', 'ftp://', 'ftps://',
+    'sftp://', 'telnet://', 'file://']
+  for url_prefix in url_prefixes
+    if link =~ $'^{url_prefix}'
+      return true
+    endif
+  endfor
+    return false
 enddef
 
 def GenerateLinksDict()
   var ref_start_line = search('\s*#\+\s\+References', 'nw')
-  var refs = getline(ref_start_line + 1, '$')->filter('v:val =~ "^\\[\\d\\+\\]:\\s"')
+  var refs = getline(ref_start_line + 1, '$')
+    ->filter('v:val =~ "^\\[\\d\\+\\]:\\s"')
   for item in refs
      var key = item->substitute('\[\(\d\+\)\].*', '\1', '')
      var value = item->substitute('^\[\d\+]\:\s*\(.*\)', '\1', '')
@@ -663,7 +671,29 @@ def GenerateLinksDict()
   endfor
 enddef
 
+export def MDRemoveLink()
+  # Initialization
+  if empty(links_dict)
+    GenerateLinksDict()
+  endif
+  # TODO: it is not the best but it works so far
+  if MDIsLink()
+      search('[')
+      norm! "_da[
+      search(']', 'bc')
+      norm! "_x
+      search('[', 'bc')
+      norm! "_x
+  endif
+enddef
+
+# TODO
+def MDCleanupReferences()
+  echoerr Not Implemented!
+enddef
+
 export def MDHandleLink()
+  # Initialization
   if empty(links_dict)
     GenerateLinksDict()
   endif
@@ -676,7 +706,6 @@ export def MDHandleLink()
     norm! ea]
     execute $'norm! a[{link_id}]'
     norm! F]h
-    # TODO do the next more robust.
     if !IsURL(links_dict[link_id]) && !filereadable(links_dict[link_id])
       exe $'edit {links_dict[link_id]}'
       # write

@@ -2,7 +2,7 @@ vim9script
 
 # For avap dev
 g:is_avap = false
-var auto_update_dotfiles = false
+var auto_update_dotfiles = true
 
 # OS detection
 def IsWSL(): bool

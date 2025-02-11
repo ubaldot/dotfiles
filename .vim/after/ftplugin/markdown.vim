@@ -61,7 +61,7 @@ enddef
 # Note taking
 nnoremap <buffer> <silent> <leader>x <ScriptCmd>myfunctions.MDToggleMark()<cr>
 nnoremap <buffer> <silent> <enter> <ScriptCmd>myfunctions.MDHandleLink()<cr>
-nnoremap <buffer> <silent> <backspace> <Cmd>buffer #<cr>
+nnoremap <buffer> <silent> <backspace> <scriptcmd>myfunctions.MDRemoveLink()<cr>
 
 # Usage :MarkdownRender, :MarkdownRender pdf, :MarkdownRender docx, etc
 command! -nargs=? -buffer -complete=customlist,MarkdownRenderCompleteList
