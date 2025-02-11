@@ -718,3 +718,17 @@ export def MDHandleLink()
     endif
   endif
 enddef
+
+export def MDContinueList(): string
+ # Get the current line
+ var current_line = getline('.')
+
+ # Check if the current line starts with '- [ ]' or '- '
+ if current_line =~ '^\s*- \[ \]' || current_line =~ '^\s*- '
+   # If it starts with '- [ ]', continue with '- [ ]'
+   return "\<CR>{current_line} "
+ else
+   # Otherwise, just insert a regular newline
+   return "\<CR>"
+ endif
+enddef
