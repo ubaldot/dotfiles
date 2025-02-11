@@ -611,9 +611,11 @@ def OpenLink()
       exe $'edit {link}'
     elseif exists(':Open')
       exe $'Open {link}'
-    else
+    elseif link =~ 'https://'
       # TODO: I have :Open everywhere but on macos
       exe $'!{g:start_cmd} -a safari.app {link}'
+    else
+      echoerr $"File {link} does not exists!"
     endif
 enddef
 
@@ -643,8 +645,8 @@ enddef
 def GenerateLinksDict()
   var refs = getline(1, '$')->filter('v:val =~ "^\\[\\d\\+\\]:\\s"')
   for item in refs
-     var key = matchstr(item, '\v^\[(\d+)\]', 1)
-     var value = matchstr(item, '\v\]:\s*(.*)')
+     var key = item->substitute('\[\(\d\+\)\].*', '\1', '')
+     var value = item->substitute('^\[\d\+]\:\s*\(.*\)', '\1', '')
      links_dict[key] = value
   endfor
 enddef
