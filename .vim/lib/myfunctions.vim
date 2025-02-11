@@ -538,7 +538,7 @@ export def Gx()
   if exists(":Open") != 0
     exe $"Open {escape(URL, '#%!')}"
   else
-    silent exe $'!{g:start_cmd} "{escape(URL, '#%!')}"'
+    exe $'!{g:start_cmd} "{escape(URL, '#%!')}"'
   endif
 enddef
 
@@ -611,9 +611,9 @@ def OpenLink()
       exe $'edit {link}'
     elseif exists(':Open') != 0
       exe $'Open {link}'
-    elseif link =~ 'https://'
+    elseif IsURL(link)
       # TODO: I have :Open everywhere but on macos
-      exe $'!{g:start_cmd} -a safari.app {link}'
+      silent exe $'!{g:start_cmd} -a safari.app "{link}"'
     else
       echoerr $"File {link} does not exists!"
     endif

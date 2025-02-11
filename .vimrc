@@ -2,7 +2,7 @@ vim9script
 
 # For avap dev
 g:is_avap = false
-var auto_update_dotfiles = false
+var auto_update_dotfiles = true
 
 # OS detection
 def IsWSL(): bool
@@ -210,22 +210,20 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 # Auto push/pull dotfiles
 def PullDotfiles()
   # If there is any local change, commit them first, then pull
-  if !empty(systemlist($'git -C {$HOME}/dotfiles status')
-->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
+  if !empty(system($'git -C {$HOME}/dotfiles status --short'))
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
   endif
 
   # Pull & merge eventual commit
-  var git_pull_status = systemlist($'git -C {$HOME}/dotfiles pull')
-  if !empty(copy(git_pull_status) ->filter('v:val =~ "CONFLICT"'))
+  var output = systemlist($'git -C {$HOME}/dotfiles pull --rebase')
+  if !empty(copy(output) ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles!"
-  elseif !empty(copy(git_pull_status) ->filter('v:val !~ "Already up to date"'))
+  elseif !empty(copy(output) ->filter('v:val !~ "Already up to date"'))
     echoerr "OBS! ~/dotfiles updated! "
              .. "You may need restart Vim to update your environment."
   endif
 enddef
-
 
 def PushDotfiles()
   # Pull first before pushing
@@ -245,13 +243,9 @@ def PushDotfiles()
 enddef
 
 if auto_update_dotfiles
-  augroup DOTFILES_PUSH
+  augroup DOTFILES
     autocmd!
     autocmd VimLeavePre * PushDotfiles()
-  augroup END
-
-  augroup DOTFILES_PULL
-    autocmd!
     autocmd VimEnter * PullDotfiles()
   augroup END
 endif
