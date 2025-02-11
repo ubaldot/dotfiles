@@ -2,7 +2,7 @@ vim9script
 
 # For avap dev
 g:is_avap = false
-var auto_update_dotfiles = false
+var auto_update_dotfiles = true
 
 # OS detection
 def IsWSL(): bool
@@ -31,7 +31,8 @@ if has('unix') && g:os == 'WSL' && !has('+clipboard')
   if !has('gui_running')
     augroup WSL_YANK
       autocmd!
-      autocmd TextYankPost * if v:event.operator ==# 'y' | system('clip.exe', getreg('0')) | endif
+      autocmd TextYankPost * if v:event.operator ==# 'y'
+            \ | system('clip.exe', getreg('0')) | endif
     augroup END
   endif
 
@@ -110,6 +111,7 @@ set langmap=ö[,ä]
 nnoremap <C-ö> <C-[>
 nnoremap <C-ä> <C-]>
 set belloff=all
+set colorcolumn=80
 set clipboard^=unnamed,unnamedplus
 set termguicolors
 set autoread
@@ -209,7 +211,7 @@ nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 def PullDotfiles()
   # If there is any local change, commit them first, then pull
   if !empty(systemlist($'git -C {$HOME}/dotfiles status')
-      ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
+->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed"'))
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
   endif
@@ -219,7 +221,8 @@ def PullDotfiles()
   if !empty(copy(git_pull_status) ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles!"
   elseif !empty(copy(git_pull_status) ->filter('v:val !~ "Already up to date"'))
-    echoerr "OBS! ~/dotfiles updated! You may need restart Vim to update your environment."
+    echoerr "OBS! ~/dotfiles updated! "
+             .. "You may need restart Vim to update your environment."
   endif
 enddef
 
@@ -232,7 +235,9 @@ def PushDotfiles()
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
   # If I changed some dotfiles I want to push them to the remote
   elseif !empty(systemlist($'git -C {$HOME}/dotfiles status')
-        ->filter('v:val =~ "Changes not staged for commit\\|Changes to be committed\\|Your branch is ahead"'))
+        ->filter('v:val =~ "Changes not staged for commit'
+             .. '\\|Changes to be committed'
+             .. '\\|Your branch is ahead"'))
     exe $'!git -C {$HOME}/dotfiles add -u'
     exe $'!git -C {$HOME}/dotfiles ci -m "Auto pushing ~/dotfiles... "'
     exe $'!git -C {$HOME}/dotfiles push'
@@ -285,7 +290,8 @@ nnoremap <c-d> <cmd>bw!<cr>
 # Formatting
 # command! -range=% Prettify myfunctions.Prettify(<line1>, <line2>)
 nnoremap Q <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
-xnoremap Q <esc><ScriptCmd>myfunctions.FormatWithoutMoving(line("'<"), line("'>"))<cr>
+xnoremap Q <esc><ScriptCmd>
+      \myfunctions.FormatWithoutMoving(line("'<"), line("'>"))<cr>
 
 # location list
 nnoremap äl :lnext<CR>
@@ -452,9 +458,11 @@ nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
 g:manim_flags = {
   low_quality: $"-pql {manim_common_flags}",
-  high_quality: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags}",
+  high_quality: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/"
+                    .. $"github_ctip/ctip_manim.cfg {manim_common_flags}",
   dry_run: $'--dry_run {manim_common_flags}',
-  transparent: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"
+  transparent: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/"
+      .. $"github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"
 }
 g:manim_default_flag = keys(g:manim_flags)[-1]
 
@@ -563,7 +571,7 @@ def LogNewDay()
   # You end up in the first non-blank line
   var day_string = strftime("## %b %d %y")
   append(line('.'), ['', day_string])
-  search(day__string, 'b')
+  search(day_string, 'b')
 enddef
 
 command! LLogNewDay LogNewDay()
