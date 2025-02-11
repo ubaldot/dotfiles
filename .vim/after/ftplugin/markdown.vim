@@ -17,7 +17,7 @@ xnoremap <buffer> <silent> <leader>cc
   \ <esc>'<i<cr><esc><ScriptCmd>myfunctions.Surround('```', '```')<cr>
   \ k$2hi<cr><esc>
 
-inoremap <buffer> <silent> <CR> <C-R>=myfunctions.MDContinueList()<CR>
+inoremap <buffer> <silent> <CR> <C-R>=MDContinueList()<CR>
 
 # This is very ugly: you add a - [ ] by pasting the content of register 'o'
 setreg("o", "- [ ] ")
