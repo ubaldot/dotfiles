@@ -3,6 +3,7 @@ vim9script
 # For avap dev
 g:is_avap = false
 var auto_update_dotfiles = true
+var auto_update_notes = true
 
 # OS detection
 def IsWSL(): bool
@@ -208,15 +209,15 @@ noremap cd <scriptcmd>GoToGitRoot()<cr>
 nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Auto push/pull dotfiles
-def PullDotfiles()
+def PullRepofiles(repo_path: string)
   # If there is any local change, commit them first, then pull
-  if !empty(system($'git -C {$HOME}/dotfiles status --short'))
-    exe $'!git -C {$HOME}/dotfiles add -u'
-    exe $'!git -C {$HOME}/dotfiles ci -m "Saved local changes"'
+  if !empty(system($'git -C {repo_path} status --short'))
+    exe $'!git -C {repo_path} add .'
+    exe $'!git -C {repo_path} ci -m "Saved local changes"'
   endif
 
   # Pull & merge eventual commit
-  var output = systemlist($'git -C {$HOME}/dotfiles pull --rebase')
+  var output = systemlist($'git -C {repo_path} pull --rebase')
   if !empty(copy(output) ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles!"
   elseif !empty(copy(output) ->filter('v:val !~ "Already up to date"'))
@@ -225,31 +226,38 @@ def PullDotfiles()
   endif
 enddef
 
-def PushDotfiles()
+def PushRepofiles(repo_path: string)
   # Pull first before pushing
-  if !empty(systemlist($'git -C {$HOME}/dotfiles pull')
+  if !empty(systemlist($'git -C {repo_path} pull')
       ->filter('v:val =~ "CONFLICT"'))
     # Needed to prevent Vim to automatically quit
     input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
   # If I changed some dotfiles I want to push them to the remote
-  elseif !empty(systemlist($'git -C {$HOME}/dotfiles status')
+  elseif !empty(systemlist($'git -C {repo_path} status')
         ->filter('v:val =~ "Changes not staged for commit'
              .. '\\|Changes to be committed'
              .. '\\|Your branch is ahead"'))
-    exe $'!git -C {$HOME}/dotfiles add -u'
-    exe $'!git -C {$HOME}/dotfiles ci -m "Auto pushing ~/dotfiles... "'
-    exe $'!git -C {$HOME}/dotfiles push'
+    exe $'!git -C {repo_path} add .'
+    exe $'!git -C {repo_path} ci -m "Auto pushing {repo_path}... "'
+    exe $'!git -C {repo_path} push'
   endif
 enddef
 
 if auto_update_dotfiles
   augroup DOTFILES
     autocmd!
-    autocmd VimLeavePre * PushDotfiles()
-    autocmd VimEnter * PullDotfiles()
+    autocmd VimLeavePre * PushRepofiles($'{$HOME}/dotfiles')
+    autocmd VimEnter * PullRepofiles($'{$HOME}/dotfiles')
   augroup END
 endif
 
+if auto_update_notes
+  augroup NOTES
+    autocmd!
+    autocmd VimLeavePre * PushRepofiles($'{$HOME}/Documents/my_notes')
+    autocmd VimEnter * PullRepofiles($'{$HOME}/Documents/my_notes')
+  augroup END
+endif
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
