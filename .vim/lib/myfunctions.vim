@@ -538,7 +538,7 @@ export def Gx()
   if exists(":Open") != 0
     exe $"Open {escape(URL, '#%!')}"
   else
-    silent exe $'!{g:start_cmd} {escape(URL, '#%!')}'
+    silent exe $'!{g:start_cmd} "{escape(URL, '#%!')}"'
   endif
 enddef
 

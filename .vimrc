@@ -582,6 +582,7 @@ enddef
 command! LLogNewDay IndexNewDay(work_log_path)
 command! LLogOpen IndexOpen(work_log_path)
 
+command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
