@@ -360,6 +360,8 @@ Plug 'ubaldot/vim-git-master'
 Plug 'girishji/easyjump.vim'
 Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector'
+# For removing expanded links in markdown. Check the help
+Plug 'qadzek/link.vim'
 # Plug 'vimwiki/vimwiki'
 # Plug 'habamax/vim-rst'
 plug#end()
