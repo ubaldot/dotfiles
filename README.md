@@ -17,7 +17,6 @@ it to the repo. Then, create a symlink from `~` to the moved file.
 >
 > You must manually download `plug.vim` and all the vim plugins.
 
-## References
 
 [1]: C:\Users\yt75534\cazo.md
 [2]: https://google.com
