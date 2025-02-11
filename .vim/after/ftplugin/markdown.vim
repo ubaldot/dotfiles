@@ -17,11 +17,15 @@ xnoremap <buffer> <silent> <leader>cc
   \ <esc>'<i<cr><esc><ScriptCmd>myfunctions.Surround('```', '```')<cr>
   \ k$2hi<cr><esc>
 
+# This is very ugly: you add a - [ ] by pasting the content of register 'o'
+setreg("o", "- [ ] ")
+
 if exists(':OutlineToggle') != 0
   nnoremap <buffer> <silent> <leader>o <Cmd>OutlineToggle ^- [ <cr>
 endif
 
 inoremap ä `
+
 
 if executable('prettier')
   &l:formatprg = $"prettier --prose-wrap always --print-width {&l:textwidth} "
