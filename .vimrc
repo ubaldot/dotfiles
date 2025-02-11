@@ -542,14 +542,33 @@ command! -nargs=1 -complete=command -range Redir
       \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
 # Activity log
-#
-var work_log_path = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.txt'
-var day_string = strftime("## %b %d %y")
-if g:os == "Windows"
-  work_log_path = 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
-endif
-command! LLogNewDay  exe "LLogOpen" | append(line('$'), day_string) | norm! G0r<cr>
-command! LLogOpen exe $'edit {work_log_path}' | norm! G
+def LogOpen()
+  var work_log_path =
+        \ '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
+  if g:os == "Windows"
+    work_log_path =
+          \ 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
+  endif
+  exe $'edit {work_log_path}'
+  var refs_line = search('^\s*#\+\s\+References')
+  if refs_line == 0
+    norm! G
+  else
+    search('^.\+$', 'b')
+  endif
+enddef
+
+def LogNewDay()
+  LogOpen()
+  # You end up in the first non-blank line
+  var day_string = strftime("## %b %d %y")
+  append(line('.'), ['', day_string])
+  search(day__string, 'b')
+enddef
+
+command! LLogNewDay LogNewDay()
+command! LLogOpen LogOpen()
+
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to

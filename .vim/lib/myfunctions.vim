@@ -623,6 +623,9 @@ var links_dict = {}
 
 def GetLinkID(): number
   var link = input('Insert link: ', '', 'file')
+  if empty(link)
+    return 0
+  endif
 
   # TODO: use full-path?
   if !IsURL(link)
@@ -676,7 +679,7 @@ export def MDRemoveLink()
   if empty(links_dict)
     GenerateLinksDict()
   endif
-  # TODO: it is not the best but it works so far
+  # TODO: it may not be the best but it works so far
   if MDIsLink()
       search('[')
       norm! "_da[
@@ -701,6 +704,9 @@ export def MDHandleLink()
     OpenLink()
   else
     var link_id = GetLinkID()
+    if link_id == 0
+      return
+    endif
     # Surround stuff
     norm! lbi[
     norm! ea]
