@@ -551,15 +551,18 @@ command! ColorsToggle myfunctions.ColorsToggle()
 command! -nargs=1 -complete=command -range Redir
       \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
+# ==  Note taking stuff ==
+var work_log_path =
+      \ '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
+if g:os == "Windows"
+  work_log_path =
+        \ 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
+endif
+
+
 # Activity log
-def LogOpen()
-  var work_log_path =
-        \ '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
-  if g:os == "Windows"
-    work_log_path =
-          \ 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
-  endif
-  exe $'edit {work_log_path}'
+def IndexOpen(index_path: string)
+  exe $'edit {index_path}'
   var refs_line = search('^\s*#\+\s\+References')
   if refs_line == 0
     norm! G
@@ -568,16 +571,16 @@ def LogOpen()
   endif
 enddef
 
-def LogNewDay()
-  LogOpen()
+def IndexNewDay(index_path: string)
+  LogOpen(index_path)
   # You end up in the first non-blank line
   var day_string = strftime("## %b %d %y")
   append(line('.'), ['', day_string])
   search(day_string, 'b')
 enddef
 
-command! LLogNewDay LogNewDay()
-command! LLogOpen LogOpen()
+command! LLogNewDay IndexNewDay(work_log_path)
+command! LLogOpen IndexOpen(work_log_path)
 
 
 # vip = visual inside paragraph
