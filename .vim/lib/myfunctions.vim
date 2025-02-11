@@ -564,7 +564,7 @@ def MDIsLink(): bool
     alias_link = GetTextObject('iw')
   endif
 
-  # Check if foo and [foo] match and if there is a (bla bla) after ].
+  # Check if foo and [foo] match and if there is a [bla bla] after ].
   var alias_link_bracket = GetTextObject('a[')
   if alias_link == alias_link_bracket[1 : -2]
     norm! f]
@@ -609,7 +609,7 @@ def OpenLink()
     var link = links_dict[link_id]
     if filereadable(link)
       exe $'edit {link}'
-    elseif exists(':Open')
+    elseif exists(':Open') != 0
       exe $'Open {link}'
     elseif link =~ 'https://'
       # TODO: I have :Open everywhere but on macos
@@ -635,8 +635,10 @@ def GetLinkID(): number
     link_id = keys(links_dict)->map('str2nr(v:val)')->max() + 1
     links_dict[$'{link_id}'] = link
     # If it is the first link ever, leave a blank line
-    if link_id == 1
+    if link_id == 1 && search('\s*#\+\s\+References', 'nw') != 0
       append(line('$'), '' )
+    elseif link_id == 1 && search('\s*#\+\s\+References', 'nw') == 0
+      append(line('$'), ['', '## References', ''])
     endif
     append(line('$'), $'[{link_id}]: {link}' )
   else
@@ -652,7 +654,8 @@ def IsURL(link: string): bool
 enddef
 
 def GenerateLinksDict()
-  var refs = getline(1, '$')->filter('v:val =~ "^\\[\\d\\+\\]:\\s"')
+  var ref_start_line = search('\s*#\+\s\+References', 'nw')
+  var refs = getline(ref_start_line + 1, '$')->filter('v:val =~ "^\\[\\d\\+\\]:\\s"')
   for item in refs
      var key = item->substitute('\[\(\d\+\)\].*', '\1', '')
      var value = item->substitute('^\[\d\+]\:\s*\(.*\)', '\1', '')
