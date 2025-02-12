@@ -722,31 +722,54 @@ enddef
 
 # TODO: check with trailing \s*
 export def g:MDContinueList(): string
- # Get the current line
- var current_line = getline('.')
+  # Get the current line
+  var current_line = getline('.')
 
- # Check if the current line starts with '- [ ]' or '- '
- var variant_1 = '^\s*- \[\s*\]'
- var variant_2 = '^\s*-'
- var variant_3 = '^\s*\*'
- var variant_4 = '^\s*\d\+\.'
+  # Check if the current line starts with '- [ ]' or '- '
+  var variant_1 = '-\s\[\s*\]\s\+'
+  var variant_2 = '-\s\+'
+  var variant_3 = '\*\s\+'
+  var variant_4 = '\d\+\.\s\+'
 
- var tmp = ''
+  var tmp = ''
+  var only_bullet = false
 
- if current_line =~ variant_1
-   tmp = $'{current_line->matchstr(variant_1)} '
- elseif current_line =~ variant_2
-   tmp = $'{current_line->matchstr(variant_2)} '
- elseif current_line =~ variant_3
-   tmp = $'{current_line->matchstr(variant_3)} '
- elseif current_line =~ variant_4
-   # Get rid of the trailing '.' and convert to number
-   var curr_nr = str2nr($'{current_line->matchstr(variant_4)[0 : -1]}')
-   tmp = $'{string(curr_nr + 1)}. '
- endif
+  # Check if you only have the bullet with no item
+  for variant in [variant_1, variant_2, variant_3, variant_4]
+    if current_line =~ $'^\s*{variant}\s*$'
+          deletebufline('%', line('.'))
+          only_bullet = true
+          break
+    endif
+  endfor
+
+  # Scan the current line through the less general regex (a regex can be
+  # contained in another regex)
+  if !only_bullet
+     if current_line =~ $'^\s*{variant_1}'
+       tmp = $"{current_line->matchstr($'^\s*{variant_1}')}"
+     elseif current_line =~ $'^\s*{variant_2}'
+       tmp = $"{current_line->matchstr($'^\s*{variant_2}')}"
+     elseif current_line =~ $'^\s*{variant_3}'
+       tmp = $"{current_line->matchstr($'^\s*{variant_3}')}"
+     elseif current_line =~ $'^\s*{variant_4}'
+       # Get rid of the trailing '.' and convert to number
+       var curr_nr = str2nr(
+         $"{current_line->matchstr($'^\s*{variant_4}')->matchstr('\d\+')}"
+       )
+       curr_nr = curr_nr + 1
+       tmp = $"{string(curr_nr + 1)}.\\s"
+     endif
+  endif
 
  return $"\<CR>{tmp}"
 enddef
+
+inoremap <buffer> <CR> <C-R>=MDContinueList()<CR>
+
+11. ciao
+12.\s
+
 
 # Set-unset blocks
 
