@@ -720,19 +720,26 @@ export def MDHandleLink()
   endif
 enddef
 
+
 # TODO: check why variant 4 does not work when indented
 export def MDContinueList()
-  # Get the current line
-  var current_line = getline('.')
-
+  # For continuing items list and enumerations
   # Check if the current line starts with '- [ ]' or '- '
-  var variant_1 = '-\s\[\s*\]\s\+'
-  var variant_2 = '-\s\+'
-  var variant_3 = '\*\s\+'
-  var variant_4 = '\d\+\.\s\+'
+  var variant_1 = '-\s\[\s*\]\s\+' # - [ ] bla bla bla
+  var variant_2 = '-\s\+' # - bla bla bla
+  var variant_3 = '\*\s\+' # * bla bla bla
+  var variant_4 = '\d\+\.\s\+' # 123. bla bla bla
+
+  var current_line = join(
+  getline(
+  search($'\({variant_1}\|{variant_2}\|{variant_3}\|{variant_4}\|\n\n\)', 'bn'),
+  line('.')),
+    '\n')
 
   var tmp = ''
+  # There is only a buller with no text. Next <CR> shall remove the bullet
   var only_bullet = false
+
 
   # Check if you only have the bullet with no item
   for variant in [variant_1, variant_2, variant_3, variant_4]
@@ -769,6 +776,9 @@ export def MDContinueList()
   startinsert
 
 enddef
+
+inoremap <silent> <CR> <ScriptCmd>MDContinueList()<CR>
+
 
 # Set-unset blocks
 
