@@ -421,7 +421,7 @@ endif
 # noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
 #
 # TODO: separate leading and trailing chars
-export def Surround(pre: string, post: string)
+export def VisualSurround(pre: string, post: string)
   # Usage:
   #   Visual select text and hit <leader> + parenthesis
   #

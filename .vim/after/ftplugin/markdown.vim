@@ -5,17 +5,20 @@ import g:dotvim .. "/lib/myfunctions.vim"
 
 # Bold, italic, strike-through, code
 xnoremap <buffer> <silent> <leader>b
-      \ <esc><ScriptCmd>myfunctions.Surround('**', '**')<cr>
+      \ <esc><ScriptCmd>myfunctions.VisualSurround('**', '**')<cr>
 xnoremap <buffer> <silent> <leader>i
       \ <esc><ScriptCmd>myfunctions.Surround('*', '*')<cr>
 xnoremap <buffer> <silent> <leader>s
-      \ <esc><ScriptCmd>myfunctions.Surround('~~', '~~')<cr>
+      \ <esc><ScriptCmd>myfunctions.VisualSurround('~~', '~~')<cr>
 xnoremap <buffer> <silent> <leader>c
-      \ <esc><ScriptCmd>myfunctions.Surround('`', '`')<cr>
+      \ <esc><ScriptCmd>myfunctions.VisualSurround('`', '`')<cr>
 # After you run the following you may run prettier to make it nicer.
+# xnoremap <buffer> <silent> <leader>cc
+#   \ <esc>'<i<cr><esc><ScriptCmd>myfunctions.VisualSurround('```', '```')<cr>
+#   \ k$2hi<cr><esc>
+
 xnoremap <buffer> <silent> <leader>cc
-  \ <esc>'<i<cr><esc><ScriptCmd>myfunctions.Surround('```', '```')<cr>
-  \ k$2hi<cr><esc>
+  \ <esc><ScriptCmd>myfunctions.VisualSurround('\<cr>```\<cr>', '\\n```\\n')<cr>
 
 inoremap <buffer> <silent> <CR> <C-R>=MDContinueList()<CR>
 
