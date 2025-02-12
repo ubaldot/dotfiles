@@ -421,6 +421,7 @@ endif
 # noremap <unique> <script> <Plug>Highlight <esc><ScriptCmd>Highlight()
 #
 # TODO: separate leading and trailing chars
+# TODO: allow to use special chars like pre = '\<CR>\<ESC>ipippo'
 export def VisualSurround(pre: string, post: string)
   # Usage:
   #   Visual select text and hit <leader> + parenthesis
@@ -453,10 +454,10 @@ export def VisualSurround(pre: string, post: string)
   cursor(line_start, column_start)
   var offset = 0
   if leading_chars == pre
-    execute($"normal! {pre_len}X")
+    exe $"normal! {pre_len}X"
     offset = -pre_len
   else
-    execute($"normal! i{pre}")
+    exe $"normal! i{pre}"
     offset = pre_len
   endif
 
@@ -468,9 +469,9 @@ export def VisualSurround(pre: string, post: string)
   endif
 
   if trailing_chars == post
-    execute($"normal! l{post_len}x")
+    exe $"normal! l{post_len}x"
   else
-    execute($"normal! a{post}")
+    exe $"normal! a{post}"
   endif
 enddef
 
@@ -719,6 +720,7 @@ export def MDHandleLink()
   endif
 enddef
 
+# TODO: check with trailing \s*
 export def g:MDContinueList(): string
  # Get the current line
  var current_line = getline('.')
@@ -744,4 +746,68 @@ export def g:MDContinueList(): string
  endif
 
  return $"\<CR>{tmp}"
+enddef
+
+# Set-unset blocks
+
+def SetBlock(tag: string, start_line: number, end_line: number)
+  append(start_line - 1, tag)
+  norm! '<k
+  while line('.') != end_line
+    norm! j0d^>>
+  endwhile
+  append(line('.'), tag)
+enddef
+
+# TODO
+def UnsetBlock(tag: string)
+  echom "TO BE IMPLEMENTED"
+enddef
+
+def GetBlockRanges(tag: string): list<list<number>>
+ # Initialize an empty list to store ranges
+  var ranges = []
+
+  # Initialize a variable to keep track of the start line
+  var start_line = -1
+
+  # Loop through each line in the buffer
+  for ii in range(1, line('$'))
+    # Get the current line content
+    var line_content = getline(ii)
+
+    # Check if the line contains the delimiter
+    if line_content =~ tag
+      # If start_line is -1, this is the start of a block
+      if start_line == -1
+        start_line = ii
+      else
+        # This is the end of a block, add the range to the list
+        add(ranges, [start_line, ii])
+        start_line = -1
+      endif
+    endif
+  endfor
+  return ranges
+enddef
+
+def ToggleBlock(tag: string, line_start: number, line_end: number)
+  var inside_block = false
+  var ranges = GetBlocksRanges(tag)
+  var current_line = line('.')
+
+  # Check if inside a block
+  for range in ranges
+    if current_line >= range[0] && current_line <= range[1]
+      inside_block = true
+      break
+    endif
+  endfor
+
+  # Set or unset
+  if inside_block
+    SetBlock(tag, line_start, line_end)
+  else
+    UnsetBlock(tag)
+  endif
 enddef

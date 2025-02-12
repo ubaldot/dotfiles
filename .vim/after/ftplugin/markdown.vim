@@ -13,12 +13,11 @@ xnoremap <buffer> <silent> <leader>s
 xnoremap <buffer> <silent> <leader>c
       \ <esc><ScriptCmd>myfunctions.VisualSurround('`', '`')<cr>
 # After you run the following you may run prettier to make it nicer.
-# xnoremap <buffer> <silent> <leader>cc
-#   \ <esc>'<i<cr><esc><ScriptCmd>myfunctions.VisualSurround('```', '```')<cr>
-#   \ k$2hi<cr><esc>
 
-xnoremap <buffer> <silent> <leader>cc
-  \ <esc><ScriptCmd>myfunctions.VisualSurround('\<cr>```\<cr>', '\\n```\\n')<cr>
+
+xnoremap <buffer> <silent> <leader>cc 
+      \ <esc><ScriptCmd>myfunctions.ToggleBlock('```', line("'<"), line("'>"))<cr>
+# ---- Not a nice part end ------
 
 inoremap <buffer> <silent> <CR> <C-R>=MDContinueList()<CR>
 

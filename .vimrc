@@ -574,7 +574,7 @@ def IndexOpen(index_path: string)
 enddef
 
 def IndexNewDay(index_path: string)
-  LogOpen(index_path)
+  IndexOpen(index_path)
   # You end up in the first non-blank line
   var day_string = strftime("## %b %d %y")
   append(line('.'), ['', day_string])
