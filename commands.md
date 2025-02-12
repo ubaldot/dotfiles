@@ -135,6 +135,12 @@ and add a new line under [remote "origin"]:
     # delete
     git tag -d v1
 
+***macos***:
+
+  To avoid github to continuously ask for the password, add the following:
+
+    sh-add --apple-use-keychain ~/.ssh/id_ed25519
+
 # conda
 
 First thing to do is config (.condarc). custom_multichannels: conda-forge: -
