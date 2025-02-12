@@ -720,8 +720,8 @@ export def MDHandleLink()
   endif
 enddef
 
-# TODO: check with trailing \s*
-export def g:MDContinueList(): string
+# TODO: check why variant 4 does not work when indented
+export def MDContinueList()
   # Get the current line
   var current_line = getline('.')
 
@@ -729,8 +729,7 @@ export def g:MDContinueList(): string
   var variant_1 = '-\s\[\s*\]\s\+'
   var variant_2 = '-\s\+'
   var variant_3 = '\*\s\+'
-  # var variant_4 = '\d\+\.\s\+'
-  var variant_4 = '\d\+.\s\+'
+  var variant_4 = '\d\+\.\s\+'
 
   var tmp = ''
   var only_bullet = false
@@ -738,6 +737,7 @@ export def g:MDContinueList(): string
   # Check if you only have the bullet with no item
   for variant in [variant_1, variant_2, variant_3, variant_4]
     if current_line =~ $'^\s*{variant}\s*$'
+          append(line('.'), '')
           deletebufline('%', line('.'))
           only_bullet = true
           break
@@ -758,17 +758,17 @@ export def g:MDContinueList(): string
        var curr_nr = str2nr(
          $"{current_line->matchstr($'^\s*{variant_4}')->matchstr('\d\+')}"
        )
-       # tmp = $"{current_line->matchstr($'^\s*{variant_4}')->substitute($'{string(curr_nr)}.', $'{string(curr_nr + 1)}\.', '')}"
-       tmp = $"{current_line->matchstr($'^\s*{variant_4}')}"
-       echom "tmp: " .. tmp
+       tmp = $"{current_line->matchstr($'^\s*{variant_4}')
+             \ ->substitute(string(curr_nr), string(curr_nr + 1), '')}"
      endif
   endif
 
- return $"\<CR>{tmp}"
+  # Add the correct newline
+  append(line('.'), $"{tmp}")
+  cursor(line('.') + 1, col('$') - 1)
+  startinsert
+
 enddef
-
-# inoremap <buffer> <CR> <C-R>=MDContinueList()<CR>
-
 
 # Set-unset blocks
 

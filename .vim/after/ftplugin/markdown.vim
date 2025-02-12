@@ -15,11 +15,11 @@ xnoremap <buffer> <silent> <leader>c
 # After you run the following you may run prettier to make it nicer.
 
 
-xnoremap <buffer> <silent> <leader>cc 
+xnoremap <buffer> <silent> <leader>cc
       \ <esc><ScriptCmd>myfunctions.ToggleBlock('```', line("'<"), line("'>"))<cr>
 # ---- Not a nice part end ------
 
-inoremap <buffer> <silent> <CR> <C-R>=MDContinueList()<CR>
+inoremap <buffer> <silent> <CR> <ScriptCmd>myfunctions.MDContinueList()<CR>
 
 # This is very ugly: you add a - [ ] by pasting the content of register 'o'
 setreg("o", "- [ ] ")
