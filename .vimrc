@@ -352,6 +352,7 @@ Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'ubaldot/vim-manim'
+Plug 'ubaldot/vim-markdown-extras'
 Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 Plug 'ubaldot/vim-extended-view'
@@ -400,6 +401,10 @@ g:everforest_background = 'medium'
 
 # vim-git-essentials
 nnoremap git <Cmd>GitMasterStatus<cr>
+
+# vim-markdown-extras
+g:markdown_extras_config = {}
+g:markdown_extras_config['css_style'] = $"-c {$HOME}/dotfiles/my_css_style.css"
 
 # vim-poptools
 g:poptools_config = {}
