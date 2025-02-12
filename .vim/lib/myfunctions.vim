@@ -729,7 +729,8 @@ export def g:MDContinueList(): string
   var variant_1 = '-\s\[\s*\]\s\+'
   var variant_2 = '-\s\+'
   var variant_3 = '\*\s\+'
-  var variant_4 = '\d\+\.\s\+'
+  # var variant_4 = '\d\+\.\s\+'
+  var variant_4 = '\d\+.\s\+'
 
   var tmp = ''
   var only_bullet = false
@@ -757,18 +758,16 @@ export def g:MDContinueList(): string
        var curr_nr = str2nr(
          $"{current_line->matchstr($'^\s*{variant_4}')->matchstr('\d\+')}"
        )
-       curr_nr = curr_nr + 1
-       tmp = $"{string(curr_nr + 1)}.\\s"
+       # tmp = $"{current_line->matchstr($'^\s*{variant_4}')->substitute($'{string(curr_nr)}.', $'{string(curr_nr + 1)}\.', '')}"
+       tmp = $"{current_line->matchstr($'^\s*{variant_4}')}"
+       echom "tmp: " .. tmp
      endif
   endif
 
  return $"\<CR>{tmp}"
 enddef
 
-inoremap <buffer> <CR> <C-R>=MDContinueList()<CR>
-
-11. ciao
-12.\s
+# inoremap <buffer> <CR> <C-R>=MDContinueList()<CR>
 
 
 # Set-unset blocks
