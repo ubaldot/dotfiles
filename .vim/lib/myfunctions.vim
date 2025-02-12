@@ -593,8 +593,6 @@ def MDIsLink(): bool
   return is_link
 enddef
 
-# nnoremap <leader>ö <scriptcmd>MDIsLink()<cr>
-
 export def MDToggleMark()
   var line = getline('.')
   if match(line, '\[\s*\]') != -1
@@ -721,8 +719,9 @@ export def MDHandleLink()
 enddef
 
 
-# TODO: check why variant 4 does not work when indented
 export def MDContinueList()
+  # OBS! If there are issues, check 'formatlistpat' value for markdown
+  # filetype
   # For continuing items list and enumerations
   # Check if the current line starts with '- [ ]' or '- '
   var variant_1 = '-\s\[\s*\]\s\+' # - [ ] bla bla bla
