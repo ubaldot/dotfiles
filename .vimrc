@@ -406,6 +406,7 @@ nnoremap git <Cmd>GitMasterStatus<cr>
 # vim-markdown-extras
 g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
+g:markdown_extras_config['code_block_language'] = ''
 g:markdown_extras_config['css_style'] = $"-c {$HOME}/dotfiles/my_css_style.css"
 
 # vim-poptools
