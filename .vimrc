@@ -352,7 +352,7 @@ Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-replica'
 Plug 'ubaldot/vim-manim'
-# Plug 'ubaldot/vim-markdown-extras'
+Plug 'ubaldot/vim-markdown-extras'
 Plug 'ubaldot/vim-microdebugger'
 Plug 'ubaldot/vim9-conversion-aid'
 Plug 'ubaldot/vim-extended-view'
@@ -365,15 +365,13 @@ Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector'
 # For removing expanded links in markdown. Check the help
 Plug 'qadzek/link.vim'
-Plug 'vimwiki/vimwiki'
+# Plug 'vimwiki/vimwiki'
 # Plug 'habamax/vim-rst'
 plug#end()
 filetype plugin on
 filetype indent on
 syntax on
 
-g:vimwiki_list = [{'path': '~/vimwiki/',
-                      \ 'syntax': 'markdown', 'ext': 'md'}]
 
 # Bundled plugins
 packadd comment
