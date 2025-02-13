@@ -198,7 +198,7 @@ def GoToGitRoot()
   exe $'cd {expand('%:p:h')}'
   var git_root = system('git rev-parse --show-toplevel')
   # v:shell_error does not work in Windows, it returns 0
-  if v:shell_error == 0 && g:os != "Windows"
+  if v:shell_error == 0 || git_root !~ 'fatal: not a git repository'
     exe $'cd {git_root}'
   endif
   pwd
