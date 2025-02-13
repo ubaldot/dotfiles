@@ -362,14 +362,18 @@ export def OpenMyTerminal()
     # enable the following and remove the popup_create part if you want
     # the terminal in a "classic" window.
     # vert term_start(&shell, {'term_name': 'MANIM' })
-    # var os_shell = ""
     var saved_shell = &shell
     if g:os == "Windows"
       &shell = "powershell"
     endif
     var buf_no = term_start(&shell, {'term_name': my_term_name, 'hidden': 1,
       'term_finish': 'close'})
-    setbufvar(bufname(buf_no), '&buflisted', 0)
+    setbufvar(buf_no, '&buflisted', 0)
+    if g:os == "Windows"
+      var curr_dir = expand('%:h')
+      term_sendkeys(buf_no, $'cd("{curr_dir}")' .. "\n")
+      &shell = saved_shell
+    endif
   endif
 
   popup_create(bufnr(my_term_name), {
