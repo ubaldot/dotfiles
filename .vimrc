@@ -174,7 +174,7 @@ def ToggleCmdWindow()
   endif
 enddef
 
-nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
+nnoremap <c-c><c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # Otherwise I cannot paste in registers
 xnoremap <leader>" <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
@@ -288,6 +288,7 @@ xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
 
 # Wipe buffer
 nnoremap <c-d> <cmd>bw!<cr>
+nnoremap <c-c> <cmd>close!<cr>
 
 # Formatting
 # command! -range=% Prettify myfunctions.Prettify(<line1>, <line2>)
