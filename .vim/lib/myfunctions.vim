@@ -370,10 +370,7 @@ export def OpenMyTerminal()
     endif
     var buf_no = term_start(os_shell, {'term_name': my_term_name, 'hidden': 1,
       'term_finish': 'close'})
-    # echom bufname(buf_no)
     setbufvar(bufname(buf_no), '&buflisted', 0)
-    # win_execute(bufwinid(buf_no), 'setlocal nobuflisted')
-    # setbufvar(buf_no, 'wrap', 0)
   endif
 
   popup_create(bufnr(my_term_name), {
