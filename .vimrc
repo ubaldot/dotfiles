@@ -408,9 +408,7 @@ g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['code_block_language'] = ''
 g:markdown_extras_config['css_style'] = $"-c {$HOME}/dotfiles/my_css_style.css"
-g:markdown_extras_config['makeprg'] =
-  'pandoc --from=markdown --output %:r:S.html $* -- %'
-
+g:markdown_extras_config['makeprg'] = 'pandoc --from=markdown --output %:p:r:S.html $* -- %:p:S'
 
 # vim-poptools
 g:poptools_config = {}
