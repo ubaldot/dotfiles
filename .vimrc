@@ -408,6 +408,7 @@ g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['code_block_language'] = ''
 g:markdown_extras_config['pandoc_args'] = [$'--css={$HOME}/dotfiles/my_css_style.css']
+g:markdown_extras_config['pandoc_args'] = ['rtf']
 
 # vim-poptools
 g:poptools_config = {}
