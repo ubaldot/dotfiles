@@ -135,8 +135,12 @@ export def TrimWhitespace()
   setpos('.', save_cursor)
 enddef
 
-export def GetTextObject(textobject: string): string
-  # You pass a text object like "inside word", etc. and it returns it.
+export def GetTextObject(textobject: string): dict<any>
+  # You pass a text object like "inside word", etc. and it returns it, along
+  # with the start and end positions.
+  # Start and end positions are of the form
+  # [buffer_number, line_number, column_number, screen_column].
+  #
   # For example GetTextObjet('aw') it returns "around word".
 
   # backup the content of register t (arbitrary choice, YMMV)
@@ -149,7 +153,8 @@ export def GetTextObject(textobject: string): string
   # restore register t
   setreg("t", oldreg)
   # return the content of given text object
-  return text
+  var text_object = {text: text, start_pos: getpos("'["), end_pos: getpos("']")}
+  return text_object
 enddef
 
 export def Redir(cmd: string, rng: number, start: number, end: number)
