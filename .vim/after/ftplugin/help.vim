@@ -1,3 +1,3 @@
 vim9script
 
-nnoremap <c-o> <c-]>
+nnoremap <c-i> <c-]>
