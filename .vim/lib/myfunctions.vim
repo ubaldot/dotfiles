@@ -135,6 +135,13 @@ export def TrimWhitespace()
   setpos('.', save_cursor)
 enddef
 
+export def InsertInLine(lnum: number, pos: number, insert: string)
+   # Insert string in the given column
+   var line = getline(lnum)                      # Get the current line
+   var new_line = strcharpart(line, 0, pos) .. insert .. strcharpart(line, pos)
+   setline(lnum, new_line)                  # Set the modified line back
+enddef
+
 export def GetTextObject(textobject: string): dict<any>
   # You pass a text object like "inside word", etc. and it returns it, along
   # with the start and end positions.
@@ -415,7 +422,7 @@ if has('mac')
   # <esc> is used in xnoremap because '<,'> are updated once you leave visual
   # mode
   xnoremap <leader>s <esc><ScriptCmd>TextToSpeech(line("'<"), line("'>"))<cr>
-  command -range Say vim9cmd TextToSpeech(<line1>, <line2>)
+  command! -range Say vim9cmd TextToSpeech(<line1>, <line2>)
 
   def TextToSpeech(firstline: number, lastline: number)
     exe $":{firstline},{lastline}w !say"

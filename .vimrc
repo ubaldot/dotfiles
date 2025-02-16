@@ -346,25 +346,25 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
-Plug 'yegappan/lsp'
+Plug 'yegappan/lsp', {'for': ['python', 'c', 'cpp', 'latex']}
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
-Plug 'ubaldot/vim-replica'
-Plug 'ubaldot/vim-manim'
-Plug 'ubaldot/vim-markdown-extras'
-Plug 'ubaldot/vim-microdebugger'
-Plug 'ubaldot/vim9-conversion-aid'
+Plug 'ubaldot/vim-replica', {'for': 'python'}
+Plug 'ubaldot/vim-manim', {'for': 'python'}
+Plug 'ubaldot/vim-markdown-extras', {'for': 'markdown'}
+Plug 'ubaldot/vim-microdebugger', {'for': ['c', 'cpp']}
+Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
 Plug 'ubaldot/vim-extended-view'
 Plug 'ubaldot/vim-poptools'
-Plug 'ubaldot/vim-latex-tools'
+Plug 'ubaldot/vim-latex-tools', {'for': 'latex'}
 Plug 'ubaldot/vim-git-master'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-Plug 'puremourning/vimspector'
-Plug 'ubaldot/vimspector'
+# Plug 'puremourning/vimspector'
+Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
 # For removing expanded links in markdown. Check the help
-Plug 'qadzek/link.vim'
+Plug 'qadzek/link.vim', {'for': 'markdown'}
 # Plug 'vimwiki/vimwiki'
 # Plug 'habamax/vim-rst'
 plug#end()
@@ -457,7 +457,6 @@ var Open_special = (textobject) => {
   endif
 }
 
-# exe "source " .. g:dotvim .. "/plugins_settings/txtfmt_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"

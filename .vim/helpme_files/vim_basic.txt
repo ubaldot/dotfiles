@@ -4,8 +4,6 @@ beginning,end of line           0 or ^, $
 top, middle, bottom             H, M, L
 Formatting text (textwidth)     gggqG
 very long words                 gj, gk, gq (break long line in multiple lines)
-jump to, jump from              <c-i>, <c-o>
-tags (to, from)                 <c-å>, <c-t>
 markers (set, jump)             ma,'a (Capital letters for inter-file jumps)
 
 INSERT:
@@ -13,6 +11,13 @@ general insert                  i, I, a, A, o, O, r, R, ci( -> change inside a (
 read                            :{line}read {file | !cmd}
                                 :13read !ls -al (the output of ls -al is placed below line 13)
                                 :$read +ff=unix myfile.txt (myfile content is appended at the end of the buffer)
+PRESS ENTER issue               use | redraw! e.g. :echom "long sentence" | redraw!
+Normal commands while in
+insert mode                     <c-o>key
+See last output message         g<
+inoremap mappings               inoremap a <c-r>=MyFunc() => insert the return value of MyFunc
+                                when I hit 'a' in insert mode. '=' is the expression register.
+
 LIST:
 Local list                      :lopen, :lnext :lprev
 Quickfix list (global)          :copen, :cnext, :cprev, :call setqflist([]) to clean-up
