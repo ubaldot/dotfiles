@@ -264,7 +264,7 @@ nnoremap S i<cr><esc>
 nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <s-tab> <cmd>bprev <cr>
-nnoremap <leader>b :b <tab>
+# nnoremap <leader>b :b <tab>
 nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
