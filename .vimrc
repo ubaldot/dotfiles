@@ -162,7 +162,6 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 # Remap {['command-line']} stuff
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
-cnoremap å ~
 
 def ToggleCmdWindow()
   if empty(getcmdwintype())
@@ -346,7 +345,7 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
-Plug 'yegappan/lsp', {'for': ['python', 'c', 'cpp', 'latex']}
+Plug 'yegappan/lsp'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
