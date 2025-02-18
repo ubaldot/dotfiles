@@ -342,7 +342,6 @@ augroup CMDWIN_MAPS
   autocmd!
   autocmd CmdWinEnter * nnoremap <buffer> <Esc> <cmd>q<CR>
   autocmd CmdWinEnter * nnoremap <buffer> <c-d> <cmd>q<CR>
-  autocmd CmdWinEnter * inoremap <buffer> <c-d> <cmd>q<CR>
 augroup END
 
 # vim-plug
