@@ -5,6 +5,9 @@ g:is_avap = false
 var auto_update_dotfiles = true
 var auto_update_notes = true
 
+auto_update_dotfiles = false
+auto_update_notes = false
+
 # OS detection
 def IsWSL(): bool
   if has("unix")
