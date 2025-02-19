@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = true
 var auto_update_notes = true
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 # OS detection
 def IsWSL(): bool
@@ -111,9 +111,7 @@ augroup END
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
-set langmap=ö[,ä]
-nnoremap <C-ö> <C-[>
-nnoremap <C-ä> <C-]>
+# set langmap=ö[,ä]
 set belloff=all
 set colorcolumn=80
 set clipboard^=unnamed,unnamedplus

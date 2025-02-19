@@ -15,7 +15,7 @@ var fontface = "Arial"
 var fontsize_tail = ""
 
 if g:os == "Windows"
-     fontsize = 10
+     fontsize = 11
      fontface = "Fira_Code:h"
      fontsize_tail = ":cANSI:qDRAFT"
      set guioptions-=T
