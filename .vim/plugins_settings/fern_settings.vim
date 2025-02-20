@@ -32,7 +32,7 @@ g:fern#renderer#default#collapsed_symbol = "+"
 g:fern#renderer#default#expanded_symbol = "-"
 
 # TODO: may remap <f1> somewhere
-noremap <silent> <space> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
+noremap <silent> <F1> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 
 def FernInit()
     nmap <buffer><expr>
