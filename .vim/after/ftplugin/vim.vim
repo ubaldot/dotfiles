@@ -14,5 +14,5 @@ def Help(args: string)
   endif
 enddef
 
-command! -buffer -nargs=1 Help <ScriptCmd>Help(<q-args>)<cr>
+command! -buffer -nargs=1 Help Help(<f-args>)
 setlocal keywordprg=:Help
