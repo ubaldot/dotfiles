@@ -6,69 +6,31 @@ vim9script
 set laststatus=2
 set statusline=
 
-# Get git branch name for statusline.
-# OBS !It may need to be changed for other OS.
+g:last_git_branch = ''
+g:last_git_dir = ''
 
-# Does not work
-def Set_b_gitbranch()
-    var branch_name = trim(system($'git -C {expand("%:h")} rev-parse --abbrev-ref HEAD 2>{g:null_device}'))
-    if v:shell_error != 0
-        branch_name = '(no repo)'
-        # clean up v:shell_error
-        system('ls')
-    else
-        branch_name = substitute(branch_name, '\n', '', '')
-    endif
-    setbufvar(bufnr('%'), 'gitbranch', branch_name)
+def UpdateGitBranch()
+  var git_dir = system('git rev-parse --show-toplevel')
+  if v:shell_error != 0
+    g:last_git_branch = ''
+    g:last_git_dir = ''
+  elseif git_dir !=# g:last_git_dir
+    # Only update if we've entered a new Git directory
+    g:last_git_branch = system($'git rev-parse --abbrev-ref HEAD 2>{g:null_device}')
+    g:last_git_branch = v:shell_error ? '' : ' ' .. substitute(g:last_git_branch, '\n', '', 'g')
+    g:last_git_dir = git_dir
+  endif
 enddef
 
-augroup Gitget
-    autocmd!
-    autocmd BufEnter,BufWinEnter * Set_b_gitbranch()
+def g:GitBranch(): string
+  return g:last_git_branch
+enddef
+
+# Update the Git branch only when changing buffers
+augroup UPDATE_GIT_BRANCH
+  autocmd!
+  autocmd BufEnter * UpdateGitBranch()
 augroup END
-
-def Set_b_current_function()
-    var n_max = 20 # max chars to be displayed.
-    var filetypes = ['c', 'cpp', 'python']
-    var text = "" # displayed text
-
-    if index(filetypes, &filetype) != -1
-        # If the filetype is recognized, then search the function line
-        var line = 0
-        if index(['c', 'cpp'], &filetype) != -1
-            line = search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bWn')
-        elseif &filetype ==# 'python'
-            line = search("^ \\{0,}def \\+.*", 'bWn')
-        endif
-        var n = match(getline(line), '\zs)') # Number of chars until ')'
-        if n < n_max
-            text = "|" .. trim(getline(line)[: n])
-        else
-            text = "|" .. trim(getline(line)[: n_max]) .. "..."
-        endif
-    endif
-    # return text
-    setbufvar(bufnr('%'), 'current_function', text)
-enddef
-
-augroup show_funcname
-    autocmd!
-    autocmd BufEnter,BufWinEnter,CursorMoved * Set_b_current_function()
-augroup end
-
-# def Set_b_lsp_warns_errors()
-#   if exists('*lsp#lsp#ErrorCount')
-#     setbufvar(bufnr('%'), 'lsp_warns', lsp#lsp#ErrorCount()['Warn'])
-#     setbufvar(bufnr('%'), 'lsp_errors', lsp#lsp#ErrorCount()['Error'])
-#   endif
-# enddef
-
-# augroup LSP
-#     autocmd!
-#     autocmd Filetype c,cpp,python Set_b_lsp_warns_errors()
-# augroup END
-
-
 
 def Set_g_conda_env()
     var conda_env = "base"
@@ -82,13 +44,18 @@ enddef
 
 augroup CONDA_ENV
     autocmd!
-    # autocmd VimEnter,BufEnter,BufWinEnter * Set_g_conda_env()
     autocmd VimEnter * Set_g_conda_env()
 augroup END
 
-def ShowFileFormat(ff: string)
-  return $'[{ff}]'
+
+def g:LSPErrorCount(): dict<any>
+  if exists('*lsp#lsp#ErrorCount')
+    return lsp#lsp#ErrorCount()
+  else
+    return {Error: 0, Warn: 0}
+  endif
 enddef
+
 
 # Anatomy of the statusline:
 # Start of highlighting	- Dynamic content - End of highlighting
@@ -96,10 +63,10 @@ enddef
 
 # Left side
 set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
-set statusline+=%#WildMenu#\ \ %{get(b:,'gitbranch','')}\ %*
+set statusline+=%#WildMenu#\ %{g:GitBranch()}\ %*
 set statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
 # Current function
-set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
+# set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
 # Right side
 set statusline+=%=
 # Current file
@@ -110,8 +77,8 @@ set statusline+=%#StatusLine#\ %y%*
 set statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
 set statusline+=%#StatusLine#\ col:%c\ %*
 # Add some conditionals here bitch!
-# set statusline+=%#Visual#\ W:\ %{get(b:,'lsp_warns','NA')}\ %*
-# set statusline+=%#CurSearch#\ E:\ %{get(b:,'lsp_errors','NA')}\ %*
+# set statusline+=%#Visual#\ W:\ %{LSPErrorCount()['Warn']}\ %*
+# set statusline+=%#CurSearch#\ E:\ %{LSPErrorCount()['Error']}\ %*
 set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
 set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
 # ----------- end statusline setup -------------------------

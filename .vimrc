@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = true
 var auto_update_notes = true
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 # OS detection
 def IsWSL(): bool
@@ -350,8 +350,8 @@ augroup END
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-# Plug 'lambdalisue/fern.vim'
-# Plug 'lambdalisue/fern-git-status.vim'
+Plug 'lambdalisue/fern.vim'
+Plug 'lambdalisue/fern-git-status.vim'
 Plug 'yegappan/lsp'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
@@ -365,14 +365,12 @@ Plug 'ubaldot/vim-extended-view'
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-latex-tools', {'for': 'latex'}
 Plug 'ubaldot/vim-git-master'
-# Plug 'ubaldot/vim-conda-activate'
+Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
 # Plug 'puremourning/vimspector'
 Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
 # For removing expanded links in markdown. Check the help
 Plug 'qadzek/link.vim', {'for': 'markdown'}
-# Plug 'vimwiki/vimwiki'
-# Plug 'habamax/vim-rst'
 plug#end()
 filetype plugin on
 filetype indent on
@@ -400,6 +398,7 @@ if hour < 7 || 14 < hour
 else
   set background=light
   colorscheme wildcharm
+  # colorscheme everforest
 endif
 # set background=dark
 g:everforest_background = 'medium'
@@ -463,10 +462,10 @@ var Open_special = (textobject) => {
   endif
 }
 
+exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
-exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/microdebugger_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
 
