@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = true
 var auto_update_notes = true
 
-# auto_update_dotfiles = false
-# auto_update_notes = false
+auto_update_dotfiles = false
+auto_update_notes = false
 
 # OS detection
 def IsWSL(): bool
@@ -350,8 +350,8 @@ augroup END
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
-Plug 'lambdalisue/fern.vim'
-Plug 'lambdalisue/fern-git-status.vim'
+# Plug 'lambdalisue/fern.vim'
+# Plug 'lambdalisue/fern-git-status.vim'
 Plug 'yegappan/lsp'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
