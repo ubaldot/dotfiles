@@ -58,6 +58,7 @@ enddef
 
 augroup STATUSLINE
     autocmd!
+    autocmd VimEnter * SetStatusLine()
     autocmd FileType c,cpp,python,tex SetStatusLine()
 augroup END
 
@@ -102,4 +103,3 @@ def SetStatusLine()
   endif
 enddef
 
-CommonStatusLine()
