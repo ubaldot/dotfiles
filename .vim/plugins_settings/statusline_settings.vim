@@ -4,7 +4,6 @@ vim9script
 # ---------------
 # Define all the functions that you need in your statusline and then build the statusline
 set laststatus=2
-set statusline=
 
 g:last_git_branch = ''
 g:last_git_dir = ''
@@ -57,28 +56,48 @@ def g:LSPErrorCount(): dict<any>
 enddef
 
 
-# Anatomy of the statusline:
-# Start of highlighting	- Dynamic content - End of highlighting
-# %#IsModified#	- %{&mod?expand('%'):''} - %*
+augroup CONDA_ENV
+    autocmd!
+    autocmd FileType c,cpp,python,tex SetStatusLine()
+augroup END
 
-# Left side
-set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
-set statusline+=%#WildMenu#\ %{g:GitBranch()}\ %*
-set statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
-# Current function
-# set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
-# Right side
-set statusline+=%=
-# Current file
-# set statusline+=%#StatusLine#\ %t(%n)%m%*
-# filetype
-set statusline+=%#StatusLine#\ %y%*
-# Fileformat
-set statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
-set statusline+=%#StatusLine#\ col:%c\ %*
-# Add some conditionals here bitch!
-# set statusline+=%#Visual#\ W:\ %{LSPErrorCount()['Warn']}\ %*
-# set statusline+=%#CurSearch#\ E:\ %{LSPErrorCount()['Error']}\ %*
-set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
-set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
-# ----------- end statusline setup -------------------------
+def CommonStatusLine()
+  set statusline=
+
+  # Anatomy of the statusline:
+  # Start of highlighting	- Dynamic content - End of highlighting
+  # %#IsModified#	- %{&mod?expand('%'):''} - %*
+
+  # Left side
+  set statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
+  set statusline+=%#WildMenu#\ %{g:GitBranch()}\ %*
+  set statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
+  # Current function
+  # set statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
+  #
+  # Right side
+  set statusline+=%=
+  # Current file
+  # set statusline+=%#StatusLine#\ %t(%n)%m%*
+  # filetype
+  set statusline+=%#StatusLine#\ %y%*
+  # Fileformat
+  set statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
+  set statusline+=%#StatusLine#\ (%l, %c)\ %*
+  # Add some conditionals here bitch!
+  # set statusline+=%#Visual#\ W:\ %{LSPErrorCount()['Warn']}\ %*
+  # set statusline+=%#CurSearch#\ E:\ %{LSPErrorCount()['Error']}\ %*
+  set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
+  set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
+  # ----------- end statusline setup -------------------------
+ enddef
+
+def SetStatusLine()
+  CommonStatusLine()
+  if index(g:lsp_filetypes, &filetype) != 0 && exists(lsp#lsp#ErrorCount()) != 0
+    set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
+    set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
+  endif
+enddef
+
+CommonStatusLine()
