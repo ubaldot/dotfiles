@@ -10,7 +10,8 @@ if g:dev_setup
   g:last_git_dir = ''
 
   def UpdateGitBranch()
-    var git_dir = system('git rev-parse --show-toplevel')
+    var git_cmd = 'git rev-parse --show-toplevel'
+    var git_dir = system(git_cmd)
     if v:shell_error != 0
       g:last_git_branch = ''
       g:last_git_dir = ''
@@ -73,6 +74,7 @@ def CommonStatusLine()
     setlocal statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
     setlocal statusline+=%#WildMenu#\ %{g:GitBranch()}\ %*
   endif
+  setlocal statusline+=%#WildMenu#\ \ No\ git\ %*
   setlocal statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
   # Current function
   # setlocal statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*

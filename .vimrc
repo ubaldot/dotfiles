@@ -5,6 +5,9 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
+auto_update_dotfiles = false
+auto_update_notes = false
+
 if !exists('g:dev_setup')
   g:dev_setup = true
 endif
@@ -396,7 +399,7 @@ augroup END
 # -----------------
 # everforest colorscheme
 var hour = str2nr(strftime("%H"))
-if hour < 7 || 14 < hour
+if hour < 7 || 16 < hour
   set background=dark
   colorscheme everforest
 else
