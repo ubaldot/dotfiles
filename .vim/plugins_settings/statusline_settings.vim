@@ -97,4 +97,3 @@ def SetStatusLine()
     set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
   endif
 enddef
-SetStatusLine()
