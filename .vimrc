@@ -4,7 +4,6 @@ vim9script
 g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
-
 # OS detection
 def IsWSL(): bool
   if has("unix")
@@ -344,6 +343,7 @@ augroup END
 
 # vim-plug
 # ----------------
+g:lsp_filetypes = ['c', 'cpp', 'python', 'tex']
 plug#begin(g:dotvim .. "/plugins/")
 Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'

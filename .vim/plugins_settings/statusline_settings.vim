@@ -87,19 +87,14 @@ def CommonStatusLine()
   # set statusline+=%#StatusLine#\ %l, %c\ %*
   # set statusline+=%#StatusLine# col:%c %*
   set statusline+=%#StatusLine#\ (%c,%l)\ %*
-  # Add some conditionals here bitch!
-  # set statusline+=%#Visual#\ W:\ %{LSPErrorCount()['Warn']}\ %*
-  # set statusline+=%#CurSearch#\ E:\ %{LSPErrorCount()['Error']}\ %*
-  set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
-  set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
   # ----------- end statusline setup -------------------------
  enddef
 
 def SetStatusLine()
   CommonStatusLine()
-  if index(g:lsp_filetypes, &filetype) != 0 && exists(lsp#lsp#ErrorCount()) != 0
+  if index(g:lsp_filetypes, &filetype) != 0 && exists('lsp#lsp#ErrorCount()') != 0
     set statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
     set statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
   endif
 enddef
-
+SetStatusLine()
