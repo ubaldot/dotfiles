@@ -56,7 +56,7 @@ def g:LSPErrorCount(): dict<any>
 enddef
 
 
-augroup CONDA_ENV
+augroup STATUSLINE
     autocmd!
     autocmd FileType c,cpp,python,tex SetStatusLine()
 augroup END
@@ -83,7 +83,9 @@ def CommonStatusLine()
   set statusline+=%#StatusLine#\ %y%*
   # Fileformat
   set statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
-  set statusline+=%#StatusLine#\ (%l, %c)\ %*
+  # set statusline+=%#StatusLine#\ %l, %c\ %*
+  # set statusline+=%#StatusLine# col:%c %*
+  set statusline+=%#StatusLine#\ (%c,%l)\ %*
   # Add some conditionals here bitch!
   # set statusline+=%#Visual#\ W:\ %{LSPErrorCount()['Warn']}\ %*
   # set statusline+=%#CurSearch#\ E:\ %{LSPErrorCount()['Error']}\ %*
