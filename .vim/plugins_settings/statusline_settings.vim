@@ -6,31 +6,32 @@ vim9script
 set laststatus=2
 
 if g:dev_setup
-  g:last_git_branch = ''
-  g:last_git_dir = ''
 
-  def UpdateGitBranch()
-    var git_cmd = 'git rev-parse --show-toplevel'
-    var git_dir = system(git_cmd)
+  def UpdateGitBranch(buf_enter: bool)
+    var git_branch = ''
+    var last_cmd = histget('cmd', -1)
+    var git_change_branch_regex = '\v(git co |git checkout|git switch)'
+    if last_cmd =~ git_change_branch_regex || buf_enter
+      git_branch = system($'git -C {expand("%:p:h")} rev-parse --abbrev-ref HEAD '
+      # '\%x00' is ^@
+      .. $'2>{g:null_device}')->substitute('\%x00', '', '')
+    endif
     if v:shell_error != 0
-      g:last_git_branch = ''
-      g:last_git_dir = ''
-    elseif git_dir !=# g:last_git_dir
-      # Only update if we've entered a new Git directory
-      g:last_git_branch = system($'git rev-parse --abbrev-ref HEAD 2>{g:null_device}')
-      g:last_git_branch = v:shell_error ? '' : ' ' .. substitute(g:last_git_branch, '\n', '', 'g')
-      g:last_git_dir = git_dir
+      g:git_branch = 'No repo'
+    else
+      g:git_branch = git_branch
     endif
   enddef
 
   def g:GitBranch(): string
-    return g:last_git_branch
+    return g:git_branch
   enddef
 
   # Update the Git branch only when changing buffers
   augroup UPDATE_GIT_BRANCH
   autocmd!
-  autocmd BufEnter * UpdateGitBranch()
+  autocmd ShellCmdPost * UpdateGitBranch(false)
+  autocmd BufEnter * UpdateGitBranch(true)
   augroup END
 
   def Set_g_conda_env()
@@ -73,8 +74,9 @@ def CommonStatusLine()
   if g:dev_setup
     setlocal statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
     setlocal statusline+=%#WildMenu#\ %{g:GitBranch()}\ %*
+  else
+    setlocal statusline+=%#WildMenu#\ \ No\ git\ %*
   endif
-  setlocal statusline+=%#WildMenu#\ \ No\ git\ %*
   setlocal statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
   # Current function
   # setlocal statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
@@ -94,7 +96,8 @@ def CommonStatusLine()
 def SetStatusLine()
   CommonStatusLine()
   if g:dev_setup
-    index(g:lsp_filetypes, &filetype) != -1 && exists('lsp#lsp#ErrorCount()') != 0
+    && index(g:lsp_filetypes, &filetype) != -1
+    && exists('lsp#lsp#ErrorCount()') != 0
     setlocal statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
     setlocal statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
   endif

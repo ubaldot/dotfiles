@@ -73,19 +73,6 @@ else
     &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
   endif
 endif
-
-# Windows
-if exists(':Open') == 0
-  if executable("xdg-open")
-    g:start_cmd = "xdg-open"
-# Linux/BSD
-  elseif executable('cmd.exe')
-    g:start_cmd = "explorer.exe"
-# MacOS
-  elseif executable("open")
-    g:start_cmd = "open"
-  endif
-endif
 # ------------------------
 
 import g:dotvim .. "/lib/myfunctions.vim"
