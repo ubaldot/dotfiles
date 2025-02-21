@@ -2,8 +2,9 @@ vim9script
 
 # For avap dev
 g:is_avap = false
-var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
-var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
+var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
+var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
+
 # OS detection
 def IsWSL(): bool
   if has("unix")

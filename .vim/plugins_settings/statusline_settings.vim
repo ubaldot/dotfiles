@@ -86,7 +86,7 @@ def CommonStatusLine()
   set statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
   # set statusline+=%#StatusLine#\ %l, %c\ %*
   # set statusline+=%#StatusLine# col:%c %*
-  set statusline+=%#StatusLine#\ (%c,%l)\ %*
+  set statusline+=%#StatusLine#\ (%l,%c)\ %*
   # ----------- end statusline setup -------------------------
  enddef
 
