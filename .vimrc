@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -249,6 +249,8 @@ if auto_update_notes
     autocmd VimEnter * PullRepofiles($'{$HOME}/Documents/my_notes')
   augroup END
 endif
+
+nnoremap <F1> <Cmd>helpclose<cr>
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
