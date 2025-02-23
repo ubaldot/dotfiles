@@ -2,38 +2,30 @@ vim9script
 
 # statusline
 # ---------------
-# Define all the functions that you need in your statusline and then build the statusline
+# Define all the functions that you need in your statusline and then build
+# the statusline
 set laststatus=2
 
 if g:dev_setup
 
   def UpdateGitBranch(buf_enter: bool)
-
+    g:git_branch = ''
 
     def GitBranchStdout(id: any, message: string)
-      g:git_branch = message
+      g:git_branch = $'{nr2char(0xE0A0)} {message}'
       redrawstatus
     enddef
     def GitBranchStderr(id: any, message: string)
-      g:git_branch = 'No repo'
+      g:git_branch = nr2char(0xE0A0) .. ' No repo'
       redrawstatus
     enddef
 
-    var git_branch = ''
     var last_cmd = histget('cmd', -1)
     var git_change_branch_regex = '\v(git co |git checkout|git switch)'
     if last_cmd =~ git_change_branch_regex || buf_enter
       job_start($'git -C {expand("%:p:h")} rev-parse --abbrev-ref HEAD ',
       {out_cb: GitBranchStdout, err_cb: GitBranchStderr}
       )
-      # git_branch = system($'git -C {expand("%:p:h")} rev-parse --abbrev-ref HEAD '
-      # # '\%x00' is ^@
-      # .. $'2>{g:null_device}')->substitute('\%x00', '', '')
-    endif
-    if v:shell_error != 0
-      g:git_branch = 'No repo'
-    else
-      g:git_branch = git_branch
     endif
   enddef
 
@@ -103,7 +95,7 @@ def CommonStatusLine()
   setlocal statusline+=%#StatusLine#\ %y%*
   # Fileformat
   setlocal statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
-  setlocal statusline+=%#StatusLine#\ (%l,%c)\ %*
+  setlocal statusline+=%#StatusLine#\ %l,%c\ %*
   # ----------- end statusline setup -------------------------
  enddef
 

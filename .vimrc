@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -78,7 +78,6 @@ endif
 import g:dotvim .. "/lib/myfunctions.vim"
 
 # Set cursor
-
 &t_SI = "\e[6 q"
 &t_EI = "\e[2 q"
 # &t_ti = "\e[6 q\e[?1049h"
@@ -372,9 +371,18 @@ filetype plugin on
 filetype indent on
 syntax on
 
-
 # Bundled plugins
 packadd comment
+
+command! -range -nargs=0 Comment {
+  var saved_cur = getcurpos()
+  exe "norm! <line1>Gv<line2>G$"
+  feedkeys("gc", "x")
+  setpos('.', saved_cur)
+  }
+nnoremap <silent> <expr> gC comment#Toggle() .. '$'
+
+# termdebug
 g:termdebug_config = {}
 packadd! termdebug
 # source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
