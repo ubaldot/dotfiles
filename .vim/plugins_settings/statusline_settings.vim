@@ -92,7 +92,7 @@ def CommonStatusLine()
   # Current file
   # setlocal statusline+=%#StatusLine#\ %t(%n)%m%*
   # filetype
-  setlocal statusline+=%#StatusLine#\ %y%*
+  setlocal statusline+=%#StatusLine#\ %y\ %*
   # Fileformat
   setlocal statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
   setlocal statusline+=%#StatusLine#\ %l,%c\ %*
