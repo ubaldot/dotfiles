@@ -374,12 +374,7 @@ syntax on
 # Bundled plugins
 packadd comment
 
-command! -range -nargs=0 Comment {
-  var saved_cur = getcurpos()
-  exe "norm! <line1>Gv<line2>G$"
-  feedkeys("gc", "x")
-  setpos('.', saved_cur)
-  }
+command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 
 # termdebug
