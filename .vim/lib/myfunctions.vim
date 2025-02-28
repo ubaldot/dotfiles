@@ -816,9 +816,12 @@ export def SurroundToggle(open_delimiter: string,
   # Also, remember that a yank set the marks '[ and '].
 
 
+  echom "CHIAMATA"
   if !empty(IsInRange(open_delimiter_dict, close_delimiter_dict))
+    echom "REMOVE"
     RemoveSurrounding(open_delimiter_dict, open_delimiter_dict)
   else
+    echom "ADD"
     SurroundSimple(open_delimiter,
       close_delimiter,
       open_delimiter_dict,
