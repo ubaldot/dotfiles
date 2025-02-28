@@ -570,7 +570,7 @@ export def SurroundSimple(open_delimiter: string,
     close_delimiters_dict: dict<string>,
     type: string = '')
 
-  if getcharpos("'[") == getcharpos("']")
+  if getcharpos("'<") == getcharpos("'>")
     return
   endif
 
