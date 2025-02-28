@@ -10,15 +10,18 @@ enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
 var match_id = 0
-def SearchReplacementHelper(search_user: string = ''): list<string>
+def g:SearchReplacementHelper(search_user: string = ''): list<string>
   augroup SEARCH_HI | autocmd!
-    autocmd CmdlineChanged @ if match_id > 0 | matchdelete(match_id) | endif |
+    autocmd CmdlineChanged @ {
+      if match_id > 0 |
+        matchdelete(match_id) |
+      endif |
     search(getcmdline(), 'w') | match_id = matchadd('IncSearch', getcmdline())
-      | redraw!
+      | redraw!}
     autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id
     = 0 | endif
   augroup END
-  var search = empty(search_user) ? input("String to search: ") : search_user
+  var search_text = empty(search_user) ? input("String to search: ") : search_user
   if !empty(search_user)
     if match_id > 0
       matchdelete(match_id)
@@ -26,20 +29,18 @@ def SearchReplacementHelper(search_user: string = ''): list<string>
     match_id = matchadd('IncSearch', search_user)
     redraw!
   endif
-  if empty(search)
-    echom ""
-    autocmd! SEARCH_HI
-    augroup! SEARCH_HI
-    return []
-  endif
   autocmd! SEARCH_HI
   augroup! SEARCH_HI
   if match_id > 0
     matchdelete(match_id)
   endif
   echo ""
-  var replacement = input("\nReplacement: ")
-  return [search, replacement]
+  if empty(search_text)
+    return[]
+  else
+    var replacement_text = input("\nReplacement: ")
+    return [search_text, replacement_text]
+  endif
 enddef
 
 def SearchAndReplaceInFiles(search_user: string = '')
