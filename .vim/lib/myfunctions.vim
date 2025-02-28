@@ -9,49 +9,52 @@ export def Echowarn(msg: string)
 enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
+def g:ClearAllMatches()
+    for match in getmatches()
+        matchdelete(match.id)
+    endfor
+enddef
 
-def g:SearchReplacementHelper(search_user: string = ''): list<string>
+def SearchReplacementHelper(search_user: string = ''): list<string>
   var return_val = []
   w:match_id = 0
+  var search_text = ''
 
-  augroup SEARCH_HI
-    autocmd!
-    autocmd CmdlineChanged @ {
-                      if w:match_id > 0 
-                        matchdelete(w:match_id) 
-                      endif 
-                      search(getcmdline(), 'w') 
-                      w:match_id = matchadd('IncSearch', getcmdline())
-                      redraw!
-                    }
-    autocmd CmdlineLeave @ {
-                      if w:match_id > 0  
-                        matchdelete(w:match_id)  
-                        w:match_id = 0 
-                      endif
-                      }
-  augroup END
-
-  var search_text = '' 
+  # First round
   if empty(search_user)
-    search_text = input("String to search: ")
-  else 
+    augroup SEARCH_HI
+      autocmd!
+      autocmd CmdlineChanged @ {
+                        if w:match_id > 0
+                          matchdelete(w:match_id)
+                        endif
+                        search(getcmdline(), 'w')
+                        w:match_id = matchadd('IncSearch', getcmdline())
+                        redraw!
+                      }
+    augroup END
+
+    search_text = input("Pattern to search: ")
+    autocmd! SEARCH_HI
+    augroup! SEARCH_HI
+
+  else
     search_text = search_user
-    if w:match_id > 0
-      matchdelete(w:match_id)
-    endif
+    search(search_text, 'w')
     w:match_id = matchadd('IncSearch', search_text)
-    redraw!
   endif
-  autocmd! SEARCH_HI
-  augroup! SEARCH_HI
+
+  # second round
+  redraw!
+  echo "String to search: " .. search_text
+  if !empty(search_text)
+    var replacement_text = input("Replacement: ")
+    return_val = empty(replacement_text) ? [] : [search_text, replacement_text]
+  endif
+
+  # Cleanup
   if w:match_id > 0
     matchdelete(w:match_id)
-  endif
-  echo ""
-  if !empty(search_text)
-    var replacement_text = input("\nReplacement: ")
-    return_val = empty(replacement_text) ? [search_text, replacement_text] : []
   endif
   unlet w:match_id
   return return_val
@@ -65,44 +68,32 @@ def SearchAndReplaceInFiles(search_user: string = '')
   if empty(search_replacement)
     return
   endif
-  var pattern = input("\nIn files: ", '*.')
+  var pattern = input("\nIn files: ", '**/*.')
   if empty(pattern)
     echom ""
     return
   endif
-  var risky = input("\nRisky: ", 'n')
-  if risky !~ "[yes]" &&  risky !~ "[no]" && empty(risky)
+
+  # Search part
+  var vimgrep_opts =
+    input("\nVimgrep options (g = add every match, j = no direct jump, f = fuzzy search): ", 'gj')
+  if empty(vimgrep_opts)
+    echo ''
     return
   endif
+  search_cmd = $'vimgrep /{search}/{vimgrep_opts} {pattern}'
+  echo $"\n{search_cmd}"
+  exe search_cmd
 
-  if risky[0] =~ "y"
-    var cmd = 'Nothing'
-    if g:os != 'Windows'
-      cmd = printf('!find %s -type f -exec sed -i ''s/%s/%s/g'' {} \;',
-        pattern, search, replacement)
-    else
-      # TODO: Command for Windows: to test
-      # cmd = $'powershell -command "gci -Recurse -File | ForEach-Object \{
-      #       \  (Get-Content $_.FullName) -replace ''{search}'',
-      #       ''{replacement}'' | Set-Content $_.FullName
-      #       \\}"'
-    endif
-    echo $"\n{cmd}"
-  else
-    var vimgrep_opts = input("\nVimgrep options: ", 'gj')
-    var substitute_opts = input("\nSubstitute options: ", 'gci')
-    if empty(substitute_opts)
-      echo ''
-      return
-    endif
-    var cmd = $'vimgrep /{search}/{vimgrep_opts} **/{pattern}'
-    echo $"\n{cmd}"
-    exe cmd
-    cmd = $'cfdo :%s/{search}/{replacement}/{substitute_opts}'
-    echo $"\n{cmd}"
-    exe cmd
-    echo "\nType ':wall' to save all or ':cfdo' u to undo"
+  # Replacement part
+  var substitute_opts = input("\nSubstitute options: ", 'gci')
+  if empty(substitute_opts)
+    echo ''
+    return
   endif
+  # TODO to be tested
+  exe $'noautocmd cdo :s/{search}/{replacement}/{substitute_opts} | update'
+  echo "\nType ':cdo bw' to close all the files or ':cdo u' to undo"
 enddef
 
 # TODO: cannot distinguish when user hit esc or cr. Perhaps you want to use
@@ -114,9 +105,6 @@ def SearchAndReplace(search_user: string = '')
     return
   endif
   var search = search_replacement[0]
-  if empty(search)
-    return
-  endif
   var replacement = search_replacement[1]
   var opts = input("\nSubstitute options: ", 'gci')
   if empty(opts)
