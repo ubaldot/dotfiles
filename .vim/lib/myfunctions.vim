@@ -583,12 +583,12 @@ export def SurroundSimple(open_delimiter: string,
   var close_delimiter_dict = {close_string: close_regex}
 
   # line and column of point A
-  var lA = line("'[")
-  var cA = col("'[")
+  var lA = line("'<")
+  var cA = col("'<")
 
   # line and column of point B
-  var lB = line("']")
-  var cB = col("']")
+  var lB = line("'>")
+  var cB = col("'>")
   echom "lA: " .. lA
   echom "cA: " .. cA
   echom "lB: " .. lB
