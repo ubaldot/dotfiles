@@ -9,7 +9,7 @@ export def Echowarn(msg: string)
 enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
-def g:ClearAllMatches()
+def ClearAllMatches()
     for match in getmatches()
         matchdelete(match.id)
     endfor
@@ -589,6 +589,10 @@ export def SurroundSimple(open_delimiter: string,
   # line and column of point B
   var lB = line("']")
   var cB = col("']")
+  echom "lA: " .. lA
+  echom "cA: " .. cA
+  echom "lB: " .. lB
+  echom "cB: " .. cB
 
   var toA = strcharpart(getline(lA), 0, cA - 1) .. open_string
   var fromB = close_string .. strcharpart(getline(lB), cB)
@@ -812,13 +816,9 @@ export def SurroundToggle(open_delimiter: string,
   # Also, remember that a yank set the marks '[ and '].
 
 
-  var tmp = IsInRange(open_delimiter_dict, close_delimiter_dict)
-  echom "range: " .. string(tmp)
   if !empty(IsInRange(open_delimiter_dict, close_delimiter_dict))
-    echom "FOO"
     RemoveSurrounding(open_delimiter_dict, open_delimiter_dict)
   else
-    echom "BAR"
     SurroundSimple(open_delimiter,
       close_delimiter,
       open_delimiter_dict,
