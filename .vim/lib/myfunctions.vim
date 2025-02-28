@@ -570,6 +570,9 @@ export def SurroundSimple(open_delimiter: string,
     close_delimiters_dict: dict<string>,
     type: string = '')
 
+  # Only works in Visual mode. Otherwise I should define an opfunc, or I shall
+  # consider a "getTextObjext"
+
   if getcharpos("'<") == getcharpos("'>")
     return
   endif
@@ -589,10 +592,6 @@ export def SurroundSimple(open_delimiter: string,
   # line and column of point B
   var lB = line("'>")
   var cB = col("'>")
-  echom "lA: " .. lA
-  echom "cA: " .. cA
-  echom "lB: " .. lB
-  echom "cB: " .. cB
 
   var toA = strcharpart(getline(lA), 0, cA - 1) .. open_string
   var fromB = close_string .. strcharpart(getline(lB), cB)
