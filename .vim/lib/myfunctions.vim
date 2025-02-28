@@ -9,38 +9,52 @@ export def Echowarn(msg: string)
 enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
-var match_id = 0
+
 def g:SearchReplacementHelper(search_user: string = ''): list<string>
-  augroup SEARCH_HI | autocmd!
+  var return_val = []
+  w:match_id = 0
+
+  augroup SEARCH_HI
+    autocmd!
     autocmd CmdlineChanged @ {
-      if match_id > 0 |
-        matchdelete(match_id) |
-      endif |
-    search(getcmdline(), 'w') | match_id = matchadd('IncSearch', getcmdline())
-      | redraw!}
-    autocmd CmdlineLeave @ if match_id > 0 | matchdelete(match_id) | match_id
-    = 0 | endif
+                      if w:match_id > 0 
+                        matchdelete(w:match_id) 
+                      endif 
+                      search(getcmdline(), 'w') 
+                      w:match_id = matchadd('IncSearch', getcmdline())
+                      redraw!
+                    }
+    autocmd CmdlineLeave @ {
+                      if w:match_id > 0  
+                        matchdelete(w:match_id)  
+                        w:match_id = 0 
+                      endif
+                      }
   augroup END
-  var search_text = empty(search_user) ? input("String to search: ") : search_user
-  if !empty(search_user)
-    if match_id > 0
-      matchdelete(match_id)
+
+  var search_text = '' 
+  if empty(search_user)
+    search_text = input("String to search: ")
+  else 
+    search_text = search_user
+    if w:match_id > 0
+      matchdelete(w:match_id)
     endif
-    match_id = matchadd('IncSearch', search_user)
+    w:match_id = matchadd('IncSearch', search_text)
     redraw!
   endif
   autocmd! SEARCH_HI
   augroup! SEARCH_HI
-  if match_id > 0
-    matchdelete(match_id)
+  if w:match_id > 0
+    matchdelete(w:match_id)
   endif
   echo ""
-  if empty(search_text)
-    return[]
-  else
+  if !empty(search_text)
     var replacement_text = input("\nReplacement: ")
-    return [search_text, replacement_text]
+    return_val = empty(replacement_text) ? [search_text, replacement_text] : []
   endif
+  unlet w:match_id
+  return return_val
 enddef
 
 def SearchAndReplaceInFiles(search_user: string = '')
