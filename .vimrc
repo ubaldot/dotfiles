@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -167,12 +167,18 @@ enddef
 nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # Otherwise I cannot paste in registers
-xnoremap <leader>" <esc><ScriptCmd>myfunctions.Surround('"', '"')<cr>
-xnoremap <leader>' <esc><ScriptCmd>myfunctions.Surround("'", "'")<cr>
-xnoremap <leader>( <esc><ScriptCmd>myfunctions.Surround('(', ')')<cr>
-xnoremap <leader>[ <esc><ScriptCmd>myfunctions.Surround('[', ']')<cr>
-xnoremap <leader>{ <esc><ScriptCmd>myfunctions.Surround('{', '}')<cr>
-xnoremap <leader>< <esc><ScriptCmd>myfunctions.Surround('<', '>')<cr>
+xnoremap <leader>" <esc><ScriptCmd>
+      \ myfunctions.SurroundToggle('"', '"', {'"': '"'}, {'"': '"'})<cr>
+xnoremap <leader>' <esc><ScriptCmd>
+      \ myfunctions.SurroundToggle("'", "'", {"'": "'"}, {"'": "'"})<cr>
+xnoremap <leader>( <esc><ScriptCmd>
+      \ myfunctions.SurroundToggle('(', ')', {'(': '('}, {')': ')'})<cr>
+xnoremap <leader>[ <esc><ScriptCmd>
+      \ myfunctions.SurroundToggle('[', ']', {'[': '['}, {']': ']'})<cr>
+xnoremap <leader>{ <esc><ScriptCmd>
+      \ myfunctions.SurroundToggle('{', '}', {'{': '{'}, {'}': '}'})<cr>
+xnoremap <leader>< <esc><ScriptCmd>
+      \ myfunctions.SurroundToggle('<', '>', {'<': '<'}, {'>': '>'})<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
