@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -283,6 +283,7 @@ nnoremap <c-s> :%s/
 xnoremap <c-s> "ty<cmd>exe $"SearchAndReplace {getreg('t')}"<cr>
 nnoremap <c-s><c-s> <cmd>SearchAndReplaceInFiles<cr>
 xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
+xnoremap <c-h> <esc><ScriptCmd>myfunctions.HighlightVisualSelection()<cr>
 
 # Wipe buffer
 nnoremap <c-d> <cmd>bw!<cr>
@@ -605,6 +606,20 @@ command! LLogNewDay IndexNewDay(work_log_path)
 command! LLogOpen IndexOpen(work_log_path)
 
 command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
+
+const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
+const NUM_MEMBERS = 20
+
+def GetTeam()
+  vnew
+  const team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', 22)
+    ->map((idx, val) => matchstr(val, '-\s\zs.*\ze:'))
+  setline(1, team_cleaned)
+  setlocal buftype=nofile bufhidden=hide noswapfile
+  set ft=markdown
+enddef
+
+command! TEAM GetTeam()
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to

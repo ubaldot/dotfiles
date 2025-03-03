@@ -9,11 +9,6 @@ export def Echowarn(msg: string)
 enddef
 # Search and replace in files.
 # Risky calls external 'sed' and it won't ask for confirmation.
-def ClearAllMatches()
-    for match in getmatches()
-        matchdelete(match.id)
-    endfor
-enddef
 
 def SearchReplacementHelper(search_user: string = ''): list<string>
   var return_val = []
@@ -1114,4 +1109,38 @@ export def UnsetBlock(open_block: dict<string>, close_block: dict<string>)
    for line in range(lA - 1, lB - 1)
      setline(line, getline(line)->substitute('^\s*', '', 'g'))
    endfor
+enddef
+
+export def HighlightVisualSelection()
+    # Get the start and end positions of the visual selection
+    var [line1, col1] = getpos("'<")[1 : 2]
+    var [line2, col2] = getpos("'>")[1 : 2]
+
+    # Ensure correct order for multi-line selections
+    if line1 > line2 || (line1 == line2 && col1 > col2)
+        [line1, col1, line2, col2] = [line2, col2, line1, col1]
+    endif
+
+    # Highlight each line
+    var matches = []
+    for lnum in range(line1, line2)
+        if lnum == line1 && lnum == line2
+            add(matches, [lnum, col1, col2 - col1 + 1])
+        elseif lnum == line1
+            add(matches, [lnum, col1, 9999]) # Highlight until end of line
+        elseif lnum == line2
+            add(matches, [lnum, 1, col2])
+        else
+            add(matches, [lnum, 1, 9999]) # Entire line
+        endif
+    endfor
+
+    # Apply the highlighting
+    matchaddpos("IncSearch", matches)
+enddef
+
+def g:ClearAllMatches()
+    for match in getmatches()
+        matchdelete(match.id)
+    endfor
 enddef
