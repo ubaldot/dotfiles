@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -194,7 +194,7 @@ def GoToGitRoot()
   exe $'cd {expand('%:p:h')}'
   var git_root = system('git rev-parse --show-toplevel')
   # v:shell_error does not work in Windows, it returns 0
-  if v:shell_error == 0 || git_root !~ 'fatal: not a git repository'
+  if v:shell_error == 0 && git_root !~ 'fatal: not a git repository'
     exe $'cd {git_root}'
   endif
   pwd
@@ -363,6 +363,7 @@ Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-git-master'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
+Plug 'tpope/vim-surround'
 if g:dev_setup
   Plug 'ubaldot/vim-latex-tools', {'for': 'latex'}
   Plug 'yegappan/lsp'
@@ -419,7 +420,7 @@ g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
 g:markdown_extras_config['pandoc_args'] =
-  [$'--css="{$HOME}/dotfiles/my_css_style.css"', '--metadata', 'title="stocazzo"']
+  [$'--css="{$HOME}/dotfiles/my_css_style.css"']
 
 # vim-poptools
 g:poptools_config = {}
@@ -582,7 +583,6 @@ if g:os == "Windows"
         \ 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
 endif
 
-
 # Activity log
 def IndexOpen(index_path: string)
   exe $'edit {index_path}'
@@ -594,20 +594,21 @@ def IndexOpen(index_path: string)
   endif
 enddef
 
+command! LLogNewDay IndexNewDay(work_log_path)
+command! LLogOpen IndexOpen(work_log_path)
+command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
+
+
 def IndexNewDay(index_path: string)
   IndexOpen(index_path)
   # You end up in the first non-blank line
-  var day_string = strftime("## %b %d %y")
+  var day_string = strftime("# %b %d %y")
   append(line('.'), ['', day_string])
   search(day_string, 'b')
 enddef
 
-command! LLogNewDay IndexNewDay(work_log_path)
-command! LLogOpen IndexOpen(work_log_path)
-
-command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
-
 const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
+const CC_DIARY = $'{CAB_CLIMATE_HOME}\diary.md'
 const NUM_MEMBERS = 20
 
 def GetTeam()
@@ -619,7 +620,11 @@ def GetTeam()
   set ft=markdown
 enddef
 
-command! TEAM GetTeam()
+command! CCDiaryNewDay IndexNewDay(CC_DIARY)
+command! CCDiaryOpen IndexOpen(CC_DIARY)
+
+command! CCTeam GetTeam()
+command! ClearAllMatches myfunctions.ClearAllMatches()
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
