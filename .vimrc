@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -127,7 +127,7 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*
+set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*,**/*dist*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+=-
@@ -425,7 +425,9 @@ g:markdown_extras_config['pandoc_args'] =
 # vim-poptools
 g:poptools_config = {}
 g:poptools_config['preview_recent_files'] = false
-g:poptools_config['preview_buffer'] = false
+g:poptools_config['preview_buffers'] = true
+g:poptools_config['preview_grep'] = true
+g:poptools_config['fuzzy_search'] = false
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
