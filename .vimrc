@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-# auto_update_dotfiles = false
-# auto_update_notes = false
+auto_update_dotfiles = false
+auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
