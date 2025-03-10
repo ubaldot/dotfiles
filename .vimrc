@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -428,6 +428,12 @@ g:poptools_config['preview_recent_files'] = false
 g:poptools_config['preview_buffers'] = true
 g:poptools_config['preview_grep'] = true
 g:poptools_config['fuzzy_search'] = false
+g:poptools_config['grep_cmd_win'] = 'powershell -NoProfile -ExecutionPolicy '
+.. 'Bypass -Command "cd {search_dir};findstr /C:{shellescape(what)} '
+.. '/N /S {items}"'
+
+g:poptools_config['grep_cmd_nix'] =
+  'grep -nrH --include="{items}" "{what}" {search_dir}'
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
