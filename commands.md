@@ -153,7 +153,8 @@ SSL: Then, you have to set the following environment variable:
 
 On Windows you have to set the environment variable through System/Env var,
 ... etc. You can download the certificate from some of your Organization
-website.
+website. Or you can add the following to your `profile.ps1`:
+`$env:REQUESTS_CA_BUNDLE = "C:\Users\ubaldot\your_cert-ca.pem"`
 
 **common commands**:
 

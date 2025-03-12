@@ -5,8 +5,8 @@ g:is_avap = false
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
 
-auto_update_dotfiles = false
-auto_update_notes = false
+# auto_update_dotfiles = false
+# auto_update_notes = false
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -427,13 +427,8 @@ g:poptools_config = {}
 g:poptools_config['preview_recent_files'] = false
 g:poptools_config['preview_buffers'] = true
 g:poptools_config['preview_grep'] = true
+g:poptools_config['preview_vimgrep'] = true
 g:poptools_config['fuzzy_search'] = false
-g:poptools_config['grep_cmd_win'] = 'powershell -NoProfile -ExecutionPolicy '
-.. 'Bypass -Command "cd {search_dir};findstr /C:{shellescape(what)} '
-.. '/N /S {items}"'
-
-g:poptools_config['grep_cmd_nix'] =
-  'grep -nrH --include="{items}" "{what}" {search_dir}'
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
@@ -617,6 +612,7 @@ enddef
 
 const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
 const CC_DIARY = $'{CAB_CLIMATE_HOME}\diary.md'
+const TODO = $'{CAB_CLIMATE_HOME}\todo.md'
 const NUM_MEMBERS = 20
 
 def GetTeam()
@@ -630,6 +626,7 @@ enddef
 
 command! CCDiaryNewDay IndexNewDay(CC_DIARY)
 command! CCDiaryOpen IndexOpen(CC_DIARY)
+command! CCTodo IndexOpen(TODO)
 
 command! CCTeam GetTeam()
 command! ClearAllMatches myfunctions.ClearAllMatches()
