@@ -2,6 +2,10 @@
 
     echo systemlist('shopt -s globstar; grep -n trim **/*.py')
 
+# Linux
+
+Install your binaries (or symlink to app images) to `~/.local/bin`
+
 # fzf
 
 **Install & setup**:

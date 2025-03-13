@@ -2,11 +2,12 @@ vim9script
 
 # For avap dev
 g:is_avap = false
+var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -66,12 +67,17 @@ else
   g:tmp = "/tmp"
   g:null_device = "/dev/null"
   g:dotvim = $HOME .. "/.vim"
-  &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-  if g:os == 'Linux' || g:os == 'WSL'
-    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
-  else
-    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
-  endif
+  #if !is_PE
+	  &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+	  if g:os == 'Linux' || g:os == 'WSL'
+	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
+	  else
+	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
+	  endif
+#else
+#	&pythonthreehome =  '/usr/bin'
+#	 &pythonthreedll = '/usr/lib/x86_64-linux-gnu/python3.10.so.1'
+#	endif
 endif
 # ------------------------
 
