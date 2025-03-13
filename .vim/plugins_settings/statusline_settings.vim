@@ -78,7 +78,9 @@ def CommonStatusLine()
 
   # Left side
   if g:dev_setup
-    setlocal statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
+    if exists('g:conda_env')
+      setlocal statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
+    endif
     setlocal statusline+=%#WildMenu#\ %{g:GitBranch()}\ %*
   else
     setlocal statusline+=%#WildMenu#\ \ No\ git\ %*
