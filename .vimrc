@@ -223,6 +223,7 @@ def PullRepofiles(repo_path: string)
   if !empty(copy(output) ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles!"
   elseif !empty(copy(output) ->filter('v:val !~ "Already up to date"'))
+    echom copy(output) ->filter('v:val !~ "Already up to date"')
     echoerr "OBS! ~/dotfiles updated! "
              .. "You may need restart Vim to update your environment."
   endif
