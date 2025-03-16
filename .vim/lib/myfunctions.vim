@@ -8,8 +8,6 @@ export def Echowarn(msg: string)
   echohl WarningMsg | echom $'{msg}' | echohl None
 enddef
 # Search and replace in files.
-# Risky calls external 'sed' and it won't ask for confirmation.
-
 def SearchReplacementHelper(search_user: string = ''): list<string>
   var return_val = []
   w:match_id = 0

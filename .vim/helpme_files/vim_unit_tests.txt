@@ -6,3 +6,12 @@ HOW TO RUN TEST WHEN CONTRIBUTING TO VIM
 3. Source the script with vim --clean and run :call <tab> and select your function
 4. Add some sleep X to be able to watch what happens during the test
 5. Run make clean and then make test_<your_tests>
+
+HOW TO RUN TEST OF MY PLUGINS
+-----------------------------
+1. Test names shall start with g:Test_...
+2. You can call your test function from within Vim with :call Test_...
+3. Use echom assert... so you can see if a test passed or not (0 passed, 1
+   failed)
+4. After a echom you may need a redraw command
+5. See markdown-extras for a good example.

@@ -26,7 +26,8 @@ if g:os == "Windows"
 elseif g:os == "Darwin"
      fontsize = 16
      fontsize_tail = ""
-     fontface = "FiraCode-Regular:h"
+     # fontface = "FiraCode-Regular:h"
+     fontface = "FiraCodeNFM-Reg:h"
 else
     fontsize = 14
      set guioptions-=T

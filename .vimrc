@@ -359,6 +359,9 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
+# Plug 'lambdalisue/vim-nerdfont'
+# Plug 'lambdalisue/vim-fern-renderer-nerdfont'
+# Plug 'lambdalisue/vim-glyph-palette'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
@@ -419,6 +422,12 @@ g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 # colorscheme everforest
 
+# vim-fern-nerdfonts-renderer
+# g:fern#renderer = "nerdfont"
+# augroup MY_GLIPH_PALETTE
+#   autocmd!
+#   autocmd FileType fern call glyph_palette#apply()
+# augroup END
 # vim-git-essentials
 nnoremap git <Cmd>GitMasterStatus<cr>
 
