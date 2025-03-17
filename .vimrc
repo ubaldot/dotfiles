@@ -454,17 +454,10 @@ g:poptools_config['fuzzy_search'] = false
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
-nnoremap <c-g> <cmd>PoptoolsGrepInBuffer<cr>
 # Copy in the selected text into t register ad leave it. Who cares about the t
 # register?
-xnoremap <c-g> "ty<cmd>exe $"PoptoolsGrepInBuffer {getreg('t')}"<cr>
-nnoremap <c-p>å <cmd>PoptoolsBuffers<cr>
-nnoremap <c-g><c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
 nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
-nnoremap <c-p>h <cmd>PoptoolsCmdHistory<cr>
-xnoremap <c-p>h <esc>PoptoolsCmdHistory<cr>
-nnoremap <c-p>d <cmd>PoptoolsFindDir<cr>
 nnoremap <c-p>o <cmd>PoptoolsRecentFiles<cr>
 
 def ShowRecentFiles()
@@ -652,6 +645,14 @@ command! CCTodo IndexOpen(TODO)
 
 command! CCTeam GetTeam()
 command! ClearAllMatches myfunctions.ClearAllMatches()
+
+def HideAll()
+  var saved_cur = getcurpos()
+  norm! ggVGg?
+  setpos('.', saved_cur)
+enddef
+
+nnoremap <c-g> <ScriptCmd>HideAll()<cr>
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
