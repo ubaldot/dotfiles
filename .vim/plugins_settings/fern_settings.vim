@@ -32,7 +32,7 @@ g:fern#renderer#default#collapsed_symbol = "+"
 g:fern#renderer#default#expanded_symbol = "-"
 
 # TODO: may remap <f1> somewhere
-noremap <silent> <space> :Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
+noremap <silent> <space> <cmd>Fern . -drawer -reveal=% -toggle -width=35<CR><C-w>=
 
 def FernInit()
     nmap <buffer><expr>
@@ -68,4 +68,5 @@ enddef
 augroup FernGroup
     autocmd!
     autocmd FileType fern call FernInit()
+    autocmd FileType fern nnoremap <buffer> O <cmd>execute "Open " .. expand('<cfile>:p')<CR>
 augroup END

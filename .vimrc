@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -630,7 +630,7 @@ const CC_DIARY = $'{CAB_CLIMATE_HOME}\diary.md'
 const TODO = $'{CAB_CLIMATE_HOME}\todo.md'
 const NUM_MEMBERS = 20
 
-def GetTeam()
+def GetTeamNames()
   vnew
   const team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', 22)
     ->map((idx, val) => matchstr(val, '-\s\zs.*\ze:'))
@@ -643,7 +643,8 @@ command! CCDiaryNewDay IndexNewDay(CC_DIARY)
 command! CCDiaryOpen IndexOpen(CC_DIARY)
 command! CCTodo IndexOpen(TODO)
 
-command! CCTeam GetTeam()
+command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
+command! CCTeamNames GetTeamNames()
 command! ClearAllMatches myfunctions.ClearAllMatches()
 
 def HideAll()
@@ -653,6 +654,49 @@ def HideAll()
 enddef
 
 nnoremap <c-g> <ScriptCmd>HideAll()<cr>
+
+def CleanupTodoList()
+  if expand('%:t') != "todo.md"
+    myfunctions.Echowarn("Filename is not 'todo.md' ")
+    return
+  endif
+
+  var todo_str = '# To do'
+  var done_str = '# Done'
+
+  var done = [done_str, '']
+  var not_done = [todo_str, '']
+  # var done = []
+  # var not_done = []
+  var done_cont = false
+  var line = ''
+
+  for line_nr in range(1, line('$'))
+    line = getline(line_nr)
+    if line !~ $'\v^\s*({done_str}|{todo_str})' && line !~ '^\s*$'
+      if line =~ '^-\s*\[\s*x\s*\]'
+        add(done, line)
+        done_cont = true
+      elseif line =~ '^-\s*\[\s*\]'
+        add(not_done, line)
+        done_cont = false
+      else
+        if done_cont
+          add(done, line)
+        else
+          add(not_done, line)
+        endif
+      endif
+    endif
+  endfor
+  deletebufline('%', 1, '$')
+  setline(1, not_done)
+  append(line('$'), '')
+  append(line('$'), done)
+enddef
+
+command! CCCleanupTodo CleanupTodoList()
+
 
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
