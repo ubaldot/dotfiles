@@ -650,12 +650,14 @@ enddef
 # In the following files you need to open and jump to the end
 command! CCDiaryNewDay IndexNewDay(CC_DIARY)
 command! CCDiaryOpen IndexOpen(CC_DIARY)
-command! CCTodo IndexOpen(TODO)
 
+command! CCTodo exe $"edit {CAB_CLIMATE_HOME}\\todo.md"
 command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
 command! CCGuidelines exe $"edit {CAB_CLIMATE_HOME}\\guidelines.md"
 command! CCTeamNames GetTeamNames()
 command! ClearAllMatches myfunctions.ClearAllMatches()
+
+&spellfile = $"{CAB_CLIMATE_HOME}\\CCspellfile.utf-8.add"
 
 def HideAll()
   var saved_cur = getcurpos()
