@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -601,8 +601,8 @@ if g:os == "Windows"
         \ 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
 endif
 
-# Activity log
 def IndexOpen(index_path: string)
+  # Opens and jump to the end. Finish.
   exe $'edit {index_path}'
   var refs_line = search('^\s*#\+\s\+References')
   if refs_line == 0
@@ -632,18 +632,23 @@ const NUM_MEMBERS = 20
 
 def GetTeamNames()
   vnew
-  const team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', 22)
+  # This is the line where the 'Contacts' section begins
+  const contacts_line = 26
+  const team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md',
+    '', 100)[contacts_line : ]
     ->map((idx, val) => matchstr(val, '-\s\zs.*\ze:'))
   setline(1, team_cleaned)
   setlocal buftype=nofile bufhidden=hide noswapfile
   set ft=markdown
 enddef
 
+# In the following files you need to open and jump to the end
 command! CCDiaryNewDay IndexNewDay(CC_DIARY)
 command! CCDiaryOpen IndexOpen(CC_DIARY)
 command! CCTodo IndexOpen(TODO)
 
 command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
+command! CCGuidelines exe $"edit {CAB_CLIMATE_HOME}\\guidelines.md"
 command! CCTeamNames GetTeamNames()
 command! ClearAllMatches myfunctions.ClearAllMatches()
 
