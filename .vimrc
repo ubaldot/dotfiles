@@ -584,8 +584,12 @@ command! GitCommitDot myfunctions.CommitDot()
 command! GitPushDot myfunctions.PushDot()
 # Merge and diff
 command! -nargs=? Diff myfunctions.Diff(<q-args>)
-nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
-nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
+nnoremap <expr> gl &diff
+      \ ? 'execute "diffget " .. getcompletion("LOCAL", "diff_buffer")[0]<CR>'
+      \ : 'gl'
+nnoremap <expr> gr &diff
+      \ ? 'execute "diffget " .. getcompletion("REMOTE", "diff_buffer")[0]<CR>'
+      \ : 'gr'
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
