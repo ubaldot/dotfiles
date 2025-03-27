@@ -80,8 +80,8 @@ highlight link LspDiagLine NONE
 
 nnoremap <silent> öd <Cmd>LspDiag prev<cr>
 nnoremap <silent> äd <Cmd>LspDiag next<cr>
-nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
-nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+# nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
+# nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
 nnoremap <silent> <leader>dd <Cmd>LspDiag show<cr>
 nnoremap <silent> <leader>d <Cmd>LspDiag current<cr>
 nnoremap <silent> <leader>i <Cmd>LspGotoImpl<cr>
