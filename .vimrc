@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -436,7 +436,8 @@ g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
 g:markdown_extras_config['pandoc_args'] =
-  [$'--css="{$HOME}/dotfiles/my_css_style.css"']
+  [$'--css="{$HOME}/dotfiles/my_css_style.css"',
+  $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"']
 
 # vim-poptools
 g:poptools_config = {}

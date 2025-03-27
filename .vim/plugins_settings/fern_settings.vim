@@ -63,6 +63,7 @@ def FernInit()
                 \   "<Plug>(fern-my-open-expand-collapse)",
                 \ )
     nmap <buffer> <CR> <Plug>(fern-cr-mapping)
+    nmap <buffer> O <Plug>(fern-action-ex=)Open<CR>
 enddef
 
 augroup FernGroup
