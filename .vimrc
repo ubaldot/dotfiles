@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -700,9 +700,11 @@ command! CCCleanupTodo CleanupTodoList()
 # Must be a list
 g:op_surround_maps = [{map: "((", open_delim: "(", close_delim: ")"},
   {map: "[[", open_delim: "[", close_delim: "]"},
-  {map: "{{", open_delim: "{", close_delim: "}"}
+  {map: "{{", open_delim: "{", close_delim: "}"},
+  {map: '<leader>"', open_delim: '"', close_delim: '"'},
+  {map: "<leader>'", open_delim: "''", close_delim: "''"}
 ]
 b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
 # vip = visual inside paragraph
-# This is used for preparing a text file for the caption to be sent to
+# This is '"used"' for preparing a text file for the caption to be sent to
 # YouTube.
