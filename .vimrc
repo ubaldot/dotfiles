@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -171,20 +171,6 @@ def ToggleCmdWindow()
 enddef
 
 nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
-
-# Otherwise I cannot paste in registers
-xnoremap <leader>" <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('"', '"', {'"': '"'}, {'"': '"'})<cr>
-xnoremap <leader>' <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle("'", "'", {"'": "'"}, {"'": "'"})<cr>
-xnoremap <leader>( <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('(', ')', {'(': '('}, {')': ')'})<cr>
-xnoremap <leader>[ <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('[', ']', {'[': '['}, {']': ']'})<cr>
-xnoremap <leader>{ <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('{', '}', {'{': '{'}, {'}': '}'})<cr>
-xnoremap <leader>< <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('<', '>', {'<': '<'}, {'>': '>'})<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
@@ -373,7 +359,7 @@ Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-git-master'
 # Plug 'ubaldot/vim-conda-activate'
 Plug 'girishji/easyjump.vim'
-Plug 'tpope/vim-surround'
+Plug 'ubaldot/vim-op-surround'
 if g:dev_setup
   Plug 'ubaldot/vim-latex-tools', {'for': 'latex'}
   Plug 'yegappan/lsp'
@@ -657,7 +643,9 @@ command! CCGuidelines exe $"edit {CAB_CLIMATE_HOME}\\guidelines.md"
 command! CCTeamNames GetTeamNames()
 command! ClearAllMatches myfunctions.ClearAllMatches()
 
-&spellfile = $"{CAB_CLIMATE_HOME}\\CCspellfile.utf-8.add"
+if g:os == 'Windows'
+  &spellfile = $"{CAB_CLIMATE_HOME}\\CCspellfile.utf-8.add"
+endif
 
 def HideAll()
   var saved_cur = getcurpos()
@@ -709,7 +697,12 @@ enddef
 
 command! CCCleanupTodo CleanupTodoList()
 
-
+# Must be a list
+g:op_surround_maps = [{map: "((", open_delim: "(", close_delim: ")"},
+  {map: "[[", open_delim: "[", close_delim: "]"},
+  {map: "{{", open_delim: "{", close_delim: "}"}
+]
+b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
 # vip = visual inside paragraph
 # This is used for preparing a text file for the caption to be sent to
 # YouTube.
