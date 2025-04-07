@@ -1,6 +1,7 @@
 vim9script
 
-inoremap ä `
+# This is very ugly: you add a - [ ] by pasting the content of register 'o'
+setreg("o", "- [ ] ")
 
 def OpenNewLine(): string
   const a = getline('.')

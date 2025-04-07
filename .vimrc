@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -595,7 +595,9 @@ endif
 def IndexOpen(index_path: string)
   # Opens and jump to the end. Finish.
   exe $'edit {index_path}'
-  var refs_line = search('^\s*#\+\s\+References')
+  const references_string =
+    "<!-- DO NOT REMOVE vim-markdown-extras references DO NOT REMOVE-->"
+  var refs_line = search(references_string)
   if refs_line == 0
     norm! G
   else
