@@ -12,4 +12,7 @@ def OpenNewLine(): string
   endif
 enddef
 
+setlocal completeopt=menu,menuone,noselect
+setlocal omnifunc=MDEOmniFunc
+inoremap <buffer> [ [<C-x><C-o>
 nnoremap <buffer> <expr> o OpenNewLine()

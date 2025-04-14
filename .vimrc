@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -700,6 +700,7 @@ enddef
 command! CCCleanupTodo CleanupTodoList()
 
 # Must be a list
+g:markdown_extras_config['large_files_threshold'] = 0
 g:op_surround_maps = [{map: "((", open_delim: "(", close_delim: ")"},
   {map: "[[", open_delim: "[", close_delim: "]"},
   {map: "{{", open_delim: "{", close_delim: "}"},
