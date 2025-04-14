@@ -12,9 +12,8 @@ def OpenNewLine(): string
   endif
 enddef
 
+import autoload "mde_funcs.vim"
 setlocal completeopt=menu,menuone,noselect
-
-import autoload "ftplugin/markdown_extras.vim"
-setlocal omnifunc=markdown_extras.MDEOmniFunc
+setlocal omnifunc=mde_funcs.MDEOmniFunc
 inoremap <buffer> [ [<C-x><C-o>
 nnoremap <buffer> <expr> o OpenNewLine()

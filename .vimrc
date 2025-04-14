@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -351,6 +351,7 @@ Plug 'lambdalisue/fern-git-status.vim'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
+# Plug 'ubaldot/vim-markdown-extras'
 Plug 'ubaldot/vim-markdown-extras', {'for': 'markdown'}
 # For removing expanded links in markdown. Check the help
 Plug 'qadzek/link.vim', {'for': 'markdown'}
