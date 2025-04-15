@@ -6,8 +6,8 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
+auto_update_dotfiles = true
+auto_update_notes = true
 
 if !exists('g:dev_setup')
   g:dev_setup = true
@@ -433,6 +433,7 @@ g:poptools_config['preview_buffers'] = true
 g:poptools_config['preview_grep'] = true
 g:poptools_config['preview_vimgrep'] = true
 g:poptools_config['fuzzy_search'] = false
+# g:poptools_config["preview_syntax"] = false
 # g:poptools_config['grep_cmd_win'] = 'powershell -NoProfile -ExecutionPolicy '
 # .. 'Bypass -Command "cd {search_dir};findstr /C:{shellescape(what)} '
 # .. '/N /S {items}"'
@@ -610,13 +611,17 @@ command! LLogNewDay IndexNewDay(work_log_path)
 command! LLogOpen IndexOpen(work_log_path)
 command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
 
+# CC stuff
 
 def IndexNewDay(index_path: string)
-  IndexOpen(index_path)
-  # You end up in the first non-blank line
+  # Open index_path and stick a date on top
+  exe $'edit {index_path}'
+  cursor(1, 1)
   var day_string = strftime("# %b %d %y")
-  append(line('.'), ['', day_string])
-  search(day_string, 'b')
+  var today_line = search($'^{day_string}', 'c')
+  if today_line == 0
+    append(0, ['', day_string])
+  endif
 enddef
 
 const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
@@ -637,12 +642,25 @@ def GetTeamNames()
 enddef
 
 # In the following files you need to open and jump to the end
-command! CCDiaryNewDay IndexNewDay(CC_DIARY)
-command! CCDiaryOpen IndexOpen(CC_DIARY)
+command! CCDiary IndexNewDay(CC_DIARY)
 
+def CreateIndex(index_file: string)
+  # TODO: finish when you have time
+  vsplit
+  const winid = win_getid(winnr('$'))
+  win_gotoid(winid)
+  wincmd H
+  # echom winid
+  exe $"edit {index_file}"
+  # const width = &columns / 3
+  # const width = 30
+  # win_execute(winid, $'vertical resize {width}')
+enddef
+
+# command! CCIndex exe $"edit {CAB_CLIMATE_HOME}\\index.md"
+command! CCIndex CreateIndex($"{CAB_CLIMATE_HOME}\\index.md")
 command! CCTodo exe $"edit {CAB_CLIMATE_HOME}\\todo.md"
-command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
-command! CCGuidelines exe $"edit {CAB_CLIMATE_HOME}\\guidelines.md"
+# command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
 command! CCTeamNames GetTeamNames()
 command! ClearAllMatches myfunctions.ClearAllMatches()
 
@@ -701,14 +719,20 @@ enddef
 command! CCCleanupTodo CleanupTodoList()
 
 # Must be a list
+<<<<<<< HEAD
 g:markdown_extras_config['large_files_threshold'] = 0
 g:op_surround_maps = [{map: "((", open_delim: "(", close_delim: ")"},
   {map: "[[", open_delim: "[", close_delim: "]"},
   {map: "{{", open_delim: "{", close_delim: "}"},
+=======
+g:op_surround_maps = [{map: "<leader>(", open_delim: "(", close_delim: ")"},
+  {map: "<leader>[", open_delim: "[", close_delim: "]"},
+  {map: "<leader>{", open_delim: "{", close_delim: "}"},
+>>>>>>> 972d02a (Auto pushing C:\Users\yt75534/dotfiles...)
   {map: '<leader>"', open_delim: '"', close_delim: '"'},
   {map: "<leader>'", open_delim: "''", close_delim: "''"}
 ]
-b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
+# b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
 # vip = visual inside paragraph
 # This is '"used"' for preparing a text file for the caption to be sent to
 # YouTube.
