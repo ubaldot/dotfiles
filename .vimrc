@@ -719,16 +719,10 @@ enddef
 command! CCCleanupTodo CleanupTodoList()
 
 # Must be a list
-<<<<<<< HEAD
 g:markdown_extras_config['large_files_threshold'] = 0
 g:op_surround_maps = [{map: "((", open_delim: "(", close_delim: ")"},
   {map: "[[", open_delim: "[", close_delim: "]"},
   {map: "{{", open_delim: "{", close_delim: "}"},
-=======
-g:op_surround_maps = [{map: "<leader>(", open_delim: "(", close_delim: ")"},
-  {map: "<leader>[", open_delim: "[", close_delim: "]"},
-  {map: "<leader>{", open_delim: "{", close_delim: "}"},
->>>>>>> 972d02a (Auto pushing C:\Users\yt75534/dotfiles...)
   {map: '<leader>"', open_delim: '"', close_delim: '"'},
   {map: "<leader>'", open_delim: "''", close_delim: "''"}
 ]
