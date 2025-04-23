@@ -660,7 +660,7 @@ enddef
 # command! CCIndex exe $"edit {CAB_CLIMATE_HOME}\\index.md"
 command! CCIndex CreateIndex($"{CAB_CLIMATE_HOME}\\index.md")
 command! CCTodo exe $"edit {CAB_CLIMATE_HOME}\\todo.md"
-# command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
+command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
 command! CCTeamNames GetTeamNames()
 command! ClearAllMatches myfunctions.ClearAllMatches()
 
@@ -717,6 +717,20 @@ def CleanupTodoList()
 enddef
 
 command! CCCleanupTodo CleanupTodoList()
+
+def CountPeople()
+  const startline = 6
+  const endline = 32
+  const num_consultants = getline(6, 32)->filter('v:val =~ "^\\d"')
+    ->filter('v:val =~ "Consultant"')->len()
+  const num_non_consultants = getline(6, 32)->filter('v:val =~ "^\\d"')
+    ->filter('v:val !~ "Consultant"')->len()
+  echo $"lines: [{startline},{endline}], num_consultants: {num_consultants}, "
+         .. $"num_employees: {num_non_consultants}"
+enddef
+
+command! CCCountPeople CountPeople()
+
 
 # Must be a list
 g:markdown_extras_config['large_files_threshold'] = 0
