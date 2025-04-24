@@ -617,7 +617,7 @@ def IndexNewDay(index_path: string)
   # Open index_path and stick a date on top
   exe $'edit {index_path}'
   cursor(1, 1)
-  var day_string = strftime("# %b %d %y")
+  var day_string = strftime("# %Y %B %d")
   var today_line = search($'^{day_string}', 'c')
   if today_line == 0
     append(0, ['', day_string])
