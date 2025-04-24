@@ -636,10 +636,17 @@ def GetTeamNames()
 
   var team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', max_lines)
 
-  team_cleaned
-    ->map((idx, val) => matchstr(val, '\d\+\.\s[\zs.\{-}\ze\]'))
+  team_cleaned->map((idx, val) => matchstr(val, '\d\+\.\s[\zs.\{-}\ze\]'))
     ->filter('!empty(v:val)')
-  setline(1, team_cleaned)
+  const non_consultants = copy(team_cleaned)->filter('v:val !~ "Consultant"')
+  const consultants = copy(team_cleaned)->filter('v:val =~ "Consultant"')
+  setline(1, non_consultants)
+  append(line('$'), '')
+  append(line('$'), consultants)
+  append(line('$'), '')
+  append(line('$'), $'non_consultants: {len(non_consultants)}')
+  append(line('$'), $'consultants: {len(consultants)}')
+
   setlocal buftype=nofile bufhidden=hide noswapfile
   set ft=markdown
 enddef
@@ -730,9 +737,9 @@ def CountPeople()
     ->filter('!empty(v:val)')
 
 
-  const num_consultants = team->filter('v:val =~ "Consultant"')->len()
-  const num_non_consultants = team->filter('v:val !~ "Consultant"')->len()
-  echo $"lines: [{startline},{endline}], num_consultants: {num_consultants}, "
+  const num_consultants = copy(team)->filter('v:val =~ "Consultant"')->len()
+  const num_non_consultants = copy(team)->filter('v:val !~ "Consultant"')->len()
+  echo $"num_consultants: {num_consultants}, "
          .. $"num_employees: {num_non_consultants}"
 enddef
 
