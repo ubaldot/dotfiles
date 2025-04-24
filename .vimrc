@@ -632,10 +632,13 @@ const NUM_MEMBERS = 20
 def GetTeamNames()
   vnew
   # This is the line where the 'Contacts' section begins
-  const contacts_line = 26
-  const team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md',
-    '', 100)[contacts_line : ]
-    ->map((idx, val) => matchstr(val, '-\s\zs.*\ze:'))
+  const max_lines = 100
+
+  var team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', max_lines)
+
+  team_cleaned
+    ->map((idx, val) => matchstr(val, '\d\+\.\s[\zs.\{-}\ze\]'))
+    ->filter('!empty(v:val)')
   setline(1, team_cleaned)
   setlocal buftype=nofile bufhidden=hide noswapfile
   set ft=markdown
@@ -719,12 +722,16 @@ enddef
 command! CCCleanupTodo CleanupTodoList()
 
 def CountPeople()
-  const startline = 6
-  const endline = 32
-  const num_consultants = getline(6, 32)->filter('v:val =~ "^\\d"')
-    ->filter('v:val =~ "Consultant"')->len()
-  const num_non_consultants = getline(6, 32)->filter('v:val =~ "^\\d"')
-    ->filter('v:val !~ "Consultant"')->len()
+  # This is the line where the 'Contacts' section begins
+  const max_lines = 100
+
+  var team = readfile($'{CAB_CLIMATE_HOME}\team.md', '', max_lines)
+    ->map((idx, val) => matchstr(val, '\d\+\.\s[\zs.\{-}\ze\]'))
+    ->filter('!empty(v:val)')
+
+
+  const num_consultants = team->filter('v:val =~ "Consultant"')->len()
+  const num_non_consultants = team->filter('v:val !~ "Consultant"')->len()
   echo $"lines: [{startline},{endline}], num_consultants: {num_consultants}, "
          .. $"num_employees: {num_non_consultants}"
 enddef
