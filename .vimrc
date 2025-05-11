@@ -556,6 +556,18 @@ xnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
 # Outline. <F8> is overriden by vimspector
 nnoremap <silent> <F8> <Plug>OutlineToggle
 
+# Must be a list
+g:markdown_extras_config['large_files_threshold'] = 0
+g:op_surround_maps = [{map: "<leader>(", open_delim: "(", close_delim: ")"},
+  {map: "<leader>[", open_delim: "[", close_delim: "]"},
+  {map: "<leader>{", open_delim: "{", close_delim: "}"},
+  {map: '<leader>"', open_delim: '"', close_delim: '"'},
+  {map: "<leader>'", open_delim: "''", close_delim: "''"}
+]
+# b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
+# vip = visual inside paragraph
+# This is '"used"' for preparing a text file for the caption to be sent to
+# YouTube.
 
 # Bunch of commands
 # -----------------------
@@ -627,16 +639,14 @@ enddef
 const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
 const CC_DIARY = $'{CAB_CLIMATE_HOME}\diary.md'
 const TODO = $'{CAB_CLIMATE_HOME}\todo.md'
-const NUM_MEMBERS = 20
 
 def GetTeamNames()
   vnew
-  # This is the line where the 'Contacts' section begins
   const max_lines = 100
-
   var team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', max_lines)
 
-  team_cleaned->map((idx, val) => matchstr(val, '\d\+\.\s[\zs.\{-}\ze\]'))
+  # Get names bases on format '<number>. [<name>]', e.g. '12. [John Smith]'
+  team_cleaned->map((idx, val) => matchstr(val, '\d\+\.\s*[\zs.\{-}\ze\]'))
     ->filter('!empty(v:val)')
   const non_consultants = copy(team_cleaned)->filter('v:val !~ "Consultant"')
   const consultants = copy(team_cleaned)->filter('v:val =~ "Consultant"')
@@ -655,7 +665,6 @@ enddef
 command! CCDiary IndexNewDay(CC_DIARY)
 
 def CreateIndex(index_file: string)
-  # TODO: finish when you have time
   vsplit
   const winid = win_getid(winnr('$'))
   win_gotoid(winid)
@@ -663,16 +672,13 @@ def CreateIndex(index_file: string)
   # echom winid
   exe $"edit {index_file}"
   # const width = &columns / 3
-  # const width = 30
-  # win_execute(winid, $'vertical resize {width}')
+  const width = 30
+  win_execute(winid, 'setlocal nobuflisted buftype=nofile noswapfile winfixbuf')
+  win_execute(winid, $'vertical resize {width}')
+  win_execute(winid, 'nmap <buffer> <cr> <s-cr>')
+  win_execute(winid, 'nnoremap <buffer> <esc> <cmd>close<cr>')
+  win_execute(winid, 'nmap <buffer> <tab> <c-w>l<tab>')
 enddef
-
-# command! CCIndex exe $"edit {CAB_CLIMATE_HOME}\\index.md"
-command! CCIndex CreateIndex($"{CAB_CLIMATE_HOME}\\index.md")
-command! CCTodo exe $"edit {CAB_CLIMATE_HOME}\\todo.md"
-command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
-command! CCTeamNames GetTeamNames()
-command! ClearAllMatches myfunctions.ClearAllMatches()
 
 if g:os == 'Windows'
   &spellfile = $"{CAB_CLIMATE_HOME}\\CCspellfile.utf-8.add"
@@ -684,7 +690,6 @@ def HideAll()
   setpos('.', saved_cur)
 enddef
 
-nnoremap <c-g> <ScriptCmd>HideAll()<cr>
 
 def CleanupTodoList()
   if expand('%:t') != "todo.md"
@@ -726,8 +731,6 @@ def CleanupTodoList()
   append(line('$'), done)
 enddef
 
-command! CCCleanupTodo CleanupTodoList()
-
 def CountPeople()
   # This is the line where the 'Contacts' section begins
   const max_lines = 100
@@ -743,18 +746,37 @@ def CountPeople()
          .. $"num_employees: {num_non_consultants}"
 enddef
 
+def WeekSummary()
+  # Check the last chars in each line and verify that they are in the format
+  # w\d\+, e.g. 'w32'
+  const current_week = str2nr(strftime("%U"))
+  const deadlines = readfile($'{CAB_CLIMATE_HOME}\\deadlines.md')
+  ->filter('v:val =~ "w\\d\\+$"')
+  ->filter((_, x) => str2nr(matchstr(x, "\\d\\+$")) <= current_week + 4)
+  new
+  setlocal buftype=nofile noswapfile
+  set ft=markdown
+  exe $"cd {CAB_CLIMATE_HOME}"
+  setline(1, '*Incoming deadlines:*')
+  setline(2, deadlines)
+  myfunctions.Echowarn($'Current week: {strftime("%U")}')
+enddef
+
+command! CCWeek myfunctions.Echowarn($'Current week: {strftime("%U")}')
 command! CCCountPeople CountPeople()
+command! CCTodoCleanup CleanupTodoList()
+command! CCIndex CreateIndex($"{CAB_CLIMATE_HOME}\\index.md")
+command! CCTodo exe $"edit {CAB_CLIMATE_HOME}\\todo.md"
+command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
+command! CCDeadlines exe $"edit {CAB_CLIMATE_HOME}\\deadlines.md"
+command! CCTeamNames GetTeamNames()
+# To remove highlighting based on 'matchadd()'
+# command! ClearAllMatches myfunctions.ClearAllMatches()
 
+nnoremap <leader>a <Cmd>CCIndex<cr>l
+nnoremap <c-g> <ScriptCmd>HideAll()<cr>
 
-# Must be a list
-g:markdown_extras_config['large_files_threshold'] = 0
-g:op_surround_maps = [{map: "((", open_delim: "(", close_delim: ")"},
-  {map: "[[", open_delim: "[", close_delim: "]"},
-  {map: "{{", open_delim: "{", close_delim: "}"},
-  {map: '<leader>"', open_delim: '"', close_delim: '"'},
-  {map: "<leader>'", open_delim: "''", close_delim: "''"}
-]
-# b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
-# vip = visual inside paragraph
-# This is '"used"' for preparing a text file for the caption to be sent to
-# YouTube.
+augroup CC
+  autocmd!
+  autocmd VimEnter * WeekSummary()
+augroup END
