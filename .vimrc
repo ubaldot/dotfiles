@@ -10,7 +10,7 @@ var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 # auto_update_notes = true
 
 if !exists('g:dev_setup')
-  g:dev_setup = true
+  g:dev_setup = false
 endif
 
 # OS detection
@@ -625,6 +625,7 @@ command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
 
 # CC stuff
 
+const current_week = str2nr(strftime("%W")) + 1
 def IndexNewDay(index_path: string)
   # Open index_path and stick a date on top
   exe $'edit {index_path}'
@@ -677,7 +678,9 @@ def CreateIndex(index_file: string)
   win_execute(winid, $'vertical resize {width}')
   win_execute(winid, 'nmap <buffer> <cr> <s-cr>')
   win_execute(winid, 'nnoremap <buffer> <esc> <cmd>close<cr>')
-  win_execute(winid, 'nmap <buffer> <tab> <c-w>l<tab>')
+  # TODO tab calls tab in the last window
+  # win_execute(winid, 'nmap <buffer> <tab> <c-w>l<tab>')
+  # win_execute(winid, 'unmap <buffer> <tab>')
 enddef
 
 if g:os == 'Windows'
@@ -749,34 +752,72 @@ enddef
 def WeekSummary()
   # Check the last chars in each line and verify that they are in the format
   # w\d\+, e.g. 'w32'
-  const current_week = str2nr(strftime("%U"))
+  const time_horizon = 4 # In weeks
   const deadlines = readfile($'{CAB_CLIMATE_HOME}\\deadlines.md')
-  ->filter('v:val =~ "w\\d\\+$"')
-  ->filter((_, x) => str2nr(matchstr(x, "\\d\\+$")) <= current_week + 4)
+  const passed_deadlines = copy(deadlines)
+    ->filter('v:val =~ "w\\d\\+"')
+    ->filter((_, x) => str2nr(matchstr(x, "\\d\\+$")) < current_week)
+  const incoming_deadlines = copy(deadlines)
+    ->filter('v:val =~ "w\\d\\+"')
+    ->filter((_, x) => str2nr(matchstr(x, "\\d\\+$")) >= current_week &&
+    str2nr(matchstr(x, "\\d\\+")) <= current_week + time_horizon)
+
   new
   setlocal buftype=nofile noswapfile
   set ft=markdown
   exe $"cd {CAB_CLIMATE_HOME}"
   setline(1, '*Incoming deadlines:*')
-  setline(2, deadlines)
-  myfunctions.Echowarn($'Current week: {strftime("%U")}')
+  setline(2, incoming_deadlines)
+  append(len(incoming_deadlines) + 1, ['', '*Passed deadlines:*'])
+  append(len(incoming_deadlines) + 3, passed_deadlines)
+  myfunctions.Echowarn($'Current week: {current_week}')
 enddef
 
-command! CCWeek myfunctions.Echowarn($'Current week: {strftime("%U")}')
+def CCIndex()
+  const index_winnr = bufwinnr($"{CAB_CLIMATE_HOME}\\index.md")
+  if index_winnr == -1
+    CreateIndex($"{CAB_CLIMATE_HOME}\\index.md")
+    norm! l
+  else
+    if winnr('$') != 1
+      exe $'close {index_winnr}'
+    else
+      vsplit
+      exe "bnext"
+      const width = 30
+      win_execute(win_getid(index_winnr), $'vertical resize {width}')
+    endif
+  endif
+enddef
+
+def CCDate()
+  const date = "# " .. strftime("%Y %b %d %X")
+  if getline('.') =~ '^$'
+    setline(line('.'), date)
+  else
+    append(line('.'), date)
+  endif
+enddef
+
+command! CCDate CCDate()
+command! CCWeek myfunctions.Echowarn($'Current week: {current_week}')
 command! CCCountPeople CountPeople()
 command! CCTodoCleanup CleanupTodoList()
-command! CCIndex CreateIndex($"{CAB_CLIMATE_HOME}\\index.md")
+command! CCIndex CCIndex()
 command! CCTodo exe $"edit {CAB_CLIMATE_HOME}\\todo.md"
 command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
 command! CCDeadlines exe $"edit {CAB_CLIMATE_HOME}\\deadlines.md"
 command! CCTeamNames GetTeamNames()
+command! CCWeekSummary WeekSummary()
 # To remove highlighting based on 'matchadd()'
 # command! ClearAllMatches myfunctions.ClearAllMatches()
 
-nnoremap <leader>a <Cmd>CCIndex<cr>l
+nnoremap <leader>a <ScriptCmd>CCIndex()<cr>
 nnoremap <c-g> <ScriptCmd>HideAll()<cr>
+
 
 augroup CC
   autocmd!
-  autocmd VimEnter * WeekSummary()
+  # autocmd VimEnter * WeekSummary()
+  autocmd VimEnter * myfunctions.Echowarn($'Current week: {current_week}')
 augroup END

@@ -147,10 +147,37 @@ and add a new line under [remote "origin"]:
 
 # conda
 
+### SSL
+Your `.condarc` shall look like the following:
+
+```
+  custom_multichannels:
+  conda-forge:
+  - https://prefix.dev/conda-forge
+  channels:
+  - conda-forge
+  channel_priority: strict
+  ssl_verify: C:\Users\yt75534/.certificates/combined.pem
+```
+
+Then, you generally have to combine the company certificate with the
+`cacert.pem`. They are usually located in `~/.certifcates`.
+Then, run:
+
+```
+  Get-Content ~/.certificates/cacert.pem, ~/.certificates/mycompany-ca.crt |
+  Set-Content ~/.certificates/combined.pem
+  conda config --set ssl_verify "$HOME/.certificates/combined.pem"
+```
+and double check with the following:
+```
+  conda config --show ssl_verify
+```
+
+### Old
 First thing to do is config (.condarc). custom_multichannels: conda-forge: -
 https://prefix.dev/conda-forge channels: - conda-forge channel_priority:
 strict
-
 SSL: Then, you have to set the following environment variable:
 
     export REQUESTS\_CA\_BUNDLE=/etc/ssl/certs/your\_certificate.pem
