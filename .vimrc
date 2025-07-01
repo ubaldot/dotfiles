@@ -8,7 +8,7 @@ var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
 # auto_update_dotfiles = true
 # auto_update_notes = true
-
+g:dev_setup = true
 if !exists('g:dev_setup')
   g:dev_setup = false
 endif
@@ -369,7 +369,8 @@ if g:dev_setup
   Plug 'ubaldot/vim-microdebugger', {'for': ['c', 'cpp']}
   Plug 'ubaldot/vim-extended-view'
   # Plug 'puremourning/vimspector'
-  Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
+  # Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
+  Plug 'ubaldot/vimspector'
 endif
 plug#end()
 filetype plugin on
