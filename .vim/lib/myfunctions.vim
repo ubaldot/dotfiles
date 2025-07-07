@@ -252,7 +252,8 @@ export def FormatWithoutMoving(a: number = 0, b: number = 0)
 
   var view = winsaveview()
   if a == 0 && b == 0
-    silent exe $":norm! gggqG"
+    normal! gggqG
+    echom "NOT WORKING!!!"
   else
     var interval = b - a + 1
     silent exe $":norm! {a}gg{interval}gqq"

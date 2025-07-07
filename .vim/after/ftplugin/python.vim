@@ -11,7 +11,7 @@ endif
 
 if executable('ruff')
   &l:formatprg = $"ruff format --line-length {&l:textwidth}
-        \ --stdin-filename {shellescape(expand("%"))} --quiet"
+        \ --stdin-filename {shellescape(expand("%"))} --silent"
 
   # Autocmd to format with ruff
   augroup PYTHON_FORMAT_ON_SAVE
@@ -33,8 +33,8 @@ def Ruff(textwidth: number)
     # --quiet.
     var win_view = winsaveview()
     if executable('ruff') && &filetype == 'python'
-      silent exe $":%!$ruff format --line-length {&l:textwidth}
-        \ --stdin-filename {shellescape(expand("%"))} --quiet"
+       exe $":%!$ruff format --line-length {&l:textwidth}
+        \ --stdin-filename {shellescape(expand("%"))} --silent"
     else
         echom "'ruff' not installed!"
     endif

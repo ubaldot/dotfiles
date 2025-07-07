@@ -107,7 +107,9 @@ augroup END
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
-# set langmap=ö[,ä]
+# langmap does not work with multi-byte chars,
+# see https://github.com/vim/vim/issues/3018
+set langmap=ö[,ä]
 set belloff=all
 set colorcolumn=80
 set clipboard^=unnamed,unnamedplus
@@ -174,8 +176,8 @@ nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
-# nmap <c-ö> <c-[>
-# nmap <c-ä> <c-]>
+nmap ö [
+nmap ä ]
 # Avoid polluting registers
 nnoremap x "_x
 
