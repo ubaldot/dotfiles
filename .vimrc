@@ -60,7 +60,6 @@ endif
 if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
-	g:dotvim = $HOME .. "\\.vim"
 	g:dotvim = $HOME .. "\\vimfiles"
   exe $"set runtimepath+={g:dotvim}"
 else
@@ -72,7 +71,7 @@ else
 	  if g:os == 'Linux' || g:os == 'WSL'
 	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
 	  else
-	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
+	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.10.dylib'
 	  endif
 #else
 #	&pythonthreehome =  '/usr/bin'
@@ -172,7 +171,7 @@ def ToggleCmdWindow()
   endif
 enddef
 
-nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
+# nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
@@ -388,7 +387,6 @@ nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 # termdebug
 g:termdebug_config = {}
 packadd! termdebug
-# source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
@@ -425,9 +423,12 @@ nnoremap git <Cmd>GitMasterStatus<cr>
 g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
+g:markdown_extras_config['format_on_save'] = true
 g:markdown_extras_config['pandoc_args'] =
   [$'--css="{$HOME}/dotfiles/my_css_style.css"',
   $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"']
+# g:markdown_extras_indices = ['testfile.md', 'testfile_1.md', 'testfile_2.md']
+g:markdown_extras_indices = {foo: 'testfile.md', bar: 'testfile_1.md', zoo: 'testfile_2.md'}
 
 # vim-poptools
 g:poptools_config = {}
