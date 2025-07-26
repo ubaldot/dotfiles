@@ -15,7 +15,7 @@ enddef
 import autoload "mde_funcs.vim"
 setlocal completeopt=menu,menuone,noselect
 setlocal omnifunc=mde_funcs.OmniFunc
-inoremap <buffer> [ [<C-x><C-o>
+inoremap <buffer> ][ ][<C-x><C-o>
 nnoremap <buffer> <expr> o OpenNewLine()
 
 def MarkdownStrikeLine()

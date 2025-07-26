@@ -8,7 +8,7 @@ var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
 # auto_update_dotfiles = true
 # auto_update_notes = true
-
+g:dev_setup = true
 if !exists('g:dev_setup')
   g:dev_setup = false
 endif
@@ -60,7 +60,6 @@ endif
 if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
-	g:dotvim = $HOME .. "\\.vim"
 	g:dotvim = $HOME .. "\\vimfiles"
   exe $"set runtimepath+={g:dotvim}"
 else
@@ -72,7 +71,7 @@ else
 	  if g:os == 'Linux' || g:os == 'WSL'
 	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
 	  else
-	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
+	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
 	  endif
 #else
 #	&pythonthreehome =  '/usr/bin'
@@ -107,7 +106,9 @@ augroup END
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
-# set langmap=ö[,ä]
+# langmap does not work with multi-byte chars,
+# see https://github.com/vim/vim/issues/3018
+set langmap=ö[,ä]
 set belloff=all
 set colorcolumn=80
 set clipboard^=unnamed,unnamedplus
@@ -170,12 +171,12 @@ def ToggleCmdWindow()
   endif
 enddef
 
-nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
+# nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
-# nmap <c-ö> <c-[>
-# nmap <c-ä> <c-]>
+nmap ö [
+nmap ä ]
 # Avoid polluting registers
 nnoremap x "_x
 
@@ -345,16 +346,13 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
-# Plug 'lambdalisue/vim-nerdfont'
-# Plug 'lambdalisue/vim-fern-renderer-nerdfont'
-# Plug 'lambdalisue/vim-glyph-palette'
+Plug 'junegunn/vim-easy-align'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
-# Plug 'ubaldot/vim-markdown-extras'
 Plug 'ubaldot/vim-markdown-extras', {'for': 'markdown'}
+# Plug 'ubaldot/vim-markdown-extras'
 # For removing expanded links in markdown. Check the help
-Plug 'qadzek/link.vim', {'for': 'markdown'}
 Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-git-master'
@@ -369,7 +367,8 @@ if g:dev_setup
   Plug 'ubaldot/vim-microdebugger', {'for': ['c', 'cpp']}
   Plug 'ubaldot/vim-extended-view'
   # Plug 'puremourning/vimspector'
-  Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
+  # Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
+  Plug 'ubaldot/vimspector'
 endif
 plug#end()
 filetype plugin on
@@ -385,7 +384,6 @@ nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 # termdebug
 g:termdebug_config = {}
 packadd! termdebug
-# source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
@@ -418,13 +416,26 @@ g:everforest_background = 'medium'
 # vim-git-essentials
 nnoremap git <Cmd>GitMasterStatus<cr>
 
+# Easy-align
+# Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)*\|
+# Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)*\|
+
+inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>myfunctions.Align()<CR>a
+command! -nargs=0 EasyDelimiter myfunctions.InsertRowDelimiter()
+
 # vim-markdown-extras
 g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
+# g:markdown_extras_config['use_pandoc'] = false
+g:markdown_extras_config['format_on_save'] = true
 g:markdown_extras_config['pandoc_args'] =
   [$'--css="{$HOME}/dotfiles/my_css_style.css"',
   $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"']
+# g:markdown_extras_indices = ['testfile.md', 'testfile_1.md', 'testfile_2.md']
+g:markdown_extras_indices = {foo: 'testfile.md', bar: 'testfile_1.md', zoo: 'testfile_2.md'}
 
 # vim-poptools
 g:poptools_config = {}
@@ -545,8 +556,8 @@ command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
 # ----------------------------------
 g:replica_console_position = "J"
 g:replica_display_range  = false
-g:replica_console_height = &lines / 4
-g:replica_console_height = 20
+# g:replica_console_height = 8
+g:replica_console_height = max([&lines / 6, 4])
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
 nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j

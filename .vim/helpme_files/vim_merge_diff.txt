@@ -1,7 +1,7 @@
 IN SHORT
 
-äc                      jump to next difference (ä is mapped to ])
-öc                      jump to previous difference (ö is mapped to [)
+:norm! ]c               jump to next difference
+:norm! [c               jump to previous difference
 
 gr                      :diffget REMOTE
 gl                      :diffget LOCAL
