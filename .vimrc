@@ -655,7 +655,7 @@ def GetTeamNames()
   append(line('$'), '')
   append(line('$'), consultants)
   append(line('$'), '')
-  append(line('$'), $'non_consultants: {len(non_consultants)}')
+  append(line('$'), $'non_consultants: {len(non_consultants) + 1}')
   append(line('$'), $'consultants: {len(consultants)}')
 
   setlocal buftype=nofile bufhidden=hide noswapfile
