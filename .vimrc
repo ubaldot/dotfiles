@@ -346,6 +346,8 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
+# Plug 'goodlygeek/tabular'
+Plug 'git@github.com:godlygeek/tabular.git'
 # Plug 'lambdalisue/vim-nerdfont'
 # Plug 'lambdalisue/vim-fern-renderer-nerdfont'
 # Plug 'lambdalisue/vim-glyph-palette'
@@ -418,6 +420,9 @@ g:everforest_background = 'medium'
 # augroup END
 # vim-git-essentials
 nnoremap git <Cmd>GitMasterStatus<cr>
+
+# Tabular
+inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>myfunctions.Align()<CR>a
 
 # vim-markdown-extras
 g:markdown_extras_config = {}

@@ -125,6 +125,27 @@ enddef
 command! -nargs=? SearchAndReplace SearchAndReplace(<f-args>)
 command! -nargs=? SearchAndReplaceInFiles SearchAndReplaceInFiles(<f-args>)
 
+# ======
+
+export def Align()
+  var p = '^\s*|\s.*\s|\s*$'
+    echom "BAR"
+    echom getline('.') =~# '^\s*|'
+    echom getline(line('.') - 1) =~# p
+  if exists(':Tabularize') != 0
+      && getline('.') =~# '^\s*|'
+      && (getline(line('.') - 1) =~# p || getline(line('.') + 1) =~# p)
+    var column = strcharlen(substitute(getline('.')[0 : col('.')], '[^|]', '', 'g'))
+    var position = strcharlen(matchstr(getline('.')[0 : col('.')], '.*|\s*\zs.*'))
+    Tabularize /|/l1
+    echom "FOO"
+    normal! 0
+    search(repeat('[^|]*|', column) .. '\s\{-\}'
+      .. repeat('.', position), 'ce', line('.'))
+  endif
+enddef
+
+
 # =======================
 export def TrimWhitespace()
   var currwin = winsaveview()
