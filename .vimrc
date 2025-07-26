@@ -346,18 +346,13 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
-# Plug 'goodlygeek/tabular'
-Plug 'git@github.com:godlygeek/tabular.git'
-# Plug 'lambdalisue/vim-nerdfont'
-# Plug 'lambdalisue/vim-fern-renderer-nerdfont'
-# Plug 'lambdalisue/vim-glyph-palette'
+Plug 'junegunn/vim-easy-align'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-markdown-extras', {'for': 'markdown'}
 # Plug 'ubaldot/vim-markdown-extras'
 # For removing expanded links in markdown. Check the help
-Plug 'qadzek/link.vim', {'for': 'markdown'}
 Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-git-master'
@@ -421,8 +416,14 @@ g:everforest_background = 'medium'
 # vim-git-essentials
 nnoremap git <Cmd>GitMasterStatus<cr>
 
-# Tabular
+# Easy-align
+# Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)*\|
+# Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)*\|
+
 inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>myfunctions.Align()<CR>a
+command! -nargs=0 EasyDelimiter myfunctions.InsertRowDelimiter()
 
 # vim-markdown-extras
 g:markdown_extras_config = {}

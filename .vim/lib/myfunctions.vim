@@ -125,23 +125,48 @@ enddef
 command! -nargs=? SearchAndReplace SearchAndReplace(<f-args>)
 command! -nargs=? SearchAndReplaceInFiles SearchAndReplaceInFiles(<f-args>)
 
-# ======
+# ====== Easy align plugin
+
+export def InsertRowDelimiter()
+  const p = '^\s*|\s*.*\s*|\s*$'
+  const curr_line = line('.')
+  if getline(curr_line) =~ p
+    appendbufline('%', curr_line, getline(curr_line)
+      ->substitute('[^\|]', '-', 'g')
+      ->substitute('|-', '| ', 'g')
+      ->substitute('-|', ' |', 'g'))
+  endif
+enddef
 
 export def Align()
-  var p = '^\s*|\s.*\s|\s*$'
-    echom "BAR"
-    echom getline('.') =~# '^\s*|'
-    echom getline(line('.') - 1) =~# p
-  if exists(':Tabularize') != 0
-      && getline('.') =~# '^\s*|'
-      && (getline(line('.') - 1) =~# p || getline(line('.') + 1) =~# p)
-    var column = strcharlen(substitute(getline('.')[0 : col('.')], '[^|]', '', 'g'))
-    var position = strcharlen(matchstr(getline('.')[0 : col('.')], '.*|\s*\zs.*'))
-    Tabularize /|/l1
-    echom "FOO"
-    normal! 0
-    search(repeat('[^|]*|', column) .. '\s\{-\}'
-      .. repeat('.', position), 'ce', line('.'))
+  const p = '^\s*|\s*.*\s*|\s*$'
+  if exists(':EasyAlign') != 0 && getline('.') =~# '^\s*|'
+
+    # Save column and position
+    const curpos = getcursorcharpos()
+
+    # Search for first line
+    var startline = line('.')
+    if startline != 1
+      while getline(startline - 1) =~ p
+        startline = search(p, 'bW')
+      endwhile
+    endif
+    setcursorcharpos(curpos[1], curpos[2])
+
+    # Search for last line
+    var endline = line('.')
+    if endline != line('$')
+      while getline(endline + 1) =~ p
+        endline = search(p, 'W')
+      endwhile
+    endif
+    setcursorcharpos(curpos[1], curpos[2])
+
+    # Easy align
+    execute $":{startline},{endline}EasyAlign *|"
+    setcursorcharpos(curpos[1], strchars(getline(curpos[1])))
+
   endif
 enddef
 
