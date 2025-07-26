@@ -15,7 +15,7 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 
-conda activate dymoval_dev
+conda activate manim_ce
 
 #
 alias ctags="/opt/homebrew/bin/ctags"
@@ -100,4 +100,4 @@ source ~/.fzf-git/fzf-git.sh
 # export FZF_COMPLETION_TRIGGER=''
 
 # LaTeX
-export PATH="/usr/local/texlive/2024/bin/universal-darwin/:$PATH"
+# export PATH="/usr/local/texlive/2024/bin/universal-darwin/:$PATH"

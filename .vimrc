@@ -71,7 +71,7 @@ else
 	  if g:os == 'Linux' || g:os == 'WSL'
 	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
 	  else
-	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.10.dylib'
+	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
 	  endif
 #else
 #	&pythonthreehome =  '/usr/bin'
@@ -352,8 +352,8 @@ Plug 'lambdalisue/fern-git-status.vim'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
-# Plug 'ubaldot/vim-markdown-extras'
 Plug 'ubaldot/vim-markdown-extras', {'for': 'markdown'}
+# Plug 'ubaldot/vim-markdown-extras'
 # For removing expanded links in markdown. Check the help
 Plug 'qadzek/link.vim', {'for': 'markdown'}
 Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
@@ -423,6 +423,7 @@ nnoremap git <Cmd>GitMasterStatus<cr>
 g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
+# g:markdown_extras_config['use_pandoc'] = false
 g:markdown_extras_config['format_on_save'] = true
 g:markdown_extras_config['pandoc_args'] =
   [$'--css="{$HOME}/dotfiles/my_css_style.css"',
@@ -549,8 +550,8 @@ command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
 # ----------------------------------
 g:replica_console_position = "J"
 g:replica_display_range  = false
-g:replica_console_height = &lines / 4
-g:replica_console_height = 20
+# g:replica_console_height = 8
+g:replica_console_height = max([&lines / 6, 4])
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
 nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j

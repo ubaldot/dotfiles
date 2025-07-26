@@ -27,7 +27,7 @@ if exists(':LspHover') != 0
 endif
 
 
-def UndoRuff():
+def UndoRuff()
     if v:shell_error != 0
       undo
       echoerr "'ruff' errors!"
