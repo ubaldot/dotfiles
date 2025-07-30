@@ -188,7 +188,43 @@ export def InsertInLine(lnum: number, pos: number, insert: string)
    setline(lnum, new_line)                  # Set the modified line back
 enddef
 
-export def Redir(cmd: string, rng: number, start: number, end: number)
+export def Redir(cmd: string, rng: number, start: number, stop: number)
+  # Used to redirect the output from the terminal in a scratch buffer
+  #
+  # Examples: :
+  #   :Redir !ls
+  #   :5Redir messages # last 5 lines
+  #   :5,10Redir messages # from line 5 to line 10
+  #
+  # You can use it also to redirect the output of some Vim commands
+  vnew
+  var full_output = []
+  var output = []
+
+  if cmd =~ '^!'
+    full_output = systemlist(cmd[1 : ])
+  else
+    full_output = split(execute(cmd), "\n")
+  endif
+
+  # rng can be 1, 2 or 3, depending on how the passed range is expressed
+  if rng == 0
+    output = full_output
+  elseif rng == 1
+    # From bottom-up
+    output = full_output[stop + 1 : ]
+  else
+    output = full_output[start - 1 : stop - 1]
+  endif
+
+  setbufline(bufnr('$'), 1, output)
+
+  const win_id = win_getid(winnr('$'))
+  win_execute(win_id, 'setlocal buftype=nofile bufhidden=wipe '
+        \ .. 'nobuflisted noswapfile')
+enddef
+
+export def Redir_old(cmd: string, rng: number, start: number, end: number)
   # Used to redirect the output from the terminal in a scratch buffer
   #
   # Example: :Redir !ls
