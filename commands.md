@@ -80,17 +80,17 @@ You can set an alias in the pyproject.toml
 
 # git
 
-Track remote branch
+git Track remote branch
 
     git fetch origin
     git branch -r
     git checkout --track origin/remote-branch-name
 
-**Forward in time:**
+**git Forward in time:**
 
     git commit
 
-**Back in time:** Only HEAD git checkout <commit>
+**git Back in time:** Only HEAD git checkout <commit>
 
     # HEAD and branch (keep working directory)
       git reset --soft <commit>
@@ -98,16 +98,16 @@ Track remote branch
     # HEAD, branch and working directory
       git reset --hard <commit>
 
-**Rebase** (put onto main with out changes):
+**git Rebase** (put onto main with out changes):
 
     git rebase -i main -Xtheirs
 
-**diff**:
+**git diff**:
 
     git difftool move_fix_sampling_periods .\src\dymoval\dataset.py
     :Diff <commit-id>
 
-**ssh/https:**
+**git ssh/https:**
 
 If you get any message from GitHub that authentication method has been changed from 2021, switch to ssh and then switch back again to https://
 
@@ -125,7 +125,7 @@ and add a new line under [remote "origin"]:
     git push origin master
     git branch -d newfeature
 
-**tags:**
+**git tags:**
 
     git tag -a v1.4
     git tag -a v1.4 -m "my version 1.4"
@@ -138,6 +138,13 @@ and add a new line under [remote "origin"]:
     git checkout v1.4
     # delete
     git tag -d v1
+
+
+**git pull-request PR:**
+
+    git fetch origin feature/my-new-feature
+    (git fetch contributor feature/my-new-feature)
+    git checkout feature/my-new-feature
 
 ***macos***:
 
