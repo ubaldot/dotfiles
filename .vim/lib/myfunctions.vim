@@ -748,3 +748,39 @@ export def GetDelimitersRanges(
 
   return ranges
 enddef
+
+
+export def PathToURL(path: string): string
+  var rest = ''
+  if has('win32') || has('win64')
+    rest = path->substitute('\\', '/', 'g')
+  else
+    rest = path
+  endif
+
+  var utf8 = iconv(rest, &encoding, 'utf-8')
+  var bytes = str2blob([utf8])
+  if len(bytes) > 0 && bytes[len(bytes) - 1] == 0x0A
+    call remove(bytes, len(bytes) - 1)
+  endif
+
+  var allowed = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.~/:'
+  var encoded = ''
+  for val in bytes
+    if stridx(allowed, nr2char(val)) >= 0
+      encoded ..= nr2char(val)
+    else
+      encoded ..= printf('%%%02X', val)
+    endif
+  endfor
+
+  if has('win32') || has('win64')
+    if rest =~ '^[A-Za-z]:/'
+      return 'file:///' .. encoded
+    else
+      return 'file:' .. encoded
+    endif
+  else
+    return 'file://' .. encoded
+  endif
+enddef

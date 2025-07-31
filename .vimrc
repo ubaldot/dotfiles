@@ -195,7 +195,7 @@ enddef
 noremap cd <scriptcmd>GoToGitRoot()<cr>
 
 # Better gx
-nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
+# nmap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Auto push/pull dotfiles
 def PullRepofiles(repo_path: string)
@@ -350,7 +350,7 @@ Plug 'junegunn/vim-easy-align'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
-Plug 'ubaldot/vim-markdown-extras', {'for': 'markdown'}
+Plug 'ubaldot/vim-markdown-extras',
 # Plug 'ubaldot/vim-markdown-extras'
 # For removing expanded links in markdown. Check the help
 Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
@@ -431,13 +431,13 @@ command! -nargs=0 EasyDelimiter myfunctions.InsertRowDelimiter()
 g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
-g:markdown_extras_config['use_prettier'] = false
-g:markdown_extras_config['format_on_save'] = true
+g:markdown_extras_config['use_prettier'] = true
+g:markdown_extras_config['format_on_save'] = false
 g:markdown_extras_config['pandoc_args'] =
   [$'--css="{$HOME}/dotfiles/my_css_style.css"',
   $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"']
 # g:markdown_extras_indices = ['testfile.md', 'testfile_1.md', 'testfile_2.md']
-g:markdown_extras_indices = {foo: 'testfile.md', bar: 'testfile_1.md', zoo: 'testfile_2.md'}
+g:markdown_extras_index = {foo: 'testfile.md', bar: 'testfile_1.md', zoo: 'testfile_2.md'}
 
 # vim-poptools
 g:poptools_config = {}
@@ -498,7 +498,7 @@ exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 
-nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
+nnoremap <leader>q <ScriptCmd>Open_special('i"')<cr>
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
@@ -611,6 +611,14 @@ command! ColorsToggle myfunctions.ColorsToggle()
 command! -nargs=1 -complete=command -range Redir
       \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
+# Path to URL command
+def PathToURL(path: string)
+  setreg('p', myfunctions.PathToURL(fnamemodify(path, ':p')))
+  echo "URL stored in register 'p'"
+enddef
+
+command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
+
 # ==  Note taking stuff ==
 var work_log_path =
       \ '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
@@ -637,200 +645,5 @@ command! LLogOpen IndexOpen(work_log_path)
 command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
 
 # CC stuff
-
-const current_week = str2nr(strftime("%W")) + 1
-def IndexNewDay(index_path: string)
-  # Open index_path and stick a date on top
-  exe $'edit {index_path}'
-  cursor(1, 1)
-  var day_string = strftime("# %Y %B %d")
-  var today_line = search($'^{day_string}', 'c')
-  if today_line == 0
-    append(0, ['', day_string])
-  endif
-enddef
-
 const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
-const CC_DIARY = $'{CAB_CLIMATE_HOME}\diary.md'
-const TODO = $'{CAB_CLIMATE_HOME}\todo.md'
-
-def GetTeamNames()
-  vnew
-  const max_lines = 100
-  var team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', max_lines)
-
-  # Get names bases on format '<number>. [<name>]', e.g. '12. [John Smith]'
-  team_cleaned->map((idx, val) => matchstr(val, '\d\+\.\s*[\zs.\{-}\ze\]'))
-    ->filter('!empty(v:val)')
-  const non_consultants = copy(team_cleaned)->filter('v:val !~ "Consultant"')
-  const consultants = copy(team_cleaned)->filter('v:val =~ "Consultant"')
-  setline(1, non_consultants)
-  append(line('$'), '')
-  append(line('$'), consultants)
-  append(line('$'), '')
-  append(line('$'), $'non_consultants: {len(non_consultants) + 1}')
-  append(line('$'), $'consultants: {len(consultants)}')
-
-  setlocal buftype=nofile bufhidden=hide noswapfile
-  set ft=markdown
-enddef
-
-# In the following files you need to open and jump to the end
-command! CCDiary IndexNewDay(CC_DIARY)
-
-def CreateIndex(index_file: string)
-  vsplit
-  const winid = win_getid(winnr('$'))
-  win_gotoid(winid)
-  wincmd H
-  # echom winid
-  exe $"edit {index_file}"
-  # const width = &columns / 3
-  const width = 30
-  win_execute(winid, 'setlocal nobuflisted buftype=nofile noswapfile winfixbuf')
-  win_execute(winid, $'vertical resize {width}')
-  win_execute(winid, 'nmap <buffer> <cr> <s-cr>')
-  win_execute(winid, 'nnoremap <buffer> <esc> <cmd>close<cr>')
-  # TODO tab calls tab in the last window
-  # win_execute(winid, 'nmap <buffer> <tab> <c-w>l<tab>')
-  # win_execute(winid, 'unmap <buffer> <tab>')
-enddef
-
-if g:os == 'Windows'
-  &spellfile = $"{CAB_CLIMATE_HOME}\\CCspellfile.utf-8.add"
-endif
-
-def HideAll()
-  var saved_cur = getcurpos()
-  norm! ggVGg?
-  setpos('.', saved_cur)
-enddef
-
-
-def CleanupTodoList()
-  if expand('%:t') != "todo.md"
-    myfunctions.Echowarn("Filename is not 'todo.md' ")
-    return
-  endif
-
-  var todo_str = '# To do'
-  var done_str = '# Done'
-
-  var done = [done_str, '']
-  var not_done = [todo_str, '']
-  # var done = []
-  # var not_done = []
-  var done_cont = false
-  var line = ''
-
-  for line_nr in range(1, line('$'))
-    line = getline(line_nr)
-    if line !~ $'\v^\s*({done_str}|{todo_str})' && line !~ '^\s*$'
-      if line =~ '^-\s*\[\s*x\s*\]'
-        add(done, line)
-        done_cont = true
-      elseif line =~ '^-\s*\[\s*\]'
-        add(not_done, line)
-        done_cont = false
-      else
-        if done_cont
-          add(done, line)
-        else
-          add(not_done, line)
-        endif
-      endif
-    endif
-  endfor
-  deletebufline('%', 1, '$')
-  setline(1, not_done)
-  append(line('$'), '')
-  append(line('$'), done)
-enddef
-
-def CountPeople()
-  # This is the line where the 'Contacts' section begins
-  const max_lines = 100
-
-  var team = readfile($'{CAB_CLIMATE_HOME}\team.md', '', max_lines)
-    ->map((idx, val) => matchstr(val, '\d\+\.\s[\zs.\{-}\ze\]'))
-    ->filter('!empty(v:val)')
-
-
-  const num_consultants = copy(team)->filter('v:val =~ "Consultant"')->len()
-  const num_non_consultants = copy(team)->filter('v:val !~ "Consultant"')->len()
-  echo $"num_consultants: {num_consultants}, "
-         .. $"num_employees: {num_non_consultants}"
-enddef
-
-def WeekSummary()
-  # Check the last chars in each line and verify that they are in the format
-  # w\d\+, e.g. 'w32'
-  const time_horizon = 4 # In weeks
-  const deadlines = readfile($'{CAB_CLIMATE_HOME}\\deadlines.md')
-  const passed_deadlines = copy(deadlines)
-    ->filter('v:val =~ "w\\d\\+"')
-    ->filter((_, x) => str2nr(matchstr(x, "\\d\\+$")) < current_week)
-  const incoming_deadlines = copy(deadlines)
-    ->filter('v:val =~ "w\\d\\+"')
-    ->filter((_, x) => str2nr(matchstr(x, "\\d\\+$")) >= current_week &&
-    str2nr(matchstr(x, "\\d\\+")) <= current_week + time_horizon)
-
-  new
-  setlocal buftype=nofile noswapfile
-  set ft=markdown
-  exe $"cd {CAB_CLIMATE_HOME}"
-  setline(1, '*Incoming deadlines:*')
-  setline(2, incoming_deadlines)
-  append(len(incoming_deadlines) + 1, ['', '*Passed deadlines:*'])
-  append(len(incoming_deadlines) + 3, passed_deadlines)
-  myfunctions.Echowarn($'Current week: {current_week}')
-enddef
-
-def CCIndex()
-  const index_winnr = bufwinnr($"{CAB_CLIMATE_HOME}\\index.md")
-  if index_winnr == -1
-    CreateIndex($"{CAB_CLIMATE_HOME}\\index.md")
-    norm! l
-  else
-    if winnr('$') != 1
-      exe $'close {index_winnr}'
-    else
-      vsplit
-      exe "bnext"
-      const width = 30
-      win_execute(win_getid(index_winnr), $'vertical resize {width}')
-    endif
-  endif
-enddef
-
-def CCDate()
-  const date = "# " .. strftime("%Y %b %d %X")
-  if getline('.') =~ '^$'
-    setline(line('.'), date)
-  else
-    append(line('.'), date)
-  endif
-enddef
-
-command! CCDate CCDate()
-command! CCWeek myfunctions.Echowarn($'Current week: {current_week}')
-command! CCCountPeople CountPeople()
-command! CCTodoCleanup CleanupTodoList()
-command! CCIndex CCIndex()
-command! CCTodo exe $"edit {CAB_CLIMATE_HOME}\\todo.md"
-command! CCTeam exe $"edit {CAB_CLIMATE_HOME}\\team.md"
-command! CCDeadlines exe $"edit {CAB_CLIMATE_HOME}\\deadlines.md"
-command! CCTeamNames GetTeamNames()
-command! CCWeekSummary WeekSummary()
-# To remove highlighting based on 'matchadd()'
-# command! ClearAllMatches myfunctions.ClearAllMatches()
-
-nnoremap <leader>a <ScriptCmd>CCIndex()<cr>
-nnoremap <c-g> <ScriptCmd>HideAll()<cr>
-
-
-augroup CC
-  autocmd!
-  # autocmd VimEnter * WeekSummary()
-  autocmd VimEnter * myfunctions.Echowarn($'Current week: {current_week}')
-augroup END
+execute $"source {CAB_CLIMATE_HOME}/cab_climate.vim"
