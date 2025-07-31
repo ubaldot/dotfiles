@@ -646,7 +646,8 @@ command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
 
 # CC stuff
 if g:os == "Windows"
-  execute $"source $'{$HOME}/cab_climate.vim"
+  const WINDOWS_HOME = 'C:/Users/yt75534/OneDrive - Volvo Group'
+  execute $"source {WINDOWS_HOME}/CabClimate/cab_climate.vim"
 elseif g:os == "WSL"
   const WINDOWS_HOME = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group'
   const filename = 'cab_climate.vim'
