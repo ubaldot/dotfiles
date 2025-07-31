@@ -645,5 +645,24 @@ command! LLogOpen IndexOpen(work_log_path)
 command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
 
 # CC stuff
-const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
-execute $"source {CAB_CLIMATE_HOME}/cab_climate.vim"
+if g:os == "Windows"
+  execute $"source $'{$HOME}/cab_climate.vim"
+elseif g:os == "WSL"
+  const WINDOWS_HOME = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group'
+  const filename = 'cab_climate.vim'
+
+  # Copy file from Windows
+  exe $"system('cp {WINDOWS_HOME}/CabClimate/{filename} {$HOME}')"
+  if v:shell_error
+    myfunctions.Echoerr($"Error in copying '{filename}' from Windows")
+  endif
+
+  # Check if the file has been copied
+  exe $"system('ls {$HOME}/cab_climate.vim')"
+  if v:shell_error
+    myfunctions.Echoerr($"'{filename}' not copied in {$HOME}")
+  endif
+
+  exe $"system('dos2unix.exe {$HOME}/cab_climate.vim')"
+  execute $"source {$HOME}/cab_climate.vim"
+endif
