@@ -395,6 +395,9 @@ augroup END
 # Plugins settings
 # -----------------
 # everforest colorscheme
+# set background=dark
+g:everforest_background = 'soft'
+g:everforest_ui_contrast = 'low'
 var hour = str2nr(strftime("%H"))
 if hour < 7 || 16 < hour
   set background=dark
@@ -404,8 +407,6 @@ else
   # colorscheme wildcharm
   colorscheme everforest
 endif
-# set background=dark
-g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 # colorscheme everforest
 

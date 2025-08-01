@@ -208,6 +208,7 @@ export def Redir(cmd: string, rng: number, start: number, stop: number)
   endif
 
   # rng can be 1, 2 or 3, depending on how the passed range is expressed
+    echom "FOO"
   if rng == 0
     output = full_output
   elseif rng == 1
