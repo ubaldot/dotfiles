@@ -375,6 +375,8 @@ filetype indent on
 syntax on
 
 # Bundled plugins
+g:termdebug_config = {}
+packadd! termdebug
 packadd comment
 packadd helptoc
 packadd matchit
@@ -382,9 +384,6 @@ packadd matchit
 command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 
-# termdebug
-g:termdebug_config = {}
-packadd! termdebug
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
