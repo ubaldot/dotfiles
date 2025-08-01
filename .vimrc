@@ -474,8 +474,45 @@ enddef
 g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
 
-# vim-poplar
-nnoremap <silent> <leader>p <cmd>Poplar<cr>
+# vim-dir
+def VimDirToggle(dir: string="")
+   const win_width = 30
+   const target_dir = empty(dir) ? '.' : dir
+
+   # Check if open or close the drawer
+   var vim_dir_id = -1
+   var found = false
+   for win in range(1, winnr('$'))
+     if !empty(getwinvar(win, 'vim_dir'))
+       found = true
+       vim_dir_id = win_getid(win)
+       break
+     endif
+   endfor
+
+   if !found
+     const old = &splitright
+     set nosplitright
+     vnew
+     const win_nr = winnr()
+     const win_id = win_getid(win_nr)
+     setwinvar(win_nr, "vim_dir", true)
+     win_execute(win_id, $'vertical resize {win_width}')
+     &splitright = old
+     exe $"Dir {target_dir}"
+     # var lines = win_execute(win_id, 'getline(1, 10)[0]"')
+     # while empty(lines)
+     #   lines = win_execute(win_id, 'getline(1, 10)[0]"')
+     # endwhile
+     win_execute(win_id, 'exe "norm <<<<<<<<"')
+     win_execute(win_id, 'nmap <buffer> o x"')
+     win_execute(win_id, 'nmap <buffer> n cc"')
+   else
+     win_execute(vim_dir_id, 'bwipe!')
+   endif
+enddef
+
+nnoremap <space> <ScriptCmd>VimDirToggle('.')<cr>
 
 # vim-outline
 g:outline_autoclose = false
@@ -498,7 +535,7 @@ if g:dev_setup
 endif
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
-exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
+# exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 
 nnoremap <leader>q <ScriptCmd>Open_special('i"')<cr>
 
