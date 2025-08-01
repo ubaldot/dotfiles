@@ -334,6 +334,7 @@ enddef
 
 def UndoFormatting()
   if v:shell_error != 0
+    echom "Errore, stronzo!"
     undo
     echoerr $"'{&l:formatprg->matchstr('^\s*\S*')}' returned errors."
   else
@@ -341,14 +342,40 @@ def UndoFormatting()
     redraw
     if !empty(&l:formatprg)
       Echowarn($'{&l:formatprg}')
-    else
+    echom "Ecco il programma:"
       Echowarn("'formatprg' is empty. Using default formatter.")
     endif
   endif
 enddef
 
-export def FormatWithoutMoving(a: number = 0, b: number = 0)
+export def FormatWithoutMoving(type: string = '')
+  # 'gq' is remapped to use this function.
+  # However, when running the 'gq' as formatter, we need to use as it is
+  # shipped with Vim, and therefore we use the bang in 'normal!'
+  var view = winsaveview()
 
+  # defer so if the function gets error of any kind, the following are run
+  # anyways
+  defer UndoFormatting()
+  defer winrestview(view)
+
+  var start = 0
+  var end = 0
+  if type != ''
+    start = line("'[")
+    end = line("']")
+  endif
+
+    echom "Chiamataaaa:"
+  if start == 0 && end == 0
+    normal! gggqG
+  else
+    var interval = end - start + 1
+    silent exe $"normal! {start}gg{interval}gqq"
+  endif
+enddef
+
+export def FormatWithoutMoving_old(a: number = 0, b: number = 0)
   var view = winsaveview()
   defer UndoFormatting()
 
@@ -356,11 +383,10 @@ export def FormatWithoutMoving(a: number = 0, b: number = 0)
     normal! gggqG
   else
     var interval = b - a + 1
-    silent exe $":norm! {a}gg{interval}gqq"
+    execute printf("normal! %dgg%dgqq", a, interval)
+    # silent exe $":norm! {a}gg{interval}gqq"
   endif
-
   winrestview(view)
-
 enddef
 
 var prettier_supported_filetypes = ['json', 'yaml', 'html', 'css']

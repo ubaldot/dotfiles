@@ -9,9 +9,16 @@ if executable('pytest')
   compiler pytest
 endif
 
+# --- To use 'gq' ----------------------
 if executable('ruff')
   &l:formatprg = $"ruff format --line-length {&l:textwidth} "
-        .. $"--stdin-filename {shellescape(expand('%'))} --silent"
+        .. $"--stdin-filename {shellescape(expand('%:p'))} --silent"
+
+  # &l:formatprg = $"black - --line-length {&l:textwidth} "
+  #       \ .. $"--stdin-filename {shellescape(expand('%'))} --quiet"
+
+  # For using gq
+  &l:opfunc = function('myfunctions.FormatWithoutMoving')
 
   # Autocmd to format with ruff
   augroup PYTHON_FORMAT_ON_SAVE
@@ -22,35 +29,14 @@ else
    echoerr "'ruff' not installed!'"
 endif
 
+# Hack on 'gq'
+nnoremap <silent> gq g@
+xnoremap <silent> gq g@
+# -------------------------------------------------
+
 if exists(':LspHover') != 0
   &l:keywordprg = ':LspHover'
 endif
-
-
-def UndoRuff()
-    if v:shell_error != 0
-      undo
-      echoerr "'ruff' errors!"
-    endif
-enddef
-
-def Ruff(textwidth: number)
-    # If black is not available, then the buffer content will be canceled upon
-    # write. To avoid appending stdout and stderr to the buffer we use
-    # --quiet.
-    var win_view = winsaveview()
-    defer UndoRuff()
-    if executable('ruff') && &filetype == 'python'
-       silent exe $":%!$ruff format --line-length {&l:textwidth} "
-        .. $"--stdin-filename {shellescape(expand("%"))} --silent"
-    else
-        echom "'ruff' not installed or 'filetype' is not 'python'"
-    endif
-
-    winrestview(win_view)
-enddef
-
-command! -buffer Ruff Ruff(120)
 
 # pytest
 command! -buffer Pytest execute('!coverage run --branch -m pytest .')
