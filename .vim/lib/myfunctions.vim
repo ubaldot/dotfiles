@@ -208,12 +208,11 @@ export def Redir(cmd: string, rng: number, start: number, stop: number)
   endif
 
   # rng can be 1, 2 or 3, depending on how the passed range is expressed
-    echom "FOO"
   if rng == 0
     output = full_output
   elseif rng == 1
     # From bottom-up
-    output = full_output[stop + 1 : ]
+    output = full_output[-stop : ]
   else
     output = full_output[start - 1 : stop - 1]
   endif
@@ -223,6 +222,7 @@ export def Redir(cmd: string, rng: number, start: number, stop: number)
   const win_id = win_getid(winnr('$'))
   win_execute(win_id, 'setlocal buftype=nofile bufhidden=wipe '
         \ .. 'nobuflisted noswapfile')
+    echom "FOO"
 enddef
 
 export def Redir_old(cmd: string, rng: number, start: number, end: number)

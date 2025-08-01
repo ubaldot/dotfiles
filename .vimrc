@@ -347,17 +347,16 @@ Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'junegunn/vim-easy-align'
+Plug 'habamax/vim-dir'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
 Plug 'ubaldot/vim-markdown-extras',
-# Plug 'ubaldot/vim-markdown-extras'
-# For removing expanded links in markdown. Check the help
 Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-git-master'
 # Plug 'ubaldot/vim-conda-activate'
-Plug 'girishji/easyjump.vim'
+# Plug 'girishji/easyjump.vim'
 Plug 'ubaldot/vim-op-surround'
 if g:dev_setup
   Plug 'ubaldot/vim-latex-tools', {'for': 'latex'}
@@ -475,6 +474,9 @@ enddef
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
+
+# vim-poplar
+nnoremap <silent> <leader>p <cmd>Poplar<cr>
 
 # vim-outline
 g:outline_autoclose = false
