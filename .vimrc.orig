@@ -2,14 +2,15 @@ vim9script
 
 # For avap dev
 g:is_avap = false
-var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', true)
-var auto_update_notes = get(g:, 'auto_update_dotfiles', true)
+var is_PE = true
+var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
+var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = false
-# auto_update_notes = false
-
+# auto_update_dotfiles = true
+# auto_update_notes = true
+g:dev_setup = true
 if !exists('g:dev_setup')
-  g:dev_setup = true
+  g:dev_setup = false
 endif
 
 # OS detection
@@ -59,19 +60,23 @@ endif
 if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
-	g:dotvim = $HOME .. "\\.vim"
 	g:dotvim = $HOME .. "\\vimfiles"
   exe $"set runtimepath+={g:dotvim}"
 else
   g:tmp = "/tmp"
   g:null_device = "/dev/null"
   g:dotvim = $HOME .. "/.vim"
-  &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-  if g:os == 'Linux' || g:os == 'WSL'
-    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
-  else
-    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.11.dylib'
-  endif
+  #if !is_PE
+	  &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+	  if g:os == 'Linux' || g:os == 'WSL'
+	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
+	  else
+	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
+	  endif
+#else
+#	&pythonthreehome =  '/usr/bin'
+#	 &pythonthreedll = '/usr/lib/x86_64-linux-gnu/python3.10.so.1'
+#	endif
 endif
 # ------------------------
 
@@ -101,7 +106,9 @@ augroup END
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
-# set langmap=ö[,ä]
+# langmap does not work with multi-byte chars,
+# see https://github.com/vim/vim/issues/3018
+set langmap=ö[,ä]
 set belloff=all
 set colorcolumn=80
 set clipboard^=unnamed,unnamedplus
@@ -164,26 +171,12 @@ def ToggleCmdWindow()
   endif
 enddef
 
-nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
-
-# Otherwise I cannot paste in registers
-xnoremap <leader>" <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('"', '"', {'"': '"'}, {'"': '"'})<cr>
-xnoremap <leader>' <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle("'", "'", {"'": "'"}, {"'": "'"})<cr>
-xnoremap <leader>( <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('(', ')', {'(': '('}, {')': ')'})<cr>
-xnoremap <leader>[ <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('[', ']', {'[': '['}, {']': ']'})<cr>
-xnoremap <leader>{ <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('{', '}', {'{': '{'}, {'}': '}'})<cr>
-xnoremap <leader>< <esc><ScriptCmd>
-      \ myfunctions.SurroundToggle('<', '>', {'<': '<'}, {'>': '>'})<cr>
+# nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
 
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
-# nmap <c-ö> <c-[>
-# nmap <c-ä> <c-]>
+nmap ö [
+nmap ä ]
 # Avoid polluting registers
 nnoremap x "_x
 
@@ -202,7 +195,7 @@ enddef
 noremap cd <scriptcmd>GoToGitRoot()<cr>
 
 # Better gx
-nnoremap gx <ScriptCmd>myfunctions.Gx()<cr>
+# nmap gx <ScriptCmd>myfunctions.Gx()<cr>
 
 # Auto push/pull dotfiles
 def PullRepofiles(repo_path: string)
@@ -217,6 +210,7 @@ def PullRepofiles(repo_path: string)
   if !empty(copy(output) ->filter('v:val =~ "CONFLICT"'))
     echoerr "You have conflicts in ~/dotfiles!"
   elseif !empty(copy(output) ->filter('v:val !~ "Already up to date"'))
+    echom copy(output) ->filter('v:val !~ "Already up to date"')
     echoerr "OBS! ~/dotfiles updated! "
              .. "You may need restart Vim to update your environment."
   endif
@@ -352,18 +346,22 @@ Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
 Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
+Plug 'junegunn/vim-easy-align'
+<<<<<<< HEAD
+Plug 'mattn/calendar-vim'
+# Plug 'habamax/vim-dir'
+=======
+>>>>>>> 58f7f86 (.)
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
-Plug 'ubaldot/vim-markdown-extras', {'for': 'markdown'}
-# For removing expanded links in markdown. Check the help
-Plug 'qadzek/link.vim', {'for': 'markdown'}
+Plug 'ubaldot/vim-markdown-extras',
 Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
 Plug 'ubaldot/vim-poptools'
 Plug 'ubaldot/vim-git-master'
 # Plug 'ubaldot/vim-conda-activate'
-Plug 'girishji/easyjump.vim'
-Plug 'tpope/vim-surround'
+# Plug 'girishji/easyjump.vim'
+Plug 'ubaldot/vim-op-surround'
 if g:dev_setup
   Plug 'ubaldot/vim-latex-tools', {'for': 'latex'}
   Plug 'yegappan/lsp'
@@ -372,7 +370,8 @@ if g:dev_setup
   Plug 'ubaldot/vim-microdebugger', {'for': ['c', 'cpp']}
   Plug 'ubaldot/vim-extended-view'
   # Plug 'puremourning/vimspector'
-  Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
+  # Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
+  Plug 'ubaldot/vimspector'
 endif
 plug#end()
 filetype plugin on
@@ -380,15 +379,15 @@ filetype indent on
 syntax on
 
 # Bundled plugins
+g:termdebug_config = {}
+packadd! termdebug
 packadd comment
+packadd helptoc
+packadd matchit
 
 command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 
-# termdebug
-g:termdebug_config = {}
-packadd! termdebug
-# source $HOME/vim_my_fork/vim/runtime/pack/dist/opt/termdebug/plugin/termdebug.vim
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
@@ -398,6 +397,9 @@ augroup END
 # Plugins settings
 # -----------------
 # everforest colorscheme
+# set background=dark
+g:everforest_background = 'soft'
+g:everforest_ui_contrast = 'low'
 var hour = str2nr(strftime("%H"))
 if hour < 7 || 16 < hour
   set background=dark
@@ -407,20 +409,38 @@ else
   # colorscheme wildcharm
   colorscheme everforest
 endif
-# set background=dark
-g:everforest_background = 'medium'
 # colorscheme solarized8_flat
 # colorscheme everforest
 
+# vim-fern-nerdfonts-renderer
+# g:fern#renderer = "nerdfont"
+# augroup MY_GLIPH_PALETTE
+#   autocmd!
+#   autocmd FileType fern call glyph_palette#apply()
+# augroup END
 # vim-git-essentials
 nnoremap git <Cmd>GitMasterStatus<cr>
+
+# Easy-align
+# Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)*\|
+# Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)*\|
+
+inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>myfunctions.Align()<CR>a
+command! -nargs=0 EasyDelimiter myfunctions.InsertRowDelimiter()
 
 # vim-markdown-extras
 g:markdown_extras_config = {}
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
+g:markdown_extras_config['use_prettier'] = true
+g:markdown_extras_config['format_on_save'] = false
 g:markdown_extras_config['pandoc_args'] =
-  [$'--css="{$HOME}/dotfiles/my_css_style.css"']
+  [$'--css="{$HOME}/dotfiles/my_css_style.css"',
+  $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"']
+# g:markdown_extras_indices = ['testfile.md', 'testfile_1.md', 'testfile_2.md']
+g:markdown_extras_index = {foo: 'testfile.md', bar: 'testfile_1.md', zoo: 'testfile_2.md'}
 
 # vim-poptools
 g:poptools_config = {}
@@ -429,29 +449,20 @@ g:poptools_config['preview_buffers'] = true
 g:poptools_config['preview_grep'] = true
 g:poptools_config['preview_vimgrep'] = true
 g:poptools_config['fuzzy_search'] = false
-<<<<<<< HEAD
-=======
+# g:poptools_config["preview_syntax"] = false
 # g:poptools_config['grep_cmd_win'] = 'powershell -NoProfile -ExecutionPolicy '
 # .. 'Bypass -Command "cd {search_dir};findstr /C:{shellescape(what)} '
 # .. '/N /S {items}"'
 
 # g:poptools_config['grep_cmd_nix'] =
 #   'grep -nrH --include="{items}" "{what}" {search_dir}'
->>>>>>> 90fc3d7 (Auto pushing /Users/ubaldot/dotfiles...)
 # g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
-nnoremap <c-g> <cmd>PoptoolsGrepInBuffer<cr>
 # Copy in the selected text into t register ad leave it. Who cares about the t
 # register?
-xnoremap <c-g> "ty<cmd>exe $"PoptoolsGrepInBuffer {getreg('t')}"<cr>
-nnoremap <c-p>å <cmd>PoptoolsBuffers<cr>
-nnoremap <c-g><c-g> <cmd>PoptoolsGrep<cr>
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
 nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
-nnoremap <c-p>h <cmd>PoptoolsCmdHistory<cr>
-xnoremap <c-p>h <esc>PoptoolsCmdHistory<cr>
-nnoremap <c-p>d <cmd>PoptoolsFindDir<cr>
 nnoremap <c-p>o <cmd>PoptoolsRecentFiles<cr>
 
 def ShowRecentFiles()
@@ -466,6 +477,7 @@ enddef
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
+
 
 # vim-outline
 g:outline_autoclose = false
@@ -488,9 +500,9 @@ if g:dev_setup
 endif
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
-exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
+# exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 
-nnoremap <leader>z <ScriptCmd>Open_special('i"')<cr>
+nnoremap <leader>q <ScriptCmd>Open_special('i"')<cr>
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
@@ -532,26 +544,50 @@ command ManimHelpTransform exe "HelpMe " .. g:dotvim
 
 
 # HelpMe files for my poor memory
-var help_me_loc = $"{g:dotvim}/helpme_files/"
-command! HelpmeBasic exe $"HelpMe {help_me_loc}/vim_basic.txt"
-command! HelpmeScript exe $"HelpMe {help_me_loc}/vim_scripting.txt"
-command! HelpmeGlobal exe $"HelpMe {help_me_loc}/vim_global.txt"
-command! HelpmeExCommands exe $"HelpMe {help_me_loc}/vim_excommands.txt"
-command! HelpmeSubstitute exe $"HelpMe {help_me_loc}/vim_substitute.txt"
-command! HelpmeUnitTests exe $"HelpMe {help_me_loc}/vim_unit_tests.txt"
-command! HelpmeAdvanced exe $"HelpMe {help_me_loc}/vim_advanced.txt"
-command! HelpmeDiffMerge exe $"HelpMe {help_me_loc}/vim_merge_diff.txt"
-command! HelpmeCoding exe $"HelpMe {help_me_loc}/vim_coding.txt"
-command! HelpmeClosures exe $"HelpMe {help_me_loc}/python_closures.txt"
-command! HelpmeDebug exe $"HelpMe {help_me_loc}/vim_debug.txt"
-command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
+# var help_me_loc = $"{g:dotvim}/helpme_files/"
+# command! HelpmeBasic exe $"HelpMe {help_me_loc}/vim_basic.txt"
+# command! HelpmeScript exe $"HelpMe {help_me_loc}/vim_scripting.txt"
+# command! HelpmeGlobal exe $"HelpMe {help_me_loc}/vim_global.txt"
+# command! HelpmeExCommands exe $"HelpMe {help_me_loc}/vim_excommands.txt"
+# command! HelpmeSubstitute exe $"HelpMe {help_me_loc}/vim_substitute.txt"
+# command! HelpmeUnitTests exe $"HelpMe {help_me_loc}/vim_unit_tests.txt"
+# command! HelpmeAdvanced exe $"HelpMe {help_me_loc}/vim_advanced.txt"
+# command! HelpmeDiffMerge exe $"HelpMe {help_me_loc}/vim_merge_diff.txt"
+# command! HelpmeCoding exe $"HelpMe {help_me_loc}/vim_coding.txt"
+# command! HelpmeClosures exe $"HelpMe {help_me_loc}/python_closures.txt"
+# command! HelpmeDebug exe $"HelpMe {help_me_loc}/vim_debug.txt"
+# command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
+
+# UBA Help me new
+import g:dotvim .. "/plugins_settings/prova.vim" as prova
+def HelpMeComplete(
+    arglead: string,
+    command_line: string,
+    position: number
+  ): list<string>
+
+  var tmp = readfile($"{g:dotvim}/plugins_settings/prova.vim")
+  var complete = tmp->filter("v:val =~ '^export const '")
+    -> map((_, val) => substitute(val, '^export const \(\w*\).*', '\1', ''))
+  return complete->filter($'v:val =~ "^{arglead}"')
+enddef
+
+# TODO remove the eval
+def HelpMeCallback(variable: string='')
+  # var tmp = prova.$'{variable}'
+  # tmp = prova.foo
+  echom prova.
+  # exe $"HelpMe {eval(tmp)}"
+enddef
+
+command! -nargs=? -complete=customlist,HelpMeComplete HelpMeArg HelpMeCallback(<f-args>)
 
 # vim-replica stuff
 # ----------------------------------
 g:replica_console_position = "J"
 g:replica_display_range  = false
-g:replica_console_height = &lines / 4
-g:replica_console_height = 20
+# g:replica_console_height = 8
+g:replica_console_height = max([&lines / 6, 4])
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
 nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
@@ -561,6 +597,40 @@ xnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
 # Outline. <F8> is overriden by vimspector
 nnoremap <silent> <F8> <Plug>OutlineToggle
 
+# Must be a list
+g:markdown_extras_config['large_files_threshold'] = 0
+g:op_surround_maps = [
+  {map: "sa'", open_delim: "''", close_delim: "''", action: "append"},
+  {map: "sd'", open_delim: "''", close_delim: "''", action: "delete"}
+]
+for [open, close] in [["(", ")"], ["[", "]"], ["{", "}"], ['"', '"'], ['`', '`']]
+  # Append mappings
+  add(g:op_surround_maps, {
+    map: $"sa{open}",
+    open_delim: open,
+    close_delim: close,
+    action: 'append'})
+
+  # Delete mappings
+  add(g:op_surround_maps, {
+    map: $"sd{open}",
+    open_delim: open,
+    close_delim: close,
+    action: 'delete'})
+endfor
+
+
+#   add(g:op_surround_maps, {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'}
+#   {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'},
+#   {map: "<leader>[", open_delim: "[", close_delim: "]", action: 'append'},
+#   {map: "<leader>{", open_delim: "{", close_delim: "}", action: 'append'},
+#   {map: '<leader>"', open_delim: '"', close_delim: '"', action: 'append'},
+#   {map: "<leader>'", open_delim: "''", close_delim: "''", action: 'append'}
+# ]
+# b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
+# vip = visual inside paragraph
+# This is '"used"' for preparing a text file for the caption to be sent to
+# YouTube.
 
 # Bunch of commands
 # -----------------------
@@ -578,14 +648,45 @@ command! GitCommitDot myfunctions.CommitDot()
 command! GitPushDot myfunctions.PushDot()
 # Merge and diff
 command! -nargs=? Diff myfunctions.Diff(<q-args>)
-nnoremap <expr> gl &diff ? ':diffget LOCAL<CR>' : 'gl'
-nnoremap <expr> gr &diff ? ':diffget REMOTE<CR>' : 'gr'
+nnoremap <expr> gl &diff
+      \ ? 'execute "diffget " .. getcompletion("LOCAL", "diff_buffer")[0]<CR>'
+      \ : 'gl'
+nnoremap <expr> gr &diff
+      \ ? 'execute "diffget " .. getcompletion("REMOTE", "diff_buffer")[0]<CR>'
+      \ : 'gr'
 
 command! ColorsToggle myfunctions.ColorsToggle()
 
 # Utils commands
 command! -nargs=1 -complete=command -range Redir
       \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
+
+# Path to URL command
+def PathToURL(path: string)
+  setreg('p', myfunctions.PathToURL(fnamemodify(path, ':p')))
+  echo "URL stored in register 'p'"
+enddef
+
+command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
+
+
+# vim-calendar
+g:calendar_no_mappings = 1
+g:calendar_weeknm = 5
+g:calendar_monday = 0
+g:calendar_mark = 'right'
+def CalendarToggle()
+  const calendar_id = bufwinid('__Calendar')
+  if calendar_id > 0
+    win_execute(calendar_id, 'q')
+  else
+   Calendar
+   wincmd p
+  endif
+enddef
+
+nnoremap <leader>c <ScriptCmd>CalendarToggle()<cr>
+
 
 # ==  Note taking stuff ==
 var work_log_path =
@@ -595,10 +696,12 @@ if g:os == "Windows"
         \ 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
 endif
 
-# Activity log
 def IndexOpen(index_path: string)
+  # Opens and jump to the end. Finish.
   exe $'edit {index_path}'
-  var refs_line = search('^\s*#\+\s\+References')
+  const references_string =
+    "<!-- DO NOT REMOVE vim-markdown-extras references DO NOT REMOVE-->"
+  var refs_line = search(references_string)
   if refs_line == 0
     norm! G
   else
@@ -610,36 +713,26 @@ command! LLogNewDay IndexNewDay(work_log_path)
 command! LLogOpen IndexOpen(work_log_path)
 command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
 
+# CC stuff
+if g:os == "Windows"
+  const WINDOWS_HOME = 'C:/Users/yt75534/OneDrive - Volvo Group'
+  execute $"source {WINDOWS_HOME}/CabClimate/cab_climate.vim"
+elseif g:os == "WSL"
+  const WINDOWS_HOME = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group'
+  const filename = 'cab_climate.vim'
 
-def IndexNewDay(index_path: string)
-  IndexOpen(index_path)
-  # You end up in the first non-blank line
-  var day_string = strftime("# %b %d %y")
-  append(line('.'), ['', day_string])
-  search(day_string, 'b')
-enddef
+  # Copy file from Windows
+  exe $"system('cp {WINDOWS_HOME}/CabClimate/{filename} {$HOME}')"
+  if v:shell_error
+    myfunctions.Echoerr($"Error in copying '{filename}' from Windows")
+  endif
 
-const CAB_CLIMATE_HOME = 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
-const CC_DIARY = $'{CAB_CLIMATE_HOME}\diary.md'
-const TODO = $'{CAB_CLIMATE_HOME}\todo.md'
-const NUM_MEMBERS = 20
+  # Check if the file has been copied
+  exe $"system('ls {$HOME}/cab_climate.vim')"
+  if v:shell_error
+    myfunctions.Echoerr($"'{filename}' not copied in {$HOME}")
+  endif
 
-def GetTeam()
-  vnew
-  const team_cleaned = readfile($'{CAB_CLIMATE_HOME}\team.md', '', 22)
-    ->map((idx, val) => matchstr(val, '-\s\zs.*\ze:'))
-  setline(1, team_cleaned)
-  setlocal buftype=nofile bufhidden=hide noswapfile
-  set ft=markdown
-enddef
-
-command! CCDiaryNewDay IndexNewDay(CC_DIARY)
-command! CCDiaryOpen IndexOpen(CC_DIARY)
-command! CCTodo IndexOpen(TODO)
-
-command! CCTeam GetTeam()
-command! ClearAllMatches myfunctions.ClearAllMatches()
-
-# vip = visual inside paragraph
-# This is used for preparing a text file for the caption to be sent to
-# YouTube.
+  exe $"system('dos2unix.exe {$HOME}/cab_climate.vim')"
+  execute $"source {$HOME}/cab_climate.vim"
+endif
