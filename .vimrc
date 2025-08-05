@@ -610,13 +610,31 @@ nnoremap <silent> <F8> <Plug>OutlineToggle
 
 # Must be a list
 g:markdown_extras_config['large_files_threshold'] = 0
-g:op_surround_maps = [
-  {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'},
-  {map: "<leader>[", open_delim: "[", close_delim: "]", action: 'append'},
-  {map: "<leader>{", open_delim: "{", close_delim: "}", action: 'append'},
-  {map: '<leader>"', open_delim: '"', close_delim: '"', action: 'append'},
-  {map: "<leader>'", open_delim: "''", close_delim: "''", action: 'append'}
-]
+g:op_surround_maps = []
+for [open, close] in [("(", ")"), ("[", "]"), ("{", "}"), ('"', '"'), ("''", "''")]
+  # Append mappings
+  add(g:op_surround_maps, {
+    map: $"sa{open}",
+    open_delim: open,
+    close_delim: close,
+    action: 'append'})
+
+  # Delete mappings
+  add(g:op_surround_maps, {
+    map: $"sd{open}",
+    open_delim: open,
+    close_delim: close,
+    action: 'delete'})
+endfor
+
+
+#   add(g:op_surround_maps, {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'}
+#   {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'},
+#   {map: "<leader>[", open_delim: "[", close_delim: "]", action: 'append'},
+#   {map: "<leader>{", open_delim: "{", close_delim: "}", action: 'append'},
+#   {map: '<leader>"', open_delim: '"', close_delim: '"', action: 'append'},
+#   {map: "<leader>'", open_delim: "''", close_delim: "''", action: 'append'}
+# ]
 # b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
 # vip = visual inside paragraph
 # This is '"used"' for preparing a text file for the caption to be sent to
