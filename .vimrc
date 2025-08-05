@@ -347,7 +347,7 @@ Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'junegunn/vim-easy-align'
-Plug 'habamax/vim-dir'
+# Plug 'habamax/vim-dir'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
@@ -512,7 +512,7 @@ def VimDirToggle(dir: string="")
    endif
 enddef
 
-nnoremap <space> <ScriptCmd>VimDirToggle('.')<cr>
+# nnoremap <space> <ScriptCmd>VimDirToggle('.')<cr>
 
 # vim-outline
 g:outline_autoclose = false
@@ -535,7 +535,7 @@ if g:dev_setup
 endif
 exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
 exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
-# exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
+exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
 
 nnoremap <leader>q <ScriptCmd>Open_special('i"')<cr>
 
@@ -610,11 +610,12 @@ nnoremap <silent> <F8> <Plug>OutlineToggle
 
 # Must be a list
 g:markdown_extras_config['large_files_threshold'] = 0
-g:op_surround_maps = [{map: "<leader>(", open_delim: "(", close_delim: ")"},
-  {map: "<leader>[", open_delim: "[", close_delim: "]"},
-  {map: "<leader>{", open_delim: "{", close_delim: "}"},
-  {map: '<leader>"', open_delim: '"', close_delim: '"'},
-  {map: "<leader>'", open_delim: "''", close_delim: "''"}
+g:op_surround_maps = [
+  {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'},
+  {map: "<leader>[", open_delim: "[", close_delim: "]", action: 'append'},
+  {map: "<leader>{", open_delim: "{", close_delim: "}", action: 'append'},
+  {map: '<leader>"', open_delim: '"', close_delim: '"', action: 'append'},
+  {map: "<leader>'", open_delim: "''", close_delim: "''", action: 'append'}
 ]
 # b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
 # vip = visual inside paragraph
