@@ -611,7 +611,8 @@ nnoremap <silent> <F8> <Plug>OutlineToggle
 # Must be a list
 g:markdown_extras_config['large_files_threshold'] = 0
 g:op_surround_maps = []
-for [open, close] in [("(", ")"), ("[", "]"), ("{", "}"), ('"', '"'), ("''", "''")]
+for [open, close] in [["(", ")"], ["[", "]"], ["{", "}"], 
+    ['"', '"'], ["''", "''"]]
   # Append mappings
   add(g:op_surround_maps, {
     map: $"sa{open}",
