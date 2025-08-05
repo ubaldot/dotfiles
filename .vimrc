@@ -554,7 +554,6 @@ command ManimHelpTransform exe "HelpMe " .. g:dotvim
 # command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
 
 # UBA Help me new
-import g:dotvim .. "/plugins_settings/prova.vim" as prova
 def HelpMeComplete(
     arglead: string,
     command_line: string,

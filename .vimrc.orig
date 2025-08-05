@@ -349,6 +349,7 @@ Plug 'lambdalisue/fern-git-status.vim'
 Plug 'junegunn/vim-easy-align'
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 Plug 'mattn/calendar-vim'
 # Plug 'habamax/vim-dir'
 =======
@@ -358,6 +359,8 @@ Plug 'mattn/calendar-vim'
 =======
 >>>>>>> 005a72b (removed vim-dir)
 >>>>>>> 1938656 (.)
+=======
+>>>>>>> 95bb0fb (.)
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
 Plug 'ubaldot/vim-outline'
@@ -489,6 +492,7 @@ g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 # vim-dir
@@ -533,6 +537,8 @@ enddef
 =======
 >>>>>>> 005a72b (removed vim-dir)
 >>>>>>> 1938656 (.)
+=======
+>>>>>>> 95bb0fb (.)
 
 # vim-outline
 g:outline_autoclose = false
@@ -654,6 +660,7 @@ nnoremap <silent> <F8> <Plug>OutlineToggle
 
 # Must be a list
 g:markdown_extras_config['large_files_threshold'] = 0
+<<<<<<< HEAD
 g:op_surround_maps = [
   {map: "sa'", open_delim: "''", close_delim: "''", action: "append"},
   {map: "sd'", open_delim: "''", close_delim: "''", action: "delete"}
@@ -686,6 +693,15 @@ endfor
 #   {map: '<leader>"', open_delim: '"', close_delim: '"', action: 'append'},
 #   {map: "<leader>'", open_delim: "''", close_delim: "''", action: 'append'}
 # ]
+=======
+# g:op_surround_maps = {
+#   paren: {map: "<leader>(", open_delim: "(", close_delim: ")"},
+#   bracket: {map: "<leader>[", open_delim: "[", close_delim: "]"},
+#   curly: {map: "<leader>{", open_delim: "{", close_delim: "}"},
+#   dquote: {map: '<leader>"', open_delim: '"', close_delim: '"'},
+#   quote: {map: "<leader>'", open_delim: "''", close_delim: "''"}
+# }
+>>>>>>> afe3894 (.)
 # b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
 # vip = visual inside paragraph
 # This is '"used"' for preparing a text file for the caption to be sent to

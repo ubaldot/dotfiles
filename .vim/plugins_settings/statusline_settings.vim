@@ -97,7 +97,7 @@ def CommonStatusLine()
   setlocal statusline+=%#StatusLine#\ %y\ %*
   # Fileformat
   setlocal statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
-  setlocal statusline+=%#StatusLine#\ %l,%c\ %*
+  setlocal statusline+=%#StatusLine#\ %l,%c(%{charcol('.')})\ %*
   # ----------- end statusline setup -------------------------
  enddef
 

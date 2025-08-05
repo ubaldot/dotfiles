@@ -101,3 +101,128 @@ source ~/.fzf-git/fzf-git.sh
 
 # LaTeX
 # export PATH="/usr/local/texlive/2024/bin/universal-darwin/:$PATH"
+#
+pixi-activate() {
+  local name="$1"
+  local base="$HOME/pixi-envs"
+  local env="$base/$name"
+  if [[ -d "$env" && -f "$env/pixi.toml" ]]; then
+    pixi shell --manifest-path "$env"
+  else
+    echo "No pixi environment named '$name' found in $base"
+    return 1
+  fi
+}
+
+
+pixi-list() {
+  local base="$HOME/pixi-envs"
+  find "$base" -maxdepth 1 -mindepth 1 -type d -exec test -f '{}/pixi.toml' \; -print | xargs -n1 basename 2>/dev/null
+}
+
+
+pixi-install() {
+  if [[ $# -lt 1 ]]; then
+    echo "Usage: pixi-install <package> [more packages...]"
+    return 1
+  fi
+
+  if [[ -z "$PIXI_PROJECT_ROOT" ]]; then
+    echo "❌ Not inside a pixi shell — cannot determine project root"
+    return 1
+  fi
+
+  echo "📦 Installing into environment: ${PIXI_PROJECT_NAME:-$PIXI_PROJECT_ROOT}"
+  pixi add --manifest-path "$PIXI_PROJECT_ROOT" "$@"
+}
+
+pixi-remove() {
+  if [[ $# -lt 1 ]]; then
+    echo "Usage: pixi-remove <package> [more packages...]"
+    return 1
+  fi
+
+  if [[ -z "$PIXI_PROJECT_ROOT" ]]; then
+    echo "❌ Not inside a pixi shell — cannot determine project root"
+    return 1
+  fi
+
+  echo "🗑️ Removing from environment: ${PIXI_PROJECT_NAME:-$PIXI_PROJECT_ROOT}"
+  pixi remove --manifest-path "$PIXI_PROJECT_ROOT" "$@"
+}
+
+
+pixi-create() {
+  local name="$1"; shift
+  local base="$HOME/pixi-envs"
+  local env_path="$base/$name"
+
+  if [[ -z "$name" ]]; then
+    echo "Usage: pixi-create <env-name> [packages...]"
+    return 1
+  fi
+
+  if [[ -e "$env_path" ]]; then
+    echo "❌ Environment '$name' already exists at $env_path"
+    return 1
+  fi
+
+  echo "📁 Creating Pixi environment: $env_path"
+  mkdir -p "$env_path"
+  cd "$env_path" || return 1
+
+  pixi init
+
+  if [[ $# -gt 0 ]]; then
+    pixi add "$@"
+  fi
+
+  echo "✅ Environment '$name' created at $env_path"
+}
+
+pixi-switch() {
+  local name="$1"
+  local base="$HOME/pixi-envs"
+  local env="$base/$name"
+
+  if [[ -z "$name" ]]; then
+    echo "Usage: pixi-switch <env-name>"
+    return 1
+  fi
+
+  if [[ ! -d "$env" || ! -f "$env/pixi.toml" ]]; then
+    echo "❌ Environment '$name' not found in $base"
+    return 1
+  fi
+
+  echo "🔄 Switching to Pixi environment: $name"
+  pixi shell --manifest-path "$env"
+}
+
+pixi-remove-env() {
+  local name="$1"
+  local base="$HOME/pixi-envs"
+  local env_path="$base/$name"
+
+  if [[ -z "$name" ]]; then
+    echo "Usage: pixi-remove-env <env-name>"
+    return 1
+  fi
+
+  if [[ ! -d "$env_path" ]]; then
+    echo "❌ No such Pixi environment: $env_path"
+    return 1
+  fi
+
+  # Ask for confirmation
+  read -p "⚠️ Are you sure you want to delete '$env_path'? [y/N] " confirm
+  if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    rm -rf "$env_path"
+    echo "🗑️ Removed Pixi environment: $env_path"
+  else
+    echo "❎ Aborted"
+  fi
+}
+
+
+# pixi-activate py314
