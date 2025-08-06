@@ -579,19 +579,41 @@ command ManimHelpTransform exe "HelpMe " .. g:dotvim
 
 
 # HelpMe files for my poor memory
-var help_me_loc = $"{g:dotvim}/helpme_files/"
-command! HelpmeBasic exe $"HelpMe {help_me_loc}/vim_basic.txt"
-command! HelpmeScript exe $"HelpMe {help_me_loc}/vim_scripting.txt"
-command! HelpmeGlobal exe $"HelpMe {help_me_loc}/vim_global.txt"
-command! HelpmeExCommands exe $"HelpMe {help_me_loc}/vim_excommands.txt"
-command! HelpmeSubstitute exe $"HelpMe {help_me_loc}/vim_substitute.txt"
-command! HelpmeUnitTests exe $"HelpMe {help_me_loc}/vim_unit_tests.txt"
-command! HelpmeAdvanced exe $"HelpMe {help_me_loc}/vim_advanced.txt"
-command! HelpmeDiffMerge exe $"HelpMe {help_me_loc}/vim_merge_diff.txt"
-command! HelpmeCoding exe $"HelpMe {help_me_loc}/vim_coding.txt"
-command! HelpmeClosures exe $"HelpMe {help_me_loc}/python_closures.txt"
-command! HelpmeDebug exe $"HelpMe {help_me_loc}/vim_debug.txt"
-command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
+# var help_me_loc = $"{g:dotvim}/helpme_files/"
+# command! HelpmeBasic exe $"HelpMe {help_me_loc}/vim_basic.txt"
+# command! HelpmeScript exe $"HelpMe {help_me_loc}/vim_scripting.txt"
+# command! HelpmeGlobal exe $"HelpMe {help_me_loc}/vim_global.txt"
+# command! HelpmeExCommands exe $"HelpMe {help_me_loc}/vim_excommands.txt"
+# command! HelpmeSubstitute exe $"HelpMe {help_me_loc}/vim_substitute.txt"
+# command! HelpmeUnitTests exe $"HelpMe {help_me_loc}/vim_unit_tests.txt"
+# command! HelpmeAdvanced exe $"HelpMe {help_me_loc}/vim_advanced.txt"
+# command! HelpmeDiffMerge exe $"HelpMe {help_me_loc}/vim_merge_diff.txt"
+# command! HelpmeCoding exe $"HelpMe {help_me_loc}/vim_coding.txt"
+# command! HelpmeClosures exe $"HelpMe {help_me_loc}/python_closures.txt"
+# command! HelpmeDebug exe $"HelpMe {help_me_loc}/vim_debug.txt"
+# command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
+
+# UBA Help me new
+import g:dotvim .. "/plugins_settings/prova.vim" as prova
+def HelpMeComplete(
+    arglead: string,
+    command_line: string,
+    position: number
+  ): list<string>
+
+  var tmp = readfile($"{g:dotvim}/plugins_settings/prova.vim")
+  var complete = tmp->filter("v:val =~ '^export const '")
+    -> map((_, val) => substitute(val, '^export const \(\w*\).*', '\1', ''))
+  return complete->filter($'v:val =~ "^{arglead}"')
+enddef
+
+# TODO remove the eval
+def HelpMeCallback(variable: string='')
+  var tmp = $"prova.{variable}"
+  exe $"HelpMe {eval(tmp)}"
+enddef
+
+command! -nargs=? -complete=customlist,HelpMeComplete HelpMeArg HelpMeCallback(<f-args>)
 
 # vim-replica stuff
 # ----------------------------------
@@ -614,7 +636,7 @@ g:op_surround_maps = [
   {map: "sa'", open_delim: "''", close_delim: "''", action: "append"},
   {map: "sd'", open_delim: "''", close_delim: "''", action: "delete"}
 ]
-for [open, close] in [["(", ")"], ["[", "]"], ["{", "}"], ['"', '"']]
+for [open, close] in [["(", ")"], ["[", "]"], ["{", "}"], ['"', '"'], ['`', '`']]
   # Append mappings
   add(g:op_surround_maps, {
     map: $"sa{open}",
