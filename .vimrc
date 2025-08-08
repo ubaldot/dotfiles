@@ -347,6 +347,7 @@ Plug 'sainnhe/everforest'
 Plug 'lambdalisue/fern.vim'
 Plug 'lambdalisue/fern-git-status.vim'
 Plug 'junegunn/vim-easy-align'
+Plug 'mattn/calendar-vim'
 # Plug 'habamax/vim-dir'
 Plug 'ubaldot/vim-highlight-yanked'
 Plug 'ubaldot/vim-helpme'
@@ -609,8 +610,10 @@ enddef
 
 # TODO remove the eval
 def HelpMeCallback(variable: string='')
-  var tmp = $"prova.{variable}"
-  exe $"HelpMe {eval(tmp)}"
+  # var tmp = prova.$'{variable}'
+  # tmp = prova.foo
+  echom prova.
+  # exe $"HelpMe {eval(tmp)}"
 enddef
 
 command! -nargs=? -complete=customlist,HelpMeComplete HelpMeArg HelpMeCallback(<f-args>)
@@ -701,6 +704,25 @@ def PathToURL(path: string)
 enddef
 
 command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
+
+
+# vim-calendar
+g:calendar_no_mappings = 1
+g:calendar_weeknm = 5
+g:calendar_monday = 0
+g:calendar_mark = 'right'
+def CalendarToggle()
+  const calendar_id = bufwinid('__Calendar')
+  if calendar_id > 0
+    win_execute(calendar_id, 'q')
+  else
+   Calendar
+   wincmd p
+  endif
+enddef
+
+nnoremap <leader>c <ScriptCmd>CalendarToggle()<cr>
+
 
 # ==  Note taking stuff ==
 var work_log_path =
