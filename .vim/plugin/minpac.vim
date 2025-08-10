@@ -38,19 +38,36 @@ def PackList(A: any, L: any, P: any): list<string>
   return sort(keys(minpac#getpluglist()))
 enddef
 
-command! -nargs=1 -complete=customlist,PackList
-      \ PackOpenDir PackInit() | term_start(&shell,
-      \    {'cwd': minpac#getpluginfo(<q-args>).dir,
-      \     'term_finish': 'close'})
+def PackEditPlugin(dirname: string)
+  # First search in "start" folder
+  var plugin_dir = getcompletion($'{g:dotvim}/pack/minpac/start/', 'dir')
+            ->filter((_, val) => val =~ dirname)
+
+  # Then search in "opt" folder
+  if empty(plugin_dir)
+    plugin_dir = getcompletion($'{g:dotvim}/pack/minpac/opt/', 'dir')
+            ->filter((_, val) => val =~ dirname)
+  endif
+
+  if !empty(plugin_dir)
+    exe $"cd {plugin_dir[0]}"
+  else
+    echoerr $"Cannot find folder '{dirname}'"
+  endif
+enddef
+
+command! -nargs=1 -complete=customlist,PackList PackEditPlugin PackEditPlugin(<f-args>)
 
 def PackConfigList(arglead: string,
     command_line: string,
     cursor_position: number): list<string>
+
   var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
                       ->map((_, val)  => fnamemodify(val, ':t:r'))
   var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
                       ->map((_, val)  => fnamemodify(val, ':t:r'))
   return opt_settings_files + start_settings_files->filter($'v:val =~ "^{arglead}"')
+
 enddef
 
 def PackEditConfig(filename: string)
