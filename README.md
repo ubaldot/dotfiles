@@ -7,17 +7,28 @@ Repo to keep track of my dot files.
 - Clone this repo in your home folder.
 - Run `python -m create_symlinks` from `~/dotfiles`
 
-[When][3] you [create][2] a new dotfile, manually move it to `~\dotfiles`
-[folder][4] and add it to the repo.
-Then, create a symlink from `~` to the moved file.
+To install all Vim plugins you need [minpac][1]. You can install it as it
+follows:
 
-> NOTE
->
-> You must manually download `plug.vim` and all the vim plugins.
+### Windows
 
-### References
+```cmd
+git clone https://github.com/k-takata/minpac.git %USERPROFILE%\vimfiles\pack\minpac\opt\minpac
+```
 
-[1]: C:\Users\yt75534\cazo.md
-[2]: https://google.com
-[3]: C:\Users\yt75534\commands.md
-[4]: C:\Users\yt75534\bar.txt
+### Linux, macOS
+
+```sh
+git clone https://github.com/k-takata/minpac.git ~/.vim/pack/minpac/opt/minpac
+```
+
+Once done, open Vim and run :`PackUpdate`.
+
+### Add new dotfiles
+
+When you create a new dotfile, manually move it to `~\dotfiles` folder and add
+it to the repo. Then, create a symlink from `~` to the moved file.
+
+<!-- DO NOT REMOVE vim-markdown-extras references DO NOT REMOVE-->
+
+[1]: https://github.com/k-takata/minpac
