@@ -6,13 +6,6 @@ var is_PE = true
 var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
 var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
-# auto_update_dotfiles = true
-# auto_update_notes = true
-g:dev_setup = true
-if !exists('g:dev_setup')
-  g:dev_setup = false
-endif
-
 # OS detection
 def IsWSL(): bool
   if has("unix")
@@ -143,9 +136,14 @@ set diffopt+=vertical
 set wildcharm=<tab>
 set conceallevel=2
 set concealcursor=nvc
+config#statusline#Setup()
 # TODO adjust path option. Move to after/ftplugin
 # set path+=**
 # set cursorline
+
+filetype plugin on
+filetype indent on
+syntax on
 
 # Some key ""bindings""
 # ----------------------
@@ -338,51 +336,125 @@ augroup CMDWIN_MAPS
   autocmd CmdWinEnter * nnoremap <buffer> <c-d> <cmd>q<CR>
 augroup END
 
-# vim-plug
-# ----------------
-g:lsp_filetypes = ['c', 'cpp', 'python', 'tex']
-plug#begin(g:dotvim .. "/plugins/")
-Plug 'junegunn/vim-plug' # For getting the help, :h plug-options
-Plug 'sainnhe/everforest'
-Plug 'lambdalisue/fern.vim'
-Plug 'lambdalisue/fern-git-status.vim'
-Plug 'junegunn/vim-easy-align'
-Plug 'ubaldot/vim-highlight-yanked'
-Plug 'ubaldot/vim-helpme'
-Plug 'ubaldot/vim-outline'
-Plug 'ubaldot/vim-markdown-extras',
-Plug 'ubaldot/vim9-conversion-aid', { 'on': 'Vim9Convert' }
-Plug 'ubaldot/vim-poptools'
-Plug 'ubaldot/vim-git-master'
-# Plug 'ubaldot/vim-conda-activate'
-# Plug 'girishji/easyjump.vim'
-Plug 'ubaldot/vim-op-surround'
-if g:dev_setup
-  Plug 'ubaldot/vim-latex-tools', {'for': 'latex'}
-  Plug 'yegappan/lsp'
-  Plug 'ubaldot/vim-replica', {'for': 'python'}
-  Plug 'ubaldot/vim-manim', {'for': 'python'}
-  Plug 'ubaldot/vim-microdebugger', {'for': ['c', 'cpp']}
-  Plug 'ubaldot/vim-extended-view'
-  # Plug 'puremourning/vimspector'
-  # Plug 'ubaldot/vimspector', { 'on': 'VimspectorLaunch' }
-  Plug 'ubaldot/vimspector'
-endif
-plug#end()
-filetype plugin on
-filetype indent on
-syntax on
+# plugins
+# start plugins: the config files go in plugin/ and they are automatically
+# loaded
+# opt plugins: the config files go on autoload/config and the config must be
+# run through a Setup() function
+def PackInit()
+
+  packadd minpac
+  minpac#init()
+  minpac#add('k-takata/minpac', {'type': 'opt'})
+  minpac#add('ubaldot/vim-helpme', {'type': 'opt'})
+  minpac#add('ubaldot/vim9-conversion-aid', {'type': 'opt'})
+  minpac#add('ubaldot/vim-latex-tools', {'type': 'opt'})
+  minpac#add('yegappan/lsp', {'type': 'opt'})
+  minpac#add('ubaldot/vim-replica', {'type': 'opt'})
+  minpac#add('ubaldot/vim-manim', {'type': 'opt'})
+  minpac#add('ubaldot/vim-microdebugger', {'type': 'opt'})
+  minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
+  minpac#add('ubaldot/vimspector', {'type': 'opt'})
+
+  # Additional plugins here.
+  minpac#add('sainnhe/everforest')
+  minpac#add('lambdalisue/fern.vim')
+  minpac#add('junegunn/vim-easy-align')
+  minpac#add('ubaldot/vim-highlight-yanked')
+  minpac#add('ubaldot/vim-outline')
+  minpac#add('ubaldot/vim-markdown-extras')
+  minpac#add('ubaldot/vim-poptools')
+  minpac#add('ubaldot/vim-git-master')
+enddef
+
+# Define user commands for updating/cleaning the plugins.
+# Each of them calls PackInit() to load minpac and register
+# the information of plugins, then performs the task.
+command! PackUpdate  PackInit() |  minpac#update()
+command! PackClean   PackInit() |  minpac#clean()
+command! PackStatus packadd minpac | minpac#status()
+
+def PackList(A: any, L: any, P: any): list<string>
+  PackInit()
+  return sort(keys(minpac#getpluglist()))
+enddef
+
+command! -nargs=1 -complete=customlist,PackList
+      \ PackOpenDir PackInit() | term_start(&shell,
+      \    {'cwd': minpac#getpluginfo(<q-args>).dir,
+      \     'term_finish': 'close'})
+
+def PackConfigList(arglead: string,
+    command_line: string,
+    cursor_position: number): list<string>
+  var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
+                      ->map((_, val)  => fnamemodify(val, ':t:r'))
+  var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
+                      ->map((_, val)  => fnamemodify(val, ':t:r'))
+  return opt_settings_files + start_settings_files->filter($'v:val =~ "^{arglead}"')
+enddef
+
+def PackEditConfig(filename: string)
+  # First start in plugin/ folder
+  var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
+  var filename_full = start_settings_files->filter((_, val) => val =~ filename)
+
+  # Next, search in autoload/config folder
+  if empty(filename_full)
+    var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
+    filename_full = opt_settings_files->filter((_, val) => val =~ filename)
+  endif
+  exe $"edit {filename_full[0]}"
+enddef
+
+command! -nargs=1 -complete=customlist,PackConfigList PackEditConfig
+      \ PackEditConfig(<f-args>)
+
+def PackDevSetup()
+  const supported_filetypes = ['c', 'python', 'cpp', 'latex']
+
+  if index(supported_filetypes, &filetype) != -1
+    if !exists('g:termdebug_loaded')
+      g:termdebug_config = {}
+      packadd termdebug
+    endif
+
+    # Order matters...
+    if !exists('g:loaded_lsp')
+      packadd lsp
+      config#lsp#Setup()
+    endif
+
+    if !exists('g:microdebugger_loaded')
+      config#microdebugger#Setup()
+      packadd vim-microdebugger
+    endif
+
+    if !exists('g:loaded_vimspector')
+      packadd vimspector
+      config#vimspector#Setup()
+    endif
+
+    config#statusline#Setup(true)
+  else
+    config#statusline#Setup(false)
+  endif
+enddef
+
+augroup PACK_DEV_SETUP
+  autocmd!
+  autocmd FileType * PackDevSetup()
+augroup END
 
 # Bundled plugins
-g:termdebug_config = {}
-packadd! termdebug
 packadd comment
 packadd helptoc
 packadd matchit
 
+# Plugin settings
+# comment
 command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
-
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!
@@ -392,7 +464,6 @@ augroup END
 # Plugins settings
 # -----------------
 # everforest colorscheme
-# set background=dark
 g:everforest_background = 'soft'
 g:everforest_ui_contrast = 'low'
 var hour = str2nr(strftime("%H"))
@@ -404,6 +475,7 @@ else
   # colorscheme wildcharm
   colorscheme everforest
 endif
+set background=dark
 # colorscheme solarized8_flat
 # colorscheme everforest
 
@@ -479,25 +551,6 @@ g:outline_autoclose = false
 
 # Plugin settings
 # Open plugin settings
-var Open_special = (textobject) => {
-  var filename = g:dotvim .. myfunctions.GetTextObject(textobject).text
-  if stridx(filename, "/plugins_settings/") != -1
-    execute("edit " .. filename)
-  else
-    echo "Not a plugin settings path."
-  endif
-}
-
-if g:dev_setup
-  exe "source " .. g:dotvim .. "/plugins_settings/lsp_settings.vim"
-  exe "source " .. g:dotvim .. "/plugins_settings/microdebugger_settings.vim"
-  exe "source " .. g:dotvim .. "/plugins_settings/vimspector_settings.vim"
-endif
-exe "source " .. g:dotvim .. "/plugins_settings/statusline_settings.vim"
-exe "source " .. g:dotvim .. "/plugins_settings/bufline_settings.vim"
-exe "source " .. g:dotvim .. "/plugins_settings/fern_settings.vim"
-
-nnoremap <leader>q <ScriptCmd>Open_special('i"')<cr>
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
@@ -595,9 +648,15 @@ nnoremap <silent> <F8> <Plug>OutlineToggle
 g:markdown_extras_config['large_files_threshold'] = 0
 g:op_surround_maps = [
   {map: "sa'", open_delim: "''", close_delim: "''", action: "append"},
-  {map: "sd'", open_delim: "''", close_delim: "''", action: "delete"}
+  {map: "sd'", open_delim: "''", close_delim: "''", action: "delete"},
+  {map: "sab", open_delim: "[", close_delim: "]", action: "append"},
+  {map: "sdb", open_delim: "[", close_delim: "]", action: "delete"},
+  {map: "sap", open_delim: "(", close_delim: ")", action: "append"},
+  {map: "sdp", open_delim: "(", close_delim: ")", action: "delete"},
+  {map: "sac", open_delim: "{", close_delim: "}", action: "append"},
+  {map: "sdc", open_delim: "{", close_delim: "}", action: "delete"}
 ]
-for [open, close] in [["(", ")"], ["[", "]"], ["{", "}"], ['"', '"'], ['`', '`']]
+for [open, close] in [['"', '"'], ['`', '`']]
   # Append mappings
   add(g:op_surround_maps, {
     map: $"sa{open}",
@@ -665,9 +724,9 @@ command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
 
 
 # vim-calendar
-g:calendar_no_mappings = 1
+g:calendar_no_mappings = false
 g:calendar_weeknm = 5
-g:calendar_monday = 0
+# g:calendar_monday = 0
 g:calendar_mark = 'right'
 def CalendarToggle()
   const calendar_id = bufwinid('__Calendar')
@@ -679,7 +738,7 @@ def CalendarToggle()
   endif
 enddef
 
-nnoremap <leader>c <ScriptCmd>CalendarToggle()<cr>
+# nnoremap <leader>c <ScriptCmd>CalendarToggle()<cr>
 
 
 # ==  Note taking stuff ==
