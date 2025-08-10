@@ -140,6 +140,7 @@ config#statusline#Setup()
 # TODO adjust path option. Move to after/ftplugin
 # set path+=**
 # set cursorline
+# UBA
 
 filetype plugin on
 filetype indent on
@@ -346,7 +347,6 @@ def PackInit()
   packadd minpac
   minpac#init()
   minpac#add('k-takata/minpac', {'type': 'opt'})
-  minpac#add('ubaldot/vim-helpme', {'type': 'opt'})
   minpac#add('ubaldot/vim9-conversion-aid', {'type': 'opt'})
   minpac#add('ubaldot/vim-latex-tools', {'type': 'opt'})
   minpac#add('yegappan/lsp', {'type': 'opt'})
@@ -365,6 +365,7 @@ def PackInit()
   minpac#add('ubaldot/vim-markdown-extras')
   minpac#add('ubaldot/vim-poptools')
   minpac#add('ubaldot/vim-git-master')
+  minpac#add('ubaldot/vim-helpme')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
@@ -435,6 +436,19 @@ def PackDevSetup()
       config#vimspector#Setup()
     endif
 
+    if !exists('g:loaded_vimspector')
+      packadd vimspector
+      config#vimspector#Setup()
+    endif
+
+    if !exists('g:replica_loaded')
+      packadd vim-replica
+    endif
+
+    if !exists('g:vim_manim_loaded')
+      packadd vim-manim
+    endif
+
     config#statusline#Setup(true)
   else
     config#statusline#Setup(false)
@@ -479,13 +493,6 @@ set background=dark
 # colorscheme solarized8_flat
 # colorscheme everforest
 
-# vim-fern-nerdfonts-renderer
-# g:fern#renderer = "nerdfont"
-# augroup MY_GLIPH_PALETTE
-#   autocmd!
-#   autocmd FileType fern call glyph_palette#apply()
-# augroup END
-# vim-git-essentials
 nnoremap git <Cmd>GitMasterStatus<cr>
 
 # Easy-align
@@ -516,14 +523,6 @@ g:poptools_config['preview_buffers'] = true
 g:poptools_config['preview_grep'] = true
 g:poptools_config['preview_vimgrep'] = true
 g:poptools_config['fuzzy_search'] = false
-# g:poptools_config["preview_syntax"] = false
-# g:poptools_config['grep_cmd_win'] = 'powershell -NoProfile -ExecutionPolicy '
-# .. 'Bypass -Command "cd {search_dir};findstr /C:{shellescape(what)} '
-# .. '/N /S {items}"'
-
-# g:poptools_config['grep_cmd_nix'] =
-#   'grep -nrH --include="{items}" "{what}" {search_dir}'
-# g:poptools_config['preview_syntax'] = false
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
 # Copy in the selected text into t register ad leave it. Who cares about the t
@@ -545,12 +544,8 @@ enddef
 g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
 
-
 # vim-outline
 g:outline_autoclose = false
-
-# Plugin settings
-# Open plugin settings
 
 # vim-manim setup
 var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
@@ -606,28 +601,43 @@ command ManimHelpTransform exe "HelpMe " .. g:dotvim
 # command! HelpmeDebug exe $"HelpMe {help_me_loc}/vim_debug.txt"
 # command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
 
-# UBA Help me new
+# HelpMe
+def HelpMeGetFiles(): list<string>
+  return getcompletion($'{g:dotvim}/helpme_files/', 'file')
+enddef
+
 def HelpMeComplete(
     arglead: string,
     command_line: string,
     position: number
   ): list<string>
 
-  var tmp = readfile($"{g:dotvim}/plugins_settings/prova.vim")
-  var complete = tmp->filter("v:val =~ '^export const '")
-    -> map((_, val) => substitute(val, '^export const \(\w*\).*', '\1', ''))
-  return complete->filter($'v:val =~ "^{arglead}"')
+  var helpme_files = HelpMeGetFiles()->map((_, val)  => fnamemodify(val, ':t:r'))
+  return helpme_files->filter($'v:val =~ "^{arglead}"')
 enddef
 
-# TODO remove the eval
-def HelpMeCallback(variable: string='')
-  # var tmp = prova.$'{variable}'
-  # tmp = prova.foo
-  echom prova.
-  # exe $"HelpMe {eval(tmp)}"
+def HelpMeShow(filename: string='')
+  var helpme_files = HelpMeGetFiles()
+  var filename_full = helpme_files->filter((_, val) => val =~ filename)
+  if !empty(filename_full)
+    exe $"HelpMe {filename_full[0]}"
+  else
+    HelpMe
+  endif
 enddef
 
-command! -nargs=? -complete=customlist,HelpMeComplete HelpMeArg HelpMeCallback(<f-args>)
+def HelpMeEdit(filename: string='')
+  var helpme_files = HelpMeGetFiles()
+  var filename_full = helpme_files->filter((_, val) => val =~ filename)
+  if !empty(filename_full)
+    exe $"edit {filename_full[0]}"
+  else
+    echoerr $"File {filename_full[0]} not found"
+  endif
+enddef
+
+command! -nargs=? -complete=customlist,HelpMeComplete HelpMeShow HelpMeShow(<q-args>)
+command! -nargs=? -complete=customlist,HelpMeComplete HelpMeEdit HelpMeEdit(<q-args>)
 
 # vim-replica stuff
 # ----------------------------------
