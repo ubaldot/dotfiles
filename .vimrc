@@ -342,130 +342,13 @@ augroup END
 # loaded
 # opt plugins: the config files go on autoload/config and the config must be
 # run through a Setup() function
-def PackInit()
-
-  packadd minpac
-  minpac#init()
-  minpac#add('k-takata/minpac', {'type': 'opt'})
-  minpac#add('ubaldot/vim9-conversion-aid', {'type': 'opt'})
-  minpac#add('ubaldot/vim-latex-tools', {'type': 'opt'})
-  minpac#add('yegappan/lsp', {'type': 'opt'})
-  minpac#add('ubaldot/vim-replica', {'type': 'opt'})
-  minpac#add('ubaldot/vim-manim', {'type': 'opt'})
-  minpac#add('ubaldot/vim-microdebugger', {'type': 'opt'})
-  minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
-  minpac#add('ubaldot/vimspector', {'type': 'opt'})
-
-  # Additional plugins here.
-  minpac#add('sainnhe/everforest')
-  minpac#add('lambdalisue/fern.vim')
-  minpac#add('junegunn/vim-easy-align')
-  minpac#add('ubaldot/vim-highlight-yanked')
-  minpac#add('ubaldot/vim-outline')
-  minpac#add('ubaldot/vim-markdown-extras')
-  minpac#add('ubaldot/vim-poptools')
-  minpac#add('ubaldot/vim-git-master')
-  minpac#add('ubaldot/vim-helpme')
-enddef
-
-# Define user commands for updating/cleaning the plugins.
-# Each of them calls PackInit() to load minpac and register
-# the information of plugins, then performs the task.
-command! PackUpdate  PackInit() |  minpac#update()
-command! PackClean   PackInit() |  minpac#clean()
-command! PackStatus packadd minpac | minpac#status()
-
-def PackList(A: any, L: any, P: any): list<string>
-  PackInit()
-  return sort(keys(minpac#getpluglist()))
-enddef
-
-command! -nargs=1 -complete=customlist,PackList
-      \ PackOpenDir PackInit() | term_start(&shell,
-      \    {'cwd': minpac#getpluginfo(<q-args>).dir,
-      \     'term_finish': 'close'})
-
-def PackConfigList(arglead: string,
-    command_line: string,
-    cursor_position: number): list<string>
-  var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
-                      ->map((_, val)  => fnamemodify(val, ':t:r'))
-  var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
-                      ->map((_, val)  => fnamemodify(val, ':t:r'))
-  return opt_settings_files + start_settings_files->filter($'v:val =~ "^{arglead}"')
-enddef
-
-def PackEditConfig(filename: string)
-  # First start in plugin/ folder
-  var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
-  var filename_full = start_settings_files->filter((_, val) => val =~ filename)
-
-  # Next, search in autoload/config folder
-  if empty(filename_full)
-    var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
-    filename_full = opt_settings_files->filter((_, val) => val =~ filename)
-  endif
-  exe $"edit {filename_full[0]}"
-enddef
-
-command! -nargs=1 -complete=customlist,PackConfigList PackEditConfig
-      \ PackEditConfig(<f-args>)
-
-def PackDevSetup()
-  const supported_filetypes = ['c', 'python', 'cpp', 'latex']
-
-  if index(supported_filetypes, &filetype) != -1
-    if !exists('g:termdebug_loaded')
-      g:termdebug_config = {}
-      packadd termdebug
-    endif
-
-    # Order matters...
-    if !exists('g:loaded_lsp')
-      packadd lsp
-      config#lsp#Setup()
-    endif
-
-    if !exists('g:microdebugger_loaded')
-      config#microdebugger#Setup()
-      packadd vim-microdebugger
-    endif
-
-    if !exists('g:loaded_vimspector')
-      packadd vimspector
-      config#vimspector#Setup()
-    endif
-
-    if !exists('g:loaded_vimspector')
-      packadd vimspector
-      config#vimspector#Setup()
-    endif
-
-    if !exists('g:replica_loaded')
-      packadd vim-replica
-    endif
-
-    if !exists('g:vim_manim_loaded')
-      packadd vim-manim
-    endif
-
-    config#statusline#Setup(true)
-  else
-    config#statusline#Setup(false)
-  endif
-enddef
-
-augroup PACK_DEV_SETUP
-  autocmd!
-  autocmd FileType * PackDevSetup()
-augroup END
-
 # Bundled plugins
 packadd comment
 packadd helptoc
 packadd matchit
 
 # Plugin settings
+# -----------------
 # comment
 command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
@@ -475,24 +358,7 @@ augroup SET_HEADERS_AS_C_FILETYPE
   autocmd BufRead,BufNewFile *.h set filetype=c
 augroup END
 
-# Plugins settings
-# -----------------
-# everforest colorscheme
-g:everforest_background = 'soft'
-g:everforest_ui_contrast = 'low'
-var hour = str2nr(strftime("%H"))
-if hour < 7 || 16 < hour
-  set background=dark
-  colorscheme everforest
-else
-  set background=light
-  # colorscheme wildcharm
-  colorscheme everforest
-endif
-set background=dark
-# colorscheme solarized8_flat
-# colorscheme everforest
-
+# git master
 nnoremap git <Cmd>GitMasterStatus<cr>
 
 # Easy-align
@@ -504,140 +370,12 @@ nmap ga <Plug>(EasyAlign)*\|
 inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>myfunctions.Align()<CR>a
 command! -nargs=0 EasyDelimiter myfunctions.InsertRowDelimiter()
 
-# vim-markdown-extras
-g:markdown_extras_config = {}
-g:markdown_extras_config['use_default_mappings'] = true
-g:markdown_extras_config['block_label'] = ''
-g:markdown_extras_config['use_prettier'] = true
-g:markdown_extras_config['format_on_save'] = true
-g:markdown_extras_config['pandoc_args'] =
-  [$'--css="{$HOME}/dotfiles/my_css_style.css"',
-  $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"']
-# g:markdown_extras_indices = ['testfile.md', 'testfile_1.md', 'testfile_2.md']
-g:markdown_extras_index = {foo: 'testfile.md', bar: 'testfile_1.md', zoo: 'testfile_2.md'}
-
-# vim-poptools
-g:poptools_config = {}
-g:poptools_config['preview_recent_files'] = false
-g:poptools_config['preview_buffers'] = true
-g:poptools_config['preview_grep'] = true
-g:poptools_config['preview_vimgrep'] = true
-g:poptools_config['fuzzy_search'] = false
-
-nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
-# Copy in the selected text into t register ad leave it. Who cares about the t
-# register?
-nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
-nnoremap <c-tab> <cmd>PoptoolsBuffers<cr>
-nnoremap <c-p>o <cmd>PoptoolsRecentFiles<cr>
-
-def ShowRecentFiles()
-  var readable_args = copy(v:argv[1 : ])->filter((_, x) =>
-    !empty(x) && filereadable(x)
-  )
-  if len(readable_args) == 0
-    execute('PoptoolsRecentFiles')
-  endif
-enddef
-
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
 
 # vim-outline
 g:outline_autoclose = false
-
-# vim-manim setup
-var manim_common_flags = '--fps 30 --disable_caching -v WARNING --save_sections'
-g:manim_flags = {
-  low_quality: $"-pql {manim_common_flags}",
-  high_quality: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/"
-                    .. $"github_ctip/ctip_manim.cfg {manim_common_flags}",
-  dry_run: $'--dry_run {manim_common_flags}',
-  transparent: $"-pqh -c ~/Documents/YouTube/ControlTheoryInPractice/"
-      .. $"github_ctip/ctip_manim.cfg {manim_common_flags} --transparent"
-}
-g:manim_default_flag = keys(g:manim_flags)[-1]
-
-if g:os == "Darwin"
-  augroup CLOSE_QUICKTIME
-    autocmd!
-    autocmd! User ManimPre exe "!osascript ~/QuickTimeClose.scpt"
-  augroup END
-endif
-
-# Manim commands
-# To make docs go to manim/docs and run make html. Be sure that all the
-# sphinx
-# extensions packages are installed.
-# TODO Make it working with Windows
-
-# command ManimDocs silent :!open -a safari.app
-#             \ ~/Documents/manimce-latest/index.html
-
-command ManimNew :enew | :0read ~/.manim/new_manim.txt
-command ManimHelpVMobjs exe "HelpMe " .. g:dotvim ..
-      \ "/helpme_files/manim_vmobjects.txt"
-command ManimHelpTex exe "HelpMe " .. g:dotvim ..
-      \ "/helpme_files/manim_tex.txt"
-command ManimHelpUpdaters exe "HelpMe " .. g:dotvim ..
-      \ "/helpme_files/manim_updaters.txt"
-command ManimHelpTransform exe "HelpMe " .. g:dotvim
-      \ .. "/helpme_files/manim_transform.txt"
-
-
-# HelpMe files for my poor memory
-# var help_me_loc = $"{g:dotvim}/helpme_files/"
-# command! HelpmeBasic exe $"HelpMe {help_me_loc}/vim_basic.txt"
-# command! HelpmeScript exe $"HelpMe {help_me_loc}/vim_scripting.txt"
-# command! HelpmeGlobal exe $"HelpMe {help_me_loc}/vim_global.txt"
-# command! HelpmeExCommands exe $"HelpMe {help_me_loc}/vim_excommands.txt"
-# command! HelpmeSubstitute exe $"HelpMe {help_me_loc}/vim_substitute.txt"
-# command! HelpmeUnitTests exe $"HelpMe {help_me_loc}/vim_unit_tests.txt"
-# command! HelpmeAdvanced exe $"HelpMe {help_me_loc}/vim_advanced.txt"
-# command! HelpmeDiffMerge exe $"HelpMe {help_me_loc}/vim_merge_diff.txt"
-# command! HelpmeCoding exe $"HelpMe {help_me_loc}/vim_coding.txt"
-# command! HelpmeClosures exe $"HelpMe {help_me_loc}/python_closures.txt"
-# command! HelpmeDebug exe $"HelpMe {help_me_loc}/vim_debug.txt"
-# command! HelpmeVimspector exe $"HelpMe {help_me_loc}/vim_vimspector.txt"
-
-# HelpMe
-def HelpMeGetFiles(): list<string>
-  return getcompletion($'{g:dotvim}/helpme_files/', 'file')
-enddef
-
-def HelpMeComplete(
-    arglead: string,
-    command_line: string,
-    position: number
-  ): list<string>
-
-  var helpme_files = HelpMeGetFiles()->map((_, val)  => fnamemodify(val, ':t:r'))
-  return helpme_files->filter($'v:val =~ "^{arglead}"')
-enddef
-
-def HelpMeShow(filename: string='')
-  var helpme_files = HelpMeGetFiles()
-  var filename_full = helpme_files->filter((_, val) => val =~ filename)
-  if !empty(filename_full)
-    exe $"HelpMe {filename_full[0]}"
-  else
-    HelpMe
-  endif
-enddef
-
-def HelpMeEdit(filename: string='')
-  var helpme_files = HelpMeGetFiles()
-  var filename_full = helpme_files->filter((_, val) => val =~ filename)
-  if !empty(filename_full)
-    exe $"edit {filename_full[0]}"
-  else
-    echoerr $"File {filename_full[0]} not found"
-  endif
-enddef
-
-command! -nargs=? -complete=customlist,HelpMeComplete HelpMeShow HelpMeShow(<q-args>)
-command! -nargs=? -complete=customlist,HelpMeComplete HelpMeEdit HelpMeEdit(<q-args>)
 
 # vim-replica stuff
 # ----------------------------------
@@ -653,47 +391,6 @@ xnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
 
 # Outline. <F8> is overriden by vimspector
 nnoremap <silent> <F8> <Plug>OutlineToggle
-
-# Must be a list
-g:markdown_extras_config['large_files_threshold'] = 0
-g:op_surround_maps = [
-  {map: "sa'", open_delim: "''", close_delim: "''", action: "append"},
-  {map: "sd'", open_delim: "''", close_delim: "''", action: "delete"},
-  {map: "sab", open_delim: "[", close_delim: "]", action: "append"},
-  {map: "sdb", open_delim: "[", close_delim: "]", action: "delete"},
-  {map: "sap", open_delim: "(", close_delim: ")", action: "append"},
-  {map: "sdp", open_delim: "(", close_delim: ")", action: "delete"},
-  {map: "sac", open_delim: "{", close_delim: "}", action: "append"},
-  {map: "sdc", open_delim: "{", close_delim: "}", action: "delete"}
-]
-for [open, close] in [['"', '"'], ['`', '`']]
-  # Append mappings
-  add(g:op_surround_maps, {
-    map: $"sa{open}",
-    open_delim: open,
-    close_delim: close,
-    action: 'append'})
-
-  # Delete mappings
-  add(g:op_surround_maps, {
-    map: $"sd{open}",
-    open_delim: open,
-    close_delim: close,
-    action: 'delete'})
-endfor
-
-
-#   add(g:op_surround_maps, {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'}
-#   {map: "<leader>(", open_delim: "(", close_delim: ")", action: 'append'},
-#   {map: "<leader>[", open_delim: "[", close_delim: "]", action: 'append'},
-#   {map: "<leader>{", open_delim: "{", close_delim: "}", action: 'append'},
-#   {map: '<leader>"', open_delim: '"', close_delim: '"', action: 'append'},
-#   {map: "<leader>'", open_delim: "''", close_delim: "''", action: 'append'}
-# ]
-# b:op_surround_maps = [{map: "<leader>X", open_delim: "<em>", close_delim: "\\<em>"}]
-# vip = visual inside paragraph
-# This is '"used"' for preparing a text file for the caption to be sent to
-# YouTube.
 
 # Bunch of commands
 # -----------------------
@@ -774,7 +471,7 @@ enddef
 
 command! LLogNewDay IndexNewDay(work_log_path)
 command! LLogOpen IndexOpen(work_log_path)
-command! TODO IndexOpen($'{$HOME}/Documents/my_notes/todo.md')
+command! TODO IndexOpen($'{$HOME}/Documents/my_notes/README.md')
 
 # CC stuff
 if g:os == "Windows"
