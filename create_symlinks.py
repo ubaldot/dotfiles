@@ -1,3 +1,7 @@
+"""
+Run this script directly from ~/dotfiles
+"""
+
 import subprocess
 import platform
 from pathlib import Path
