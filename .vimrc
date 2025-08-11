@@ -430,24 +430,6 @@ enddef
 command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
 
 
-# vim-calendar
-g:calendar_no_mappings = false
-g:calendar_weeknm = 5
-# g:calendar_monday = 0
-g:calendar_mark = 'right'
-def CalendarToggle()
-  const calendar_id = bufwinid('__Calendar')
-  if calendar_id > 0
-    win_execute(calendar_id, 'q')
-  else
-   Calendar
-   wincmd p
-  endif
-enddef
-
-# nnoremap <leader>c <ScriptCmd>CalendarToggle()<cr>
-
-
 # ==  Note taking stuff ==
 var work_log_path =
       \ '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
