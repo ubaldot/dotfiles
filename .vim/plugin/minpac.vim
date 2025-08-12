@@ -18,13 +18,13 @@ def PackInit()
   minpac#add('sainnhe/everforest')
   minpac#add('lambdalisue/fern.vim')
   minpac#add('junegunn/vim-easy-align')
-  minpac#add('mattn/calendar-vim')
   minpac#add('ubaldot/vim-highlight-yanked')
   minpac#add('ubaldot/vim-outline')
   minpac#add('ubaldot/vim-markdown-extras')
   minpac#add('ubaldot/vim-poptools')
   minpac#add('ubaldot/vim-git-master')
   minpac#add('ubaldot/vim-helpme')
+  minpac#add('ubaldot/vim-calendar')
 enddef
 
 # Define user commands for updating/cleaning the plugins.

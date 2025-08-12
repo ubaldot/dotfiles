@@ -54,7 +54,7 @@ if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
 	g:dotvim = $HOME .. "\\vimfiles"
-  exe $"set runtimepath+={g:dotvim}"
+  # exe $"set runtimepath+={g:dotvim}"
 else
   g:tmp = "/tmp"
   g:null_device = "/dev/null"
@@ -127,7 +127,7 @@ set nofoldenable
 set foldmethod=syntax
 set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*,**/*dist*
+set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+=-
@@ -346,6 +346,7 @@ augroup END
 packadd comment
 packadd helptoc
 packadd matchit
+# packadd matchparen
 
 # Plugin settings
 # -----------------
