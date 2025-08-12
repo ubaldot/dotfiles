@@ -25,6 +25,7 @@ def PackInit()
   minpac#add('ubaldot/vim-git-master')
   minpac#add('ubaldot/vim-helpme')
   minpac#add('ubaldot/vim-calendar')
+  minpac#add('ubaldot/vim-op-surround')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
