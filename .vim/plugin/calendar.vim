@@ -52,13 +52,12 @@ const month_n2_to_str = {
 }
 
 # Collect last month
-def g:LastMonthFiles(month_req: number = -1, one_file: bool = false)
-  # TODO: refactor a bit
-  # OBS: You need vim-calendar
-  g:calendar_files = []
+# Open 1 buffer with a summary
+def g:MonthSummary(month_req: number = -1)
   const month = month_req == -1 ? strftime('%m') : $"0{month_req}"[-2 : ]
   const year = strftime("%Y")
 
+  # This is needed if you stack all the pages in one buffer
   const bufname = $'{month_n2_to_str[month]} {year}'
 
   var win_list = win_findbuf(bufnr(bufname))
@@ -82,12 +81,10 @@ def g:LastMonthFiles(month_req: number = -1, one_file: bool = false)
     var day = ''
     for filename in files
       if filereadable(filename)
-        exe $"edit {filename}"
-        add(g:calendar_files, filename)
         # Append on one single file
-        # day = filename->fnamemodify(':t:r')
-        # appendbufline('%', 0, ['', $"## {year} {month_n2_to_str[month]} {day}"])
-        # appendbufline('%', 2, readfile(filename))
+        day = filename->fnamemodify(':t:r')
+        appendbufline('%', 0, ['', $"## {year} {month_n2_to_str[month]} {day}"])
+        appendbufline('%', 2, readfile(filename))
       endif
     endfor
   else
@@ -96,19 +93,78 @@ def g:LastMonthFiles(month_req: number = -1, one_file: bool = false)
   cursor(1, 1)
 enddef
 
-command! -nargs=? CalendarLastMonth g:LastMonthFiles(<args>)
+command! -nargs=? CalendarMonthSummary g:MonthSummary(<args>)
+
+# Open N buffers
+def g:MonthPages(month_req: number = -1)
+  # OBS: You need vim-calendar
+  g:calendar_files = []
+  const month = month_req == -1 ? strftime('%m') : $"0{month_req}"[-2 : ]
+  const year = strftime("%Y")
+
+  const path = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
+  const full_path = $"{path}/{year}/{month}"
+  if isdirectory(full_path)
+    const files = readdir(full_path)->map((_, val) => $"{full_path}/{val}")
+
+    var day = ''
+    for filename in files
+      if filereadable(filename)
+        exe $"edit {filename}"
+        add(g:calendar_files, filename)
+      endif
+    endfor
+  else
+    confirm($"Directory {full_path} does not exists")
+  endif
+enddef
+
+command! -nargs=? CalendarMonth g:MonthPages(<args>)
 
 def CalendarClearPages()
   for file in g:calendar_files
     exe $"bw! {file->fnamemodify(':t')}"
   endfor
 enddef
-
 command! -nargs=0 CalendarClearPages CalendarClearPages()
 
+
+# Open N buffers
+def g:LastNDaysPages()
+
+    g:calendar_files = []
+    const N_default = 10
+    var N_str = input($'How many days (default {N_default})? ')
+    var N = empty(N_str) ? N_default : str2nr(N_str)
+
+    var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
+    var ts = localtime()  # start from now
+
+    for _ in range(N)
+        var year  = strftime('%Y', ts)
+        var month = strftime('%m', ts)
+        month = len(month) == 1 ? $"0{month}"[-2 : ] : month
+        var day   = strftime('%d', ts)
+        day = len(day) == 1 ? $"0{day}"[-2 : ] : day
+
+        const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
+        var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
+
+        if filereadable(filename)
+          exe $"edit {filename}"
+          add(g:calendar_files, filename)
+        endif
+
+        # 86400 is the number of seconds in one day, 3600 * 24
+        ts -= 86400  # go back one day
+    endfor
+enddef
+command! -nargs=0 CalendarLastDays g:LastNDaysPages()
+
+
 # Pass last N days
-# def g:LastNDaysFiles(N: number)
-def g:LastNDaysFiles()
+# def g:LastNDaysPages(N: number)
+def g:LastNDaysPagesSummary()
 
     const N_default = 10
     var N_str = input($'How many days (default {N_default})? ')
@@ -144,7 +200,7 @@ def g:LastNDaysFiles()
     deletebufline('%', 1)
 enddef
 
-command! -nargs=0 CalendarLastDays g:LastNDaysFiles()
+command! -nargs=0 CalendarLastDaysSummary g:LastNDaysPagesSummary()
 
 # Toggle calendar
 def CalendarToggle()
