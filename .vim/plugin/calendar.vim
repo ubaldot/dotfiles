@@ -79,7 +79,8 @@ def g:MonthSummary(month_req: number = -1)
     const files = readdir(full_path)->map((_, val) => $"{full_path}/{val}")
 
     var day = ''
-    for filename in files
+    # Don't pick the last day
+    for filename in files[: -2]
       if filereadable(filename)
         # Append on one single file
         day = filename->fnamemodify(':t:r')
@@ -128,6 +129,26 @@ def CalendarClearPages()
 enddef
 command! -nargs=0 CalendarClearPages CalendarClearPages()
 
+def g:CalendarToday()
+
+    var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
+    var year  = strftime('%Y')
+    var month = strftime('%m')
+    month = len(month) == 1 ? $"0{month}"[-2 : ] : month
+    var day   = strftime('%d')
+    day = len(day) == 1 ? $"0{day}"[-2 : ] : day
+
+    const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
+    var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
+
+    if filereadable(filename)
+      exe $"edit {filename}"
+    else
+      exe $"vnew {filename}"
+    endif
+enddef
+command! -nargs=0 CalendarToday g:CalendarToday()
+
 
 # Open N buffers
 def g:LastNDaysPages()
@@ -169,6 +190,8 @@ def g:LastNDaysPagesSummary()
     const N_default = 10
     var N_str = input($'How many days (default {N_default})? ')
     var N = empty(N_str) ? N_default : str2nr(N_str)
+    var today = strftime('%d')
+    today = len(today) == 1 ? $"0{today}"[-2 : ] : today
 
     vnew
     wincmd H
@@ -188,7 +211,7 @@ def g:LastNDaysPagesSummary()
         const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
         var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
 
-        if filereadable(filename)
+        if filereadable(filename) && day != today
             appendbufline('%', line('$'), ['', $"## {year} {month_n2_to_str[month]} {day}"])
             appendbufline('%', line('$'), readfile(filename))
             appendbufline('%', line('$'), '')
