@@ -134,6 +134,9 @@ command! -nargs=0 CalendarClearPages CalendarClearPages()
 
 def g:CalendarToday()
 
+    # Close all the windows
+    exe "only"
+
     var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
     var year  = strftime('%Y')
     var month = strftime('%m')
@@ -143,11 +146,14 @@ def g:CalendarToday()
     const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
     var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
 
-    if filereadable(filename)
-      exe $"edit {filename}"
-    else
-      exe $"vnew {filename}"
-    endif
+    exe $"edit {filename}"
+    # if filereadable(filename)
+    #   exe $"edit {filename}"
+    # else
+    #   exe $"vnew {filename}"
+    # endif
+    g:LastNDaysPagesSummary(10)
+    wincmd p
 enddef
 command! -nargs=0 CalendarToday g:CalendarToday()
 
@@ -185,15 +191,19 @@ command! -nargs=0 CalendarLastDays g:LastNDaysPages()
 
 
 # Pass last N days
-def g:LastNDaysPagesSummary()
+def g:LastNDaysPagesSummary(N_req: number = 0)
 
+  var N = 0
+  if N_req == 0
     const N_default = 10
     var N_str = input($'How many days (default {N_default})? ')
-    var N = empty(N_str) ? N_default : str2nr(N_str)
+    N = empty(N_str) ? N_default : str2nr(N_str)
+  else
+    N = N_req
+  endif
     var today = strftime('%d')
 
     vnew
-    wincmd H
     exe $"file 'last {N} days'"
     set ft=markdown
 
@@ -221,7 +231,7 @@ def g:LastNDaysPagesSummary()
     endfor
     deletebufline('%', 1)
 enddef
-command! -nargs=0 CalendarLastDaysSummary g:LastNDaysPagesSummary()
+command! -nargs=? CalendarLastDaysSummary g:LastNDaysPagesSummary(<args>)
 
 
 def g:Today()
