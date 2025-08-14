@@ -506,7 +506,7 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
     endif
 
     if inc_week
-      # Highlight Sundays
+      # Highlight week
       range(firstline + 1, line('$'))
         ->map((_, val) => matchaddpos('CursorLineNr', [[val, 23, 2]]))
     endif
@@ -534,4 +534,4 @@ def PrintMultipleCal(
   endfor
 enddef
 
-PrintMultipleCal(2025, 08)
+PrintMultipleCal(2025, 08, false, true)
