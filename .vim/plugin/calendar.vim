@@ -317,8 +317,8 @@ enddef
 #
 # ============= ATTEMPT FOR A NEW CALENDAR ======================
 
-
-# Get number of days in a given month
+# --- Helpers ---
+# Number of days in a given month
 def DaysInMonth(year: number, month: number): number
     if month == 2
         # Leap year check
@@ -478,7 +478,6 @@ def CalendarForDateISO(year: number, month: number, day: number, add_weeknum: bo
 
     return weeks
 enddef
-
 # Example: Get current date's calendar
 var yy = str2nr(strftime('%Y'))
 var mm = str2nr(strftime('%m'))
@@ -488,12 +487,9 @@ var Ww = str2nr(strftime('%W'))
 yy = 1979
 mm = 5
 dd = 7
-# var cal_list =  CalendarForDate(y, m, d)
-# var cal_list =  CalendarForDateISO(yy, mm, dd, true)
 
-def PrintCal(year: number, month: number, cal: list<list<number>>)
-  only
-  vnew
+
+def PrintSingleCal(year: number, month: number, inc_week: bool)
 
   # Fix head
   var month_str = month_n2_to_str[printf('%02d', month)]
@@ -505,20 +501,39 @@ def PrintCal(year: number, month: number, cal: list<list<number>>)
   # Fix weekdays
   var weekdays = 'Su Mo Tu We Th Fr Sa'
 
-  padding = len(cal[0]) == 7 ? 1 : 4
+  padding = inc_week ? 4 : 1
   appendbufline('%', line('$'), $" {weekdays}")
   matchadd('StatusLine', weekdays)
 
-  # Fix actual days
+  # Actual days
+  var cal = CalendarForDateISO(year, month, 15, inc_week)
+  echom cal
   for line in cal
+    var firstline = line('$')
     var line_cleaned: string =
       line->mapnew((_, val) => printf('%02d', val))
     ->map((_, val) => substitute(val, '00', '  ', 'g'))
     ->map((_, val) => substitute(val, '^0', ' ', 'g'))
     ->map((_, val) => substitute(val, ',', ' ', 'g'))
     ->join()
-    appendbufline('%', line('$'), $" {line_cleaned}")
+    appendbufline('%', firstline, $" {line_cleaned}")
+
+    # Color Sunday
+    range(firstline + 1, line('$'))
+      ->map((_, val) => matchaddpos('Error', [[val, 2, 2]]))
+    # Color Saturdays
+    range(firstline + 1, line('$'))
+      ->map((_, val) => matchaddpos('Special', [[val, 20, 2]]))
   endfor
 enddef
 
-# PrintCal(yy, mm, cal_list)
+def PrintMultipleCal(year: number, month: number, inc_week: bool, N: number = 1)
+  vnew
+  for ii in range(N)
+    PrintSingleCal(year, month + ii, true)
+    appendbufline('%', line('$'), '')
+  endfor
+enddef
+vnew
+# PrintSingleCal(2025, 08, true)
+PrintMultipleCal(2025, 08, true, 3)
