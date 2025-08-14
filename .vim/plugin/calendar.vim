@@ -153,8 +153,8 @@ def g:CalendarToday()
     var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
 
     exe $"edit {filename}"
-    g:LastNDaysPagesSummary(30)
-    # g:LastNDaysPages(10)
+    # g:LastNDaysPagesSummary(30)
+    g:LastNDaysPages(10)
     win_gotoid(saved_win)
 enddef
 command! -nargs=0 CalendarToday g:CalendarToday()
@@ -313,3 +313,212 @@ def g:CalendarActionUnique(
     endif
 enddef
 # g:calendar_action = 'g:CalendarActionUnique'
+#
+#
+# ============= ATTEMPT FOR A NEW CALENDAR ======================
+
+
+# Get number of days in a given month
+def DaysInMonth(year: number, month: number): number
+    if month == 2
+        # Leap year check
+        if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+            return 29
+        endif
+        return 28
+    endif
+    if index([1, 3, 5, 7, 8, 10, 12], month) != -1
+        return 31
+    endif
+    return 30
+enddef
+
+# # Build calendar for a given date
+# # Returns weekday of a date (0=Monday, 6=Sunday)
+def WeekdayOfDate(year: number, month: number, day: number): number
+    var month_tmp = month
+    var year_tmp = year
+    if month_tmp < 3
+        month_tmp += 12
+        year_tmp -= 1
+    endif
+    var K = year % 100
+    var J = year / 100
+    var h = (day + (13 * (month_tmp + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
+    # Zeller's h: 0=Saturday, ..., 6=Friday
+    # Convert to Monday=0 ... Sunday=6
+    return (h + 5) % 7
+enddef
+
+# def CalendarForDate(
+#     year: number,
+#     month: number,
+#     day: number,
+#     add_weeknum: bool = true): list<list<number>>
+
+#   var month_days = DaysInMonth(year, month)
+#   var first_wday = WeekdayOfDate(year, month, 1)
+#   var weeks: list<list<number>> = []
+#   var week: list<number> = []
+#   var week_num = 1
+
+#   # Fill first row with blanks before day 1
+#   for _ in range(first_wday)
+#     week->add(0)
+#   endfor
+
+#   # Fill days
+#   for d in range(1, month_days)
+#     week->add(d)
+#     if week->len() == 7
+#       if add_weeknum
+#         week->add(week_num)
+#       endif
+#       weeks->add(week)
+#       week = []
+#       week_num += 1
+#     endif
+#   endfor
+
+#   # Fill trailing blanks
+#   if !empty(week)
+#     while week->len() < 7
+#       week->add(0)
+#     endwhile
+#     if add_weeknum
+#       week->add(week_num)
+#     endif
+#     weeks->add(week)
+#   endif
+
+#   return weeks
+# enddef
+
+
+# Compute ISO 8601 week number for a given date
+def ISOWeekNumber(year: number, month: number, day: number): number
+    # Zeller's congruence to get weekday (0=Monday,...6=Sunday)
+    var y = year
+    var m = month
+    if m < 3
+        m += 12
+        y -= 1
+    endif
+    var K = y % 100
+    var J = y / 100
+    var h = (day + (13 * (m + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
+    var d = (h + 5) % 7  # Monday=0,...Sunday=6
+
+    # Compute day of year
+    var days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    # Adjust February for leap year
+    if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+        days_in_month[1] = 29
+    endif
+    var doy = day
+    for i in range(0, month - 2)
+        doy += days_in_month[i]
+    endfor
+
+    # ISO week number formula
+    var woy = (doy - d + 10) / 7
+    if woy < 1
+        # Week belongs to last week of previous year
+        return ISOWeekNumber(year - 1, 12, 31)
+    elseif woy > 52
+        # Handle year-end edge cases
+        var last_day_wday = ISOWeekNumber(year, 12, 31)
+        if last_day_wday == 1 || last_day_wday == 2 || last_day_wday == 3 || last_day_wday == 4
+            return 53
+        else
+            return 1
+        endif
+    endif
+    return woy
+enddef
+
+# Generate calendar with optional ISO week numbers at the end
+def CalendarForDateISO(year: number, month: number, day: number, add_weeknum: bool = 0): list<list<number>>
+    var month_days = DaysInMonth(year, month)
+    var first_wday = WeekdayOfDate(year, month, 1)  # weekday 0=Mon
+    var weeks: list<list<number>> = []
+    var week: list<number> = []
+
+    # Get ISO week number of the first day of the month
+    var week_num = ISOWeekNumber(year, month, 1)
+
+    # Fill first week with blanks before day 1
+    for _ in range(first_wday)
+        week->add(0)
+    endfor
+
+    # Fill days
+    for d in range(1, month_days)
+        week->add(d)
+        if week->len() == 7
+            if add_weeknum
+                week->add(week_num)
+            endif
+            weeks->add(week)
+            week = []
+            week_num += 1
+        endif
+    endfor
+
+    # Fill trailing blanks
+    if !empty(week)
+        while week->len() < 7
+            week->add(0)
+        endwhile
+        if add_weeknum
+            week->add(week_num)
+        endif
+        weeks->add(week)
+    endif
+
+    return weeks
+enddef
+
+# Example: Get current date's calendar
+var yy = str2nr(strftime('%Y'))
+var mm = str2nr(strftime('%m'))
+var dd = str2nr(strftime('%d'))
+var Ww = str2nr(strftime('%W'))
+
+yy = 1979
+mm = 5
+dd = 7
+# var cal_list =  CalendarForDate(y, m, d)
+# var cal_list =  CalendarForDateISO(yy, mm, dd, true)
+
+def PrintCal(year: number, month: number, cal: list<list<number>>)
+  only
+  vnew
+
+  # Fix head
+  var month_str = month_n2_to_str[printf('%02d', month)]
+  var padding = max([0, 18 - len(month_str)]) / 2
+  var year_month = $"{repeat(' ', padding)}{month_str} {year}"
+  appendbufline('%', line('$'), $"{year_month}")
+  matchadd('WarningMsg', year_month)
+
+  # Fix weekdays
+  var weekdays = 'Su Mo Tu We Th Fr Sa'
+
+  padding = len(cal[0]) == 7 ? 1 : 4
+  appendbufline('%', line('$'), $" {weekdays}")
+  matchadd('StatusLine', weekdays)
+
+  # Fix actual days
+  for line in cal
+    var line_cleaned: string =
+      line->mapnew((_, val) => printf('%02d', val))
+    ->map((_, val) => substitute(val, '00', '  ', 'g'))
+    ->map((_, val) => substitute(val, '^0', ' ', 'g'))
+    ->map((_, val) => substitute(val, ',', ' ', 'g'))
+    ->join()
+    appendbufline('%', line('$'), $" {line_cleaned}")
+  endfor
+enddef
+
+# PrintCal(yy, mm, cal_list)
