@@ -350,52 +350,7 @@ def WeekdayOfDate(year: number, month: number, day: number): number
     return (h + 5) % 7
 enddef
 
-# def CalendarForDate(
-#     year: number,
-#     month: number,
-#     day: number,
-#     add_weeknum: bool = true): list<list<number>>
-
-#   var month_days = DaysInMonth(year, month)
-#   var first_wday = WeekdayOfDate(year, month, 1)
-#   var weeks: list<list<number>> = []
-#   var week: list<number> = []
-#   var week_num = 1
-
-#   # Fill first row with blanks before day 1
-#   for _ in range(first_wday)
-#     week->add(0)
-#   endfor
-
-#   # Fill days
-#   for d in range(1, month_days)
-#     week->add(d)
-#     if week->len() == 7
-#       if add_weeknum
-#         week->add(week_num)
-#       endif
-#       weeks->add(week)
-#       week = []
-#       week_num += 1
-#     endif
-#   endfor
-
-#   # Fill trailing blanks
-#   if !empty(week)
-#     while week->len() < 7
-#       week->add(0)
-#     endwhile
-#     if add_weeknum
-#       week->add(week_num)
-#     endif
-#     weeks->add(week)
-#   endif
-
-#   return weeks
-# enddef
-
-
-# Compute ISO 8601 week number for a given date
+# de# Compute ISO 8601 week number for a given date
 def ISOWeekNumber(year: number, month: number, day: number): number
     # Zeller's congruence to get weekday (0=Monday,...6=Sunday)
     var y = year
@@ -438,7 +393,7 @@ def ISOWeekNumber(year: number, month: number, day: number): number
 enddef
 
 # Generate calendar with optional ISO week numbers at the end
-def CalendarForDateISO(year: number, month: number, day: number, add_weeknum: bool = 0): list<list<number>>
+def CalendarMonth(year: number, month: number, day: number, add_weeknum: bool = 0): list<list<number>>
     var month_days = DaysInMonth(year, month)
     var first_wday = WeekdayOfDate(year, month, 1)  # weekday 0=Mon
     var weeks: list<list<number>> = []
@@ -484,12 +439,62 @@ var mm = str2nr(strftime('%m'))
 var dd = str2nr(strftime('%d'))
 var Ww = str2nr(strftime('%W'))
 
-yy = 1979
-mm = 5
-dd = 7
 
+# def PrintSingleCal(year: number, month: number, inc_week: bool)
+#   # Identify today
+#   var is_today_year_month = strftime('%Y') == printf('%04d', year)
+#                             && strftime('%m') == printf('%02d', month)
 
+#   # Month header
+#   var month_str = month_n2_to_str[printf('%02d', month)]
+#   var padding = max([0, 18 - len(month_str)]) / 2
+#   appendbufline('%', line('$'), $"{repeat(' ', padding)}{month_str} {year}")
+
+#   # Weekday header (Monday first)
+#   var weekdays = 'Su Mo Tu We Th Fr Sa'
+
+#   # Generate calendar
+#   const dummy_day = 15
+#   var cal = CalendarMonth(year, month, dummy_day, inc_week)
+
+#   # var start_on_monday = true
+#   # if start_on_monday
+#   #  weekdays = 'Mo Tu We Th Fr Sa Su'
+#   #  for idx in range(len(cal))
+#   #     cal[idx]->map((_, val) => val + 1)
+#   #  endfor
+#   # endif
+#   appendbufline('%', line('$'), $" {weekdays}")
+
+#   for row in cal
+#     var firstline = line('$')
+#     var line_cleaned = row
+#       ->mapnew((_, val) => printf('%02d', val))
+#       ->map((_, val) => substitute(val, '00', '  ', 'g'))
+#       ->map((_, val) => substitute(val, '^0', ' ', 'g'))
+#       ->join(' ')
+#     appendbufline('%', firstline, $" {line_cleaned}")
+
+#     # Highlight Saturday (6th column) and Sunday (7th column)
+#     matchaddpos('Special', [[firstline + 1, 17, 2]]) # adjust column as needed
+#     matchaddpos('Error',   [[firstline + 1, 20, 2]])
+
+#     # Highlight today if applicable
+#     if is_today_year_month
+#       const today = strftime('%d')
+#       matchadd('DiffAdd', $'\%{firstline + 1}l\%V{today}')
+#     endif
+#   endfor
+# enddef
+#
+#
 def PrintSingleCal(year: number, month: number, inc_week: bool)
+  # Identify today
+  var is_today_year_month = false
+  if strftime('%Y') == printf('%04d', year)
+      && strftime('%m') == printf('%02d', month)
+    is_today_year_month = true
+  endif
 
   # Fix head
   var month_str = month_n2_to_str[printf('%02d', month)]
@@ -499,14 +504,15 @@ def PrintSingleCal(year: number, month: number, inc_week: bool)
   matchadd('WarningMsg', year_month)
 
   # Fix weekdays
-  var weekdays = 'Su Mo Tu We Th Fr Sa'
+  var weekdays = 'Mo Tu We Th Fr Sa Su'
 
   padding = inc_week ? 4 : 1
   appendbufline('%', line('$'), $" {weekdays}")
   matchadd('StatusLine', weekdays)
 
   # Actual days
-  var cal = CalendarForDateISO(year, month, 15, inc_week)
+  const dummy_day = 15 # Needed only for computing the current week
+  var cal = CalendarMonth(year, month, dummy_day, inc_week)
   echom cal
   for line in cal
     var firstline = line('$')
@@ -518,22 +524,31 @@ def PrintSingleCal(year: number, month: number, inc_week: bool)
     ->join()
     appendbufline('%', firstline, $" {line_cleaned}")
 
-    # Color Sunday
+    # Higlight Saturdays
     range(firstline + 1, line('$'))
-      ->map((_, val) => matchaddpos('Error', [[val, 2, 2]]))
-    # Color Saturdays
+      ->map((_, val) => matchaddpos('Special', [[val, 17, 2]]))
+
+    # Highlight Sundays
     range(firstline + 1, line('$'))
-      ->map((_, val) => matchaddpos('Special', [[val, 20, 2]]))
+      ->map((_, val) => matchaddpos('Error', [[val, 20, 2]]))
+
+    # Highlight today
+    if is_today_year_month
+      const today = strftime('%d')
+      var line_span = range(firstline + 1, line('$'))
+        ->map((_, val) => $'\%{val}l')->join('\|')
+      matchadd('DiffAdd', $'{line_span}\zs{today}')
+    endif
   endfor
 enddef
 
-def PrintMultipleCal(year: number, month: number, inc_week: bool, N: number = 1)
+def PrintMultipleCal(year: number, month: number, inc_week: bool = false, N: number = 3)
   vnew
   for ii in range(N)
-    PrintSingleCal(year, month + ii, true)
+    PrintSingleCal(year, month - 1 + ii, inc_week)
     appendbufline('%', line('$'), '')
   endfor
 enddef
-vnew
+# vnew
 # PrintSingleCal(2025, 08, true)
-PrintMultipleCal(2025, 08, true, 3)
+PrintMultipleCal(2025, 08, true)
