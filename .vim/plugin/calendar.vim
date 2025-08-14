@@ -465,12 +465,9 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
   matchadd('WarningMsg', year_month)
 
   # Fix weekdays
-  var weekdays = ''
-  if start_on_sunday
-    weekdays = 'Su Mo Tu We Th Fr Sa'
-  else
-    weekdays = 'Mo Tu We Th Fr Sa Su'
-  endif
+  var weekdays = start_on_sunday
+    ? 'Su Mo Tu We Th Fr Sa'
+    : 'Mo Tu We Th Fr Sa Su'
 
   padding = inc_week ? 4 : 1
   appendbufline('%', line('$'), $" {weekdays}")
@@ -534,4 +531,4 @@ def PrintMultipleCal(
   endfor
 enddef
 
-PrintMultipleCal(2025, 08, false, true)
+# PrintMultipleCal(2021, 08, false, false)
