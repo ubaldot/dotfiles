@@ -101,7 +101,7 @@ enddef
 command! -nargs=? CalendarMonthSummary g:MonthSummary(<args>)
 
 # Open N buffers
-def g:MonthPages(month_req: number = -1)
+def g:CalendarMonthPages(month_req: number = -1)
   # OBS: You need vim-calendar
   g:calendar_files = []
   const month = month_req == -1 ? strftime('%m') : month_req
@@ -123,20 +123,26 @@ def g:MonthPages(month_req: number = -1)
     confirm($"Directory {full_path} does not exists")
   endif
 enddef
-command! -nargs=? CalendarMonth g:MonthPages(<args>)
+command! -nargs=? CalendarMonthPages g:CalendarMonthPages(<args>)
 
 def CalendarClearPages()
-  for file in g:calendar_files
-    exe $"bw! {file->fnamemodify(':t')}"
-  endfor
+  # Clear all the pages but today
+  if exists('g:calendar_files') && !empty(g:calendar_files)
+    const today = strftime('%Y/%m/%d')
+    for file in g:calendar_files
+      if file !~ today
+        exe $"bw! {file->fnamemodify(':t')}"
+      endif
+    endfor
+  endif
 enddef
 command! -nargs=0 CalendarClearPages CalendarClearPages()
 
 def g:CalendarToday()
 
     # Close all the windows
+    const saved_win = win_getid()
     exe "only"
-
     var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
     var year  = strftime('%Y')
     var month = strftime('%m')
@@ -147,50 +153,53 @@ def g:CalendarToday()
     var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
 
     exe $"edit {filename}"
-    # if filereadable(filename)
-    #   exe $"edit {filename}"
-    # else
-    #   exe $"vnew {filename}"
-    # endif
-    g:LastNDaysPagesSummary(10)
-    wincmd p
+    g:LastNDaysPagesSummary(30)
+    # g:LastNDaysPages(10)
+    win_gotoid(saved_win)
 enddef
 command! -nargs=0 CalendarToday g:CalendarToday()
 
 # Open N buffers
-def g:LastNDaysPages()
+def g:LastNDaysPages(N_req: number = 0)
 
-    g:calendar_files = []
+  g:calendar_files = []
+
+  var N = 0
+  if N_req == 0
     const N_default = 10
     var N_str = input($'How many days (default {N_default})? ')
-    var N = empty(N_str) ? N_default : str2nr(N_str)
+    N = empty(N_str) ? N_default : str2nr(N_str)
+  else
+    N = N_req
+  endif
 
-    var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
-    var ts = localtime()  # start from now
+  var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
+  var ts = localtime()  # start from now
+  vnew
 
-    for _ in range(N)
-        var year  = strftime('%Y', ts)
-        var month = strftime('%m', ts)
-        month = len(month) == 1 ? $"0{month}"[-2 : ] : month
-        var day   = strftime('%d', ts)
-        day = len(day) == 1 ? $"0{day}"[-2 : ] : day
+  for _ in range(N)
+    var year  = strftime('%Y', ts)
+    var month = strftime('%m', ts)
+    month = len(month) == 1 ? $"0{month}"[-2 : ] : month
+    var day   = strftime('%d', ts)
+    day = len(day) == 1 ? $"0{day}"[-2 : ] : day
 
-        const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
-        var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
+    const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
+    var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
 
-        if filereadable(filename)
-          exe $"edit {filename}"
-          add(g:calendar_files, filename)
-        endif
+    if filereadable(filename)
+      exe $"edit {filename}"
+      add(g:calendar_files, filename)
+    endif
 
-        # 86400 is the number of seconds in one day, 3600 * 24
-        ts -= 86400  # go back one day
-    endfor
+    # 86400 is the number of seconds in one day, 3600 * 24
+    ts -= 86400  # go back one day
+  endfor
 enddef
-command! -nargs=0 CalendarLastDays g:LastNDaysPages()
+command! -nargs=? CalendarLastDaysPages g:LastNDaysPages(<args>)
 
 
-# Pass last N days
+# Past last N days
 def g:LastNDaysPagesSummary(N_req: number = 0)
 
   var N = 0
@@ -201,45 +210,38 @@ def g:LastNDaysPagesSummary(N_req: number = 0)
   else
     N = N_req
   endif
-    var today = strftime('%d')
 
-    vnew
-    exe $"file 'last {N} days'"
-    set ft=markdown
+  var today = strftime('%d')
+  vnew
+  exe $"file 'last {N} days'"
+  set ft=markdown
 
-    var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
-    var ts = localtime()  # start from now
+  var base_dir = g:calendar_diary_list[g:calendar_diary_list_curr_idx].path
+  var ts = localtime()  # start from now
 
-    for _ in range(N)
-        var year  = strftime('%Y', ts)
-        var month = strftime('%m', ts)
-        month = len(month) == 1 ? $"0{month}"[-2 : ] : month
-        var day   = strftime('%d', ts)
-        day = len(day) == 1 ? $"0{day}"[-2 : ] : day
+  for _ in range(N)
+    var year  = strftime('%Y', ts)
+    var month = strftime('%m', ts)
+    month = len(month) == 1 ? $"0{month}"[-2 : ] : month
+    var day   = strftime('%d', ts)
+    day = len(day) == 1 ? $"0{day}"[-2 : ] : day
 
-        const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
-        var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
+    const ext = g:calendar_diary_list[g:calendar_diary_list_curr_idx].ext
+    var filename = $"{base_dir}/{year}/{month}/{day}{ext}"
 
-        if filereadable(filename) && day != today
-            appendbufline('%', line('$'), ['', $"## {year} {month_n2_to_str[month]} {day}"])
-            appendbufline('%', line('$'), readfile(filename))
-            appendbufline('%', line('$'), '')
-        endif
+    if filereadable(filename) && day != today
+      appendbufline('%', line('$'), ['', $"## {year} {month_n2_to_str[month]} {day}"])
+      appendbufline('%', line('$'), readfile(filename))
+      appendbufline('%', line('$'), '')
+    endif
 
-        # 86400 is the number of seconds in one day, 3600 * 24
-        ts -= 86400  # go back one day
-    endfor
-    deletebufline('%', 1)
+    # 86400 is the number of seconds in one day, 3600 * 24
+    ts -= 86400  # go back one day
+  endfor
+  deletebufline('%', 1)
 enddef
 command! -nargs=? CalendarLastDaysSummary g:LastNDaysPagesSummary(<args>)
 
-
-def g:Today()
-  const year = strftime('%Y')->str2nr()
-  const month = strftime('%m')->str2nr()
-  const day = strftime('%d')->str2nr()
-  g:CalendarUnique(day, month, year, 0, '')
-enddef
 
 # Toggle calendar
 def CalendarToggle()
@@ -253,13 +255,32 @@ enddef
 
 nnoremap <leader>C <ScriptCmd>CalendarToggle()<cr>
 
-# Unique calendar
-def g:CalendarUnique(
+# =========== Unique calendar =================
+# Instead of using resolution at days level
+# (i.e. g:calendar_diary/year/month/day.md)
+# you have it at month level (i.e. g:calendar_diary/year/month/day.md)
+#
+# You have to set g:calendar_action, see EOF and change cab_climate dashboard
+# TODO: a function for finding the last N days in this case
+# =============================================
+#
+# Used for adding a day in the month file
+def g:TodayUnique()
+  const year = strftime('%Y')->str2nr()
+  const month = strftime('%m')->str2nr()
+  const day = strftime('%d')->str2nr()
+  g:CalendarUnique(day, month, year, 0, '')
+enddef
+
+# It create files for each month rather than for each day
+def g:CalendarActionUnique(
     day: number,
     month: number,
     year: number,
     week: number,
     dir: string)
+
+    # Header day format used in search is # {year} {month} {day}
 
     const year_str = year->printf("%04d")
     const month_str = month->printf("%02d")
@@ -291,4 +312,4 @@ def g:CalendarUnique(
       norm! j
     endif
 enddef
-# g:calendar_action = 'g:CalendarUnique'
+# g:calendar_action = 'g:CalendarActionUnique'
