@@ -459,47 +459,35 @@ enddef
 def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
     var us_calendar: list<list<number>> = []
     var carry_sunday = 0
-    var us_week = 0
-    var first_sunday_found = 0
+    var carry_week = 0  # ISO week of carried Sunday
 
     for week in iso_calendar
-        # Copy only the 7 days (ignore ISO week number)
         var new_week = week[0 : 6]
+        var iso_week = week[7]
         var sunday = new_week[6]
 
-        # Insert carryover Sunday at start, remove ISO Sunday at end
+        # Prepend carryover Sunday at start
         insert(new_week, carry_sunday, 0)
         remove(new_week, 7)
 
-        # OK
-        echom "len(new_week): " .. len(new_week)
-        # Determine first US week
-        if first_sunday_found == 0
-            for day in new_week
-                if day != 0
-                    first_sunday_found = 1
-                    us_week = 1
-                    break
-                endif
-            endfor
-        else
-            us_week += 1
-        endif
+        # Determine US week number
+        var us_week = carry_sunday != 0 ? carry_week : iso_week
 
-        # Append US week number
-        add(new_week, first_sunday_found ? us_week : 0)
+        add(new_week, us_week)
         add(us_calendar, new_week)
 
+        # Carry Sunday to next row
         carry_sunday = sunday
+        carry_week = iso_week
     endfor
 
     # Add last row if a Sunday remains
     if carry_sunday != 0
-        var last_week = [carry_sunday, 0, 0, 0, 0, 0, 0, us_week + 1]
+        var last_week = [carry_sunday, 0, 0, 0, 0, 0, 0, carry_week]
         add(us_calendar, last_week)
     endif
 
-    # Remove first row if all days are zero
+    # Remove first row if all zeros
     if count(us_calendar[0][0 : 6], 0) == 7
         remove(us_calendar, 0)
     endif
