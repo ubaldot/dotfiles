@@ -336,15 +336,15 @@ enddef
 # # Build calendar for a given date
 # # Returns weekday of a date (0=Monday, 6=Sunday)
 def WeekdayOfDate(year: number, month: number, day: number): number
-    var month_tmp = month
-    var year_tmp = year
-    if month_tmp < 3
-        month_tmp += 12
-        year_tmp -= 1
+    var month_adj = month
+    var year_adj = year
+    if month_adj < 3
+        month_adj += 12
+        year_adj -= 1
     endif
-    var K = year % 100
-    var J = year / 100
-    var h = (day + (13 * (month_tmp + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
+    var K = year_adj % 100
+    var J = year_adj / 100
+    var h = (day + (13 * (month_adj + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
     # Zeller's h: 0=Saturday, ..., 6=Friday
     # Convert to Monday=0 ... Sunday=6
     return (h + 5) % 7
@@ -353,15 +353,15 @@ enddef
 # de# Compute ISO 8601 week number for a given date
 def ISOWeekNumber(year: number, month: number, day: number): number
     # Zeller's congruence to get weekday (0=Monday,...6=Sunday)
-    var y = year
-    var m = month
-    if m < 3
-        m += 12
-        y -= 1
+    var year_adj = year
+    var month_adj = month
+    if month_adj < 3
+        month_adj += 12
+        year_adj -= 1
     endif
-    var K = y % 100
-    var J = y / 100
-    var h = (day + (13 * (m + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
+    var K = year_adj % 100
+    var J = year_adj / 100
+    var h = (day + (13 * (month_adj + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
     var d = (h + 5) % 7  # Monday=0,...Sunday=6
 
     # Compute day of year
@@ -531,4 +531,6 @@ def PrintMultipleCal(
   endfor
 enddef
 
+vnew
+PrintSingleCal(2022, 1, false, true)
 # PrintMultipleCal(2021, 08, false, false)
