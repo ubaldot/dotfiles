@@ -458,6 +458,46 @@ def CalendarMonth(
 
     return weeks
 enddef
+
+# Convert an ISO calendar to US Sunday-start calendar
+def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
+    var us_calendar: list<list<number>> = []
+
+    var first_sunday_found = 0
+    var us_week = 0
+
+    for week in iso_calendar
+        # Copy week
+        var new_week = week[:]
+
+        # Remove the ISO Sunday (index 6) and insert at start
+        var sunday = new_week[6]
+        remove(new_week, 6)
+        insert(new_week, sunday, 0)
+
+        # Compute US week number
+        if first_sunday_found == 0
+            for day in new_week[0 : 7]
+                if day != 0
+                    first_sunday_found = 1
+                    break
+                endif
+            endfor
+        endif
+
+        if first_sunday_found
+            new_week[7] = us_week + 1
+            us_week += 1
+        else
+            new_week[7] = 0
+        endif
+
+        add(us_calendar, new_week)
+    endfor
+
+    return us_calendar
+enddef
+
 # Example: Get current date's calendar
 var yy = str2nr(strftime('%Y'))
 var mm = str2nr(strftime('%m'))
@@ -547,8 +587,8 @@ enddef
 
 
 # TESTS
-# Expewcted results are for January of different years
-var expected_results = {
+# Expected results are for January of different years
+const expected_results = {
   '2005': [0, 0, 0, 0, 0, 1, 2, 53],
   '2006': [0, 0, 0, 0, 0, 0, 1, 52],
   '2010': [0, 0, 0, 0, 1, 2, 3, 53],
@@ -568,3 +608,33 @@ for yyy in test_years
   extend(actual_results, current_result)
 endfor
 echom assert_equal(expected_results, actual_results)
+
+
+# Start on Sunday
+const expected_results_sunday = {
+  '2005': [0, 0, 0, 0, 0, 1, 2, 52],
+  '2006': [0, 0, 0, 0, 0, 0, 1, 51],
+  '2010': [0, 0, 0, 0, 1, 2, 3, 52],
+  '2015': [0, 0, 0, 1, 2, 3, 4, 1],
+  '2016': [0, 0, 0, 0, 1, 2, 3, 52],
+  '2018': [1, 2, 3, 4, 5, 6, 7, 1],
+  '2021': [0, 0, 0, 0, 1, 2, 3, 52],
+  '2022': [0, 0, 0, 0, 0, 1, 2, 51],
+  '2024': [1, 2, 3, 4, 5, 6, 7, 1]
+}
+
+actual_results = {}
+current_result = {}
+for yyy in test_years
+  var cal = CalendarMonth(yyy, 1, false, true)
+  var cal_us = ConvertISOtoUS(cal)
+  current_result = {[yyy]: cal[0]}
+  extend(actual_results, current_result)
+endfor
+# echom assert_equal(expected_results_sunday, actual_results)
+# echom actual_results
+
+vnew
+PrintSingleCal(2016, 1, false, true)
+vnew
+PrintSingleCal(2016, 1, true, true)
