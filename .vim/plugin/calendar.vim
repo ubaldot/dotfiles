@@ -455,10 +455,11 @@ def ConvertISOtoUS(iso_calendar: list<list<number>>, month: number): list<list<n
     var us_calendar: list<list<number>> = []
     var carry_sunday = 0
     var carry_week = 0  # ISO week of carried Sunday
+    var iso_week_present = len(iso_calendar[0]) == 8 ? true : false
 
     for week in iso_calendar
         var new_week = week[0 : 6]
-        var iso_week = week[7]
+        var iso_week = iso_week_present ? week[7] : -1
         var sunday = new_week[6]
 
         # Prepend carryover Sunday at start
@@ -466,21 +467,24 @@ def ConvertISOtoUS(iso_calendar: list<list<number>>, month: number): list<list<n
         remove(new_week, 7)
 
         # Determine US week number
-        # var us_week = carry_sunday != 0 ? carry_week : iso_week
-        var us_week = iso_week
+        if iso_week_present
+          var us_week = iso_week
+          add(new_week, us_week)
+          carry_week = iso_week
+        endif
 
-        add(new_week, us_week)
         add(us_calendar, new_week)
 
         # Carry Sunday to next row
         carry_sunday = sunday
-        carry_week = iso_week
     endfor
 
     # Add last row if a Sunday remains
     if carry_sunday != 0
-        var last_week = [carry_sunday, 0, 0, 0, 0, 0, 0, carry_week + 1]
-        add(us_calendar, last_week)
+      var last_week = iso_week_present
+        ?  [carry_sunday, 0, 0, 0, 0, 0, 0, carry_week + 1]
+        :  [carry_sunday, 0, 0, 0, 0, 0, 0]
+      add(us_calendar, last_week)
     endif
 
     # Remove first row if all zeros
@@ -634,7 +638,7 @@ for yyy in test_years
 endfor
 echom assert_equal(expected_us_results, actual_results)
 
-var XXX  = 2026
+var XXX  = 2021
 vnew
-DisplaySingleCal(XXX, 1, false, true)
-DisplaySingleCal(XXX, 1, true, true)
+DisplaySingleCal(XXX, 4, false, true)
+DisplaySingleCal(XXX, 4, true, true)
