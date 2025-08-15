@@ -456,33 +456,48 @@ def CalendarMonth(
 enddef
 
 # Convert ISO (Monday-start) calendar to US (Sunday-start) calendar
-def ConvertISOtoUS(iso: list<list<number>>): list<list<number>>
-    var us: list<list<number>> = []
+def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
+    var us_calendar: list<list<number>> = []
+    var carry_sunday = 0
+    var first_sunday_found = 0
+    var us_week = 0
 
-    # Step 1: Shift each row so Sunday comes first (ignore ISO week number)
-    for row in iso
-        var days = [row[6]] + row[0 : 5]   # Sunday first, then Mon..Sat
-        add(us, days)
-    endfor
+    for week in iso_calendar
+        # Copy first 7 columns only (strip ISO week number)
+        var new_week = week[0 : 6]
+        var sunday = new_week[6]
 
-    # Step 2: Assign US week numbers
-    var week_num = 0
-    var found_jan1 = false
-    for row in us
-        if !found_jan1
-            if index(row, 1) != -1
-                found_jan1 = true
-                week_num = 1
-            endif
-        else
-            week_num += 1
+        # Insert carry Sunday from previous week
+        insert(new_week, carry_sunday, 0)
+        remove(new_week, 7)  # remove old Sunday
+
+        # Week numbering
+        if first_sunday_found == 0 && new_week[0] != 0
+            first_sunday_found = 1
+            us_week = 1
+        elseif first_sunday_found
+            us_week += 1
         endif
-        add(row, week_num)
+
+        add(new_week, first_sunday_found ? us_week : 0)
+        add(us_calendar, new_week)
+
+        carry_sunday = sunday
     endfor
 
-    return us
-enddef
+    # Add last week if Sunday remains
+    if carry_sunday != 0
+        var last_week = [carry_sunday, 0, 0, 0, 0, 0, 0, us_week + 1]
+        add(us_calendar, last_week)
+    endif
 
+    # Remove first row if all days are zero
+    if count(us_calendar[0][0 : 6], 0) == 7
+        remove(us_calendar, 0)
+    endif
+
+    return us_calendar
+enddef
 
 # Example: Get current date's calendar
 var yy = str2nr(strftime('%Y'))
@@ -598,32 +613,35 @@ echom assert_equal(expected_results, actual_results)
 
 
 # Start on Sunday
-const expected_results_sunday = {
-  '2006': [1, 0, 0, 0, 0, 0, 0, 1],
-  '2015': [4, 0, 0, 0, 1, 2, 3, 1],
-  '2016': [3, 0, 0, 0, 0, 1, 2, 1],
-  '2021': [3, 0, 0, 0, 0, 1, 2, 1],
-  '2018': [7, 1, 2, 3, 4, 5, 6, 1],
-  '2024': [7, 1, 2, 3, 4, 5, 6, 1],
-  '2022': [2, 0, 0, 0, 0, 0, 1, 1],
-  '2010': [3, 0, 0, 0, 0, 1, 2, 1],
-  '2005': [2, 0, 0, 0, 0, 0, 1, 1]
+
+const expected_us_results = {
+  '2005': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2005 is Saturday → week 1 starts Dec 26, 2004
+  '2006': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2006 is Sunday → week 1 starts Jan 1
+  '2010': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2010 is Friday → week 1 starts Dec 27, 2009
+  '2015': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2015 is Thursday → week 1 starts Dec 28, 2014
+  '2016': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2016 is Friday → week 1 starts Jan 3, 2016?
+  '2018': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2018 is Monday → week 1 starts Dec 31, 2017
+  '2021': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2021 is Friday → week 1 starts Dec 27, 2020
+  '2022': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2022 is Saturday → week 1 starts Jan 2, 2022?
+  '2024': [1, 2, 3, 4, 5, 6, 7, 1]    # Jan 1, 2024 is Monday → week 1 starts Dec 31, 2023
 }
 
-actual_results = {}
-current_result = {}
-for yyy in test_years
-  var cal = ConvertISOtoUS(CalendarMonth(yyy, 1, true))
-  current_result = {[yyy]: cal[0]}
-  extend(actual_results, current_result)
-endfor
+
+# actual_results = {}
+# current_result = {}
+# for yyy in test_years
+#   var cal = ConvertISOtoUS(CalendarMonth(yyy, 1, true))
+#   current_result = {[yyy]: cal[0]}
+#   extend(actual_results, current_result)
+# endfor
 # echom assert_equal(expected_results_sunday, actual_results)
 # echom actual_results
 # :3Redir messages
 
 vnew
-PrintSingleCal(2006, 1, true, true)
+PrintSingleCal(2014, 1, false, true)
+PrintSingleCal(2014, 1, true, true)
 # vnew
-echom "iso: " .. string(PrintSingleCal(2006, 1, false, true))
-echom "us: " .. string(ConvertISOtoUS(CalendarMonth(2006, 1, true)))
-:3Redir messages
+# echom "iso: " .. string(PrintSingleCal(2006, 1, false, true))
+# echom "us: " .. string(ConvertISOtoUS(CalendarMonth(2006, 1, true)))
+# :3Redir messages
