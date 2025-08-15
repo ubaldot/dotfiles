@@ -336,6 +336,8 @@ enddef
 # Build calendar for a given date
 # Returns weekday of a date (0=Monday, 6=Sunday)
 def WeekdayOfDate(year: number, month: number, day: number): number
+    # Implement modified Zeller's congruence
+    # Zeller's h: 0=Saturday, ..., 6=Friday
     var month_adj = month
     var year_adj = year
     if month_adj < 3
@@ -343,22 +345,13 @@ def WeekdayOfDate(year: number, month: number, day: number): number
         year_adj -= 1
     endif
     var h = (day + (13 * (month_adj + 1)) / 5 + year_adj + (year_adj / 4) - (year_adj / 100) + (year_adj / 400)) % 7
-    # Zeller's h: 0=Saturday, ..., 6=Friday
     # Convert to Monday=0 ... Sunday=6
     return (h + 5) % 7
 enddef
 
 # Compute ISO 8601 week number for a given date
 def ISOWeekNumber(year: number, month: number, day: number): number
-    # Zeller's congruence to get weekday (Monday=0,...Sunday=6)
-    var month_adj = month
-    var year_adj = year
-    if month_adj < 3
-        month_adj += 12
-        year_adj -= 1
-    endif
-    var h = (day + (13 * (month_adj + 1)) / 5 + year_adj + (year_adj / 4) - (year_adj / 100) + (year_adj / 400)) % 7
-    var wd = (h + 5) % 7
+    var wd = WeekdayOfDate(year, month, day)
 
     # Day-of-year
     var dim = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -495,11 +488,12 @@ def ConvertISOtoUS(iso_calendar: list<list<number>>, month: number): list<list<n
         remove(us_calendar, 0)
     endif
 
+    # TODO: check it better
     # If 1st of January falls in the last week of the year, then it become the
     # first week of the year
-    if month == 12 && us_calendar[-1][-2] != 31
-      us_calendar[-1][-1] = 1
-    endif
+    # if month == 12 && us_calendar[-1][-2] != 31
+    #   us_calendar[-1][-1] = 1
+    # endif
 
     return us_calendar
 enddef
@@ -510,7 +504,7 @@ var mm = str2nr(strftime('%m'))
 var dd = str2nr(strftime('%d'))
 var Ww = str2nr(strftime('%W'))
 
-def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week: bool): list<list<number>>
+def DisplaySingleCal(year: number, month: number, start_on_sunday: bool, inc_week: bool): list<list<number>>
   # Identify today
   var is_today_year_month = strftime('%Y') == printf('%04d', year)
       && strftime('%m') == printf('%02d', month)
@@ -543,6 +537,7 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
   const col_Sa = start_on_sunday ? 20 : 17
   const col_Su = start_on_sunday ? 2 : 20
 
+  # Build the calendar
   for line in cal
     var firstline = line('$')
     var line_cleaned: string =
@@ -580,7 +575,7 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
   return cal
 enddef
 
-def PrintMultipleCal(
+def DisplayMultipleCal(
     year: number,
     month: number,
     start_on_sunday: bool = true,
@@ -588,12 +583,12 @@ def PrintMultipleCal(
     N: number = 3)
   vnew
   for ii in range(N)
-    PrintSingleCal(year, month - 1 + ii, start_on_sunday, inc_week)
+    DisplaySingleCal(year, month - 1 + ii, start_on_sunday, inc_week)
     appendbufline('%', line('$'), '')
   endfor
 enddef
 
-# TESTS
+# ===================== TESTS =================================
 # Expected results are for January of different years
 const expected_results = {
   '2005': [0, 0, 0, 0, 0, 1, 2, 53],
@@ -618,36 +613,28 @@ echom assert_equal(expected_results, actual_results)
 
 
 # Start on Sunday
-
 const expected_us_results = {
-  '2005': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2005 is Saturday → week 1 starts Dec 26, 2004
-  '2006': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2006 is Sunday → week 1 starts Jan 1
-  '2010': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2010 is Friday → week 1 starts Dec 27, 2009
-  '2015': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2015 is Thursday → week 1 starts Dec 28, 2014
-  '2016': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2016 is Friday → week 1 starts Jan 3, 2016?
-  '2018': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2018 is Monday → week 1 starts Dec 31, 2017
-  '2021': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2021 is Friday → week 1 starts Dec 27, 2020
-  '2022': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1, 2022 is Saturday → week 1 starts Jan 2, 2022?
-  '2024': [1, 2, 3, 4, 5, 6, 7, 1]    # Jan 1, 2024 is Monday → week 1 starts Dec 31, 2023
+  '2005': [0, 0, 0, 0, 0, 0, 1, 53],  # Jan 1 is Saturday → week 53 prev. year
+  '2006': [1, 2, 3, 4, 5, 6, 7, 1],   # Jan 1 is Sunday → week 1
+  '2010': [0, 0, 0, 0, 0, 1, 2, 53],   # first Sunday Jan 3
+  '2015': [0, 0, 0, 0, 1, 2, 3, 1],   # first Sunday Jan 4
+  '2016': [0, 0, 0, 0, 0, 1, 2, 53],   # first Sunday Jan 3
+  '2018': [0, 1, 2, 3, 4, 5, 6, 1],   # first Sunday Jan 7
+  '2021': [0, 0, 0, 0, 0, 1, 2, 53],   # first Sunday Jan 3
+  '2022': [0, 0, 0, 0, 0, 0, 1, 52],   # first Sunday Jan 2
+  '2024': [0, 1, 2, 3, 4, 5, 6, 1]    # first Sunday Jan 7
 }
 
+actual_results = {}
+current_result = {}
+for yyy in test_years
+  var cal = ConvertISOtoUS(CalendarMonth(yyy, 1, true), 1)
+  current_result = {[yyy]: cal[0]}
+  extend(actual_results, current_result)
+endfor
+echom assert_equal(expected_us_results, actual_results)
 
-# actual_results = {}
-# current_result = {}
-# for yyy in test_years
-#   var cal = ConvertISOtoUS(CalendarMonth(yyy, 1, true))
-#   current_result = {[yyy]: cal[0]}
-#   extend(actual_results, current_result)
-# endfor
-# echom assert_equal(expected_results_sunday, actual_results)
-# echom actual_results
-# :3Redir messages
-
-var XXX  = 2015
+var XXX  = 2026
 vnew
-PrintSingleCal(XXX, 12, false, true)
-PrintSingleCal(XXX, 12, true, true)
-# vnew
-# echom "iso: " .. string(PrintSingleCal(2006, 1, false, true))
-# echom "us: " .. string(ConvertISOtoUS(CalendarMonth(2006, 1, true)))
-# :3Redir messages
+DisplaySingleCal(XXX, 1, false, true)
+DisplaySingleCal(XXX, 1, true, true)
