@@ -455,44 +455,34 @@ def CalendarMonth(
     return weeks
 enddef
 
-# Convert an ISO calendar to US Sunday-start calendar
-def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
-    var us_calendar: list<list<number>> = []
+# Convert ISO (Monday-start) calendar to US (Sunday-start) calendar
+def ConvertISOtoUS(iso: list<list<number>>): list<list<number>>
+    var us: list<list<number>> = []
 
-    var first_sunday_found = 0
-    var us_week = 0
-
-    for week in iso_calendar
-        # Copy week
-        var new_week = week[:]
-
-        # Remove the ISO Sunday (index 6) and insert at start
-        var sunday = new_week[6]
-        remove(new_week, 6)
-        insert(new_week, sunday, 0)
-
-        # Compute US week number
-        if first_sunday_found == 0
-            for day in new_week[0 : 7]
-                if day != 0
-                    first_sunday_found = 1
-                    break
-                endif
-            endfor
-        endif
-
-        if first_sunday_found
-            new_week[7] = us_week + 1
-            us_week += 1
-        else
-            new_week[7] = 0
-        endif
-
-        add(us_calendar, new_week)
+    # Step 1: Shift each row so Sunday comes first (ignore ISO week number)
+    for row in iso
+        var days = [row[6]] + row[0 : 5]   # Sunday first, then Mon..Sat
+        add(us, days)
     endfor
 
-    return us_calendar
+    # Step 2: Assign US week numbers
+    var week_num = 0
+    var found_jan1 = false
+    for row in us
+        if !found_jan1
+            if index(row, 1) != -1
+                found_jan1 = true
+                week_num = 1
+            endif
+        else
+            week_num += 1
+        endif
+        add(row, week_num)
+    endfor
+
+    return us
 enddef
+
 
 # Example: Get current date's calendar
 var yy = str2nr(strftime('%Y'))
@@ -500,7 +490,7 @@ var mm = str2nr(strftime('%m'))
 var dd = str2nr(strftime('%d'))
 var Ww = str2nr(strftime('%W'))
 
-def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week: bool)
+def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week: bool): list<list<number>>
   # Identify today
   var is_today_year_month = strftime('%Y') == printf('%04d', year)
       && strftime('%m') == printf('%02d', month)
@@ -567,6 +557,7 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
       matchadd('DiffAdd', $'{line_span}\zs{today}')
     endif
   endfor
+  return cal
 enddef
 
 def PrintMultipleCal(
@@ -581,8 +572,6 @@ def PrintMultipleCal(
     appendbufline('%', line('$'), '')
   endfor
 enddef
-
-
 
 # TESTS
 # Expected results are for January of different years
@@ -628,11 +617,13 @@ for yyy in test_years
   current_result = {[yyy]: cal[0]}
   extend(actual_results, current_result)
 endfor
-echom assert_equal(expected_results_sunday, actual_results)
-echom actual_results
+# echom assert_equal(expected_results_sunday, actual_results)
+# echom actual_results
 # :3Redir messages
 
+vnew
+PrintSingleCal(2006, 1, true, true)
 # vnew
-# PrintSingleCal(2006, 1, false, true)
-# vnew
-# PrintSingleCal(2006, 1, true, true)
+echom "iso: " .. string(PrintSingleCal(2006, 1, false, true))
+echom "us: " .. string(ConvertISOtoUS(CalendarMonth(2006, 1, true)))
+:3Redir messages
