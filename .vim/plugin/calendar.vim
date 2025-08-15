@@ -532,5 +532,10 @@ def PrintMultipleCal(
 enddef
 
 vnew
-PrintSingleCal(2022, 1, false, true)
-# PrintMultipleCal(2021, 08, false, false)
+for yyy in range(2000, 2026)
+  PrintSingleCal(yyy - 1, 12, false, true)
+  appendbufline('%', line('$'), '')
+  PrintSingleCal(yyy, 1, false, true)
+  appendbufline('%', line('$'), '')
+  appendbufline('%', line('$'), '--------------')
+endfor
