@@ -333,8 +333,8 @@ def DaysInMonth(year: number, month: number): number
     return 30
 enddef
 
-# # Build calendar for a given date
-# # Returns weekday of a date (0=Monday, 6=Sunday)
+# Build calendar for a given date
+# Returns weekday of a date (0=Monday, 6=Sunday)
 def WeekdayOfDate(year: number, month: number, day: number): number
     var month_adj = month
     var year_adj = year
@@ -407,7 +407,6 @@ enddef
 def CalendarMonth(
     year: number,
     month: number,
-    day: number,
     start_on_sunday: bool = false,
     add_weeknum: bool = false): list<list<number>>
 
@@ -438,12 +437,11 @@ def CalendarMonth(
             endif
             weeks->add(week)
             week = []
-            if month == 1 && (week_num == 52 || week_num == 53)
-              week_num = 1
-            else
-              week_num += 1
-            endif
-
+            # If the first week of January is the same as the previous year,
+            # then reset the week number
+            week_num = month == 1 && (week_num == 52 || week_num == 53)
+              ? 1
+              : week_num + 1
         endif
     endfor
 
@@ -491,9 +489,7 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
   matchadd('StatusLine', weekdays)
 
   # Actual days
-  const dummy_day = 15 # Needed only for computing the current week
-
-  var cal = CalendarMonth(year, month, dummy_day, start_on_sunday, inc_week)
+  var cal = CalendarMonth(year, month, start_on_sunday, inc_week)
 
   # For the highlight
   const col_Sa = start_on_sunday ? 20 : 17
@@ -548,11 +544,27 @@ def PrintMultipleCal(
   endfor
 enddef
 
-vnew
-# for yyy in [2015, 2016, 2021, 2004, 2010, 2012]
-for yyy in range(2000, 2031)
-  PrintSingleCal(yyy, 1, false, true)
-  appendbufline('%', line('$'), '')
-  appendbufline('%', line('$'), '--------------')
+
+
+# TESTS
+# Expewcted results are for January of different years
+var expected_results = {
+  '2005': [0, 0, 0, 0, 0, 1, 2, 53],
+  '2006': [0, 0, 0, 0, 0, 0, 1, 52],
+  '2010': [0, 0, 0, 0, 1, 2, 3, 53],
+  '2015': [0, 0, 0, 1, 2, 3, 4, 1],
+  '2016': [0, 0, 0, 0, 1, 2, 3, 53],
+  '2018': [1, 2, 3, 4, 5, 6, 7, 1],
+  '2021': [0, 0, 0, 0, 1, 2, 3, 53],
+  '2022': [0, 0, 0, 0, 0, 1, 2, 52],
+  '2024': [1, 2, 3, 4, 5, 6, 7, 1]
+}
+var actual_results = {}
+var current_result = {}
+const test_years = [2005, 2006, 2010, 2015, 2016, 2018, 2021, 2022, 2024]
+for yyy in test_years
+  var cal = CalendarMonth(yyy, 1, false, true)
+  current_result = {[yyy]: cal[0]}
+  extend(actual_results, current_result)
 endfor
-# PrintSingleCal(2016, 2, false, true)
+echom assert_equal(expected_results, actual_results)
