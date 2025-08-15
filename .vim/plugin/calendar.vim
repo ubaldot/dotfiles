@@ -348,44 +348,59 @@ def WeekdayOfDate(year: number, month: number, day: number): number
     return (h + 5) % 7
 enddef
 
-# de# Compute ISO 8601 week number for a given date
+# Compute ISO 8601 week number for a given date
 def ISOWeekNumber(year: number, month: number, day: number): number
-    # Zeller's congruence to get weekday (0=Monday,...6=Sunday)
-    var year_adj = year
+    # Zeller's congruence to get weekday (Monday=0,...Sunday=6)
     var month_adj = month
+    var year_adj = year
     if month_adj < 3
         month_adj += 12
         year_adj -= 1
     endif
     var h = (day + (13 * (month_adj + 1)) / 5 + year_adj + (year_adj / 4) - (year_adj / 100) + (year_adj / 400)) % 7
-    var d = (h + 5) % 7  # Monday=0,...Sunday=6
+    var wd = (h + 5) % 7
 
-    # Compute day of year
-    var days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    # Adjust February for leap year
+    # Day-of-year
+    var dim = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
-        days_in_month[1] = 29
+        dim[1] = 29
     endif
     var doy = day
-    for i in range(0, month - 2)
-        doy += days_in_month[i]
+    for i in range(0, month - 1)
+        if i > 0
+            doy += dim[i - 1]
+        endif
     endfor
 
-    # ISO week number formula
-    var woy = (doy - d + 10) / 7
-    if woy < 1
-        # Week belongs to last week of previous year
-        return ISOWeekNumber(year - 1, 12, 28)
-    elseif woy > 52
-        # Handle year-end edge cases
-        var last_day_wday = WeekdayOfDate(year, 12, 31)  # Monday=0...Sunday=6
-        if last_day_wday <= 3  # Mon(0) to Thu(3)
-            return 53
-        else
-            return 1
-        endif
+    # Thursday of the week
+    var doy_thu = doy + (3 - wd)
+
+    # Days in year
+    var days_in_year = 365
+    if (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+        days_in_year = 366
     endif
-    return woy
+
+    # Determine ISO year
+    var iso_year = year
+    if doy_thu < 1
+        iso_year -= 1
+        if (iso_year % 4 == 0 && iso_year % 100 != 0) || (iso_year % 400 == 0)
+            doy_thu += 366
+        else
+            doy_thu += 365
+        endif
+    elseif doy_thu > days_in_year
+        iso_year += 1
+        doy_thu -= days_in_year
+    endif
+
+    # Week 1 start: Monday of the week containing Jan 4
+    var jan4_wd = WeekdayOfDate(iso_year, 1, 4)
+    var week1_start = 4 - jan4_wd
+
+    # ISO week number
+    return float2nr(1 + floor((doy_thu - week1_start - 1) / 7))
 enddef
 
 # Generate calendar with optional ISO week numbers at the end
@@ -408,6 +423,7 @@ def CalendarMonth(
     # Get ISO week number of the first day of the month
     var week_num = ISOWeekNumber(year, month, 1)
 
+
     # Fill first week with blanks before day 1
     for _ in range(first_wday)
         week->add(0)
@@ -422,7 +438,12 @@ def CalendarMonth(
             endif
             weeks->add(week)
             week = []
-            week_num += 1
+            if month == 1 && (week_num == 52 || week_num == 53)
+              week_num = 1
+            else
+              week_num += 1
+            endif
+
         endif
     endfor
 
@@ -528,10 +549,10 @@ def PrintMultipleCal(
 enddef
 
 vnew
-for yyy in range(2000, 2026)
-  PrintSingleCal(yyy - 1, 12, false, true)
-  appendbufline('%', line('$'), '')
+# for yyy in [2015, 2016, 2021, 2004, 2010, 2012]
+for yyy in range(2000, 2031)
   PrintSingleCal(yyy, 1, false, true)
   appendbufline('%', line('$'), '')
   appendbufline('%', line('$'), '--------------')
 endfor
+# PrintSingleCal(2016, 2, false, true)
