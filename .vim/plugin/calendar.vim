@@ -342,9 +342,7 @@ def WeekdayOfDate(year: number, month: number, day: number): number
         month_adj += 12
         year_adj -= 1
     endif
-    var K = year_adj % 100
-    var J = year_adj / 100
-    var h = (day + (13 * (month_adj + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
+    var h = (day + (13 * (month_adj + 1)) / 5 + year_adj + (year_adj / 4) - (year_adj / 100) + (year_adj / 400)) % 7
     # Zeller's h: 0=Saturday, ..., 6=Friday
     # Convert to Monday=0 ... Sunday=6
     return (h + 5) % 7
@@ -359,9 +357,7 @@ def ISOWeekNumber(year: number, month: number, day: number): number
         month_adj += 12
         year_adj -= 1
     endif
-    var K = year_adj % 100
-    var J = year_adj / 100
-    var h = (day + (13 * (month_adj + 1)) / 5 + K + (K / 4) + (J / 4) + 5 * J) % 7
+    var h = (day + (13 * (month_adj + 1)) / 5 + year_adj + (year_adj / 4) - (year_adj / 100) + (year_adj / 400)) % 7
     var d = (h + 5) % 7  # Monday=0,...Sunday=6
 
     # Compute day of year
