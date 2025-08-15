@@ -379,11 +379,11 @@ def ISOWeekNumber(year: number, month: number, day: number): number
     var woy = (doy - d + 10) / 7
     if woy < 1
         # Week belongs to last week of previous year
-        return ISOWeekNumber(year - 1, 12, 31)
+        return ISOWeekNumber(year - 1, 12, 28)
     elseif woy > 52
         # Handle year-end edge cases
-        var last_day_wday = ISOWeekNumber(year, 12, 31)
-        if last_day_wday == 1 || last_day_wday == 2 || last_day_wday == 3 || last_day_wday == 4
+        var last_day_wday = WeekdayOfDate(year, 12, 31)  # Monday=0...Sunday=6
+        if last_day_wday <= 3  # Mon(0) to Thu(3)
             return 53
         else
             return 1
