@@ -459,33 +459,41 @@ enddef
 def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
     var us_calendar: list<list<number>> = []
     var carry_sunday = 0
-    var first_sunday_found = 0
     var us_week = 0
+    var first_sunday_found = 0
 
     for week in iso_calendar
-        # Copy first 7 columns only (strip ISO week number)
+        # Copy only the 7 days (ignore ISO week number)
         var new_week = week[0 : 6]
         var sunday = new_week[6]
 
-        # Insert carry Sunday from previous week
+        # Insert carryover Sunday at start, remove ISO Sunday at end
         insert(new_week, carry_sunday, 0)
-        remove(new_week, 7)  # remove old Sunday
+        remove(new_week, 7)
 
-        # Week numbering
-        if first_sunday_found == 0 && new_week[0] != 0
-            first_sunday_found = 1
-            us_week = 1
-        elseif first_sunday_found
+        # OK
+        echom "len(new_week): " .. len(new_week)
+        # Determine first US week
+        if first_sunday_found == 0
+            for day in new_week
+                if day != 0
+                    first_sunday_found = 1
+                    us_week = 1
+                    break
+                endif
+            endfor
+        else
             us_week += 1
         endif
 
+        # Append US week number
         add(new_week, first_sunday_found ? us_week : 0)
         add(us_calendar, new_week)
 
         carry_sunday = sunday
     endfor
 
-    # Add last week if Sunday remains
+    # Add last row if a Sunday remains
     if carry_sunday != 0
         var last_week = [carry_sunday, 0, 0, 0, 0, 0, 0, us_week + 1]
         add(us_calendar, last_week)
@@ -638,9 +646,10 @@ const expected_us_results = {
 # echom actual_results
 # :3Redir messages
 
+var XXX  = 2018
 vnew
-PrintSingleCal(2014, 1, false, true)
-PrintSingleCal(2014, 1, true, true)
+PrintSingleCal(XXX, 12, false, true)
+PrintSingleCal(XXX, 12, true, true)
 # vnew
 # echom "iso: " .. string(PrintSingleCal(2006, 1, false, true))
 # echom "us: " .. string(ConvertISOtoUS(CalendarMonth(2006, 1, true)))
