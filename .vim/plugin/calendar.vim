@@ -403,18 +403,14 @@ def ISOWeekNumber(year: number, month: number, day: number): number
     return float2nr(1 + floor((doy_thu - week1_start - 1) / 7))
 enddef
 
-# Generate calendar with optional ISO week numbers at the end
+# Generate calendar with optional ISO week numbers at the end, 0=Monday
 def CalendarMonth(
     year: number,
     month: number,
-    start_on_sunday: bool = false,
     add_weeknum: bool = false): list<list<number>>
 
     var month_days = DaysInMonth(year, month)
-
-    var first_wday = start_on_sunday
-      ? (WeekdayOfDate(year, month, 1) + 1) % 7 # weekday 0 = Su
-      : WeekdayOfDate(year, month, 1)  # weekday 0=Mon
+    var first_wday = WeekdayOfDate(year, month, 1)  # weekday 0=Mon
 
     var weeks: list<list<number>> = []
     var week: list<number> = []
@@ -529,7 +525,9 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
   matchadd('StatusLine', weekdays)
 
   # Actual days
-  var cal = CalendarMonth(year, month, start_on_sunday, inc_week)
+  var cal = start_on_sunday
+    ? ConvertISOtoUS(CalendarMonth(year, month, inc_week))
+    : CalendarMonth(year, month, inc_week)
 
   # For the highlight
   const col_Sa = start_on_sunday ? 20 : 17
@@ -603,7 +601,7 @@ var actual_results = {}
 var current_result = {}
 const test_years = [2005, 2006, 2010, 2015, 2016, 2018, 2021, 2022, 2024]
 for yyy in test_years
-  var cal = CalendarMonth(yyy, 1, false, true)
+  var cal = CalendarMonth(yyy, 1, true)
   current_result = {[yyy]: cal[0]}
   extend(actual_results, current_result)
 endfor
@@ -612,29 +610,29 @@ echom assert_equal(expected_results, actual_results)
 
 # Start on Sunday
 const expected_results_sunday = {
-  '2005': [0, 0, 0, 0, 0, 1, 2, 52],
-  '2006': [0, 0, 0, 0, 0, 0, 1, 51],
-  '2010': [0, 0, 0, 0, 1, 2, 3, 52],
-  '2015': [0, 0, 0, 1, 2, 3, 4, 1],
-  '2016': [0, 0, 0, 0, 1, 2, 3, 52],
-  '2018': [1, 2, 3, 4, 5, 6, 7, 1],
-  '2021': [0, 0, 0, 0, 1, 2, 3, 52],
-  '2022': [0, 0, 0, 0, 0, 1, 2, 51],
-  '2024': [1, 2, 3, 4, 5, 6, 7, 1]
+  '2006': [1, 0, 0, 0, 0, 0, 0, 1],
+  '2015': [4, 0, 0, 0, 1, 2, 3, 1],
+  '2016': [3, 0, 0, 0, 0, 1, 2, 1],
+  '2021': [3, 0, 0, 0, 0, 1, 2, 1],
+  '2018': [7, 1, 2, 3, 4, 5, 6, 1],
+  '2024': [7, 1, 2, 3, 4, 5, 6, 1],
+  '2022': [2, 0, 0, 0, 0, 0, 1, 1],
+  '2010': [3, 0, 0, 0, 0, 1, 2, 1],
+  '2005': [2, 0, 0, 0, 0, 0, 1, 1]
 }
 
 actual_results = {}
 current_result = {}
 for yyy in test_years
-  var cal = CalendarMonth(yyy, 1, false, true)
-  var cal_us = ConvertISOtoUS(cal)
+  var cal = ConvertISOtoUS(CalendarMonth(yyy, 1, true))
   current_result = {[yyy]: cal[0]}
   extend(actual_results, current_result)
 endfor
-# echom assert_equal(expected_results_sunday, actual_results)
-# echom actual_results
+echom assert_equal(expected_results_sunday, actual_results)
+echom actual_results
+# :3Redir messages
 
-vnew
-PrintSingleCal(2016, 1, false, true)
-vnew
-PrintSingleCal(2016, 1, true, true)
+# vnew
+# PrintSingleCal(2006, 1, false, true)
+# vnew
+# PrintSingleCal(2006, 1, true, true)
