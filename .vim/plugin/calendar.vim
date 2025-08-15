@@ -455,8 +455,10 @@ def CalendarMonth(
     return weeks
 enddef
 
+# TODO: if 1st January is in the last week of December, then it shall be set
+# to w1. However, we cannot distinguish the month as we just pass a calendar
 # Convert ISO (Monday-start) calendar to US (Sunday-start) calendar
-def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
+def ConvertISOtoUS(iso_calendar: list<list<number>>, month: number): list<list<number>>
     var us_calendar: list<list<number>> = []
     var carry_sunday = 0
     var carry_week = 0  # ISO week of carried Sunday
@@ -471,7 +473,8 @@ def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
         remove(new_week, 7)
 
         # Determine US week number
-        var us_week = carry_sunday != 0 ? carry_week : iso_week
+        # var us_week = carry_sunday != 0 ? carry_week : iso_week
+        var us_week = iso_week
 
         add(new_week, us_week)
         add(us_calendar, new_week)
@@ -483,13 +486,19 @@ def ConvertISOtoUS(iso_calendar: list<list<number>>): list<list<number>>
 
     # Add last row if a Sunday remains
     if carry_sunday != 0
-        var last_week = [carry_sunday, 0, 0, 0, 0, 0, 0, carry_week]
+        var last_week = [carry_sunday, 0, 0, 0, 0, 0, 0, carry_week + 1]
         add(us_calendar, last_week)
     endif
 
     # Remove first row if all zeros
     if count(us_calendar[0][0 : 6], 0) == 7
         remove(us_calendar, 0)
+    endif
+
+    # If 1st of January falls in the last week of the year, then it become the
+    # first week of the year
+    if month == 12 && us_calendar[-1][-2] != 31
+      us_calendar[-1][-1] = 1
     endif
 
     return us_calendar
@@ -527,7 +536,7 @@ def PrintSingleCal(year: number, month: number, start_on_sunday: bool, inc_week:
 
   # Actual days
   var cal = start_on_sunday
-    ? ConvertISOtoUS(CalendarMonth(year, month, inc_week))
+    ? ConvertISOtoUS(CalendarMonth(year, month, inc_week), month)
     : CalendarMonth(year, month, inc_week)
 
   # For the highlight
@@ -634,7 +643,7 @@ const expected_us_results = {
 # echom actual_results
 # :3Redir messages
 
-var XXX  = 2018
+var XXX  = 2015
 vnew
 PrintSingleCal(XXX, 12, false, true)
 PrintSingleCal(XXX, 12, true, true)
