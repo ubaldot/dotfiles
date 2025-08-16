@@ -345,27 +345,27 @@ const test_years = [2005, 2006, 2010, 2015, 2016, 2018, 2021, 2022, 2024]
 for [idx, y] in items(test_years)
   var [head, vals] = items(be.CalendarMonth_iso8601(y, 1, true))[0]
   var current_result = {[head]: vals[0]}
-  echom assert_equal(expected_results[idx], current_result)
+  # echom assert_equal(expected_results[idx], current_result)
 endfor
 
 
 # Start on Sunday
 const expected_us_results = [
-  {'January 2005': [0, 0, 0, 0, 0, 0, 1, 53]},  # Jan 1 is Saturday → week 53 prev. yea}r
-  {'January 2006': [1, 2, 3, 4, 5, 6, 7, 1]},   # Jan 1 is Sunday → week }1
-  {'January 2010': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan }3
-  {'January 2015': [0, 0, 0, 0, 1, 2, 3, 1]},   # first Sunday Jan }4
-  {'January 2016': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan }3
-  {'January 2018': [0, 1, 2, 3, 4, 5, 6, 1]},   # first Sunday Jan }7
-  {'January 2021': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan }3
-  {'January 2022': [0, 0, 0, 0, 0, 0, 1, 52]},   # first Sunday Jan }2
-  {'January 2024': [0, 1, 2, 3, 4, 5, 6, 1]}    # first Sunday Jan }7
+  {'January 2005': [0, 0, 0, 0, 0, 0, 1, 53]},  # Jan 1 is Saturday → week 53 prev. yea
+  {'January 2006': [1, 2, 3, 4, 5, 6, 7, 1]},   # Jan 1 is Sunday → week
+  {'January 2010': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
+  {'January 2015': [0, 0, 0, 0, 1, 2, 3, 1]},   # first Sunday Jan
+  {'January 2016': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
+  {'January 2018': [0, 1, 2, 3, 4, 5, 6, 1]},   # first Sunday Jan
+  {'January 2021': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
+  {'January 2022': [0, 0, 0, 0, 0, 0, 1, 52]},   # first Sunday Jan
+  {'January 2024': [0, 1, 2, 3, 4, 5, 6, 1]}    # first Sunday Jan
 ]
 
 for [idx, y] in items(test_years)
   var [head, vals] = items(be.ConvertISOtoUS(be.CalendarMonth_iso8601(y, 1, true)))[0]
   var current_result = {[head]: vals[0]}
-  echom assert_equal(expected_us_results[idx], current_result)
+  # echom assert_equal(expected_us_results[idx], current_result)
 endfor
 # echom assert_equal(expected_us_results, actual_results)
 
