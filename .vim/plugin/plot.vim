@@ -171,6 +171,7 @@ def g:PlotSimple_GNUPlot(x: list<float>,
     '-e',
     printf('"set term dumb %d %d; ', term_w, term_h) ..
     'set key off; ' ..
+    'set tics scale 0; ' ..
     # $'set xlabel \"{x_label}\"; set ylabel \"{y_label}\"; set title \"{title}\";' ..
     printf('set xrange [%f:%f]; ', x_min, x_max) ..
     printf('set yrange [%f:%f]; ', y_min, y_max) ..
