@@ -72,7 +72,7 @@ def PackConfigList(arglead: string,
 
 enddef
 
-def PackEditConfig(filename: string)
+def PackConfig(filename: string)
   # First start in plugin/ folder
   var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
   var filename_full = start_settings_files->filter((_, val) => val =~ filename)
@@ -85,14 +85,14 @@ def PackEditConfig(filename: string)
   exe $"edit {filename_full[0]}"
 enddef
 
-command! -nargs=1 -complete=customlist,PackConfigList PackEditConfig
-      \ PackEditConfig(<f-args>)
+command! -nargs=1 -complete=customlist,PackConfigList PackConfig
+      \ PackConfig(<f-args>)
 
 def PackDevSetup()
   const supported_filetypes = ['c', 'python', 'cpp', 'latex']
 
   if index(supported_filetypes, &filetype) != -1
-    if !exists('g:termdebug_loaded')
+    if !exists('g:loaded_termdebug')
       g:termdebug_config = {}
       packadd termdebug
     endif
@@ -103,7 +103,7 @@ def PackDevSetup()
       config#lsp#Setup()
     endif
 
-    if !exists('g:microdebugger_loaded')
+    if !exists('g:loaded_microdebugger')
       config#microdebugger#Setup()
       packadd vim-microdebugger
     endif
@@ -113,16 +113,12 @@ def PackDevSetup()
       config#vimspector#Setup()
     endif
 
-    if !exists('g:loaded_vimspector')
-      packadd vimspector
-      config#vimspector#Setup()
-    endif
 
-    if !exists('g:replica_loaded')
+    if !exists('g:loaded_replica')
       packadd vim-replica
     endif
 
-    if !exists('g:vim_manim_loaded')
+    if !exists('g:loaded_vim_manim')
       packadd vim-manim
     endif
 

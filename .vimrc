@@ -2,9 +2,6 @@ vim9script
 
 # For avap dev
 g:is_avap = false
-var is_PE = true
-var auto_update_dotfiles = get(g:, 'auto_update_dotfiles', false)
-var auto_update_notes = get(g:, 'auto_update_dotfiles', false)
 
 # OS detection
 def IsWSL(): bool
@@ -54,22 +51,16 @@ if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
 	g:dotvim = $HOME .. "\\vimfiles"
-  # exe $"set runtimepath+={g:dotvim}"
 else
   g:tmp = "/tmp"
   g:null_device = "/dev/null"
   g:dotvim = $HOME .. "/.vim"
-  #if !is_PE
-	  &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
-	  if g:os == 'Linux' || g:os == 'WSL'
-	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
-	  else
-	    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
-	  endif
-#else
-#	&pythonthreehome =  '/usr/bin'
-#	 &pythonthreedll = '/usr/lib/x86_64-linux-gnu/python3.10.so.1'
-#	endif
+  &pythonthreehome = fnamemodify(trim(system("which python")), ":h:h")
+  if g:os == 'Linux' || g:os == 'WSL'
+    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.so'
+  else
+    &pythonthreedll = $'{&pythonthreehome}/lib/libpython3.12.dylib'
+  endif
 endif
 # ------------------------
 
@@ -78,30 +69,33 @@ import g:dotvim .. "/lib/myfunctions.vim"
 # Set cursor
 &t_SI = "\e[6 q"
 &t_EI = "\e[2 q"
-# &t_ti = "\e[6 q\e[?1049h"
-# &t_te = "\e[5 q\e[?1049l"
 
 augroup RELOAD_VIM_SCRIPTS
   autocmd!
   autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
     exe "source %"
-    echo expand('%:t') .. " reloaded."
+    echo $"{expand('%:t')} reloaded."
   }
 augroup END
 
 # Open help pages in vertical split
 augroup vimrc_help
   autocmd!
-  autocmd BufEnter *.txt if &buftype == 'help' | wincmd H | endif
+  autocmd BufEnter *.txt {
+    if &buftype == 'help'
+      wincmd H
+    endif
+  }
 augroup END
 # Internal vim variables aka 'options'
 # Set terminal with 256 colors
+set nocompatible
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
 # langmap does not work with multi-byte chars,
 # see https://github.com/vim/vim/issues/3018
-set langmap=ö[,ä]
+# set langmap=ö[,ä]
 set belloff=all
 set colorcolumn=80
 set clipboard^=unnamed,unnamedplus
@@ -115,19 +109,14 @@ set expandtab
 set smartindent
 set nobackup
 set backspace=indent,eol,start
-set nocompatible              # required
 set splitright
 set splitbelow
 set incsearch # for displaying while searching
 set smartcase
 set hidden
 set noswapfile
-set spell spelllang=en_us
-set nofoldenable
-set foldmethod=syntax
-set foldlevelstart=20
 set wildmenu wildoptions=pum
-set wildignore+=**/*cache*,*.o,**/*miniforge*,**/*ipynb*
+set wildignore+=**/*cache*,*.o,**/*ipynb*
 set completeopt-=preview
 set textwidth=78
 set iskeyword+=-
@@ -136,11 +125,8 @@ set diffopt+=vertical
 set wildcharm=<tab>
 set conceallevel=2
 set concealcursor=nvc
+set spell spelllang=en_us
 config#statusline#Setup()
-# TODO adjust path option. Move to after/ftplugin
-# set path+=**
-# set cursorline
-# UBA
 
 filetype plugin on
 filetype indent on
@@ -150,9 +136,32 @@ syntax on
 # ----------------------
 g:mapleader = ","
 g:maplocalleader = ","
-map <leader>vr <Cmd>source $MYVIMRC<cr> \| <Cmd>echo ".vimrc reloaded."
+
+# Essential mappings
+# ----------------------
+# Avoid polluting registers
+nnoremap x "_x
+# Switch window
+nnoremap <c-h> <c-w>h
+nnoremap <c-down> <c-e>
+nnoremap <c-up> <c-y>
+nnoremap <c-l> <c-w>l
+nnoremap <c-k> <c-w>k
+nnoremap <c-j> <c-w>j
+
+# Wipe buffer
+nnoremap <c-d> <cmd>bw!<cr>
+
+# to be able to undo accidental c-w"
+inoremap <c-u> <c-g>u<c-u>
+inoremap <c-w> <c-g>u<c-w>
+
 map <leader>vv <Cmd>e $MYVIMRC<cr>
 
+augroup SET_HEADERS_AS_C_FILETYPE
+  autocmd!
+  autocmd BufRead,BufNewFile *.h set filetype=c
+augroup END
 # For using up and down in popup menu
 inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 
@@ -160,24 +169,10 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
-def ToggleCmdWindow()
-  if empty(getcmdwintype())
-    feedkeys("q:i", "n")
-  else
-    var cmd = getline('.')
-    quit
-    feedkeys($":{cmd}", "n")
-  endif
-enddef
-
-# nnoremap <c-c> <ScriptCmd>ToggleCmdWindow()<cr>
-
 # TODO: does not work with macos
 # adjustment for Swedish keyboard
-nmap ö [
-nmap ä ]
-# Avoid polluting registers
-nnoremap x "_x
+# nmap ö [
+# nmap ä ]
 
 # Change to repo root, ~ or /.
 def GoToGitRoot()
@@ -193,61 +188,6 @@ def GoToGitRoot()
 enddef
 noremap cd <scriptcmd>GoToGitRoot()<cr>
 
-# Better gx
-# nmap gx <ScriptCmd>myfunctions.Gx()<cr>
-
-# Auto push/pull dotfiles
-def PullRepofiles(repo_path: string)
-  # If there is any local change, commit them first, then pull
-  if !empty(system($'git -C {repo_path} status --short'))
-    exe $'!git -C {repo_path} add .'
-    exe $'!git -C {repo_path} ci -m "Saved local changes"'
-  endif
-
-  # Pull & merge eventual commit
-  var output = systemlist($'git -C {repo_path} pull --rebase')
-  if !empty(copy(output) ->filter('v:val =~ "CONFLICT"'))
-    echoerr "You have conflicts in ~/dotfiles!"
-  elseif !empty(copy(output) ->filter('v:val !~ "Already up to date"'))
-    echom copy(output) ->filter('v:val !~ "Already up to date"')
-    echoerr "OBS! ~/dotfiles updated! "
-             .. "You may need restart Vim to update your environment."
-  endif
-enddef
-
-def PushRepofiles(repo_path: string)
-  # Pull first before pushing
-  if !empty(systemlist($'git -C {repo_path} pull')
-      ->filter('v:val =~ "CONFLICT"'))
-    # Needed to prevent Vim to automatically quit
-    input('You have conflicts in ~/dotfiles. Nothing will be pushed.')
-  # If I changed some dotfiles I want to push them to the remote
-  elseif !empty(systemlist($'git -C {repo_path} status')
-        ->filter('v:val =~ "Changes not staged for commit'
-             .. '\\|Changes to be committed'
-             .. '\\|Your branch is ahead"'))
-    exe $'!git -C {repo_path} add .'
-    exe $'!git -C {repo_path} ci -m "Auto pushing {repo_path}... "'
-    exe $'!git -C {repo_path} push'
-  endif
-enddef
-
-if auto_update_dotfiles
-  augroup DOTFILES
-    autocmd!
-    autocmd VimLeavePre * PushRepofiles($'{$HOME}/dotfiles')
-    autocmd VimEnter * PullRepofiles($'{$HOME}/dotfiles')
-  augroup END
-endif
-
-if auto_update_notes
-  augroup NOTES
-    autocmd!
-    autocmd VimLeavePre * PushRepofiles($'{$HOME}/Documents/my_notes')
-    autocmd VimEnter * PullRepofiles($'{$HOME}/Documents/my_notes')
-  augroup END
-endif
-
 nnoremap <F1> <Cmd>helpclose<cr>
 # Opposite of J, i.e. split from current cursor position
 nnoremap S i<cr><esc>
@@ -262,38 +202,10 @@ nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 #
-# Switch window
-nnoremap <c-h> <c-w>h
-nnoremap <c-down> <c-e>
-nnoremap <c-up> <c-y>
-nnoremap <c-l> <c-w>l
-nnoremap <c-k> <c-w>k
-nnoremap <c-j> <c-w>j
 
 # search
-# nnoremap <c-s> <cmd>SearchAndReplace<cr>
-nnoremap <c-s> :%s/
-xnoremap <c-s> "ty<cmd>exe $"SearchAndReplace {getreg('t')}"<cr>
-nnoremap <c-s><c-s> <cmd>SearchAndReplaceInFiles<cr>
-xnoremap <c-s><c-s> "ty<cmd>exe $"SearchAndReplaceInFiles {getreg('t')}"<cr>
-xnoremap <c-h> <esc><ScriptCmd>myfunctions.HighlightVisualSelection()<cr>
-
-# Wipe buffer
-nnoremap <c-d> <cmd>bw!<cr>
-
-# Formatting
-# command! -range=% Prettify myfunctions.Prettify(<line1>, <line2>)
-nnoremap Q <ScriptCmd>myfunctions.FormatWithoutMoving()<cr>
-xnoremap Q <esc><ScriptCmd>
-      \myfunctions.FormatWithoutMoving(line("'<"), line("'>"))<cr>
-
-# location list
-nnoremap äl :lnext<CR>
-nnoremap öl :lprevious<CR>
-
-# to be able to undo accidental c-w"
-inoremap <c-u> <c-g>u<c-u>
-inoremap <c-w> <c-g>u<c-w>
+# TODO:
+# xnoremap <c-h> <esc><ScriptCmd>myfunctions.HighlightVisualSelection()<cr>
 
 # Terminal stuff
 # --------------
@@ -314,13 +226,6 @@ nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
 tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 tnoremap <c-d> <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
 tnoremap <c-r> <c-w>"
-command! Terminal myfunctions.OpenMyTerminal()
-# Open terminal below all windows
-if g:os == "Windows"
-  exe "cabbrev bter bo terminal powershell"
-else
-  exe "cabbrev vter vert botright terminal " .. &shell
-endif
 
 augroup DIRCHANGE
   autocmd!
@@ -338,8 +243,9 @@ augroup CMDWIN_MAPS
 augroup END
 
 # plugins
-# start plugins: the config files go in plugin/ and they are automatically
-# loaded
+# ----------------
+# Use Pack<tab> to tweak the various plugins
+# the config files go in plugin/ and they are automatically loaded
 # opt plugins: the config files go on autoload/config and the config must be
 # run through a Setup() function
 # Bundled plugins
@@ -353,11 +259,6 @@ packadd matchit
 # comment
 command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
-
-augroup SET_HEADERS_AS_C_FILETYPE
-  autocmd!
-  autocmd BufRead,BufNewFile *.h set filetype=c
-augroup END
 
 # git master
 nnoremap git <Cmd>GitMasterStatus<cr>
@@ -378,21 +279,6 @@ g:vim9_conversion_aid_fix_asl = true
 # vim-outline
 g:outline_autoclose = false
 
-# vim-replica stuff
-# ----------------------------------
-g:replica_console_position = "J"
-g:replica_display_range  = false
-# g:replica_console_height = 8
-g:replica_console_height = max([&lines / 6, 4])
-g:replica_jupyter_console_options = {
-  python: " --config ~/.jupyter/jupyter_console_config.py"}
-nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
-nnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
-xnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
-
-# Outline. <F8> is overriden by vimspector
-nnoremap <silent> <F8> <Plug>OutlineToggle
-
 # Bunch of commands
 # -----------------------
 augroup REMOVE_TRAILING_WHITESPACES
@@ -408,14 +294,7 @@ augroup END
 command! GitCommitDot myfunctions.CommitDot()
 command! GitPushDot myfunctions.PushDot()
 # Merge and diff
-command! -nargs=? Diff myfunctions.Diff(<q-args>)
-nnoremap <expr> gl &diff
-      \ ? 'execute "diffget " .. getcompletion("LOCAL", "diff_buffer")[0]<CR>'
-      \ : 'gl'
-nnoremap <expr> gr &diff
-      \ ? 'execute "diffget " .. getcompletion("REMOTE", "diff_buffer")[0]<CR>'
-      \ : 'gr'
-
+command! -nargs=? Diff myfunctions.Diff(<f-args>)
 command! ColorsToggle myfunctions.ColorsToggle()
 
 # Utils commands
@@ -427,34 +306,7 @@ def PathToURL(path: string)
   setreg('p', myfunctions.PathToURL(fnamemodify(path, ':p')))
   echo "URL stored in register 'p'"
 enddef
-
 command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
-
-
-# ==  Note taking stuff ==
-var work_log_path =
-      \ '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
-if g:os == "Windows"
-  work_log_path =
-        \ 'C:\Users\yt75534/OneDrive\ -\ Volvo\ Group/work_log.md'
-endif
-
-def IndexOpen(index_path: string)
-  # Opens and jump to the end. Finish.
-  exe $'edit {index_path}'
-  const references_string =
-    "<!-- DO NOT REMOVE vim-markdown-extras references DO NOT REMOVE-->"
-  var refs_line = search(references_string)
-  if refs_line == 0
-    norm! G
-  else
-    search('^.\+$', 'b')
-  endif
-enddef
-
-command! LLogNewDay IndexNewDay(work_log_path)
-command! LLogOpen IndexOpen(work_log_path)
-command! TODO IndexOpen($'{$HOME}/Documents/my_notes/README.md')
 
 # CC stuff
 if g:os == "Windows"

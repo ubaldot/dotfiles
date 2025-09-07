@@ -225,42 +225,6 @@ export def Redir(cmd: string, rng: number, start: number, stop: number)
     echom "FOO"
 enddef
 
-export def Redir_old(cmd: string, rng: number, start: number, end: number)
-  # Used to redirect the output from the terminal in a scratch buffer
-  #
-  # Example: :Redir !ls
-  #
-  # You can use it also to redirect the output of some Vim commands
-  for win in range(1, winnr('$'))
-    if !empty(getwinvar(win, 'scratch'))
-      execute ":" .. win .. 'windo :close'
-    endif
-  endfor
-  var output = []
-  if cmd =~ '^!'
-    var cmd_filt = cmd =~ ' %'
-      ? matchstr(substitute(cmd, ' %', ' '
-      .. shellescape(escape(expand('%:p'), '\')), ''), '^!\zs.*')
-      : matchstr(cmd, '^!\zs.*')
-    if rng == 0
-      output = systemlist(cmd_filt)
-    else
-      var joined_lines = join(getline(start, end), '\n')
-      var cleaned_lines = substitute(shellescape(joined_lines), "'\\\\''",
-        "\\\\'", 'g')
-      output = systemlist(cmd_filt .. " <<< $" .. cleaned_lines)
-    endif
-  else
-    var tmp = execute(cmd)
-    output = split(tmp, "\n")
-  endif
-  vnew
-  w:scratch = 1
-  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
-  setline(1, output)
-enddef
-
-
 var color_is_shown = false
 # export def ColorsShow(clear: bool = false): void
 export def ColorsToggle(): void
@@ -376,20 +340,6 @@ export def FormatWithoutMoving(type: string = '')
   endif
 enddef
 
-export def FormatWithoutMoving_old(a: number = 0, b: number = 0)
-  var view = winsaveview()
-  defer UndoFormatting()
-
-  if a == 0 && b == 0
-    normal! gggqG
-  else
-    var interval = b - a + 1
-    execute printf("normal! %dgg%dgqq", a, interval)
-    # silent exe $":norm! {a}gg{interval}gqq"
-  endif
-  winrestview(view)
-enddef
-
 var prettier_supported_filetypes = ['json', 'yaml', 'html', 'css']
 def SetFormatter()
   if !empty(&filetype)
@@ -405,8 +355,6 @@ augroup PRETTIFY
   autocmd!
   autocmd BufEnter * SetFormatter()
 augroup END
-
-# --------------------------------------------------------------
 
 export def QuitWindow()
   # Close window and wipe buffer but it prevent to quit Vim if one window is
@@ -523,80 +471,11 @@ if has('mac')
   enddef
 endif
 
-export def Gx()
-  if exists('g:start_cmd') == 0 && exists(':Open') == 0
-    echohl Error
-    echomsg "Can't find proper opener for an URL!"
-    echohl None
-    return
-  endif
-
-  # URL regexes
-  var rx_base = '\%(\%(http\|ftp\|irc\)s\?\|file\)://\S'
-  var rx_bare = rx_base .. '\+'
-  var rx_embd = rx_base .. '\{-}'
-
-  var URL = ""
-
-  # markdown URL [link text](http://ya.ru 'yandex search')
-  var save_view = winsaveview()
-  defer winrestview(save_view)
-  if searchpair('\[.\{-}\](', '', ')\zs', 'cbW', '', line('.')) > 0
-    URL = matchstr(getline('.')[col('.') - 1 : ], '\[.\{-}\](\zs' .. rx_embd
-      .. '\ze\(\s\+.\{-}\)\?)')
-  endif
-
-  # asciidoc URL http://yandex.ru[yandex search]
-  if empty(URL)
-    if searchpair(rx_bare .. '\[', '', '\]\zs', 'cbW', '', line('.')) > 0
-      URL = matchstr(getline('.')[col('.') - 1 : ], '\S\{-}\ze[')
-    endif
-  endif
-
-  # HTML URL <a href='http://www.python.org'>Python is here</a>
-  #          <a href="http://www.python.org"/>
-  if empty(URL)
-    if searchpair('<a\s\+href=', '', '\%(</a>\|/>\)\zs', 'cbW', '', line('.'))
-        > 0
-      URL = matchstr(getline('.')[col('.') - 1 : ],
-        'href=["' .. "'" .. ']\?\zs\S\{-}\ze["' .. "'" .. ']\?/\?>')
-    endif
-  endif
-
-  # URL <http://google.com>
-  if empty(URL)
-    URL = matchstr(expand("<cWORD>"), $'^<\zs{rx_bare}\ze>$')
-  endif
-
-  # URL (http://google.com)
-  if empty(URL)
-    URL = matchstr(expand("<cWORD>"), $'^(\zs{rx_bare}\ze)$')
-  endif
-
-  # barebone URL http://google.com
-  if empty(URL)
-    URL = matchstr(expand("<cWORD>"), rx_bare)
-  endif
-
-  if empty(URL)
-    echo "Invalid URL"
-    return
-  endif
-
-  if exists(":Open") != 0
-    exe $"Open {escape(URL, '#%!')}"
-  else
-    exe $'!{g:start_cmd} "{escape(URL, '#%!')}"'
-  endif
-enddef
-
-
 export def ClearAllMatches()
     for match in getmatches()
         matchdelete(match.id)
     endfor
 enddef
-
 
 export def KeysFromValue(dict: dict<string>, target_value: string): list<string>
     # Given a value, return all the keys associated to it
