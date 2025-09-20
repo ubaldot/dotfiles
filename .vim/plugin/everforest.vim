@@ -8,9 +8,10 @@ if hour < 7 || 16 < hour
   colorscheme everforest
 else
   set background=light
-  # colorscheme wildcharm
   colorscheme everforest
 endif
-set background=light
+#
+# colorscheme wildcharm
+# set background=light
 # colorscheme solarized8_flat
 # colorscheme everforest
