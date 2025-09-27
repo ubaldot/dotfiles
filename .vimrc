@@ -112,6 +112,7 @@ set backspace=indent,eol,start
 set splitright
 set splitbelow
 set incsearch # for displaying while searching
+set ignorecase
 set smartcase
 set hidden
 set noswapfile
