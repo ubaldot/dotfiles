@@ -279,6 +279,7 @@ g:vim9_conversion_aid_fix_asl = true
 
 # vim-outline
 g:outline_autoclose = false
+g:outline_win_size = 40
 
 # Bunch of commands
 # -----------------------
