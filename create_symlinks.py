@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Run this script directly from ~/dotfiles
 """
