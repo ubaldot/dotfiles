@@ -1,6 +1,9 @@
 vim9script
 
 def PackInit()
+  # This function has nothing to do with plugin loading.
+  # Plugin are automatically loaded at startup if they are in
+  # ~/.vim/pack/start
 
   packadd minpac
   minpac#init()
@@ -12,7 +15,6 @@ def PackInit()
   minpac#add('ubaldot/vim-manim', {'type': 'opt'})
   minpac#add('ubaldot/vim-microdebugger', {'type': 'opt'})
   minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
-  minpac#add('ubaldot/vimspector', {'type': 'opt'})
 
   # Additional plugins here.
   minpac#add('sainnhe/everforest')
@@ -26,6 +28,7 @@ def PackInit()
   minpac#add('ubaldot/vim-helpme')
   minpac#add('ubaldot/vim-calendar')
   minpac#add('ubaldot/vim-op-surround')
+  minpac#add('ubaldot/vimspector')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
@@ -95,6 +98,7 @@ def PackDevSetup()
     if !exists('g:loaded_termdebug')
       g:termdebug_config = {}
       packadd termdebug
+      exe $"set ft={&filetype}"
     endif
 
     # Order matters...
@@ -107,12 +111,6 @@ def PackDevSetup()
       config#microdebugger#Setup()
       packadd vim-microdebugger
     endif
-
-    if !exists('g:loaded_vimspector')
-      packadd vimspector
-      config#vimspector#Setup()
-    endif
-
 
     if !exists('g:loaded_replica')
       packadd vim-replica

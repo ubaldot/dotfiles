@@ -30,7 +30,7 @@ g:calendar_diary_list_curr_idx = 0
 # Adjust for WSL
 if g:os == "WSL"
   for item in g:calendar_diary_list
-    item.path = item.path->substitute('\\', '/' ,'g')->substitute('C:', '/mnt/c')
+    item.path = item.path->substitute('\\', '/', 'g')->substitute('C:', '/mnt/c', 'g')
   endfor
 elseif g:os == "Darwin"
   g:calendar_diary_list = [
@@ -324,49 +324,49 @@ g:calendar_action = 'g:CalendarActionUnique'
 #
 # ============= ATTEMPT FOR A NEW CALENDAR ======================
 
-import autoload g:dotvim .. "/pack/minpac/start/vim-calendar/autoload/backend.vim" as be
-import autoload g:dotvim .. "/pack/minpac/start/vim-calendar/autoload/frontend.vim" as fe
+# import autoload g:dotvim .. "/pack/minpac/start/vim-calendar/autoload/backend.vim" as be
+# import autoload g:dotvim .. "/pack/minpac/start/vim-calendar/autoload/frontend.vim" as fe
 # import "./backend.vim" as be
 # import "./frontend.vim" as fe
 # ===================== TESTS =================================
 # Expected results are for January of different years
-const expected_results = [
-  {'January 2005': [0, 0, 0, 0, 0, 1, 2, 53]},
-  {'January 2006': [0, 0, 0, 0, 0, 0, 1, 52]},
-  {'January 2010': [0, 0, 0, 0, 1, 2, 3, 53]},
-  {'January 2015': [0, 0, 0, 1, 2, 3, 4, 1]},
-  {'January 2016': [0, 0, 0, 0, 1, 2, 3, 53]},
-  {'January 2018': [1, 2, 3, 4, 5, 6, 7, 1]},
-  {'January 2021': [0, 0, 0, 0, 1, 2, 3, 53]},
-  {'January 2022': [0, 0, 0, 0, 0, 1, 2, 52]},
-  {'January 2024': [1, 2, 3, 4, 5, 6, 7, 1]}
-]
-const test_years = [2005, 2006, 2010, 2015, 2016, 2018, 2021, 2022, 2024]
-for [idx, y] in items(test_years)
-  var [head, vals] = items(be.CalendarMonth_iso8601(y, 1, true))[0]
-  var current_result = {[head]: vals[0]}
-  # echom assert_equal(expected_results[idx], current_result)
-endfor
+# const expected_results = [
+#   {'January 2005': [0, 0, 0, 0, 0, 1, 2, 53]},
+#   {'January 2006': [0, 0, 0, 0, 0, 0, 1, 52]},
+#   {'January 2010': [0, 0, 0, 0, 1, 2, 3, 53]},
+#   {'January 2015': [0, 0, 0, 1, 2, 3, 4, 1]},
+#   {'January 2016': [0, 0, 0, 0, 1, 2, 3, 53]},
+#   {'January 2018': [1, 2, 3, 4, 5, 6, 7, 1]},
+#   {'January 2021': [0, 0, 0, 0, 1, 2, 3, 53]},
+#   {'January 2022': [0, 0, 0, 0, 0, 1, 2, 52]},
+#   {'January 2024': [1, 2, 3, 4, 5, 6, 7, 1]}
+# ]
+# const test_years = [2005, 2006, 2010, 2015, 2016, 2018, 2021, 2022, 2024]
+# for [idx, y] in items(test_years)
+#   var [head, vals] = items(be.CalendarMonth_iso8601(y, 1, true))[0]
+#   var current_result = {[head]: vals[0]}
+#   # echom assert_equal(expected_results[idx], current_result)
+# endfor
 
 
-# Start on Sunday
-const expected_us_results = [
-  {'January 2005': [0, 0, 0, 0, 0, 0, 1, 53]},  # Jan 1 is Saturday → week 53 prev. yea
-  {'January 2006': [1, 2, 3, 4, 5, 6, 7, 1]},   # Jan 1 is Sunday → week
-  {'January 2010': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
-  {'January 2015': [0, 0, 0, 0, 1, 2, 3, 1]},   # first Sunday Jan
-  {'January 2016': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
-  {'January 2018': [0, 1, 2, 3, 4, 5, 6, 1]},   # first Sunday Jan
-  {'January 2021': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
-  {'January 2022': [0, 0, 0, 0, 0, 0, 1, 52]},   # first Sunday Jan
-  {'January 2024': [0, 1, 2, 3, 4, 5, 6, 1]}    # first Sunday Jan
-]
+# # Start on Sunday
+# const expected_us_results = [
+#   {'January 2005': [0, 0, 0, 0, 0, 0, 1, 53]},  # Jan 1 is Saturday → week 53 prev. yea
+#   {'January 2006': [1, 2, 3, 4, 5, 6, 7, 1]},   # Jan 1 is Sunday → week
+#   {'January 2010': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
+#   {'January 2015': [0, 0, 0, 0, 1, 2, 3, 1]},   # first Sunday Jan
+#   {'January 2016': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
+#   {'January 2018': [0, 1, 2, 3, 4, 5, 6, 1]},   # first Sunday Jan
+#   {'January 2021': [0, 0, 0, 0, 0, 1, 2, 53]},   # first Sunday Jan
+#   {'January 2022': [0, 0, 0, 0, 0, 0, 1, 52]},   # first Sunday Jan
+#   {'January 2024': [0, 1, 2, 3, 4, 5, 6, 1]}    # first Sunday Jan
+# ]
 
-for [idx, y] in items(test_years)
-  var [head, vals] = items(be.ConvertISOtoUS(be.CalendarMonth_iso8601(y, 1, true)))[0]
-  var current_result = {[head]: vals[0]}
-  # echom assert_equal(expected_us_results[idx], current_result)
-endfor
+# for [idx, y] in items(test_years)
+#   var [head, vals] = items(be.ConvertISOtoUS(be.CalendarMonth_iso8601(y, 1, true)))[0]
+#   var current_result = {[head]: vals[0]}
+#   # echom assert_equal(expected_us_results[idx], current_result)
+# endfor
 # echom assert_equal(expected_us_results, actual_results)
 
 # var XXX  = 2021
