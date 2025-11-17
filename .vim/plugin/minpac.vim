@@ -9,10 +9,6 @@ def PackInit()
   minpac#init()
   minpac#add('k-takata/minpac', {'type': 'opt'})
   minpac#add('yegappan/lsp', {'type': 'opt'})
-  minpac#add('ubaldot/vim9-conversion-aid', {'type': 'opt'})
-  minpac#add('ubaldot/vim-latex-tools', {'type': 'opt'})
-  minpac#add('ubaldot/vim-replica', {'type': 'opt'})
-  minpac#add('ubaldot/vim-manim', {'type': 'opt'})
   minpac#add('ubaldot/vim-microdebugger', {'type': 'opt'})
   minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
 
@@ -29,6 +25,10 @@ def PackInit()
   minpac#add('ubaldot/vim-calendar')
   minpac#add('ubaldot/vim-op-surround')
   minpac#add('ubaldot/vimspector')
+  minpac#add('ubaldot/vim9-conversion-aid')
+  minpac#add('ubaldot/vim-latex-tools')
+  minpac#add('ubaldot/vim-replica')
+  minpac#add('ubaldot/vim-manim')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
@@ -110,14 +110,6 @@ def PackDevSetup()
     if !exists('g:loaded_microdebugger')
       config#microdebugger#Setup()
       packadd vim-microdebugger
-    endif
-
-    if !exists('g:loaded_replica')
-      packadd vim-replica
-    endif
-
-    if !exists('g:loaded_vim_manim')
-      packadd vim-manim
     endif
 
     config#statusline#Setup(true)
