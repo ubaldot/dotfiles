@@ -2,6 +2,7 @@ vim9script
 # Tell vim where is Python. OBS: this is independent of the plugins!
 
 setlocal foldmethod=indent
+setlocal keywordprg=:LspHover
 import g:dotvim .. "/lib/myfunctions.vim"
 
 # Usage: make .

@@ -93,6 +93,7 @@ set nocompatible
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
+set nofoldenable
 # langmap does not work with multi-byte chars,
 # see https://github.com/vim/vim/issues/3018
 # set langmap=ö[,ä]

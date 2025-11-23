@@ -6,25 +6,38 @@ export def Setup()
   # This json-like style to encode configs like
   # pylsp.plugins.pycodestyle.enabled = true
   var pylsp_config = {
-    'pylsp': {
-      'ConfigurationSources': 'flake8',
-      'plugins': {
-        'pylsp_mypy': {
-          'enabled': true,
-          'live_mode': true,
-          'strict': false,
-          'exclude': ["tests/*", "manual_tests/*", "docs/*"]},
-        'pycodestyle': {
-          'enabled': false},
-        'pyflakes': {
-          'enabled': true},
-        'pydocstyle': {
-          'enabled': false},
-        'mccabe': {
-          'enabled': false},
-        'autopep8': {
-          'enabled': false}, }, }, }
+    pylsp: {
+      ConfigurationSources: 'flake8',
+      plugins: {
+        pylsp_mypy: {
+          enabled: true,
+          live_mode: true,
+          strict: false,
+          exclude: ["tests/*", "manual_tests/*", "docs/*"]},
+        pycodestyle: {
+          enabled: false},
+        pyflakes: {
+          enabled: true},
+        pydocstyle: {
+          enabled: false},
+        mccabe: {
+          enabled: false},
+        autopep8: {
+          enabled: false},
+      }, }, }
 
+  var pyright_config = {
+    settings: {
+      python: {
+        analysis: {
+          autoSearchPaths: true,
+          diagnosticMode: "openFilesOnly",
+        },
+        pythonPath: exepath('python'),
+      },
+      verboseOutput: true
+    },
+  }
 
   # clangd env setup
   var clangd_name = 'clangd'
@@ -45,6 +58,22 @@ export def Setup()
   endif
 
   var lspServers = [
+    {
+      name: "pyright",
+      filetype: ["pythonXXX"],
+      path: "pyright-langserver",
+      workspaceConfig: pyright_config,
+      rootSearch: [
+        "pyproject.toml",
+        "setup.py",
+        "setup.cfg",
+        "requirements.txt",
+        "Pipfile",
+        "pyrightconfig.json",
+        ".git"
+      ],
+      args: ['--stdio']
+    },
     {
       name: 'pylsp', # This is a dummy name
       filetype: ['python'],
