@@ -32,10 +32,11 @@ export def Setup()
         analysis: {
           autoSearchPaths: true,
           diagnosticMode: "openFilesOnly",
+          useLibraryCodeForTypes: true,
         },
         pythonPath: exepath('python'),
-        venvPath: '/opt/homebrew/Caskroom/miniconda/base/envs/myenv',
-        venv: 'myenv'
+        # venvPath: '/opt/homebrew/Caskroom/miniconda/base/envs/myenv',
+        # venv: 'myenv'
       },
       verboseOutput: true
     },
