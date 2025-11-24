@@ -34,7 +34,6 @@ export def Setup()
           diagnosticMode: "openFilesOnly",
         },
         pythonPath: exepath('python'),
-        pythonPath: '/opt/homebrew/Caskroom/miniconda/base/envs/myenv/bin/python'
         venvPath: '/opt/homebrew/Caskroom/miniconda/base/envs/myenv',
         venv: 'myenv'
       },
