@@ -15,7 +15,7 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 
-conda activate manim_ce
+conda activate myenv
 
 #
 alias ctags="/opt/homebrew/bin/ctags"

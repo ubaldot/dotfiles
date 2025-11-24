@@ -34,6 +34,9 @@ export def Setup()
           diagnosticMode: "openFilesOnly",
         },
         pythonPath: exepath('python'),
+        pythonPath: '/opt/homebrew/Caskroom/miniconda/base/envs/myenv/bin/python'
+        venvPath: '/opt/homebrew/Caskroom/miniconda/base/envs/myenv',
+        venv: 'myenv'
       },
       verboseOutput: true
     },
@@ -60,7 +63,7 @@ export def Setup()
   var lspServers = [
     {
       name: "pyright",
-      filetype: ["pythonXXX"],
+      filetype: ["python"],
       path: "pyright-langserver",
       workspaceConfig: pyright_config,
       rootSearch: [
@@ -76,7 +79,7 @@ export def Setup()
     },
     {
       name: 'pylsp', # This is a dummy name
-      filetype: ['python'],
+      filetype: ['pythonXXX'],
       path: 'pylsp', # This is the executable name
       workspaceConfig: pylsp_config,
       debug: true,
