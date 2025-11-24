@@ -78,6 +78,14 @@ export def Setup()
       args: ['--stdio']
     },
     {
+      name: 'Zuban', # This is a dummy name
+      filetype: ['pythonXXX'],
+      path: 'zuban', # This is the executable name
+      # workspaceConfig: pylsp_config,
+      # debug: true,
+      args: ['server'],
+    },
+    {
       name: 'pylsp', # This is a dummy name
       filetype: ['pythonXXX'],
       path: 'pylsp', # This is the executable name
