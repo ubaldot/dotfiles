@@ -62,7 +62,7 @@ export def Setup()
 
   var pyright_lsp = {
       name: "pyright",
-      filetype: ["pythonXXX"],
+      filetype: ["python"],
       path: "pyright-langserver",
       workspaceConfig: pyright_config,
       rootSearch: [
@@ -88,7 +88,7 @@ export def Setup()
 
   var pylsp_lsp = {
       name: 'pylsp', # This is a dummy name
-      filetype: ['pythonXXX'],
+      filetype: ['python'],
       path: 'pylsp', # This is the executable name
       workspaceConfig: pylsp_config,
       debug: true,
@@ -96,7 +96,7 @@ export def Setup()
     }
 
 
-  var python_lsp = zuban_lsp
+  var python_lsp = pyright_lsp
 
   var lspServers = [
     {
