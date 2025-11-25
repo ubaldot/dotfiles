@@ -60,10 +60,9 @@ export def Setup()
 
   endif
 
-  var lspServers = [
-    {
+  var pyright_lsp = {
       name: "pyright",
-      filetype: ["python"],
+      filetype: ["pythonXXX"],
       path: "pyright-langserver",
       workspaceConfig: pyright_config,
       rootSearch: [
@@ -76,23 +75,30 @@ export def Setup()
         ".git"
       ],
       args: ['--stdio']
-    },
-    {
+    }
+
+  var zuban_lsp = {
       name: 'Zuban', # This is a dummy name
-      filetype: ['pythonXXX'],
+      filetype: ['python'],
       path: 'zuban', # This is the executable name
       # workspaceConfig: pylsp_config,
       # debug: true,
       args: ['server'],
-    },
-    {
+    }
+
+  var pylsp_lsp = {
       name: 'pylsp', # This is a dummy name
       filetype: ['pythonXXX'],
       path: 'pylsp', # This is the executable name
       workspaceConfig: pylsp_config,
       debug: true,
       args: ['--check-parent-process', '-vv'],
-    },
+    }
+
+
+  var python_lsp = zuban_lsp
+
+  var lspServers = [
     {
       name: clangd_name,
       filetype: ['c', 'cpp'],
@@ -113,6 +119,9 @@ export def Setup()
     #   workspaceConfig: {esbonio: {logging: {level: "debug"}}}
     # },
   ]
+
+  add(lspServers, python_lsp)
+
   # autocmd VimEnter * g:LspAddServer(lspServers)
   g:LspAddServer(lspServers)
   var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
