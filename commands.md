@@ -154,7 +154,23 @@ and add a new line under [remote "origin"]:
 
 # conda
 
-### SSL
+### SSL issue
+You need:
+
+```
+  export REQUESTS\_CA\_BUNDLE=C:\Users\yt75534\.certificate\volvo-ca.crt
+```
+
+and your .certificate\ folder shall contain the following:
+
+
+Or you can add the following to your `profile.ps1`:
+`$env:REQUESTS_CA_BUNDLE = "C:\Users\ubaldot\your_cert-ca.crt"`
+
+For Linux is analogous.
+
+### OLD
+
 Your `.condarc` shall look like the following:
 
 ```
@@ -164,35 +180,7 @@ Your `.condarc` shall look like the following:
   channels:
   - conda-forge
   channel_priority: strict
-  ssl_verify: C:\Users\yt75534/.certificates/combined.pem
 ```
-
-Then, you generally have to combine the company certificate with the
-`cacert.pem`. They are usually located in `~/.certifcates`.
-Then, run:
-
-```
-  Get-Content ~/.certificates/cacert.pem, ~/.certificates/mycompany-ca.crt |
-  Set-Content ~/.certificates/combined.pem
-  conda config --set ssl_verify "$HOME/.certificates/combined.pem"
-```
-and double check with the following:
-```
-  conda config --show ssl_verify
-```
-
-### Old
-First thing to do is config (.condarc). custom_multichannels: conda-forge: -
-https://prefix.dev/conda-forge channels: - conda-forge channel_priority:
-strict
-SSL: Then, you have to set the following environment variable:
-
-    export REQUESTS\_CA\_BUNDLE=/etc/ssl/certs/your\_certificate.pem
-
-On Windows you have to set the environment variable through System/Env var,
-... etc. You can download the certificate from some of your Organization
-website. Or you can add the following to your `profile.ps1`:
-`$env:REQUESTS_CA_BUNDLE = "C:\Users\ubaldot\your_cert-ca.pem"`
 
 **common commands**:
 
