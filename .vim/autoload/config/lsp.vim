@@ -2,6 +2,24 @@ vim9script
 
 export def Setup()
   # LSP setup
+  #
+  # clangd env setup
+  var clangd_name = 'clangd'
+  var clangd_path = 'clangd'
+  var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=never']
+
+  if g:is_avap
+    clangd_name = 'avap'
+    var project_root = '/home/yt75534/avap_example'
+    clangd_path = $'{project_root}/clangd_in_docker.sh'
+    clangd_args = []
+    set makeprg=./avap-util/scripts/enter-container.sh\ build_avap\ linux
+
+    # au! BufReadPost quickfix  setlocal modifiable
+    # 	\ | silent exe ':%s/^\/app/\/home\/yt75534\/avap_example/g'
+    # 	\ | setlocal nomodifiable
+
+  endif
   # ---------------------------
   # This json-like style to encode configs like
   # pylsp.plugins.pycodestyle.enabled = true
@@ -42,24 +60,6 @@ export def Setup()
     },
   }
 
-  # clangd env setup
-  var clangd_name = 'clangd'
-  var clangd_path = 'clangd'
-  var clangd_args =  ['--background-index', '--clang-tidy', '-header-insertion=never']
-
-  if g:is_avap
-    clangd_name = 'avap'
-    var project_root = '/home/yt75534/avap_example'
-    clangd_path = $'{project_root}/clangd_in_docker.sh'
-    clangd_args = []
-    set makeprg=./avap-util/scripts/enter-container.sh\ build_avap\ linux
-
-    # au! BufReadPost quickfix  setlocal modifiable
-    # 	\ | silent exe ':%s/^\/app/\/home\/yt75534\/avap_example/g'
-    # 	\ | setlocal nomodifiable
-
-  endif
-
   var pyright_lsp = {
       name: "pyright",
       filetype: ["python"],
@@ -96,7 +96,7 @@ export def Setup()
     }
 
 
-  var python_lsp = pyright_lsp
+  var python_lsp = zuban_lsp
 
   var lspServers = [
     {
