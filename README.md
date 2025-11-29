@@ -4,18 +4,18 @@ Repo to keep track of my dot files.
 
 # Usage
 
-#### Linux, Macos, WSL
+## Linux, Macos, WSL
 
 - Clone this repo in your home folder.
 - Run `python -m create_symlinks` from `~/dotfiles`
 
-#### Windows
+## Windows
 
 1. Clone this repo into WSL `~\dotfiles`,
 2. Download the script `create_symlinks.py` in Windows,
 3. Run `python -m create_symlinks` from Windows.
 
-##### Notes
+### Notes
 
 - To have common dotfiles between Windows and WSL, and to avoid `^M` mess, we
   create symlinks in Windows that points to the dotfiles stored in WSL,
