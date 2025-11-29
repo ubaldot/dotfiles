@@ -2,7 +2,7 @@
 """
 It reads the content of 'home_dir/dotfiles' and create symlinks in
 '~/dotfiles'.
-Note that home_dir is '/mnt/c/Users/yt5534' in WSL and not '/home/yt75534/'
+In Windows, the source is always on WSL
 
 Run this script directly from home_dir/dotfiles.
 """
@@ -31,6 +31,9 @@ def link_dotfiles(source_dir, target_dir):
     source_path = Path(source_dir)
     target_path = Path(target_dir)
 
+    print("source_path: ", source_path)
+    print("target_path: ", target_path)
+
     for source_file in source_path.rglob("*"):
         # Calculate the relative path from the source directory
         rel_path = source_file.relative_to(source_path)
@@ -46,23 +49,23 @@ def link_dotfiles(source_dir, target_dir):
 
         target_file = target_path / rel_path
 
+        print("source_file: ", source_file)
+        print("target_file: ", target_file)
+
         if source_file.is_dir():
             target_file.mkdir(parents=True, exist_ok=True)
         else:
             create_symlink(source_file, target_file)
 
 
-# Get the home directory
-home_dir = Path.home()
-
 # Define the source and target directories for dotfiles
+# To avoid ^M mess on WSL and macos, original dotfiles are stored in Ubuntu. Windows just symlink to Ubuntu.
 source_dir = (
-    PureWindowsPath("C:\\Users\\yt75534") / "dotfiles"
-    if is_wsl()
-    else home_dir / "dotfiles"
+    Path("//wsl.localhost/Ubuntu-22.04.2-PEES-0.0.7/home/yt75534/dotfiles")
+    if platform.system() == "Windows"
+    else Path.home() / "dotfiles"
 )
-
-target_dir = home_dir
+target_dir = Path.home()
 
 # Create symbolic links for all files in the dotfiles directory
 link_dotfiles(source_dir, target_dir)
