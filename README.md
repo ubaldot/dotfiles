@@ -49,7 +49,7 @@ Once done, open Vim and run :`PackUpdate`.
 
 In Windows case, it is reasonable to install plugins in both Windows and WSL.
 
-### Add new dotfiles
+# Add new dotfiles
 
 When you create a new dotfile, manually move it to `~\dotfiles` repo and start
 tracking it.
