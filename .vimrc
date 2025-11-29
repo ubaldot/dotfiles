@@ -282,6 +282,9 @@ g:vim9_conversion_aid_fix_asl = true
 g:outline_autoclose = false
 g:outline_win_size = 40
 
+# vim-fern-rendered
+g:fern#renderer = "nerdfont"
+
 # Bunch of commands
 # -----------------------
 augroup REMOVE_TRAILING_WHITESPACES

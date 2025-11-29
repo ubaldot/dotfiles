@@ -18,6 +18,7 @@ if g:os == "Windows"
      fontsize = 11
      fontface = "Fira_Code:h"
      fontsize_tail = ":cANSI:qDRAFT"
+     # fontface = "FiraCode\ Nerd\ Font\ Mono:h"
      set guioptions-=T
      set lines=40
      set columns=180
