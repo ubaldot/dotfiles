@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 """
-Run this script directly from ~/dotfiles
+It reads the content of 'home_dir/dotfiles' and create symlinks in
+'~/dotfiles'.
+Note that home_dir is '/mnt/c/Users/yt5534' in WSL and not '/home/yt75534/'
+
+Run this script directly from home_dir/dotfiles.
 """
 
 import subprocess
 import platform
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
+
+
+def is_wsl():
+    return "WSL" in platform.release()
 
 
 def create_symlink(source, target):
@@ -32,7 +40,7 @@ def link_dotfiles(source_dir, target_dir):
             continue
 
         # Create the corresponding target path
-        # Replace .vim with vimfiles if on Windows
+        # Replace .vim with vimfiles if on Windows or WSL
         if platform.system() == "Windows" and rel_path.parts[0] == ".vim":
             rel_path = Path("vimfiles").joinpath(*rel_path.parts[1:])
 
@@ -48,7 +56,12 @@ def link_dotfiles(source_dir, target_dir):
 home_dir = Path.home()
 
 # Define the source and target directories for dotfiles
-source_dir = home_dir / "dotfiles"
+source_dir = (
+    PureWindowsPath("C:\\Users\\yt75534") / "dotfiles"
+    if is_wsl()
+    else home_dir / "dotfiles"
+)
+
 target_dir = home_dir
 
 # Create symbolic links for all files in the dotfiles directory
