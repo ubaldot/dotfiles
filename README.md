@@ -2,27 +2,31 @@
 
 Repo to keep track of my dot files.
 
-# Usage \*nix systems, including WSL)
+# Usage
+
+#### Linux, Macos, WSL
 
 - Clone this repo in your home folder.
 - Run `python -m create_symlinks` from `~/dotfiles`
 
-# Usage (Windows)
+#### Windows
 
 1. Clone this repo into WSL `~\dotfiles`,
 2. Download the script `create_symlinks.py` in Windows,
 3. Run `python -m create_symlinks` from Windows.
 
-#### Notes
+##### Notes
 
 - To have common dotfiles between Windows and WSL, and to avoid `^M` mess, we
   create symlinks in Windows that points to the dotfiles stored in WSL,
 - By doing that, you can jump back and forth between WSL and Windows without
-  the need of updating the dotfiles in each environment
+  the need of updating the dotfiles in each environment,
 - However, if you want to push/pull new or modified dotfiles, the easiest is
   to do it through WSL, as the actual dotfiles repo is stored there, or to go
   to `\\wsl.localhost\your-distro\home\your-name\dotfiles` and push from
-  there.
+  there,
+- If you exclusively use Windows, you can easily update the
+  `create_symlinks.py` script.
 
 # Vim plugins
 
@@ -35,7 +39,7 @@ follows:
 git clone https://github.com/k-takata/minpac.git %USERPROFILE%\vimfiles\pack\minpac\opt\minpac
 ```
 
-### Linux, macOS
+### Linux, macOS, WSL
 
 ```sh
 git clone https://github.com/k-takata/minpac.git ~/.vim/pack/minpac/opt/minpac
