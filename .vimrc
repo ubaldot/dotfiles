@@ -37,10 +37,9 @@ if has('unix') && g:os == 'WSL' && !has('+clipboard')
 
   def WslPut(above: bool = false)
     var start_linenr = above ? line('.') - 1 : line('.')
-    var copied_text = split(getreg('+'), '\n')
+    var copied_text = split(getreg('+'), '\r\n')
     var end_linenr = start_linenr + len(copied_text)
     appendbufline(bufnr(), start_linenr, copied_text)
-    silent! exe $":{start_linenr},{end_linenr}s/\\r$//g"
   enddef
 
   nnoremap "+p <scriptcmd>WslPut()<cr>
@@ -127,6 +126,9 @@ set diffopt+=vertical
 set wildcharm=<tab>
 set conceallevel=2
 set concealcursor=nvc
+set autocomplete
+set complete=.^5,w^5,b^5,u^5
+set completeopt=popup
 set spell spelllang=en_us
 config#statusline#Setup()
 
@@ -150,6 +152,10 @@ nnoremap <c-up> <c-y>
 nnoremap <c-l> <c-w>l
 nnoremap <c-k> <c-w>k
 nnoremap <c-j> <c-w>j
+
+# <tab> for pum completion
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
 # Wipe buffer
 nnoremap <c-d> <cmd>bw!<cr>
@@ -175,6 +181,13 @@ cnoremap <c-n> <down>
 # adjustment for Swedish keyboard
 # nmap ö [
 # nmap ä ]
+
+# Resize gvim window to take notes:
+
+def ResizeGvim()
+  set lines=20 columns=60
+enddef
+command! -nargs=0 ResizeGvim ResizeGvim()
 
 # Change to repo root, ~ or /.
 def GoToGitRoot()
