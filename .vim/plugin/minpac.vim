@@ -71,7 +71,7 @@ def PackConfigList(arglead: string,
                       ->map((_, val)  => fnamemodify(val, ':t:r'))
   var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
                       ->map((_, val)  => fnamemodify(val, ':t:r'))
-  return opt_settings_files + start_settings_files->filter($'v:val =~ "^{arglead}"')
+  return (opt_settings_files + start_settings_files)->filter($'v:val =~ "^{arglead}"')
 
 enddef
 
