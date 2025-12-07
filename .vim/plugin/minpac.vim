@@ -52,9 +52,9 @@ enddef
 
 def PackEditPlugin(dirname: string)
   var start_dir = getcompletion($'{g:dotvim}/pack/minpac/start/', 'dir')
-            ->filter((_, val) => val =~ dirname)
+    ->filter((_, val) => val =~ dirname)
   var opt_dir = getcompletion($'{g:dotvim}/pack/minpac/opt/', 'dir')
-            ->filter((_, val) => val =~ dirname)
+    ->filter((_, val) => val =~ dirname)
 
   var plugin_dir = start_dir + opt_dir
 

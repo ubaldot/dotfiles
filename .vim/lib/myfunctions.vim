@@ -299,7 +299,6 @@ enddef
 
 def UndoFormatting()
   if v:shell_error != 0
-    echom "Errore, stronzo!"
     undo
     echoerr $"'{&l:formatprg->matchstr('^\s*\S*')}' returned errors."
   else
@@ -307,7 +306,7 @@ def UndoFormatting()
     redraw
     if !empty(&l:formatprg)
       Echowarn($'{&l:formatprg}')
-    echom "Ecco il programma:"
+    else
       Echowarn("'formatprg' is empty. Using default formatter.")
     endif
   endif
@@ -330,8 +329,6 @@ export def FormatWithoutMoving(type: string = '')
     start = line("'[")
     end = line("']")
   endif
-
-    echom "Chiamataaaa:"
   if start == 0 && end == 0
     normal! gggqG
   else
