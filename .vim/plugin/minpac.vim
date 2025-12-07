@@ -38,21 +38,25 @@ command! PackUpdate  PackInit() |  minpac#update()
 command! PackClean   PackInit() |  minpac#clean()
 command! PackStatus packadd minpac | minpac#status()
 
-def PackList(A: any, L: any, P: any): list<string>
-  PackInit()
-  return sort(keys(minpac#getpluglist()))
+def PackEditList(arglead: string,
+    command_line: string,
+    cursor_position: number): list<string>
+
+  var start_plugins = getcompletion($'{g:dotvim}/pack/minpac/start/', 'dir')
+                      ->map((_, val)  => fnamemodify(val, ':h:t'))
+  var opt_plugins = getcompletion($'{g:dotvim}/pack/minpac/opt/', 'dir')
+                      ->map((_, val)  => fnamemodify(val, ':h:t'))
+  return (start_plugins + opt_plugins)->filter($'v:val =~ "{arglead}"')
+
 enddef
 
 def PackEditPlugin(dirname: string)
-  # First search in "start" folder
-  var plugin_dir = getcompletion($'{g:dotvim}/pack/minpac/start/', 'dir')
+  var start_dir = getcompletion($'{g:dotvim}/pack/minpac/start/', 'dir')
+            ->filter((_, val) => val =~ dirname)
+  var opt_dir = getcompletion($'{g:dotvim}/pack/minpac/opt/', 'dir')
             ->filter((_, val) => val =~ dirname)
 
-  # Then search in "opt" folder
-  if empty(plugin_dir)
-    plugin_dir = getcompletion($'{g:dotvim}/pack/minpac/opt/', 'dir')
-            ->filter((_, val) => val =~ dirname)
-  endif
+  var plugin_dir = start_dir + opt_dir
 
   if !empty(plugin_dir)
     exe $"cd {plugin_dir[0]}"
@@ -61,7 +65,7 @@ def PackEditPlugin(dirname: string)
   endif
 enddef
 
-command! -nargs=1 -complete=customlist,PackList PackEditPlugin PackEditPlugin(<f-args>)
+command! -nargs=1 -complete=customlist,PackEditList PackEditPlugin PackEditPlugin(<f-args>)
 
 def PackConfigList(arglead: string,
     command_line: string,

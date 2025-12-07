@@ -155,17 +155,55 @@ and add a new line under [remote "origin"]:
 # conda
 
 ### SSL issue
+
 You need:
 
 ```
-  export REQUESTS\_CA\_BUNDLE=C:\Users\yt75534\.certificate\volvo-ca.crt
+  export REQUESTS\_CA\_BUNDLE=C:\Users\ubaldot\.certificate\xyz-ca.crt
 ```
 
-and your .certificate\ folder shall contain the following:
+If you  `cat xyz-ca.crt` you should see:
+
+```
+  -----BEGIN CERTIFICATE-----
+  (Base64 data, usually split into 64-character lines)
+  -----END CERTIFICATE-----
+```
+
+If you don't have such a file, then export it:
+
+1. run `certmgr.msc`
+2. Find the certificate, right click->all tasks->export
+3. Select `Base-64 encoded X.509 (.CER)` (this is PEM format).
+4. Save it as e.g. `my_cert.cer`.
+
+Then, you can set `REQUESTS_CA_BUNDLE = my_cert.cer`.
+
+Or download a `xyz-ca.pem.crt` from somewhere.
 
 
-Or you can add the following to your `profile.ps1`:
-`$env:REQUESTS_CA_BUNDLE = "C:\Users\ubaldot\your_cert-ca.crt"`
+### SSL Issue debug
+
+To build the `xyz-ca.crt` you have to download and concatenate all the
+various `.pem`:
+
+```
+  type "XYZ-Class2-Issuing-CA2-2099.pem" >> "C:\Users\ubaldot\.certificates\xyz-ca.crt"
+  type "XYZ-Class2-Issuing-CA3-2099.pem" >> "C:\Users\ubaldot\.certificates\xyz-ca.crt"
+```
+
+The `.pem` shall be of the form:
+
+```
+  -----BEGIN CERTIFICATE-----
+  (Base64 data, usually split into 64-character lines)
+  -----END CERTIFICATE-----
+```
+
+
+In `profile.ps1` you can add:
+
+`$env:REQUESTS_CA_BUNDLE = "C:\Users\ubaldot\xyz-ca.crt"`
 
 For Linux is analogous.
 
