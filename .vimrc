@@ -157,8 +157,18 @@ nnoremap <c-j> <c-w>j
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-# Wipe buffer
-nnoremap <c-d> <cmd>bw!<cr>
+# Delete buffer
+def BufferDelete()
+  if len(getbufinfo({'buflisted': 1})) == 2
+    bdelete %
+  else
+    var curr_buff = bufnr()
+    exe "bprev"
+    exe $"bd! {curr_buff}"
+  endif
+enddef
+
+nnoremap <c-d> <ScriptCmd>BufferDelete()<cr>
 
 # to be able to undo accidental c-w"
 inoremap <c-u> <c-g>u<c-u>
