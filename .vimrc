@@ -162,9 +162,8 @@ def BufferDelete()
   if len(getbufinfo({'buflisted': 1})) == 2
     bdelete %
   else
-    var curr_buff = bufnr()
-    exe "bprev"
-    exe $"bd! {curr_buff}"
+    bprev
+    exe $"bd! {bufnr('#')}"
   endif
 enddef
 
