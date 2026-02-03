@@ -293,6 +293,7 @@ def Highlight()
     prop_remove({'id': id})
   endif
 enddef
+xnoremap <c-h> <esc><ScriptCmd>Highlight()<cr>
 
 # --------- General formatting function -----------------
 #
@@ -687,3 +688,27 @@ export def PathToURL(path: string): string
     return 'file://' .. encoded
   endif
 enddef
+
+var total = 0.0
+def SumBlock()
+
+  var tmp = getreg('s')
+  silent norm! "sy
+
+  var numbers: list<any>
+  if @s =~ "\|"
+    numbers = split(@s, "\|")
+  else
+    numbers = split(@s)
+  endif
+
+  for v in numbers
+    total += str2float(v)
+  endfor
+
+  echo total
+  total = 0.0
+  setreg('s', tmp)
+enddef
+
+xnoremap <c-s> <ScriptCmd>SumBlock()<cr>

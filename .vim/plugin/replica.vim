@@ -2,8 +2,11 @@ vim9script
 
 g:replica_console_position = "J"
 g:replica_display_range  = false
-# g:replica_console_height = 8
-g:replica_console_height = max([&lines / 6, 4])
+
+g:replica_debug = true
+g:replica_log_level = 'Info'
+# g:replica_console_height = 20
+# g:replica_console_height = max([&lines / 3, 4])
 g:replica_jupyter_console_options = {
   python: " --config ~/.jupyter/jupyter_console_config.py"}
 nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j

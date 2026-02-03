@@ -11,6 +11,7 @@ endif
 #
 colorscheme everforest
 # colorscheme wildcharm
+# set background=dark
 # set background=light
 # set background=dark
 # colorscheme solarized8_flat
