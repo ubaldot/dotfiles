@@ -22,8 +22,7 @@ def SumBlock()
   setreg('s', tmp)
 enddef
 
-
-export def InsertRowDelimiter()
+def InsertRowDelimiter()
   const p = '^\s*|\s*.*\s*|\s*$'
   const curr_line = line('.')
   if getline(curr_line) =~ p
@@ -34,7 +33,7 @@ export def InsertRowDelimiter()
   endif
 enddef
 
-export def Align()
+def Align()
   const p = '^\s*|\s*.*\s*|\s*$'
   if exists(':EasyAlign') != 0 && getline('.') =~# '^\s*|'
 
@@ -73,5 +72,5 @@ xmap ga <Plug>(EasyAlign)*\|
 nmap ga <Plug>(EasyAlign)*\|
 
 xnoremap <c-s> <ScriptCmd>SumBlock()<cr>
-inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>myfunctions.Align()<CR>a
-command! -nargs=0 EasyDelimiter myfunctions.InsertRowDelimiter()
+inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>Align()<CR>a
+command! -nargs=0 EasyDelimiter InsertRowDelimiter()
