@@ -287,15 +287,6 @@ nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 # git master
 nnoremap git <Cmd>GitMasterStatus<cr>
 
-# Easy-align
-# Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)*\|
-# Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)*\|
-
-inoremap <silent> <Bar> <Bar><Esc><ScriptCmd>myfunctions.Align()<CR>a
-command! -nargs=0 EasyDelimiter myfunctions.InsertRowDelimiter()
-
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true
 g:vim9_conversion_aid_fix_asl = true
@@ -303,9 +294,6 @@ g:vim9_conversion_aid_fix_asl = true
 # vim-outline
 g:outline_autoclose = false
 g:outline_win_size = 40
-
-# vim-fern-rendered
-g:fern#renderer = "nerdfont"
 
 # Bunch of commands
 # -----------------------
