@@ -226,3 +226,12 @@ pixi-remove-env() {
 
 
 # pixi-activate py314
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+path=('/Users/ubaldot/.juliaup/bin' $path)
+export PATH
+
+# <<< juliaup initialize <<<

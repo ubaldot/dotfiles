@@ -3,8 +3,9 @@ vim9script
 g:replica_console_position = "J"
 g:replica_display_range  = false
 
-g:replica_debug = true
+g:replica_debug = false
 g:replica_log_level = 'Info'
+g:replica_display_variables = 'popup'
 # g:replica_console_height = 20
 # g:replica_console_height = max([&lines / 3, 4])
 g:replica_jupyter_console_options = {
