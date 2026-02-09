@@ -55,6 +55,7 @@ def SearchReplacementHelper(search_user: string = ''): list<string>
 enddef
 
 def SearchAndReplaceInFiles(search_user: string = '')
+  norm! 0
   echo "Search & replace in files\n"
   var search_replacement = SearchReplacementHelper(search_user)
   var search = ''
