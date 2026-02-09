@@ -1,5 +1,10 @@
 vim9script
 
+augroup MarkdownStrike
+  autocmd!
+  autocmd ColorScheme * highlight markdownStrike gui=strikethrough cterm=strikethrough
+augroup END
+
 # This is very ugly: you add a - [ ] by pasting the content of register 'o'
 setreg("o", "- [ ] ")
 
@@ -17,6 +22,9 @@ setlocal completeopt=menu,menuone,noselect
 setlocal omnifunc=mde_funcs.OmniFunc
 inoremap <buffer> ][ ][<C-x><C-o>
 nnoremap <buffer> <expr> o OpenNewLine()
+
+# This is an extension of markdown_extras.vim to use capital letters for
+# highlighting
 
 def MarkdownStrikeLine()
     const curpos = getcursorcharpos()
