@@ -2,7 +2,7 @@ vim9script
 
 augroup MarkdownStrike
   autocmd!
-  autocmd ColorScheme * highlight markdownStrike gui=strikethrough cterm=strikethrough
+  autocmd ColorScheme * highlight htmlStrike gui=strikethrough cterm=strikethrough
 augroup END
 
 # This is very ugly: you add a - [ ] by pasting the content of register 'o'
