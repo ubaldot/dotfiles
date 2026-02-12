@@ -156,6 +156,20 @@ and add a new line under [remote "origin"]:
 
 ### SSL issue
 
+You need a mirror like on artifactory.
+Then, create a ~/.condarc with the following content:
+
+    channels:
+      - https://my_company.net/artifactory/conda-forge-remote
+
+Then, run:
+
+    conda config --show-sources
+
+and remove other files (like /home/yt75534/miniforge3/.condarc)
+
+**Alternative**
+
 You need:
 
 ```
