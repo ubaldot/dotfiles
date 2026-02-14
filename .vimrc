@@ -21,10 +21,10 @@ if has("win64") || has("win32") || has("win16")
   g:dotfiles = '\\wsl.localhost\Ubuntu-22.04.2-PEES-0.0.7\home\yt75534\dotfiles'
 elseif IsWSL()
   g:os = 'WSL'
-  g:dotfiles = $'{HOME}/dotfiles'
+  g:dotfiles = $'{$HOME}/dotfiles'
 else
   g:os = substitute(system('uname'), '\n', '', '')
-  g:dotfiles = $'{HOME}/dotfiles'
+  g:dotfiles = $'{$HOME}/dotfiles'
   language en_US.UTF-8
 endif
 
