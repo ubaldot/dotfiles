@@ -18,10 +18,13 @@ enddef
 
 if has("win64") || has("win32") || has("win16")
   g:os = "Windows"
+  g:dotfiles = '\\wsl.localhost\Ubuntu-22.04.2-PEES-0.0.7\home\yt75534\dotfiles'
 elseif IsWSL()
   g:os = 'WSL'
+  g:dotfiles = $'{HOME}/dotfiles'
 else
   g:os = substitute(system('uname'), '\n', '', '')
+  g:dotfiles = $'{HOME}/dotfiles'
   language en_US.UTF-8
 endif
 
@@ -174,7 +177,24 @@ nnoremap <c-d> <ScriptCmd>BufferDelete()<cr>
 inoremap <c-u> <c-g>u<c-u>
 inoremap <c-w> <c-g>u<c-w>
 
-map <leader>vv <Cmd>e $MYVIMRC<cr>
+nnoremap <leader>vv <cmd>exe $'edit {g:dotfiles}/.vimrc'<cr>
+
+# Windows-like mapping
+nnoremap <c-z> u
+nnoremap <c-a> ggVG
+if g:os == "Windows"
+  xnoremap <c-c> "*y
+else
+  xnoremap <c-c> "+y
+endif
+
+if g:os == "Windows"
+  nnoremap <c-v> "*p
+elseif g:os == "WSL"
+  nnoremap <c-v> <scriptcmd>WslPut()<cr>
+else
+  nnoremap <c-v> "+p
+endif
 
 augroup SET_HEADERS_AS_C_FILETYPE
   autocmd!

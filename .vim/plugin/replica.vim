@@ -1,15 +1,14 @@
 vim9script
 
-g:replica_console_position = "J"
-g:replica_display_range  = false
+g:replica_config = {}
+g:replica_config.console_position = "J"
+g:replica_config.display_range  = false
 
-g:replica_debug = false
-g:replica_log_level = 'Info'
-g:replica_display_variables = 'tab'
-# g:replica_console_height = 20
-# g:replica_console_height = max([&lines / 3, 4])
-g:replica_jupyter_console_options = {
-  python: " --config ~/.jupyter/jupyter_console_config.py"}
+g:replica_config.debug = true
+g:replica_config.log_level = 'Info'
+g:replica_config.display_variables = 'vsplit'
+# g:replica_config.replica_console_height = 20
+# g:replica_config.replica_console_height = max([&lines / 3, 4])
 nnoremap <silent> <c-enter> <Plug>ReplicaSendCell<cr>j
 nnoremap <silent> <s-enter> <Plug>ReplicaSendFile<cr>
 nnoremap <silent> <F9> <Plug>ReplicaSendLines<cr>
