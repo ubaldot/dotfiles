@@ -32,10 +32,12 @@ elseif g:os == "Darwin"
 else
     fontsize = 14
      set guioptions-=T
+     set guioptions+=m
      set lines=40
      set columns=160
      fontsize_tail = ""
      fontface = "Fira\ Code\ "
+     winpos 100 100
 endif
 
 &guifont = fontface .. string(fontsize) .. fontsize_tail
