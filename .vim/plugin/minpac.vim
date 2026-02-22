@@ -11,6 +11,8 @@ def PackInit()
   minpac#add('yegappan/lsp', {'type': 'opt'})
   minpac#add('ubaldot/vim-microdebugger', {'type': 'opt'})
   minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
+  minpac#add('yegappan/snake', {'type': 'opt'})
+  minpac#add('yegappan/tetris', {'type': 'opt'})
 
   # Additional plugins here.
   minpac#add('sainnhe/everforest')

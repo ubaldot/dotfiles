@@ -6,7 +6,7 @@ endif
 g:replica_config.console_position = "L"
 g:replica_config.display_range  = false
 # g:replica_config.use_utf16 = false
-g:replica_config.debug = false
+g:replica_config.debug = true
 g:replica_config.log_level = 'Debug'
 g:replica_config.display_variables = 'vsplit'
 # g:replica_config.replica_console_height = 20
