@@ -16,10 +16,10 @@ def FindCmd(): string
         cmd = 'ugrep "" -Rl -I --ignore-files'
     elseif executable('rg')
         cmd = 'rg --path-separator / --files --hidden --glob !.git'
+    elseif executable('where') && has('win32')
+        cmd = 'where.exe /r . * | findstr /I /V /L "\.git\" | findstr /I /V /R "\.swp$"'
     elseif executable('find')
         cmd = 'find \! \( -path "*/.git" -prune -o -name "*.swp" \) -type f -follow'
-      elseif executable('where') && has('win32')
-        cmd = '& where.exe /r . * | findstr /I /V /L "\\.git\\" | findstr /I /V /R "\.swp$'
     endif
     return cmd
 enddef
@@ -33,12 +33,16 @@ def Find(cmd_arg: string, cmd_complete: bool): list<string>
                 ->mapnew((_, v) => v->substitute('^\.[\/]', "", ""))
         else
             files_cache = systemlist(cmd)
+                ->mapnew((_, v) => trim(v))
+                ->mapnew((_, v) => fnamemodify(v, ':.'))
+                ->mapnew((_, v) => v->substitute('\\', "/", "g"))
         endif
     endif
     if empty(cmd_arg)
         return files_cache
     else
-        return files_cache->matchfuzzy(cmd_arg)
+        # return files_cache->matchstr(cmd_arg)
+        return files_cache->filter($"v:val =~ '{cmd_arg}'")
     endif
 enddef
 

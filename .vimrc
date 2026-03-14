@@ -120,6 +120,7 @@ set smartcase
 set hidden
 set noswapfile
 set wildmenu wildoptions=pum
+set wildmode=noselect:lastused,full
 set wildignore+=**/*cache*,*.o,**/*ipynb*
 set completeopt-=preview
 set textwidth=78
@@ -246,6 +247,8 @@ nnoremap <tab> <Cmd>bnext<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
+
+nnoremap <leader>F :find<space>
 #
 
 # search
@@ -271,6 +274,12 @@ nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
 tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 tnoremap <c-d> <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
 tnoremap <c-r> <c-w>"
+
+
+augroup CMD_AUTOCOMPLETE
+  autocmd!
+	autocmd CmdlineChanged [:\/\?] call wildtrigger()
+augroup END
 
 augroup DIRCHANGE
   autocmd!
