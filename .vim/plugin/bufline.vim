@@ -8,46 +8,46 @@ set showtabline=2
 if !exists('*g:SpawnBufferLine')
   def g:SpawnBufferLine(): string
     # var s = pwd .. ' | '
-    var s = ''
+    var buf_line = ''
 
     # Get the list of buffers. Use bufexists() to include hidden buffers
-    var bufferNums = filter(range(1, bufnr('$')), 'buflisted(v:val)')
+    var bufferNums = range(1, bufnr('$'))->filter((_, val) => buflisted(val))
     # Making a buffer list on the left side
     for i in bufferNums
       # Highlight with yellow if it's the current buffer
-      s ..= (i == bufnr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-      s = $'{s}{i} '		# Append the buffer number
+      buf_line ..= (i == bufnr()) ? ('%#TabLineSel#') : ('%#TabLine#')
+      buf_line = $'{buf_line}{i} '		# Append the buffer number
       if bufname(i) == ''
-        s = $'{s}[NEW]'		# Give a name to a new buffer
+        buf_line = $'{buf_line}[NEW]'		# Give a name to a new buffer
       endif
       if getbufvar(i, '&modifiable')
-        s ..= fnamemodify(bufname(i), ':t')	# Append the file name
-        # s ..= pathshorten(bufname(i))  # Use this if you want a trimmed path
+        buf_line ..= fnamemodify(bufname(i), ':t')	# Append the file name
+        # buf_line ..= pathshorten(bufname(i))  # Use this if you want a trimmed path
         # If the buffer is modified, add + and separator. Else, add separator
-        s ..= (getbufvar(i, "&modified")) ? (' [+] |') : (' |')
+        buf_line ..= (getbufvar(i, "&modified")) ? (' [+] |') : (' |')
       else
-        s ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only flag
+        buf_line ..= fnamemodify(bufname(i), ':t') .. ' [RO] | '  # Add read only flag
       endif
     endfor
-    s = $'{s}%#TabLineFill#%T'  # Reset highlight
+    buf_line = $'{buf_line}%#TabLineFill#%T'  # Reset highlight
 
-    s = $'{s}%='			# Spacer
+    buf_line = $'{buf_line}%='			# Spacer
 
     # Making a tab list on the right side
     for i in range(1, tabpagenr('$'))  # Loop through the number of tabs
       # Highlight with yellow if it's the current tab
-      s ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
-      s = $'{s}%{i}T '		# set the tab page number (for mouse clicks)
-      s = $'{s}{i}'		# set page number string
+      buf_line ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
+      buf_line = $'{buf_line}%{i}T '		# set the tab page number (for mouse clicks)
+      buf_line = $'{buf_line}{i}'		# set page number string
     endfor
-    s = $'{s}%#TabLineFill#%T'	# Reset highlight
+    buf_line = $'{buf_line}%#TabLineFill#%T'	# Reset highlight
 
     # Close button on the right if there are multiple tabs
     if tabpagenr('$') > 1
-      s = $'{s}%999X X'
+      buf_line = $'{buf_line}%999X X'
     endif
 
-    return s
+    return buf_line
   enddef
 endif
 # ---------- Bufline -----------------------
