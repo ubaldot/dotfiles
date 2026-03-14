@@ -25,25 +25,41 @@ def FindCmd(): string
 enddef
 
 def Find(cmd_arg: string, cmd_complete: bool): list<string>
-    if empty(files_cache)
-        var cmd = FindCmd()
-        if empty(cmd)
-            files_cache = globpath('.', '**', 1, 1)
-                ->filter((_, v) => !isdirectory(v))
-                ->mapnew((_, v) => v->substitute('^\.[\/]', "", ""))
-        else
-            files_cache = systemlist(cmd)
-                ->mapnew((_, v) => trim(v))
-                ->mapnew((_, v) => fnamemodify(v, ':.'))
-                ->mapnew((_, v) => v->substitute('\\', "/", "g"))
-        endif
-    endif
-    if empty(cmd_arg)
-        return files_cache
+  # Fill in the cache with the longest filenames at first <tab> hit and then
+  # re-use (and filters) the cached at every key press, without the need of
+  # recalling the external program
+
+  if getcwd() ==# $HOME
+    echoerr "You are in your HOME directory.Too many results"
+    return []
+  endif
+
+  if empty(files_cache)
+    var cmd = FindCmd()
+    var files_cache_dirty: list<string> = []
+
+    if empty(cmd)
+      files_cache_dirty = globpath('.', '**', 1, 1)
     else
-        # return files_cache->matchstr(cmd_arg)
-        return files_cache->filter($"v:val =~ '{cmd_arg}'")
+      files_cache_dirty = systemlist(cmd)
     endif
+
+    # Update filter_cache only at cmdline enter. Then reuse it at every
+    # button press.
+    files_cache = files_cache_dirty
+      ->filter((_, v) => !isdirectory(v))
+      ->mapnew((_, v) => trim(v))
+      ->mapnew((_, v) => fnamemodify(v, ':.'))
+      ->mapnew((_, v) => v->substitute('\\', "/", "g"))
+      ->mapnew((_, v) => v->substitute('^\.[\/]', "", ""))
+  endif
+
+  if empty(cmd_arg)
+    return files_cache
+  else
+    # return files_cache->matchfuzzy(cmd_arg)
+    return files_cache->filter($"v:val =~ '{cmd_arg}'")
+  endif
 enddef
 
 set findfunc=Find
