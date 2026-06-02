@@ -182,7 +182,6 @@ nnoremap <leader>vv <cmd>exe $'edit {g:dotfiles}/.vimrc'<cr>
 
 # Windows-like mapping
 nnoremap <c-z> u
-nnoremap <c-a> ggVG
 if g:os == "Windows"
   xnoremap <c-c> "*y
 else
