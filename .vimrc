@@ -36,7 +36,7 @@ if has('unix') && g:os == 'WSL' && !has('+clipboard')
       autocmd TextYankPost * if v:event.operator ==# 'y'
             \ | system('clip.exe', getreg('0')) | endif
     augroup END
-  endif
+   endif
 
   def WslPut(above: bool = false)
     var start_linenr = above ? line('.') - 1 : line('.')
@@ -52,7 +52,7 @@ endif
 if g:os == "Windows" || g:os =~ "^MINGW64"
   g:tmp = "C:/temp"
   g:null_device = "NUL"
-	g:dotvim = $HOME .. "\\vimfiles"
+  g:dotvim = $HOME .. "\\vimfiles"
 else
   g:tmp = "/tmp"
   g:null_device = "/dev/null"
@@ -89,16 +89,17 @@ augroup vimrc_help
     endif
   }
 augroup END
-# Internal vim variables aka 'options'
-# Set terminal with 256 colors
+
+# langmap does not work with multi-byte chars,
+# see https://github.com/vim/vim/issues/3018
+# set langmap=ö[,ä]
+
+
 set nocompatible
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
 set nofoldenable
-# langmap does not work with multi-byte chars,
-# see https://github.com/vim/vim/issues/3018
-# set langmap=ö[,ä]
 set belloff=all
 set colorcolumn=80
 set clipboard^=unnamed,unnamedplus
@@ -128,8 +129,8 @@ set iskeyword+=-
 set formatoptions+=wnp
 set diffopt+=vertical
 set wildcharm=<tab>
-set conceallevel=2
-set concealcursor=nvc
+# set conceallevel=2
+# set concealcursor=nvc
 set autocomplete
 set complete=.^5,w^5,b^5,u^5
 set completeopt=popup
@@ -161,15 +162,16 @@ nnoremap <c-j> <c-w>j
 # <tab> for pum completion
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <c-space> <c-n>
 
 # Delete buffer
 def BufferDelete()
-  if len(getbufinfo({'buflisted': 1})) == 2
-    bdelete %
-  else
-    bprev
-    exe $"bd! {bufnr('#')}"
-  endif
+if len(getbufinfo({'buflisted': 1})) == 2
+  bdelete %
+else
+  bprev
+   exe $"bd! {bufnr('#')}"
+endif
 enddef
 
 nnoremap <c-d> <ScriptCmd>BufferDelete()<cr>
@@ -207,10 +209,10 @@ inoremap <expr> <cr> pumvisible() ? "\<C-Y>" : "\<cr>"
 cnoremap <c-p> <up>
 cnoremap <c-n> <down>
 
-# TODO: does not work with macos
-# adjustment for Swedish keyboard
-# nmap ö [
-# nmap ä ]
+# # TODO: does not work with macos
+# # adjustment for Swedish keyboard
+# # nmap ö [
+# # nmap ä ]
 
 # Resize gvim window to take notes:
 
@@ -225,7 +227,7 @@ def GoToGitRoot()
   # then change dir to the git repo root.
   exe $'cd {expand('%:p:h')}'
   var git_root = system('git rev-parse --show-toplevel')
-  # v:shell_error does not work in Windows, it returns 0
+  v:shell_error does not work in Windows, it returns 0
   if v:shell_error == 0 && git_root !~ 'fatal: not a git repository'
     exe $'cd {git_root}'
   endif
@@ -248,7 +250,7 @@ noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 
 nnoremap <leader>F :find<space>
-#
+ #
 
 # search
 # TODO:
@@ -277,7 +279,7 @@ tnoremap <c-r> <c-w>"
 
 augroup CMD_AUTOCOMPLETE
   autocmd!
-	autocmd CmdlineChanged [:\/\?] call wildtrigger()
+  autocmd CmdlineChanged [:\/\?] call wildtrigger()
 augroup END
 
 augroup DIRCHANGE
@@ -302,10 +304,8 @@ augroup END
 # opt plugins: the config files go on autoload/config and the config must be
 # run through a Setup() function
 # Bundled plugins
-packadd comment
-packadd helptoc
-packadd matchit
-# packadd matchparen
+ packadd comment
+# packadd matchit
 
 # Plugin settings
 # -----------------
@@ -349,7 +349,7 @@ command! -nargs=1 -complete=command -range Redir
 # Path to URL command
 def PathToURL(path: string)
   setreg('p', myfunctions.PathToURL(fnamemodify(path, ':p')))
-  echo "URL stored in register 'p'"
+   echo "URL stored in register 'p'"
 enddef
 command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
 

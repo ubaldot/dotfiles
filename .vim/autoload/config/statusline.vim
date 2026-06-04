@@ -11,11 +11,11 @@ def UpdateGitBranch(buf_enter: bool)
 
   def GitBranchStdout(id: any, message: string)
     g:git_branch = $'{nr2char(0xE0A0)} {message}'
-    redrawstatus
+    # redrawstatus
   enddef
   def GitBranchStderr(id: any, message: string)
     g:git_branch = nr2char(0xE0A0) .. ' No repo'
-    redrawstatus
+    # redrawstatus
   enddef
 
   var last_cmd = histget('cmd', -1)

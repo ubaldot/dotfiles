@@ -1,5 +1,8 @@
 vim9script
 
+setlocal conceallevel=2
+setlocal concealcursor=nvc
+
 augroup MarkdownStrike
   autocmd!
   autocmd ColorScheme * highlight htmlStrike gui=strikethrough cterm=strikethrough
