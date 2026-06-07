@@ -1,8 +1,0 @@
-NERDTree:
-copy NERDTree dir to pwd     cd
-open/close NERDTree          <F1> (:NERDToggle)
-switch to C: drive           :NERDTree c:/
-show hidden files            I
-refresh folder               R
-modify files                 m
-open file and stay           go

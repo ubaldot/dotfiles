@@ -12,7 +12,7 @@ def HelpMeComplete(
   ): list<string>
 
   var helpme_files = HelpMeGetFiles()->map((_, val)  => fnamemodify(val, ':t:r'))
-  return helpme_files->filter($'v:val =~ "^{arglead}"')
+  return helpme_files->filter($'v:val =~ "{arglead}"')
 enddef
 
 def HelpMeShow(filename: string='')

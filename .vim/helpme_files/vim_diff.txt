@@ -1,0 +1,9 @@
+VIM DIFF
+
+j         jump to next difference, same as :norm! ]c
+k         jump to previous difference, same as :norm! [c
+
+gr        :diffget REMOTE
+gl        :diffget LOCAL
+
+<F5>      :diffupdate

@@ -135,7 +135,7 @@ set autocomplete
 set complete=.^5,w^5,b^5,u^5
 set completeopt=popup
 set spell spelllang=en_us
-config#statusline#Setup()
+# config#statusline#Setup()
 
 filetype plugin on
 filetype indent on
@@ -216,6 +216,30 @@ cnoremap <c-n> <down>
 
 # Resize gvim window to take notes:
 
+# Only apply when in diff mode
+augroup DIFF_KEYBINDINGS
+  autocmd!
+  autocmd OptionSet diff if &diff | DiffMappings() | endif
+augroup END
+
+def DiffMappings()
+  # Navigation between changes
+  nnoremap <buffer> j <cmd>normal! ]c<CR>
+  nnoremap <buffer> k <cmd>normal! [c<CR>
+
+  # Get changes from other buffers
+  nnoremap <buffer> gr <cmd>diffget REMOTE<CR>
+  nnoremap <buffer> gl <cmd>diffget LOCAL<CR>
+
+  # Refresh diff
+  nnoremap <buffer> <F5> <cmd>diffupdate<CR>
+
+  # Quit diff mode
+  nnoremap <buffer> <esc> <cmd>diffoff<CR>
+enddef
+
+
+
 def ResizeGvim()
   set lines=20 columns=60
 enddef
@@ -277,10 +301,10 @@ tnoremap <c-d> <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
 tnoremap <c-r> <c-w>"
 
 
-augroup CMD_AUTOCOMPLETE
-  autocmd!
-  autocmd CmdlineChanged [:\/\?] call wildtrigger()
-augroup END
+# augroup AUTOCOMPLETE_CMDLINE
+#   autocmd!
+#   autocmd CmdlineChanged [:\/\?] call wildtrigger()
+# augroup END
 
 augroup DIRCHANGE
   autocmd!
