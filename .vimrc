@@ -273,7 +273,7 @@ nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
 
-nnoremap <leader>F :find<space>
+# nnoremap <leader>F :find<space>
  #
 
 # search
@@ -321,6 +321,17 @@ augroup CMDWIN_MAPS
   autocmd CmdWinEnter * nnoremap <buffer> <c-d> <cmd>q<CR>
 augroup END
 
+def ShiftRegisters()
+    for ii in [8, 7, 6, 5, 4, 3, 2, 1, 0]
+      setreg(string(ii + 1), getreg(string(ii)))
+    endfor
+enddef
+
+augroup YANK_SHIFT_REGISTERS
+  autocmd!
+  autocmd TextYankPost * if v:event.operator == 'y' | ShiftRegisters() | endif
+augroup END
+
 # plugins
 # ----------------
 # Use Pack<tab> to tweak the various plugins
@@ -329,6 +340,7 @@ augroup END
 # run through a Setup() function
 # Bundled plugins
  packadd comment
+ packadd hlyank
 # packadd matchit
 
 # Plugin settings

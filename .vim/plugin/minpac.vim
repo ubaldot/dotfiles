@@ -13,12 +13,13 @@ def PackInit()
   minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
   minpac#add('yegappan/snake', {'type': 'opt'})
   minpac#add('yegappan/tetris', {'type': 'opt'})
+  minpac#add('ubaldot/vim9-conversion-aid', {'type': 'opt'})
+  minpac#add('ubaldot/vim-latex-tools', {'type': 'opt'})
+  minpac#add('ubaldot/vim-manim', {'type': 'opt'})
 
   # Additional plugins here.
   minpac#add('sainnhe/everforest')
   minpac#add('lambdalisue/fern.vim')
-  minpac#add('junegunn/vim-easy-align')
-  minpac#add('ubaldot/vim-highlight-yanked')
   minpac#add('ubaldot/vim-outline')
   minpac#add('ubaldot/vim-markdown-extras')
   minpac#add('ubaldot/vim-poptools')
@@ -27,10 +28,8 @@ def PackInit()
   minpac#add('ubaldot/vim-calendar')
   minpac#add('ubaldot/vim-op-surround')
   minpac#add('ubaldot/vimspector')
-  minpac#add('ubaldot/vim9-conversion-aid')
-  minpac#add('ubaldot/vim-latex-tools')
   minpac#add('ubaldot/vim-replica')
-  minpac#add('ubaldot/vim-manim')
+  minpac#add('DanBradbury/copilot-chat.vim')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
