@@ -349,6 +349,10 @@ augroup END
 command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 
+# hlyank
+g:hlyank_hlgroup = 'Visual'
+g:hlyank_duration = 400
+
 # git master
 nnoremap git <Cmd>GitMasterStatus<cr>
 

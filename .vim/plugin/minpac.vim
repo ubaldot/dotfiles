@@ -29,7 +29,7 @@ def PackInit()
   minpac#add('ubaldot/vim-op-surround')
   minpac#add('ubaldot/vimspector')
   minpac#add('ubaldot/vim-replica')
-  minpac#add('DanBradbury/copilot-chat.vim')
+  minpac#add('ubaldot/copilot-chat.vim')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
