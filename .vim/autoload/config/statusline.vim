@@ -9,26 +9,31 @@ set laststatus=2
 def UpdateGitBranch(buf_enter: bool)
   g:git_branch = ''
 
-  def GitBranchStdout(id: any, message: string)
-    g:git_branch = $'{nr2char(0xE0A0)} {message}'
-    # redrawstatus
-  enddef
-  def GitBranchStderr(id: any, message: string)
-    g:git_branch = nr2char(0xE0A0) .. ' No repo'
-    # redrawstatus
+  def GitBranchStdout(id: any, msg: string)
+    g:git_branch = nr2char(0xE0A0) .. ' ' .. msg->trim()
   enddef
 
+  def GitBranchStderr(id: any, msg: string)
+    g:git_branch = nr2char(0xE0A0) .. ' No repo'
+  enddef
+
+  # Recompute git branch only upon switch or checkout
   var last_cmd = histget('cmd', -1)
   var git_change_branch_regex = '\v(git co |git checkout|git switch)'
   if last_cmd =~ git_change_branch_regex || buf_enter
-    job_start($'git -C {expand("%:p:h")} rev-parse --abbrev-ref HEAD ',
+    var dir = expand("%:p:h")
+    job_start($'git -C {shellescape(dir)} rev-parse --abbrev-ref HEAD ',
       {out_cb: GitBranchStdout, err_cb: GitBranchStderr}
     )
   endif
 enddef
 
 def g:GitBranch(): string
-  return g:git_branch
+  if exists('g:git_branch')
+    return g:git_branch
+  else
+    return ''
+  endif
 enddef
 
 # Update the Git branch only when changing buffers
@@ -78,9 +83,9 @@ def CommonStatusLine()
   # ----------- end statusline setup -------------------------
  enddef
 
-export def Setup(is_dev: bool = false)
+export def Init(is_dev: bool = false)
   CommonStatusLine()
-  if is_dev
+  if is_dev && exists('*lsp#lsp#ErrorCount')
     setlocal statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
     setlocal statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
   endif

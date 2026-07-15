@@ -109,17 +109,17 @@ def PackDevSetup()
     # Order matters...
     if !exists('g:loaded_lsp')
       packadd lsp
-      config#lsp#Setup()
+      config#lsp#Init()
     endif
 
     if !exists('g:loaded_microdebugger')
-      config#microdebugger#Setup()
+      config#microdebugger#Init()
       packadd vim-microdebugger
     endif
 
-    config#statusline#Setup(true)
+    config#statusline#Init(true)
   else
-    config#statusline#Setup(false)
+    config#statusline#Init(false)
   endif
 enddef
 
