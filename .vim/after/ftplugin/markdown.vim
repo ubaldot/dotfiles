@@ -26,6 +26,9 @@ setlocal omnifunc=mde_funcs.OmniFunc
 inoremap <buffer> ][ ][<C-x><C-o>
 nnoremap <buffer> <expr> o OpenNewLine()
 
+# Add a table
+nnoremap <buffer> <leader>T <Cmd>MDETableInsert<cr>
+
 # This is an extension of markdown_extras.vim to use capital letters for
 # highlighting
 

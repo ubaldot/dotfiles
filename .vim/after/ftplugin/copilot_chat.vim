@@ -10,3 +10,4 @@ inoremap <buffer> <CR> <scriptcmd>SendQuery()<cr>
 inoremap <buffer> <s-CR> <cr>
 nnoremap <buffer> <leader>CD <cmd>bwipe<cr>
 nnoremap <buffer> <leader>D <cmd>bwipe<cr>
+nnoremap <buffer> <leader>S <cmd>CopilotChatSetActive<cr>

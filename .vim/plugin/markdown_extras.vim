@@ -2,7 +2,7 @@ vim9script
 
 g:markdown_extras_config = {}
 g:markdown_extras_config['smart_table_format'] = false
-g:markdown_extras_config['table_updates_in_window'] = true
+g:markdown_extras_config['table_updates_in_window'] = false
 g:markdown_extras_config['use_default_mappings'] = true
 g:markdown_extras_config['block_label'] = ''
 g:markdown_extras_config['use_prettier'] = true
