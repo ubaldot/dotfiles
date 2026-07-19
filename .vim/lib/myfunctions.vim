@@ -177,7 +177,8 @@ export def Redir(cmd: string, rng: number, start: number, stop: number)
   const win_id = win_getid(winnr('$'))
   win_execute(win_id, 'setlocal buftype=nofile bufhidden=wipe '
         \ .. 'nobuflisted noswapfile')
-    echom "FOO"
+
+  nnoremap <buffer> <esc> <cmd>close<cr>
 enddef
 
 var color_is_shown = false

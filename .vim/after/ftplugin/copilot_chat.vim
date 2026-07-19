@@ -1,5 +1,7 @@
 vim9script
 
+set noautocomplete
+
 def SendQuery()
   exe $"CopilotChatSetActive {bufnr()}"
   exe "CopilotChatSubmit"

@@ -375,11 +375,6 @@ augroup REMOVE_TRAILING_WHITESPACES
   }
 augroup END
 
-# git add -u && git commit -m "."
-command! GitCommitDot myfunctions.CommitDot()
-command! GitPushDot myfunctions.PushDot()
-# Merge and diff
-command! -nargs=? Diff myfunctions.Diff(<f-args>)
 command! ColorsToggle myfunctions.ColorsToggle()
 
 # Utils commands
@@ -416,3 +411,30 @@ elseif g:os == "WSL"
   exe $"system('dos2unix.exe {$HOME}/cab_climate.vim')"
   execute $"source {$HOME}/cab_climate.vim"
 endif
+
+
+# Copilot CLI
+def StartCopilotAgent()
+  # Reuse existing Copilot terminal if it exists
+  for buf in getbufinfo()
+    if buf.name =~# 'copilot-agent' && bufwinid(buf.name) != -1
+      win_gotoid(buf.windows[0])
+      return
+    elseif buf.name =~# 'copilot-agent' && bufwinid(buf.name) == -1
+      wincmd v
+      execute $"buffer {bufnr(buf.name)}"
+      return
+    endif
+  endfor
+
+  # Start Copilot
+  term_start(
+    'copilot',
+    {
+      # vertical: true,
+      term_finish: 'close',
+    },
+  )
+enddef
+
+command! CopilotAgent StartCopilotAgent()
