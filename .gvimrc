@@ -7,6 +7,12 @@ set mousehide
 set guioptions+=!
 set guioptions-=e
 
+# Otherwise it leaks into syntax files if used for code
+augroup SET_SPELL
+  autocmd!
+  autocmd FileType markdown,text,gitcommit setlocal spell spelllang=en_us
+augroup END
+
 # Set fonts for gvim
 # fontsize = 11 with the 14'' MacBook you have exactly two columns
 # with textwidth = 78

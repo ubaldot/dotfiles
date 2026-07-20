@@ -9,7 +9,7 @@ else
   set background=light
 endif
 #
-colorscheme everforest
+colorscheme catppuccin
 # colorscheme wildcharm
 # set background=dark
 # set background=light

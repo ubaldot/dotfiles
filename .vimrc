@@ -68,10 +68,6 @@ endif
 
 import g:dotvim .. "/lib/myfunctions.vim"
 
-# Set cursor
-&t_SI = "\e[6 q"
-&t_EI = "\e[2 q"
-
 augroup RELOAD_VIM_SCRIPTS
   autocmd!
   autocmd BufWritePost *.vim,*.vimrc,*.gvimrc {
@@ -93,8 +89,6 @@ augroup END
 # langmap does not work with multi-byte chars,
 # see https://github.com/vim/vim/issues/3018
 # set langmap=ö[,ä]
-
-
 set nocompatible
 set scrolloff=8
 set encoding=utf-8
@@ -129,17 +123,41 @@ set iskeyword+=-
 set formatoptions+=wnp
 set diffopt+=vertical
 set wildcharm=<tab>
-# set conceallevel=2
-# set concealcursor=nvc
+set conceallevel=2
+set concealcursor=nvc
 set autocomplete
 set complete=.^5,w^5,b^5,u^5
 set completeopt=popup
-set spell spelllang=en_us
 # config#statusline#Setup()
 
 filetype plugin on
 filetype indent on
 syntax on
+
+# Set cursor
+# Needed for Windows terminal
+if g:os == "Windows" && !has("gui_running")
+
+  set guicursor=
+
+  &t_SI = "\e[6 q" # beam in Insert mode
+  &t_EI = "\e[2 q" # block in Normal mode
+
+  # Restore cursor shape when leavig Vim
+  def RestoreCursorWindowsTerminal()
+    &t_EI = "\e[6 q"
+    execute "normal! i\<Esc>"
+  enddef
+
+  augroup CURSOR_SHAPE_WINDOWS
+    autocmd!
+    autocmd VimEnter * silent! execute "normal! \<Esc>"
+    autocmd VimLeave * RestoreCursorWindowsTerminal()
+  augroup END
+else
+  &t_SI = "\e[6 q"
+  &t_EI = "\e[2 q"
+endif
 
 # Some key ""bindings""
 # ----------------------
