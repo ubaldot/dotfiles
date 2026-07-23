@@ -407,13 +407,23 @@ enddef
 command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
 
 # CC stuff
-if g:os == "Windows"
-  const WINDOWS_HOME = 'C:/Users/yt75534/OneDrive - Volvo Group'
-  execute $"source {WINDOWS_HOME}/CabClimate/cab_climate.vim"
-elseif g:os == "WSL"
-  const WINDOWS_HOME = '/mnt/c/Users/yt75534/OneDrive\ -\ Volvo\ Group'
-  const filename = 'cab_climate.vim'
+const WINDOWS_HOME = 'C:\Users\yt75534\OneDrive\ -\ Volvo\ Group'
+const filename = 'cab_climate.vim'
 
+def SourceCabClimate()
+  if g:os == 'Windows'
+    execute $"source {WINDOWS_HOME}\\CabClimate\\cab_climate.vim"
+  elseif g:os == 'WSL'
+    execute $"source {$HOME}/CabClimate/cab_climate.vim"
+  endif
+enddef
+
+augroup CAB_CLIMATE_SOURCE_SCRIPT
+  autocmd!
+  autocmd! VimEnter * SourceCabClimate()
+augroup END
+
+if g:os == "WSL"
   # Copy file from Windows
   exe $"system('cp {WINDOWS_HOME}/CabClimate/{filename} {$HOME}')"
   if v:shell_error
@@ -427,9 +437,7 @@ elseif g:os == "WSL"
   endif
 
   exe $"system('dos2unix.exe {$HOME}/cab_climate.vim')"
-  execute $"source {$HOME}/cab_climate.vim"
 endif
-
 
 # Copilot CLI
 def StartCopilotAgent()

@@ -1,12 +1,13 @@
 vim9script
 
 # vim-poptools
-g:poptools_config = {}
-g:poptools_config['preview_recent_files'] = false
-g:poptools_config['preview_buffers'] = true
-g:poptools_config['preview_grep'] = true
-g:poptools_config['preview_vimgrep'] = true
-g:poptools_config['fuzzy_search'] = false
+g:poptools_config = {
+  preview_recent_files: false,
+  preview_buffers: false,
+  preview_grep: true,
+  preview_vimgrep: true,
+  fuzzy_search: false,
+}
 
 nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
 # Copy in the selected text into t register ad leave it. Who cares about the t
