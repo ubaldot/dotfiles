@@ -49,9 +49,9 @@ def PackEditPlugin_CompleteList(arglead: string,
     cursor_position: number): list<string>
 
   var start_plugins = getcompletion($'{g:dotvim}/pack/minpac/start/', 'dir')
-                      ->map((_, val)  => fnamemodify(val, ':h:t'))
+    ->map((_, val)  => fnamemodify(val, ':h:t'))
   var opt_plugins = getcompletion($'{g:dotvim}/pack/minpac/opt/', 'dir')
-                      ->map((_, val)  => fnamemodify(val, ':h:t'))
+    ->map((_, val)  => fnamemodify(val, ':h:t'))
   return (start_plugins + opt_plugins)->filter($'v:val =~ "{arglead}"')
 
 enddef
@@ -77,9 +77,9 @@ def PackConfig_CompleteList(arglead: string,
     cursor_position: number): list<string>
 
   var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
-                      ->map((_, val)  => fnamemodify(val, ':t:r'))
+    ->map((_, val)  => fnamemodify(val, ':t:r'))
   var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
-                      ->map((_, val)  => fnamemodify(val, ':t:r'))
+    ->map((_, val)  => fnamemodify(val, ':t:r'))
   return (opt_settings_files + start_settings_files)->filter($'v:val =~ "^{arglead}"')
 
 enddef
@@ -101,8 +101,6 @@ enddef
 # ----------------------------------------
 # opt packages and statusline management
 # ----------------------------------------
-var is_dev_statusline = false
-
 def PackDevSetup()
   const supported_filetypes = ['c', 'python', 'cpp', 'latex']
 
@@ -124,16 +122,9 @@ def PackDevSetup()
       packadd vim-microdebugger
     endif
 
-    if !is_dev_statusline
-      config#statusline#Init(true)
-      is_dev_statusline = true
-    endif
+    config#statusline#Init(true)
   else
-    if is_dev_statusline
     config#statusline#Init(false)
-      is_dev_statusline = false
-    endif
-
   endif
 enddef
 

@@ -129,7 +129,8 @@ set autocomplete
 set complete=.^5,w^5,b^5,u^5
 set completeopt=popup
 
-config#statusline#Init()
+# This is in autoload
+# config#statusline#Init()
 
 filetype plugin on
 filetype indent on
