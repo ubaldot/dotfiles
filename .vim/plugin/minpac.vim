@@ -101,30 +101,35 @@ enddef
 # ----------------------------------------
 # opt packages and statusline management
 # ----------------------------------------
+
+import autoload $'{g:dotvim}/lib/config/lsp.vim' as lsp_config
+import autoload $'{g:dotvim}/lib/config/microdebugger.vim' as microdebugger_config
+import autoload $'{g:dotvim}/lib/config/statusline.vim' as statusline_config
+
 def PackDevSetup()
   const supported_filetypes = ['c', 'python', 'cpp', 'latex']
 
   if index(supported_filetypes, &filetype) != -1
     if !exists('g:loaded_termdebug')
       g:termdebug_config = {}
-      packadd termdebug
+      packadd termdeubug
       exe $"set ft={&filetype}"
     endif
 
     # Order matters...
     if !exists('g:loaded_lsp')
       packadd lsp
-      config#lsp#Init()
+      lsp_config.Init()
     endif
 
     if !exists('g:loaded_microdebugger')
-      config#microdebugger#Init()
+      microdebugger_config.Init()
       packadd vim-microdebugger
     endif
 
-    config#statusline#Init(true)
+    statusline_config.Init(true)
   else
-    config#statusline#Init(false)
+    statusline_config.Init(false)
   endif
 enddef
 

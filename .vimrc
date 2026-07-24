@@ -139,8 +139,8 @@ syntax on
 # Set spell only in selected filetypes
 augroup SPELLLANG_OPTION
   autocmd!
-  autocmd FileType markdown setlocal spell spelllang=en_us
-  autocmd FileType tex setlocal spell spelllang=en_us
+  # autocmd FileType markdown setlocal spell spelllang=en_us
+  autocmd FileType text,tex,gitcommit setlocal spell spelllang=en_us
   autocmd FileType gitcommit setlocal spell spelllang=en_us
 augroup END
 
