@@ -19,10 +19,8 @@ def CalendarToggle()
 
   if win_id == -1
     Calendar
-  elseif bufname() != '__Calendar'
-    win_execute(win_id, 'close')
   else
-    close
+    win_execute(win_id, 'norm q')
   endif
 enddef
 

@@ -39,7 +39,12 @@ command! PackUpdate  PackInit() |  minpac#update()
 command! PackClean   PackInit() |  minpac#clean()
 command! PackStatus packadd minpac | minpac#status()
 
-def PackEditList(arglead: string,
+command! -nargs=1 -complete=customlist,PackConfig_CompleteList PackConfig
+      \ PackConfig(<f-args>)
+
+command! -nargs=1 -complete=customlist,PackEditPlugin_CompleteList PackEditPlugin PackEditPlugin(<f-args>)
+
+def PackEditPlugin_CompleteList(arglead: string,
     command_line: string,
     cursor_position: number): list<string>
 
@@ -66,9 +71,8 @@ def PackEditPlugin(dirname: string)
   endif
 enddef
 
-command! -nargs=1 -complete=customlist,PackEditList PackEditPlugin PackEditPlugin(<f-args>)
 
-def PackConfigList(arglead: string,
+def PackConfig_CompleteList(arglead: string,
     command_line: string,
     cursor_position: number): list<string>
 
@@ -93,8 +97,11 @@ def PackConfig(filename: string)
   exe $"edit {filename_full[0]}"
 enddef
 
-command! -nargs=1 -complete=customlist,PackConfigList PackConfig
-      \ PackConfig(<f-args>)
+
+# ----------------------------------------
+# opt packages and statusline management
+# ----------------------------------------
+var is_dev_statusline = false
 
 def PackDevSetup()
   const supported_filetypes = ['c', 'python', 'cpp', 'latex']
@@ -117,9 +124,16 @@ def PackDevSetup()
       packadd vim-microdebugger
     endif
 
-    config#statusline#Init(true)
+    if !is_dev_statusline
+      config#statusline#Init(true)
+      is_dev_statusline = true
+    endif
   else
+    if is_dev_statusline
     config#statusline#Init(false)
+      is_dev_statusline = false
+    endif
+
   endif
 enddef
 

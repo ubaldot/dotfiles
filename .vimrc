@@ -128,11 +128,20 @@ set concealcursor=nvc
 set autocomplete
 set complete=.^5,w^5,b^5,u^5
 set completeopt=popup
-# config#statusline#Setup()
+
+config#statusline#Init()
 
 filetype plugin on
 filetype indent on
 syntax on
+
+# Set spell only in selected filetypes
+augroup SPELLLANG_OPTION
+  autocmd!
+  autocmd FileType markdown setlocal spell spelllang=en_us
+  autocmd FileType tex setlocal spell spelllang=en_us
+  autocmd FileType gitcommit setlocal spell spelllang=en_us
+augroup END
 
 # Set cursor
 # Needed for Windows terminal
@@ -158,6 +167,7 @@ else
   &t_SI = "\e[6 q"
   &t_EI = "\e[2 q"
 endif
+
 
 # Some key ""bindings""
 # ----------------------
@@ -371,8 +381,8 @@ nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 g:hlyank_hlgroup = 'Visual'
 g:hlyank_duration = 400
 
-# git master
-nnoremap git <Cmd>GitMasterStatus<cr>
+# git box
+nnoremap git <Cmd>GitBox<cr>
 
 # Vim9-conversion-aid
 g:vim9_conversion_aid_fix_let = true

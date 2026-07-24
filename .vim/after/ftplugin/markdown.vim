@@ -20,7 +20,10 @@ def OpenNewLine(): string
   endif
 enddef
 
-import autoload "mde_funcs.vim"
+# Link completion with omnifunc
+const mde_funcs_path = globpath(&rtp, 'lib/mde_funcs.vim')->fnamemodify(':h')
+import autoload $"{mde_funcs_path}/mde_funcs.vim" as mde_funcs
+
 setlocal completeopt=menu,menuone,noselect
 setlocal omnifunc=mde_funcs.OmniFunc
 inoremap <buffer> ][ ][<C-x><C-o>
