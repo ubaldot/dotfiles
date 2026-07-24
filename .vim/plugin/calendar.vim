@@ -20,8 +20,9 @@ def CalendarToggle()
   if win_id == -1
     Calendar
   else
+    # valid for both popup and windows view
     win_execute(win_id, 'norm q')
   endif
 enddef
 
-nnoremap <leader>z <scriptcmd>CalendarToggle()<cr>
+nnoremap <leader>q <scriptcmd>CalendarToggle()<cr>
