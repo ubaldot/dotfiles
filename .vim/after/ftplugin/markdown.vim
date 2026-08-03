@@ -20,58 +20,64 @@ def OpenNewLine(): string
   endif
 enddef
 
+# vim-markdown-extras settings
 # Link completion with omnifunc
 const mde_funcs_path = globpath(&rtp, 'lib/mde_funcs.vim')->fnamemodify(':h')
-import autoload $"{mde_funcs_path}/mde_funcs.vim" as mde_funcs
 
-setlocal completeopt=menu,menuone,noselect
-setlocal omnifunc=mde_funcs.OmniFunc
-inoremap <buffer> ][ ][<C-x><C-o>
-nnoremap <buffer> <expr> o OpenNewLine()
+if !empty(mde_funcs_path)
+  import autoload $"{mde_funcs_path}/mde_funcs.vim" as mde_funcs
 
-# Add a table
-nnoremap <buffer> <leader>T <Cmd>MDETableInsert<cr>
+  setlocal completeopt=menu,menuone,noselect
+  setlocal omnifunc=mde_funcs.OmniFunc
+  inoremap <buffer> ][ ][<C-x><C-o>
+  nnoremap <buffer> <expr> o OpenNewLine()
 
-# This is an extension of markdown_extras.vim to use capital letters for
-# highlighting
+  # Add a table
+  nnoremap <buffer> <leader>T <Cmd>MDETableInsert<cr>
+  # Show help
+  nnoremap <buffer> ? <Cmd>MDEDefaultMappings<cr>
 
-def MarkdownStrikeLine()
-    const curpos = getcursorcharpos()
-    execute "normal! \<s-V>"
-    execute "normal! \<Plug>MarkdownStrike"
-    cursor(curpos[1], curpos[2] + 2)
-enddef
+  # This is an extension of markdown_extras.vim to use capital letters for
+  # highlighting
 
-def MarkdownBoldLine()
-    const curpos = getcursorcharpos()
-    execute "normal! \<s-V>"
-    execute "normal! \<Plug>MarkdownBold"
-    cursor(curpos[1], curpos[2] + 2)
-enddef
+  def MarkdownStrikeLine()
+      const curpos = getcursorcharpos()
+      execute "normal! \<s-V>"
+      execute "normal! \<Plug>MarkdownStrike"
+      cursor(curpos[1], curpos[2] + 2)
+  enddef
 
-def MarkdownItalicLine()
-    const curpos = getcursorcharpos()
-    execute "normal! \<s-V>"
-    execute "normal! \<Plug>MarkdownItalic"
-    cursor(curpos[1], curpos[2] + 1)
-enddef
+  def MarkdownBoldLine()
+      const curpos = getcursorcharpos()
+      execute "normal! \<s-V>"
+      execute "normal! \<Plug>MarkdownBold"
+      cursor(curpos[1], curpos[2] + 2)
+  enddef
 
-def MarkdownHighlightLine()
-    const curpos = getcursorcharpos()
-    execute "normal! \<s-V>"
-    execute "normal! \<Plug>MarkdownHighlight"
-    cursor(curpos[1], curpos[2])
-enddef
+  def MarkdownItalicLine()
+      const curpos = getcursorcharpos()
+      execute "normal! \<s-V>"
+      execute "normal! \<Plug>MarkdownItalic"
+      cursor(curpos[1], curpos[2] + 1)
+  enddef
 
-def MarkdownUnderlineLine()
-    const curpos = getcursorcharpos()
-    execute "normal! \<s-V>"
-    execute "normal! \<Plug>MarkdownUnderline"
-    cursor(curpos[1], curpos[2] + 3)
-enddef
+  def MarkdownHighlightLine()
+      const curpos = getcursorcharpos()
+      execute "normal! \<s-V>"
+      execute "normal! \<Plug>MarkdownHighlight"
+      cursor(curpos[1], curpos[2])
+  enddef
 
-nnoremap <localleader>S <ScriptCmd>MarkdownStrikeLine()<cr>
-nnoremap <localleader>B <ScriptCmd>MarkdownBoldLine()<cr>
-nnoremap <localleader>I <ScriptCmd>MarkdownItalicLine()<cr>
-nnoremap <localleader>H <ScriptCmd>MarkdownHighlightLine()<cr>
-nnoremap <localleader>U <ScriptCmd>MarkdownUnderlineLine()<cr>
+  def MarkdownUnderlineLine()
+      const curpos = getcursorcharpos()
+      execute "normal! \<s-V>"
+      execute "normal! \<Plug>MarkdownUnderline"
+      cursor(curpos[1], curpos[2] + 3)
+  enddef
+
+  nnoremap <localleader>S <ScriptCmd>MarkdownStrikeLine()<cr>
+  nnoremap <localleader>B <ScriptCmd>MarkdownBoldLine()<cr>
+  nnoremap <localleader>I <ScriptCmd>MarkdownItalicLine()<cr>
+  nnoremap <localleader>H <ScriptCmd>MarkdownHighlightLine()<cr>
+  nnoremap <localleader>U <ScriptCmd>MarkdownUnderlineLine()<cr>
+endif
