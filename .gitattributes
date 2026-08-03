@@ -1,1 +1,25 @@
-* text eol=lf
+# This repo is checked out once and used from both Windows and WSL through
+# the same physical files, so the working tree must be LF everywhere. A file
+# written with CRLF by a Windows tool shows up as ^M in Linux Vim.
+#
+# text=auto lets Git detect binary files and leave them alone; eol=lf pins the
+# working-tree ending regardless of the machine-level core.autocrlf setting.
+* text=auto eol=lf
+
+# Belt and braces: never line-ending-convert these, even if misdetected.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+# Windows-only scripts that genuinely need CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf

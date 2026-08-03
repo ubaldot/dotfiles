@@ -93,6 +93,13 @@ set nocompatible
 set nomodeline
 set scrolloff=8
 set encoding=utf-8
+
+# These dotfiles are shared between Windows and WSL through the same physical
+# files, so anything written with CRLF shows up as ^M in Linux Vim. Windows
+# Vim defaults to 'fileformats=dos,unix', which gives every *new* file CRLF.
+# Listing unix first makes new files LF everywhere; existing CRLF files are
+# still detected correctly, because "dos" remains in the list.
+set fileformats=unix,dos
 set langmenu=en_US.UTF-8
 set nofoldenable
 set belloff=all
@@ -420,36 +427,45 @@ enddef
 command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
 
 # CC stuff
-const WINDOWS_HOME = 'C:\Users\yt75534\OneDrive\ -\ Volvo\ Group'
-const filename = 'cab_climate.vim'
+const CC_FILENAME = 'cab_climate.vim'
+
+# The same OneDrive folder, addressed from whichever side Vim is running on.
+# The WSL branch used to be given the Windows path, so the copy below failed
+# on every startup.
+const CC_DIR = g:os == 'WSL'
+  ? '/mnt/c/Users/yt75534/OneDrive - Volvo Group/CabClimate'
+  : 'C:\Users\yt75534\OneDrive - Volvo Group\CabClimate'
+
+# On WSL the script is copied out of the Windows filesystem first: /mnt/c is
+# slow to source from and the file arrives with CRLF endings.
+const CC_LOCAL = g:os == 'WSL'
+  ? $'{$HOME}/{CC_FILENAME}'
+  : $'{CC_DIR}\{CC_FILENAME}'
 
 def SourceCabClimate()
-  if g:os == 'Windows'
-    execute $"source {WINDOWS_HOME}\\CabClimate\\cab_climate.vim"
-  elseif g:os == 'WSL'
-    execute $"source {$HOME}/CabClimate/cab_climate.vim"
+  if filereadable(CC_LOCAL)
+    execute $'source {fnameescape(CC_LOCAL)}'
   endif
 enddef
 
 augroup CAB_CLIMATE_SOURCE_SCRIPT
   autocmd!
-  autocmd! VimEnter * SourceCabClimate()
+  autocmd VimEnter * SourceCabClimate()
 augroup END
 
 if g:os == "WSL"
-  # Copy file from Windows
-  exe $"system('cp {WINDOWS_HOME}/CabClimate/{filename} {$HOME}')"
-  if v:shell_error
-    myfunctions.Echoerr($"Error in copying '{filename}' from Windows")
+  # Refresh the local copy from Windows, quietly doing nothing when the
+  # OneDrive folder is not mounted (offline, or a machine without it).
+  var cc_remote = $'{CC_DIR}/{CC_FILENAME}'
+  if filereadable(cc_remote)
+    # Copy and strip CR in one step. dos2unix is not used: the only one on
+    # PATH here is the Windows .exe, which cannot see a Linux path.
+    var cp_out = system(
+      $'tr -d "\r" < {shellescape(cc_remote)} > {shellescape(CC_LOCAL)}')
+    if v:shell_error
+      myfunctions.Echoerr($"Error in copying '{CC_FILENAME}' from Windows: {cp_out}")
+    endif
   endif
-
-  # Check if the file has been copied
-  exe $"system('ls {$HOME}/cab_climate.vim')"
-  if v:shell_error
-    myfunctions.Echoerr($"'{filename}' not copied in {$HOME}")
-  endif
-
-  exe $"system('dos2unix.exe {$HOME}/cab_climate.vim')"
 endif
 
 # Copilot CLI
