@@ -30,7 +30,7 @@ def PackInit()
   minpac#add('ubaldot/vimspector')
   minpac#add('ubaldot/vim-replica')
   minpac#add('ubaldot/copilot-chat.vim')
-  minpac#add('ubaldot/vim-ms-outlook')
+  minpac#add('ubaldot/vim-outlook')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
