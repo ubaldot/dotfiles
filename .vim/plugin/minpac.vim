@@ -30,6 +30,7 @@ def PackInit()
   minpac#add('ubaldot/vimspector')
   minpac#add('ubaldot/vim-replica')
   minpac#add('ubaldot/copilot-chat.vim')
+  minpac#add('ubaldot/vim-ms-outlook')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
@@ -126,12 +127,13 @@ def PackDevSetup()
       microdebugger_config.Init()
       packadd vim-microdebugger
     endif
-
-    statusline_config.Init(true)
-  else
-    statusline_config.Init(false)
   endif
 enddef
+
+# The statusline is global and fully expression-driven, so it is set once here
+# instead of being rebuilt per buffer on FileType. That keeps it from wiping
+# the window-local statusline of plugin windows.
+statusline_config.Init()
 
 augroup PACK_DEV_SETUP
   autocmd!

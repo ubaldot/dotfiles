@@ -2,9 +2,19 @@ vim9script
 
 # statusline
 # ---------------
-# Define all the functions that you need in your statusline and then build
-# the statusline
+# The statusline is set ONCE, globally. Every dynamic part is a %{} expression
+# which Vim evaluates at redraw time in the context of the window being drawn,
+# so there is nothing to recompute per buffer and no autocmd is needed.
+#
+# This also means the statusline is never written with :setlocal, so any window
+# that sets its own window-local 'statusline' (plugin scratch buffers, mail
+# composers, file explorers, ...) keeps it instead of having it overwritten.
+
 set laststatus=2
+
+const DEV_FILETYPES = ['c', 'python', 'cpp', 'latex']
+
+# --- git branch -------------------------------------------------------------
 
 def UpdateGitBranch(buf_enter: bool)
   g:git_branch = ''
@@ -29,11 +39,7 @@ def UpdateGitBranch(buf_enter: bool)
 enddef
 
 def g:GitBranch(): string
-  if exists('g:git_branch')
-    return g:git_branch
-  else
-    return ''
-  endif
+  return get(g:, 'git_branch', '')
 enddef
 
 # Update the Git branch only when changing buffers
@@ -43,50 +49,55 @@ augroup UPDATE_GIT_BRANCH
   autocmd BufEnter * UpdateGitBranch(true)
 augroup END
 
+# --- conda environment ------------------------------------------------------
+
 def Set_g_conda_env()
-    var conda_env = "base"
-    if g:os ==# "Windows"
-        conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
-    elseif exists("$CONDA_DEFAULT_ENV")
-        conda_env = $CONDA_DEFAULT_ENV
-    endif
-    g:conda_env = conda_env
+  var conda_env = "base"
+  if g:os ==# "Windows"
+    conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
+  elseif exists("$CONDA_DEFAULT_ENV")
+    conda_env = $CONDA_DEFAULT_ENV
+  endif
+  g:conda_env = conda_env
 enddef
 
-def CommonStatusLine()
-  setlocal statusline=
-
-  # Anatomy of the statusline:
-  # Start of highlighting	- Dynamic content - End of highlighting
-  # %#IsModified#	- %{&mod?expand('%'):''} - %*
-
-  # Left side
-  if exists('g:conda_env') == 0
+# Resolved on the first redraw rather than at startup, so the system() call
+# does not slow Vim down before anything is on screen.
+def g:StatuslineConda(): string
+  if !exists('g:conda_env')
     Set_g_conda_env()
   endif
-
-  setlocal statusline+=%#StatusLineNC#\ (%{g:conda_env})\ %*
-  setlocal statusline+=%#WildMenu#\ %{g:GitBranch()}\ %*
-  setlocal statusline+=\ %{fnamemodify(getcwd(),':~')}\ %*
-  # Current function
-  # setlocal statusline+=%#StatusLineNC#\%{get(b:,'current_function','')}\ %*
-  #
-  # Right side
-  setlocal statusline+=%=
-  # Current file
-  # setlocal statusline+=%#StatusLine#\ %t(%n)%m%*
-  # filetype
-  setlocal statusline+=%#StatusLine#\ %y\ %*
-  # Fileformat
-  setlocal statusline+=%#StatusLineNC#\ %{&fileformat}\ %*
-  setlocal statusline+=%#StatusLine#\ %l,%c(%{charcol('.')})\ %*
-  # ----------- end statusline setup -------------------------
- enddef
-
-export def Init(is_dev: bool = false)
-  CommonStatusLine()
-  if is_dev && exists('*lsp#lsp#ErrorCount')
-    setlocal statusline+=%#Visual#\ W:\ %{lsp#lsp#ErrorCount()['Warn']}\ %*
-    setlocal statusline+=%#CurSearch#\ E:\ %{lsp#lsp#ErrorCount()['Error']}\ %*
-  endif
+  return g:conda_env
 enddef
+
+# --- lsp diagnostics --------------------------------------------------------
+
+# Returns statusline items (used with %{%...%}) so that the highlight groups
+# are emitted only when there is something to show.
+def g:StatuslineLsp(): string
+  if !exists('*lsp#lsp#ErrorCount')
+      || index(DEV_FILETYPES, &filetype) == -1
+    return ''
+  endif
+  var counts = lsp#lsp#ErrorCount()
+  return $'%#Visual# W: {counts["Warn"]} %*%#CurSearch# E: {counts["Error"]} %*'
+enddef
+
+# --- the statusline itself --------------------------------------------------
+
+export def Init()
+  # Left side
+  var left = '%#StatusLineNC# (%{g:StatuslineConda()}) %*'
+    .. '%#WildMenu# %{g:GitBranch()} %*'
+    .. ' %{fnamemodify(getcwd(), ":~")} %*'
+
+  # Right side
+  var right = '%#StatusLine# %y %*'
+    .. '%#StatusLineNC# %{&fileformat} %*'
+    .. '%#StatusLine# %l,%c(%{charcol(".")}) %*'
+    .. '%{%g:StatuslineLsp()%}'
+
+  &g:statusline = left .. '%=' .. right
+enddef
+
+# vim: shiftwidth=2 softtabstop=2 expandtab

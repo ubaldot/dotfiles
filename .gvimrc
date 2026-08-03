@@ -21,13 +21,17 @@ var fontface = "Arial"
 var fontsize_tail = ""
 
 if g:os == "Windows"
+  # See :h guifont for help in settings
      fontsize = 11
-     fontface = "Fira_Code:h"
-     fontsize_tail = ":cANSI:qDRAFT"
+     fontface = "Fira\ Code:h"
+     fontsize_tail = ':W200' # Weight
+     # fontsize_tail = ":cDEFAULT:qDEFAULT"
      # fontface = "FiraCode\ Nerd\ Font\ Mono:h"
      set guioptions-=T
      set lines=40
      set columns=180
+     set guiligatures=!\"#$%&()*+-./:<=>?@[]^_{\|~
+     set renderoptions=type:directx,renmode:5,taamode:1
     # Open gvim in full-screen
     # au GUIEnter * simalt ~x
 elseif g:os == "Darwin"
@@ -52,18 +56,20 @@ def ChangeFontsize(n: number)
     var old_redraw = &lazyredraw
     set lazyredraw
 
-    fontsize = fontsize + n
-    &guifont = fontface .. string(fontsize) .. fontsize_tail
+    # fontsize = fontsize + n
+    # &guifont = fontface .. string(fontsize) .. fontsize_tail
 
-    &lazyredraw = old_redraw
+    # &lazyredraw = old_redraw
 enddef
 
 def GuiResize()
   var old_size = matchstr(v:option_old, '\d\+')
   var new_size = matchstr(v:option_new, '\d\+')
-  var factor = str2float(new_size) / str2float(old_size)
-  &columns = float2nr(&columns / factor)
-  &lines = float2nr(&lines / factor)
+  if !empty(new_size) && !empty(old_size)
+    var factor = str2float(new_size) / str2float(old_size)
+    &columns = float2nr(&columns / factor)
+    &lines = float2nr(&lines / factor)
+  endif
 enddef
 
 augroup GUI_RESIZE
@@ -71,7 +77,7 @@ augroup GUI_RESIZE
     autocmd OptionSet guifont GuiResize()
 augroup END
 
-# Some key bindings
-command! FontsizeIncrease vim9cmd ChangeFontsize(1)
-command! FontsizeDecrease vim9cmd ChangeFontsize(-1)
+# Some useful commands
+command! -nargs=0 FontsizeIncrease vim9cmd ChangeFontsize(1)
+command! -nargs=0 FontsizeDecrease vim9cmd ChangeFontsize(-1)
 command! -nargs=1 FontsizeChange vim9cmd ChangeFontsize(<args>)

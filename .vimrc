@@ -90,6 +90,7 @@ augroup END
 # see https://github.com/vim/vim/issues/3018
 # set langmap=ö[,ä]
 set nocompatible
+set nomodeline
 set scrolloff=8
 set encoding=utf-8
 set langmenu=en_US.UTF-8
@@ -392,6 +393,7 @@ g:vim9_conversion_aid_fix_asl = true
 # vim-outline
 g:outline_autoclose = false
 g:outline_win_size = 40
+
 
 # Bunch of commands
 # -----------------------
