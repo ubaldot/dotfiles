@@ -18,7 +18,7 @@ def PackInit()
   minpac#add('ubaldot/vim-manim', {'type': 'opt'})
 
   # Additional plugins here.
-  minpac#add('sainnhe/everforest')
+  # minpac#add('sainnhe/everforest')
   minpac#add('lambdalisue/fern.vim')
   minpac#add('ubaldot/vim-outline')
   minpac#add('ubaldot/vim-markdown-extras')
@@ -77,7 +77,7 @@ def PackConfig_CompleteList(arglead: string,
     command_line: string,
     cursor_position: number): list<string>
 
-  var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
+  var opt_settings_files = getcompletion($'{g:dotvim}/lib/config/', 'file')
     ->map((_, val)  => fnamemodify(val, ':t:r'))
   var start_settings_files = getcompletion($'{g:dotvim}/plugin/', 'file')
     ->map((_, val)  => fnamemodify(val, ':t:r'))
@@ -92,7 +92,7 @@ def PackConfig(filename: string)
 
   # Next, search in autoload/config folder
   if empty(filename_full)
-    var opt_settings_files = getcompletion($'{g:dotvim}/autoload/config/', 'file')
+    var opt_settings_files = getcompletion($'{g:dotvim}/lib/config/', 'file')
     filename_full = opt_settings_files->filter((_, val) => val =~ filename)
   endif
   exe $"edit {filename_full[0]}"

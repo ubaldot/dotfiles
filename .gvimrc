@@ -56,10 +56,10 @@ def ChangeFontsize(n: number)
     var old_redraw = &lazyredraw
     set lazyredraw
 
-    # fontsize = fontsize + n
-    # &guifont = fontface .. string(fontsize) .. fontsize_tail
+    fontsize = fontsize + n
+    &guifont = fontface .. string(fontsize) .. fontsize_tail
 
-    # &lazyredraw = old_redraw
+    &lazyredraw = old_redraw
 enddef
 
 def GuiResize()

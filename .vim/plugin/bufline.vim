@@ -3,7 +3,7 @@ vim9script
 # ---------- Bufline -----------------------
 #  OBS! DOES NOT WORK WITH GVIM
 # -----------------------------------------
-set showtabline=2
+set showtabline=1
 
 if !exists('*g:SpawnBufferLine')
   def g:SpawnBufferLine(): string
@@ -52,4 +52,4 @@ if !exists('*g:SpawnBufferLine')
 endif
 # ---------- Bufline -----------------------
 
-set tabline=%!SpawnBufferLine()  # Assign the tabline
+# set tabline=%!SpawnBufferLine()  # Assign the tabline

@@ -305,7 +305,9 @@ nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <s-tab> <cmd>bprev <cr>
 # nnoremap <leader>b :b <tab>
-nnoremap <tab> <Cmd>bnext<cr>
+# nnoremap <tab> <Cmd>bnext<cr>
+# nnoremap <tab> :b <tab>
+nnoremap <tab> <cmd>PoptoolsBuffers<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
