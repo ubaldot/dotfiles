@@ -105,7 +105,6 @@ enddef
 
 import autoload $'{g:dotvim}/lib/config/lsp.vim' as lsp_config
 import autoload $'{g:dotvim}/lib/config/microdebugger.vim' as microdebugger_config
-import autoload $'{g:dotvim}/lib/config/statusline.vim' as statusline_config
 
 def PackDevSetup()
   const supported_filetypes = ['c', 'python', 'cpp', 'latex']
@@ -129,11 +128,6 @@ def PackDevSetup()
     endif
   endif
 enddef
-
-# The statusline is global and fully expression-driven, so it is set once here
-# instead of being rebuilt per buffer on FileType. That keeps it from wiping
-# the window-local statusline of plugin windows.
-statusline_config.Init()
 
 augroup PACK_DEV_SETUP
   autocmd!
