@@ -3,7 +3,7 @@ vim9script
 # ---------- Bufline -----------------------
 #  OBS! DOES NOT WORK WITH GVIM
 # -----------------------------------------
-set showtabline=1
+set showtabline=2
 
 if !exists('*g:SpawnBufferLine')
   def g:SpawnBufferLine(): string

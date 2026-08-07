@@ -16,9 +16,10 @@ def PackInit()
   minpac#add('ubaldot/vim9-conversion-aid', {'type': 'opt'})
   minpac#add('ubaldot/vim-latex-tools', {'type': 'opt'})
   minpac#add('ubaldot/vim-manim', {'type': 'opt'})
+  minpac#add('ubaldot/copilot-chat.vim', {'type': 'opt'})
+  minpac#add('ubaldot/vim-outlook', {'type': 'opt'})
 
   # Additional plugins here.
-  # minpac#add('sainnhe/everforest')
   minpac#add('lambdalisue/fern.vim')
   minpac#add('ubaldot/vim-outline')
   minpac#add('ubaldot/vim-markdown-extras')
@@ -29,8 +30,6 @@ def PackInit()
   minpac#add('ubaldot/vim-op-surround')
   minpac#add('ubaldot/vimspector')
   minpac#add('ubaldot/vim-replica')
-  minpac#add('ubaldot/copilot-chat.vim')
-  minpac#add('ubaldot/vim-outlook')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
