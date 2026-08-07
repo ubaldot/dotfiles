@@ -52,4 +52,4 @@ if !exists('*g:SpawnBufferLine')
 endif
 # ---------- Bufline -----------------------
 
-# set tabline=%!SpawnBufferLine()  # Assign the tabline
+set tabline=%!SpawnBufferLine()  # Assign the tabline
