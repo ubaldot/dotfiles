@@ -14,5 +14,7 @@ def CopilotWindowToggle()
   endif
 enddef
 
-nnoremap <leader>CC <scriptcmd>CopilotWindowToggle()<cr>
-xnoremap <leader>CE <Plug>CopilotChatAddSelection
+if g:os == "Windows" || g:os == "WSL"
+  nnoremap <leader>CC <scriptcmd>CopilotWindowToggle()<cr>
+  xnoremap <leader>CE <Plug>CopilotChatAddSelection
+endif
