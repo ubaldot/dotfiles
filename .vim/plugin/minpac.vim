@@ -113,28 +113,27 @@ def PackDevSetup()
       exe $"set ft={&filetype}"
     endif
 
-    # Order matters...
     if !exists('g:loaded_lsp')
-      echom g:dotvim
       execute $'source {g:dotvim}/lib/config/lsp.vim'
-      packadd! lsp
-
+      packadd lsp
       highlight link LspDiagLine NONE
-
-      # ---- Useful mappings -----
-      nnoremap <buffer> <silent> öd <Cmd>LspDiag prev<cr>
-      nnoremap <buffer> <silent> äd <Cmd>LspDiag next<cr>
-      # nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
-      # nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
-      nnoremap <buffer> <silent> <leader>dd <Cmd>LspDiag show<cr>
-      nnoremap <buffer> <silent> <leader>d <Cmd>LspDiag current<cr>
-      nnoremap <buffer> <silent> <leader>i <Cmd>LspGotoImpl<cr>
-      nnoremap <buffer> <silent> <leader>g <Cmd>LspGotoDefinition<cr>
-      nnoremap <buffer> <silent> <leader>r <Cmd>LspShowReferences<cr>
     endif
 
+    # ---- LSP buffer-local mappings -----
+    nnoremap <buffer> <silent> öd <Cmd>LspDiag prev<cr>
+    nnoremap <buffer> <silent> äd <Cmd>LspDiag next<cr>
+    # nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
+    # nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+    nnoremap <buffer> <silent> <leader>dd <Cmd>LspDiag show<cr>
+    nnoremap <buffer> <silent> <leader>d <Cmd>LspDiag current<cr>
+    nnoremap <buffer> <silent> <leader>i <Cmd>LspGotoImpl<cr>
+    nnoremap <buffer> <silent> <leader>g <Cmd>LspGotoDefinition<cr>
+    nnoremap <buffer> <silent> <leader>r <Cmd>LspShowReferences<cr>
+    # TODO: fix the following
+    nnoremap <buffer> ? <cmd>HelpMeShow vim_coding<cr>
+
     if !exists('g:loaded_microdebugger')
-      source $'{g:dotvim}/lib/config/vim-microdebugger.vim'
+      execute $'source {g:dotvim}/lib/config/vim-microdebugger.vim'
       packadd! vim-microdebugger
     endif
   endif
