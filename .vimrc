@@ -415,6 +415,9 @@ packadd! copilot-chat.vim
 execute $'source {g:dotvim}/lib/config/vim-helpme.vim'
 packadd! vim-helpme
 
+execute $'source {g:dotvim}/lib/config/vim-markdown-extras.vim'
+packadd vim-markdown-extras
+
 execute $'source {g:dotvim}/lib/config/vim-poptools.vim'
 packadd! vim-poptools
 
