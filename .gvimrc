@@ -30,7 +30,7 @@ if g:os == "Windows"
      set guioptions-=T
      set lines=40
      set columns=180
-     set guiligatures=!\"#$%&()*+-./:<=>?@[]^_{\|~
+     # set guiligatures=!\"#$%&()*+-./:<=>?@[]^_{\|~
      set renderoptions=type:directx,renmode:5,taamode:1
     # Open gvim in full-screen
     # au GUIEnter * simalt ~x

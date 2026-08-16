@@ -10,6 +10,7 @@ vim9script
 # that sets its own window-local 'statusline' (plugin scratch buffers, mail
 # composers, file explorers, ...) keeps it instead of having it overwritten.
 
+set showtabline=2
 set laststatus=2
 
 const DEV_FILETYPES = ['c', 'python', 'cpp', 'latex']
@@ -86,14 +87,46 @@ enddef
 # --- the statusline itself --------------------------------------------------
 
 # Left side
-var left = '%#StatusLineNC# (%{g:StatuslineConda()}) %*'
-  .. '%#WildMenu# %{g:GitBranch()} %*'
-  .. ' %{fnamemodify(getcwd(), ":~")} %*'
+# var statusline_left = '%#StatusLineNC# (%{g:StatuslineConda()}) %*'
+#   .. '%#WildMenu# %{g:GitBranch()} %*'
+#   .. ' %{fnamemodify(getcwd(), ":~")} %*'
 
 # Right side
-var right = '%#StatusLine# %y %*'
+# var statusline_right = '%#StatusLine# %y%*'
+#   .. ' %#StatusLineNC# %{&fileformat}%*'
+#   .. ' %#StatusLine# %l,%c(%{charcol(".")})%*'
+#   .. '%{%g:StatuslineLsp()%} -'
+#   .. ' %{strftime("%a, %d %B %Y - w%V")} '
+
+# Left side
+var statusline_left = '%#WildMenu# %{g:GitBranch()} %*' .. " %f %m %r"
+# Right side
+var statusline_right = '%#StatusLine# %y %*'
   .. '%#StatusLineNC# %{&fileformat} %*'
   .. '%#StatusLine# %l,%c(%{charcol(".")}) %*'
   .. '%{%g:StatuslineLsp()%}'
 
-&g:statusline = left .. '%=' .. right
+&g:statusline = statusline_left .. '%=' .. statusline_right
+
+# --- the tabline itself --------------------------------------------------
+# Left side
+var tabline_left = ' %#StatusLineNC# (%{g:StatuslineConda()}) %*'
+  .. ' %{fnamemodify(getcwd(), ":~")} %*'
+
+# Right side
+# g:current_datetime = strftime("%A, %d %B %Y, %H:%M, w%V")
+
+# def UpdateCurrentDatetime()
+#   g:current_datetime = strftime("%A, %d %B %Y, %H:%M, w%V")
+#   redrawtabline
+# enddef
+
+def g:Strftime(): string
+  return strftime("%A, %d %B %Y, %H:%M, w%V")
+enddef
+
+var tabline_right = ' %{g:Strftime()}'
+
+timer_start(60000, (_) => execute('redrawtabline'), {'repeat': -1})
+
+&g:tabline = tabline_left .. '%=' .. tabline_right

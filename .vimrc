@@ -305,9 +305,9 @@ nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <s-tab> <cmd>bprev <cr>
 # nnoremap <leader>b :b <tab>
-nnoremap <tab> <Cmd>bnext<cr>
+# nnoremap <tab> <Cmd>bnext<cr>
 # nnoremap <tab> :b <tab>
-# nnoremap <tab> <cmd>PoptoolsBuffers<cr>
+nnoremap <tab> <cmd>PoptoolsBuffers<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
@@ -373,36 +373,56 @@ augroup END
 
 # plugins
 # ----------------
-# Use Pack<tab> to tweak the various plugins
-# the config files go in plugin/ and they are automatically loaded
-# opt plugins: the config files go on autoload/config and the config must be
-# run through a Setup() function
+# OBS! Some plugins are loaded in after/ftplugins
+#
 # Bundled plugins
- packadd comment
- packadd hlyank
-# packadd matchit
-
-# Plugin settings
-# -----------------
+#
 # comment
+packadd! comment
 command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
 nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 
 # hlyank
 g:hlyank_hlgroup = 'Visual'
 g:hlyank_duration = 400
+packadd! hlyank
 
-# git box
-nnoremap git <Cmd>GitBox<cr>
-
-# Vim9-conversion-aid
-g:vim9_conversion_aid_fix_let = true
-g:vim9_conversion_aid_fix_asl = true
+# packadd matchit
 
 # vim-outline
 g:outline_autoclose = false
 g:outline_win_size = 40
+packadd! vim-outline
 
+execute $'source {g:dotvim}/lib/config/fern.vim.vim'
+packadd! fern.vim
+
+if g:os == "Windows" || g:os == "WSL"
+  packadd! vim-outlook
+  nnoremap Q <Cmd>OutlookToggle<cr>
+endif
+
+execute $'source {g:dotvim}/lib/config/vim-calendar.vim'
+packadd! vim-calendar
+nnoremap W <Cmd>CalendarToggle<cr>
+
+packadd! vim-git-box
+nnoremap git <Cmd>GitBox<cr>
+
+execute $'source {g:dotvim}/lib/config/copilot-chat.vim.vim'
+packadd! copilot-chat.vim
+
+execute $'source {g:dotvim}/lib/config/vim-helpme.vim'
+packadd! vim-helpme
+
+execute $'source {g:dotvim}/lib/config/vim-poptools.vim'
+packadd! vim-poptools
+
+execute $'source {g:dotvim}/lib/config/vim-replica.vim'
+packadd! vim-replica
+
+execute $'source {g:dotvim}/lib/config/copilot-chat.vim.vim'
+packadd! copilot-chat.vim
 
 # Bunch of commands
 # -----------------------

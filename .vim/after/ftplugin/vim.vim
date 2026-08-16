@@ -1,5 +1,10 @@
 vim9script
 
+# Vim9-conversion-aid
+g:vim9_conversion_aid_fix_let = true
+g:vim9_conversion_aid_fix_asl = true
+packadd! Vim9-conversion-aid
+
 def Help(args: string)
   var syn_name = synIDattr(synID(line('.'), col('.'), 1), 'name')
 

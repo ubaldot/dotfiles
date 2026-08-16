@@ -1,5 +1,8 @@
 vim9script
 
+execute $'source {g:dotvim}/lib/config/vim-markdown-extras.vim'
+packadd! vim-markdown-extras
+
 setlocal conceallevel=2
 setlocal concealcursor=nvc
 

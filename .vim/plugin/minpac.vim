@@ -2,13 +2,14 @@ vim9script
 
 def PackInit()
   # This function has nothing to do with plugin loading.
-  # Plugin are automatically loaded at startup if they are in
-  # ~/.vim/pack/start
 
   packadd minpac
   minpac#init()
   minpac#add('k-takata/minpac', {'type': 'opt'})
-  minpac#add('yegappan/lsp', {'type': 'opt'})
+
+  # Optional plugins
+  # minpac#add('yegappan/lsp', {'type': 'opt'})
+  minpac#add('ubaldot/lsp', {'type': 'opt'})
   minpac#add('ubaldot/vim-microdebugger', {'type': 'opt'})
   minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
   minpac#add('yegappan/snake', {'type': 'opt'})
@@ -18,18 +19,18 @@ def PackInit()
   minpac#add('ubaldot/vim-manim', {'type': 'opt'})
   minpac#add('ubaldot/copilot-chat.vim', {'type': 'opt'})
   minpac#add('ubaldot/vim-outlook', {'type': 'opt'})
+  minpac#add('lambdalisue/fern.vim', {'type': 'opt'})
+  minpac#add('ubaldot/vim-outline', {'type': 'opt'})
+  minpac#add('ubaldot/vim-markdown-extras', {'type': 'opt'})
+  minpac#add('ubaldot/vim-poptools', {'type': 'opt'})
+  minpac#add('ubaldot/vim-git-box', {'type': 'opt'})
+  minpac#add('ubaldot/vim-helpme', {'type': 'opt'})
+  minpac#add('ubaldot/vim-calendar', {'type': 'opt'})
+  minpac#add('ubaldot/vim-op-surround', {'type': 'opt'})
+  minpac#add('ubaldot/vim-replica', {'type': 'opt'})
 
-  # Additional plugins here.
-  minpac#add('lambdalisue/fern.vim')
-  minpac#add('ubaldot/vim-outline')
-  minpac#add('ubaldot/vim-markdown-extras')
-  minpac#add('ubaldot/vim-poptools')
-  minpac#add('ubaldot/vim-git-box')
-  minpac#add('ubaldot/vim-helpme')
-  minpac#add('ubaldot/vim-calendar')
-  minpac#add('ubaldot/vim-op-surround')
+  # Start plugins.
   minpac#add('ubaldot/vimspector')
-  minpac#add('ubaldot/vim-replica')
 enddef
 
 # Define user commands for updating/cleaning the plugins.
@@ -102,28 +103,39 @@ enddef
 # opt packages and statusline management
 # ----------------------------------------
 
-import autoload $'{g:dotvim}/lib/config/lsp.vim' as lsp_config
-import autoload $'{g:dotvim}/lib/config/microdebugger.vim' as microdebugger_config
-
 def PackDevSetup()
   const supported_filetypes = ['c', 'python', 'cpp', 'latex']
 
   if index(supported_filetypes, &filetype) != -1
     if !exists('g:loaded_termdebug')
       g:termdebug_config = {}
-      packadd termdeubug
+      packadd! termdeubug
       exe $"set ft={&filetype}"
     endif
 
     # Order matters...
     if !exists('g:loaded_lsp')
-      packadd lsp
-      lsp_config.Init()
+      echom g:dotvim
+      execute $'source {g:dotvim}/lib/config/lsp.vim'
+      packadd! lsp
+
+      highlight link LspDiagLine NONE
+
+      # ---- Useful mappings -----
+      nnoremap <buffer> <silent> öd <Cmd>LspDiag prev<cr>
+      nnoremap <buffer> <silent> äd <Cmd>LspDiag next<cr>
+      # nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
+      # nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+      nnoremap <buffer> <silent> <leader>dd <Cmd>LspDiag show<cr>
+      nnoremap <buffer> <silent> <leader>d <Cmd>LspDiag current<cr>
+      nnoremap <buffer> <silent> <leader>i <Cmd>LspGotoImpl<cr>
+      nnoremap <buffer> <silent> <leader>g <Cmd>LspGotoDefinition<cr>
+      nnoremap <buffer> <silent> <leader>r <Cmd>LspShowReferences<cr>
     endif
 
     if !exists('g:loaded_microdebugger')
-      microdebugger_config.Init()
-      packadd vim-microdebugger
+      source $'{g:dotvim}/lib/config/vim-microdebugger.vim'
+      packadd! vim-microdebugger
     endif
   endif
 enddef
