@@ -8,8 +8,7 @@ def PackInit()
   minpac#add('k-takata/minpac', {'type': 'opt'})
 
   # Optional plugins
-  # minpac#add('yegappan/lsp', {'type': 'opt'})
-  minpac#add('ubaldot/lsp', {'type': 'opt'})
+  minpac#add('yegappan/lsp', {'type': 'opt'})
   minpac#add('ubaldot/vim-microdebugger', {'type': 'opt'})
   minpac#add('ubaldot/vim-extended-view', {'type': 'opt'})
   minpac#add('yegappan/snake', {'type': 'opt'})
@@ -120,17 +119,21 @@ def PackDevSetup()
     endif
 
     # ---- LSP buffer-local mappings -----
-    nnoremap <buffer> <silent> öd <Cmd>LspDiag prev<cr>
-    nnoremap <buffer> <silent> äd <Cmd>LspDiag next<cr>
-    # nnoremap <silent> <leader>p <Cmd>LspDiag prev<cr>
-    # nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+    # nnoremap <buffer> <silent> öd <Cmd>LspDiag prev<cr>
+    # nnoremap <buffer> <silent> äd <Cmd>LspDiag next<cr>
+    nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+    nnoremap <silent> <leader>N <Cmd>LspDiag prev<cr>
     nnoremap <buffer> <silent> <leader>dd <Cmd>LspDiag show<cr>
     nnoremap <buffer> <silent> <leader>d <Cmd>LspDiag current<cr>
     nnoremap <buffer> <silent> <leader>i <Cmd>LspGotoImpl<cr>
     nnoremap <buffer> <silent> <leader>g <Cmd>LspGotoDefinition<cr>
     nnoremap <buffer> <silent> <leader>r <Cmd>LspShowReferences<cr>
-    # TODO: fix the following
-    nnoremap <buffer> ? <cmd>HelpMeShow vim_coding<cr>
+
+    if exists(':HelpMe') != 0
+      nnoremap <buffer> ? <cmd>HelpMeShow vim_coding<cr>
+    else
+      echo ":HelpMe not installed"
+    endif
 
     if !exists('g:loaded_microdebugger')
       execute $'source {g:dotvim}/lib/config/vim-microdebugger.vim'

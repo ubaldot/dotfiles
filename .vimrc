@@ -404,10 +404,9 @@ endif
 
 execute $'source {g:dotvim}/lib/config/vim-calendar.vim'
 packadd! vim-calendar
-nnoremap W <Cmd>CalendarToggle<cr>
 
-packadd! vim-git-box
 nnoremap git <Cmd>GitBox<cr>
+packadd! vim-git-box
 
 execute $'source {g:dotvim}/lib/config/copilot-chat.vim.vim'
 packadd! copilot-chat.vim
@@ -416,7 +415,7 @@ execute $'source {g:dotvim}/lib/config/vim-helpme.vim'
 packadd! vim-helpme
 
 execute $'source {g:dotvim}/lib/config/vim-markdown-extras.vim'
-packadd vim-markdown-extras
+packadd! vim-markdown-extras
 
 execute $'source {g:dotvim}/lib/config/vim-poptools.vim'
 packadd! vim-poptools
