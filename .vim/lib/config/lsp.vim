@@ -1,5 +1,7 @@
 vim9script
 
+const supported_filetypes = ['c', 'cpp', 'python', 'tex']
+
 # clangd env setup
 var clangd_name = 'clangd'
 var clangd_path = 'clangd'
@@ -81,3 +83,31 @@ g:lsp_servers = lspServers
 # ---- lsp options -----
 var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
 g:lsp_options = lspOpts
+
+def InstallKeymappings()
+  if index(supported_filetypes, &filetype) != -1
+    # ---- LSP buffer-local mappings -----
+    # nnoremap <buffer> <silent> öd <Cmd>LspDiag prev<cr>
+    # nnoremap <buffer> <silent> äd <Cmd>LspDiag next<cr>
+    nnoremap <silent> <leader>n <Cmd>LspDiag next<cr>
+    nnoremap <silent> <leader>N <Cmd>LspDiag prev<cr>
+    nnoremap <buffer> <silent> <leader>dd <Cmd>LspDiag show<cr>
+    nnoremap <buffer> <silent> <leader>d <Cmd>LspDiag current<cr>
+    nnoremap <buffer> <silent> <leader>i <Cmd>LspGotoImpl<cr>
+    nnoremap <buffer> <silent> <leader>g <Cmd>LspGotoDefinition<cr>
+    nnoremap <buffer> <silent> <leader>r <Cmd>LspShowReferences<cr>
+
+    if exists(':HelpMe') != 0
+      nnoremap <buffer> ? <cmd>HelpMeShow vim_coding<cr>
+    else
+      echo ":HelpMe not installed"
+    endif
+  endif
+enddef
+
+augroup LSP_MAPPINGS
+  autocmd!
+  autocmd BufEnter * InstallKeymappings()
+augroup END
+
+InstallKeymappings()

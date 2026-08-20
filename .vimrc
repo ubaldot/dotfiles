@@ -351,7 +351,7 @@ augroup DIRCHANGE
 augroup END
 
 augroup shoutoff_terminals
-  autocmd QuitPre * call myfunctions.WipeoutTerminals()
+  autocmd QuitPre * myfunctions.WipeoutTerminals()
 augroup END
 
 augroup CMDWIN_MAPS
@@ -371,60 +371,35 @@ augroup YANK_SHIFT_REGISTERS
   autocmd TextYankPost * if v:event.operator == 'y' | ShiftRegisters() | endif
 augroup END
 
-# plugins
+# packages
 # ----------------
-# OBS! Some plugins are loaded in after/ftplugins
-#
-# Bundled plugins
-#
-# comment
-packadd! comment
-command! -range -nargs=0 Comment exe ":<line1>,<line2>norm gcc"
-nnoremap <silent> <expr> gC comment#Toggle() .. '$'
 
-# hlyank
-g:hlyank_hlgroup = 'Visual'
-g:hlyank_duration = 400
-packadd! hlyank
+const packages_to_load = [
+  'comment',
+  'hlyank',
+  'vim-outline',
+  'fern.vim',
+  'vim-calendar',
+  'vim-git-box',
+  'copilot-chat.vim',
+  'vim-helpme',
+  'vim-markdown-extras',
+  'vim-poptools',
+  'vim-replica',
+]
 
-# packadd matchit
+for pack in packages_to_load
+  # No need to reload if a package is already loaded
+  if index(myfunctions.LoadedPackages(), pack) == -1
+    myfunctions.Packadd(pack)
+  endif
+endfor
 
-# vim-outline
-g:outline_autoclose = false
-g:outline_win_size = 40
-packadd! vim-outline
-
-execute $'source {g:dotvim}/lib/config/fern.vim.vim'
-packadd! fern.vim
-
-if g:os == "Windows" || g:os == "WSL"
-  packadd! vim-outlook
-  nnoremap Q <Cmd>OutlookToggle<cr>
+if (g:os == "Windows" || g:os == "WSL")
+    && index(myfunctions.LoadedPackages(), 'vim-outlook') == -1
+  myfunctions.Packadd('vim-outlook')
 endif
 
-execute $'source {g:dotvim}/lib/config/vim-calendar.vim'
-packadd! vim-calendar
-
-nnoremap git <Cmd>GitBox<cr>
-packadd! vim-git-box
-
-execute $'source {g:dotvim}/lib/config/copilot-chat.vim.vim'
-packadd! copilot-chat.vim
-
-execute $'source {g:dotvim}/lib/config/vim-helpme.vim'
-packadd! vim-helpme
-
-execute $'source {g:dotvim}/lib/config/vim-markdown-extras.vim'
-packadd! vim-markdown-extras
-
-execute $'source {g:dotvim}/lib/config/vim-poptools.vim'
-packadd! vim-poptools
-
-execute $'source {g:dotvim}/lib/config/vim-replica.vim'
-packadd! vim-replica
-
-execute $'source {g:dotvim}/lib/config/copilot-chat.vim.vim'
-packadd! copilot-chat.vim
 
 # Bunch of commands
 # -----------------------
@@ -494,6 +469,7 @@ endif
 
 # Copilot CLI
 def StartCopilotAgent()
+
   # Reuse existing Copilot terminal if it exists
   for buf in getbufinfo()
     if buf.name =~# 'copilot-agent' && bufwinid(buf.name) != -1

@@ -412,6 +412,59 @@ export def HideMyTerminal()
   endif
 enddef
 
+export def LoadedPackages(): list<string>
+  return split(&runtimepath, ',')
+    # Adjust for Windows paths
+    ->map((_, val) => substitute(val, '\\', '/', 'g'))
+    # Filter only optional packages
+    ->filter((_, val) => val =~ '\/pack\/.*\/opt\/')
+    # Pick the string between .../opt and $
+    ->map((_, val) => substitute(val, '.*\/opt\/\(.*\)$', '\1', 'g'))
+    # Remove subfolders, e.g markdown-extras/after
+    ->filter((_, val) => val !~ '\/')
+enddef
+
+export def Packadd(package: string)
+  # It works as follow:
+  #
+  #   1. source a config script
+  #   2. load package through :packadd
+  #
+  # Assume that the config script and the package have the same name, and it
+  # assumes that the config scripts are in $'{g:dotvim}/lib/config/'
+
+  if v:vim_did_init && index(getcompletion('', 'packadd'), package) == -1
+    Echoerr($"Package '{package}' does not exist")
+    return
+  endif
+
+  const packages_dir = $'{g:dotvim}/lib/config/'
+
+  if !empty(readdir(packages_dir, (dir) => dir ==# $'{package}.vim'))
+    execute $'source {g:dotvim}/lib/config/{package}.vim'
+    # echom $'sourced {g:dotvim}/lib/config/{package}.vim'
+  endif
+
+  if v:vim_did_init
+    execute $'packadd {package}'
+  else
+    # echom "package: " .. package
+    execute $'packadd! {package}'
+  endif
+enddef
+
+def PackConfig_CompleteList(arglead: string,
+    command_line: string,
+    cursor_position: number): list<string>
+
+  var loaded_packages = LoadedPackages()
+
+  var all_packages = getcompletion('', 'packadd')
+  var leftovers = copy(all_packages)->filter((_, val) => index(loaded_packages, val) == -1)
+  return leftovers->filter($'v:val =~ "^{arglead}"')
+enddef
+
+command! -nargs=1 -complete=customlist,PackConfig_CompleteList Packadd Packadd(<f-args>)
 
 # Make vim to speak on macos
 if has('mac')
