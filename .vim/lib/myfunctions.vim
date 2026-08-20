@@ -413,6 +413,9 @@ export def HideMyTerminal()
 enddef
 
 export def LoadedPackages(): list<string>
+  #
+  # Report the list of loaded packages in opt, both bundled and user-defined
+  #
   return split(&runtimepath, ',')
     # Adjust for Windows paths
     ->map((_, val) => substitute(val, '\\', '/', 'g'))
@@ -434,7 +437,7 @@ export def Packadd(package: string)
   # assumes that the config scripts are in $'{g:dotvim}/lib/config/'
 
   if v:vim_did_init && index(getcompletion('', 'packadd'), package) == -1
-    Echoerr($"Package '{package}' does not exist")
+    Echoerr($"Package '{package}' not installed")
     return
   endif
 
@@ -660,40 +663,4 @@ export def GetDelimitersRanges(
   remove(ranges, -1)
 
   return ranges
-enddef
-
-
-export def PathToURL(path: string): string
-  var rest = ''
-  if has('win32') || has('win64')
-    rest = path->substitute('\\', '/', 'g')
-  else
-    rest = path
-  endif
-
-  var utf8 = iconv(rest, &encoding, 'utf-8')
-  var bytes = str2blob([utf8])
-  if len(bytes) > 0 && bytes[len(bytes) - 1] == 0x0A
-    call remove(bytes, len(bytes) - 1)
-  endif
-
-  var allowed = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.~/:'
-  var encoded = ''
-  for val in bytes
-    if stridx(allowed, nr2char(val)) >= 0
-      encoded ..= nr2char(val)
-    else
-      encoded ..= printf('%%%02X', val)
-    endif
-  endfor
-
-  if has('win32') || has('win64')
-    if rest =~ '^[A-Za-z]:/'
-      return 'file:///' .. encoded
-    else
-      return 'file:' .. encoded
-    endif
-  else
-    return 'file://' .. encoded
-  endif
 enddef

@@ -137,9 +137,6 @@ set autocomplete
 set complete=.^5,w^5,b^5,u^5
 set completeopt=popup
 
-# This is in autoload
-# config#statusline#Init()
-
 filetype plugin on
 filetype indent on
 syntax on
@@ -276,7 +273,6 @@ def DiffMappings()
 enddef
 
 
-
 def ResizeGvim()
   set lines=20 columns=60
 enddef
@@ -294,6 +290,7 @@ def GoToGitRoot()
   endif
   pwd
 enddef
+
 noremap cd <scriptcmd>GoToGitRoot()<cr>
 
 nnoremap <F1> <Cmd>helpclose<cr>
@@ -306,8 +303,8 @@ nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <s-tab> <cmd>bprev <cr>
 # nnoremap <leader>b :b <tab>
 # nnoremap <tab> <Cmd>bnext<cr>
-# nnoremap <tab> :b <tab>
-nnoremap <tab> <cmd>PoptoolsBuffers<cr>
+nnoremap <tab> :b <tab>
+nnoremap <c-p>o <cmd>browse oldfiles<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>
 noremap <c-PageUp> <Cmd>bnext<cr>
@@ -329,7 +326,6 @@ tnoremap <c-h> <c-w>h
 tnoremap <c-l> <c-w>l
 tnoremap <c-k> <c-w>k
 tnoremap <c-j> <c-w>j
-tnoremap <c-tab> <cmd>PoptolsBuffers<cr>
 # tnoremap <s-tab> <cmd>bnext<cr>
 tnoremap <s-tab> <c-w>:b <tab>
 tnoremap <c-w>q <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
@@ -338,12 +334,6 @@ nnoremap <c-t> <ScriptCmd>myfunctions.OpenMyTerminal()<cr>
 tnoremap <c-t> <ScriptCmd>myfunctions.HideMyTerminal()<cr>
 tnoremap <c-d> <ScriptCmd>myfunctions.Quit_term_popup(true)<cr>
 tnoremap <c-r> <c-w>"
-
-
-# augroup AUTOCOMPLETE_CMDLINE
-#   autocmd!
-#   autocmd CmdlineChanged [:\/\?] call wildtrigger()
-# augroup END
 
 augroup DIRCHANGE
   autocmd!
@@ -373,19 +363,19 @@ augroup END
 
 # packages
 # ----------------
-
 const packages_to_load = [
   'comment',
   'hlyank',
-  'vim-outline',
+  # 'vim-outline',
   'fern.vim',
   'vim-calendar',
-  'vim-git-box',
-  'copilot-chat.vim',
+  # 'minpac',
+  # 'vim-git-box',
+  # 'copilot-chat.vim',
   'vim-helpme',
   'vim-markdown-extras',
   'vim-poptools',
-  'vim-replica',
+  # 'vim-replica',
 ]
 
 for pack in packages_to_load
@@ -418,13 +408,6 @@ command! ColorsToggle myfunctions.ColorsToggle()
 command! -nargs=1 -complete=command -range Redir
       \ silent myfunctions.Redir(<q-args>, <range>, <line1>, <line2>)
 
-# Path to URL command
-def PathToURL(path: string)
-  setreg('p', myfunctions.PathToURL(fnamemodify(path, ':p')))
-   echo "URL stored in register 'p'"
-enddef
-command! -nargs=1 -complete=file PathToURL PathToURL(<f-args>)
-
 # CC stuff
 const CC_FILENAME = 'cab_climate.vim'
 
@@ -452,6 +435,7 @@ augroup CAB_CLIMATE_SOURCE_SCRIPT
   autocmd VimEnter * SourceCabClimate()
 augroup END
 
+# If working in WSL
 if g:os == "WSL"
   # Refresh the local copy from Windows, quietly doing nothing when the
   # OneDrive folder is not mounted (offline, or a machine without it).
@@ -466,30 +450,3 @@ if g:os == "WSL"
     endif
   endif
 endif
-
-# Copilot CLI
-def StartCopilotAgent()
-
-  # Reuse existing Copilot terminal if it exists
-  for buf in getbufinfo()
-    if buf.name =~# 'copilot-agent' && bufwinid(buf.name) != -1
-      win_gotoid(buf.windows[0])
-      return
-    elseif buf.name =~# 'copilot-agent' && bufwinid(buf.name) == -1
-      wincmd v
-      execute $"buffer {bufnr(buf.name)}"
-      return
-    endif
-  endfor
-
-  # Start Copilot
-  term_start(
-    'copilot',
-    {
-      # vertical: true,
-      term_finish: 'close',
-    },
-  )
-enddef
-
-command! CopilotAgent StartCopilotAgent()

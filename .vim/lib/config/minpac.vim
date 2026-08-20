@@ -3,7 +3,6 @@ vim9script
 def PackInit()
   # This function has nothing to do with plugin loading.
 
-  packadd minpac
   minpac#init()
   minpac#add('k-takata/minpac', {'type': 'opt'})
 
@@ -25,7 +24,6 @@ def PackInit()
   minpac#add('ubaldot/vim-git-box', {'type': 'opt'})
   minpac#add('ubaldot/vim-helpme', {'type': 'opt'})
   minpac#add('ubaldot/vim-calendar', {'type': 'opt'})
-  minpac#add('ubaldot/vim-op-surround', {'type': 'opt'})
   minpac#add('ubaldot/vim-replica', {'type': 'opt'})
 
   # Start plugins.
@@ -42,9 +40,9 @@ command! PackStatus packadd minpac | minpac#status()
 command! -nargs=1 -complete=customlist,PackConfig_CompleteList PackConfig
       \ PackConfig(<f-args>)
 
-command! -nargs=1 -complete=customlist,PackEditPlugin_CompleteList PackEditPlugin PackEditPlugin(<f-args>)
+command! -nargs=1 -complete=customlist,PackEditPackage_CompleteList PackEditPackage PackEditPackage(<f-args>)
 
-def PackEditPlugin_CompleteList(arglead: string,
+def PackEditPackage_CompleteList(arglead: string,
     command_line: string,
     cursor_position: number): list<string>
 
@@ -56,7 +54,7 @@ def PackEditPlugin_CompleteList(arglead: string,
 
 enddef
 
-def PackEditPlugin(dirname: string)
+def PackEditPackage(dirname: string)
   var start_dir = getcompletion($'{g:dotvim}/pack/minpac/start/', 'dir')
     ->filter((_, val) => val =~ dirname)
   var opt_dir = getcompletion($'{g:dotvim}/pack/minpac/opt/', 'dir')
