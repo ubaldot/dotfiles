@@ -414,18 +414,25 @@ enddef
 
 export def LoadedPackages(): list<string>
   #
-  # Report the list of loaded packages in opt, both bundled and user-defined
+  # Report the list of loaded packages in opt and start, both bundled (dist/)
+  # and user-defined
   #
-  return split(&runtimepath, ',')
+  const runtimepath_normalized = split(&runtimepath, ',')
     # Adjust for Windows paths
-    ->map((_, val) => substitute(val, '\\', '/', 'g'))
-    # Filter only optional packages
-    ->filter((_, val) => val =~ '\/pack\/.*\/opt\/')
-    # Pick the string between .../opt and $
-    ->map((_, val) => substitute(val, '.*\/opt\/\(.*\)$', '\1', 'g'))
-    # Remove subfolders, e.g markdown-extras/after
-    ->filter((_, val) => val !~ '\/')
+    ->mapnew((_, val) => substitute(val, '\\', '/', 'g'))
+
+  # Pick the string between .../start and $ or /*$
+  const start_packages = runtimepath_normalized
+    ->mapnew((_, val) => matchstr(val, 'start/\zs[^/]*$'))
+
+  # Pick the string between .../opt and $ or /*$
+  const opt_packages = runtimepath_normalized
+    ->mapnew((_, val) => matchstr(val, 'opt/\zs[^/]*$'))
+
+  return copy(start_packages + opt_packages)->filter((_, val) => !empty(val))
 enddef
+
+command! -nargs=0 PackLoaded echo LoadedPackages()
 
 export def Packadd(package: string)
   # It works as follow:
