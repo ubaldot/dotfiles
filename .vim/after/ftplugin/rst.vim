@@ -4,13 +4,6 @@ import g:dotvim .. "/after/ftplugin/markdown.vim"
 setlocal iskeyword-=_
 &l:tabstop = 3
 
-# Bold, italic, strikethrough
-xnoremap <buffer> <silent> <leader>** <esc><ScriptCmd>myfunctions.VisualSurround('**', '**')<cr>
-xnoremap <buffer> <silent> <leader>* <esc><ScriptCmd>myfunctions.VisualSurround('*', '*')<cr>
-xnoremap <buffer> <silent> <leader>~ <esc><ScriptCmd>myfunctions.VisualSurround('~~', '~~')<cr>
-
-inoremap ä `
-
 if executable('rstfmt')
   &l:formatprg = $"rstfmt -w {&l:textwidth}"
 endif
