@@ -295,7 +295,7 @@ noremap cd <scriptcmd>GoToGitRoot()<cr>
 
 nnoremap <F1> <Cmd>helpclose<cr>
 # Opposite of J, i.e. split from current cursor position
-nnoremap S i<cr><esc>
+nnoremap S i<c-j><esc>
 # <ScriptCmd> allows remapping to functions without the need of defining
 # them as g:.
 nnoremap <c-w>q <ScriptCmd>myfunctions.QuitWindow()<cr>
@@ -303,7 +303,7 @@ nnoremap <c-w><c-q> <ScriptCmd>myfunctions.QuitWindow()<cr>
 nnoremap <s-tab> <cmd>bprev <cr>
 # nnoremap <leader>b :b <tab>
 # nnoremap <tab> <Cmd>bnext<cr>
-nnoremap <tab> :b <tab>
+nnoremap <tab> :b <tab><tab>
 nnoremap <c-p>o <cmd>browse oldfiles<cr>
 nnoremap Y y$
 noremap <c-PageDown> <Cmd>bprev<cr>

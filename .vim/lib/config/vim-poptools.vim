@@ -13,7 +13,7 @@ nnoremap <c-p> <cmd>PoptoolsFindFile<cr>
 # Copy in the selected text into t register ad leave it. Who cares about the t
 # register?
 nnoremap <c-p>l <cmd>PoptoolsLastSearch<cr>
-# nnoremap <tab> <cmd>PoptoolsBuffers<cr>
+nnoremap <tab> <cmd>PoptoolsBuffers<cr>
 tnoremap <c-tab> <cmd>PoptolsBuffers<cr>
 nnoremap <c-p>o <cmd>PoptoolsRecentFiles<cr>
 
