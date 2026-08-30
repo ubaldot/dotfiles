@@ -366,7 +366,7 @@ augroup END
 const packages_to_load = [
   'comment',
   'hlyank',
-  # 'vim-outline',
+  'vim-outline',
   'fern.vim',
   'vim-calendar',
   # 'minpac',

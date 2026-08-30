@@ -107,6 +107,7 @@ var statusline_right = '%#StatusLine# %y %*'
   .. '%{%g:StatuslineLsp()%}'
 
 &g:statusline = statusline_left .. '%=' .. statusline_right
+# &g:tabline = statusline_left .. '%=' .. statusline_right
 
 # --- the tabline itself --------------------------------------------------
 # Left side
@@ -130,3 +131,4 @@ var tabline_right = ' %{g:Strftime()}'
 timer_start(60000, (_) => execute('redrawtabline'), {'repeat': -1})
 
 &g:tabline = tabline_left .. '%=' .. tabline_right
+# &g:statusline = tabline_left .. '%=' .. tabline_right
