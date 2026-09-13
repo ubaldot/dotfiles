@@ -2,6 +2,7 @@ vim9script
 
 # For avap dev
 g:is_avap = false
+g:use_conda = false
 
 # OS detection
 def IsWSL(): bool
@@ -137,6 +138,8 @@ set autocomplete
 set complete=.^5,w^5,b^5,u^5
 set completeopt=popup
 
+# This remove the menu and should be set before sourcing .gvimrc
+set guioptions+=M
 filetype plugin on
 filetype indent on
 syntax on
@@ -368,7 +371,7 @@ const packages_to_load = [
   'hlyank',
   'vim-outline',
   'fern.vim',
-  'vim-calendar',
+  # 'vim-calendar',
   # 'minpac',
   # 'vim-git-box',
   # 'copilot-chat.vim',

@@ -9,5 +9,15 @@ g:markdown_extras_config = {
   link_first_register: 'a',
   format_on_save: false,
   pandoc_args: [$'--css="{$HOME}/dotfiles/my_css_style.css"',
-    $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"']
+    $'--lua-filter="{$HOME}/dotfiles/emoji-admonitions.lua"',
+    $'--from=markdown+tex_math_single_backslash',
+    '--mathml'
+  ]
 }
+
+# For LaTeX:
+#   - $ ... $ is TeX, \[ ... \] is LaTeX
+#   - For LaTeX rendering, consider:
+#     - --mathml - simple, fast no javascript needed, limited,
+#     - --mathjax - complete, slow, javascript needed,
+#     - --ketex - half way, javascript needed.

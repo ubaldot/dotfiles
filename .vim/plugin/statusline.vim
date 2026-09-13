@@ -50,27 +50,6 @@ augroup UPDATE_GIT_BRANCH
   autocmd BufEnter * UpdateGitBranch(true)
 augroup END
 
-# --- conda environment ------------------------------------------------------
-
-def Set_g_conda_env()
-  var conda_env = "base"
-  if g:os ==# "Windows"
-    conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
-  elseif exists("$CONDA_DEFAULT_ENV")
-    conda_env = $CONDA_DEFAULT_ENV
-  endif
-  g:conda_env = conda_env
-enddef
-
-# Resolved on the first redraw rather than at startup, so the system() call
-# does not slow Vim down before anything is on screen.
-def g:StatuslineConda(): string
-  if !exists('g:conda_env')
-    Set_g_conda_env()
-  endif
-  return g:conda_env
-enddef
-
 # --- lsp diagnostics --------------------------------------------------------
 
 # Returns statusline items (used with %{%...%}) so that the highlight groups
@@ -110,25 +89,56 @@ var statusline_right = '%#StatusLine# %y %*'
 # &g:tabline = statusline_left .. '%=' .. statusline_right
 
 # --- the tabline itself --------------------------------------------------
-# Left side
-var tabline_left = ' %#StatusLineNC# (%{g:StatuslineConda()}) %*'
-  .. ' %{fnamemodify(getcwd(), ":~")} %*'
 
-# Right side
-# g:current_datetime = strftime("%A, %d %B %Y, %H:%M, w%V")
+# --- conda environment ------------------------------------------------------
 
-# def UpdateCurrentDatetime()
-#   g:current_datetime = strftime("%A, %d %B %Y, %H:%M, w%V")
-#   redrawtabline
-# enddef
+def Set_g_conda_env()
+  var conda_env = "base"
+  if g:os ==# "Windows"
+    conda_env = trim(system("echo %CONDA_DEFAULT_ENV%"))
+  elseif exists("$CONDA_DEFAULT_ENV")
+    conda_env = $CONDA_DEFAULT_ENV
+  endif
+  g:conda_env = conda_env
+enddef
+
+# Resolved on the first redraw rather than at startup, so the system() call
+# does not slow Vim down before anything is on screen.
+def g:StatuslineConda(): string
+  if !exists('g:conda_env')
+    Set_g_conda_env()
+  endif
+  return g:conda_env
+enddef
 
 def g:Strftime(): string
   return strftime("%A, %d %B %Y, %H:%M, w%V")
 enddef
 
-var tabline_right = ' %{g:Strftime()}'
+def g:BuildTabline(): string
+  var tabline_left = g:use_conda
+    ? ' %#StatusLineNC# (%{g:StatuslineConda()}) %* %{fnamemodify(getcwd(), ":~")} %*'
+    : ' %{fnamemodify(getcwd(), ":~")} %*'
 
+  var tabline_right = ' %{g:Strftime()}'
+  # Display tabs if more tabs are opened
+  for i in range(1, tabpagenr('$'))  # Loop through the number of tabs
+    # Highlight with yellow if it's the current tab
+    tabline_right ..= (i == tabpagenr()) ? ('%#TabLineSel#') : ('%#TabLine#')
+    tabline_right = $'{tabline_right}%{i}T '		# set the tab page number (for mouse clicks)
+    tabline_right = $'{tabline_right}{i}'		# set page number string
+  endfor
+  tabline_right = $'{tabline_right}%#TabLineFill#%T'	# Reset highlight
+
+  # Close button on the right if there are multiple tabs
+  if tabpagenr('$') > 1
+    tabline_right = $'{tabline_right}%999X X'
+  endif
+
+  return tabline_left .. '%=' .. tabline_right
+enddef
+
+set tabline=%!BuildTabline()  # Assign the tabline
+
+# For updating the clock in the tabline
 timer_start(60000, (_) => execute('redrawtabline'), {'repeat': -1})
-
-&g:tabline = tabline_left .. '%=' .. tabline_right
-# &g:statusline = tabline_left .. '%=' .. tabline_right

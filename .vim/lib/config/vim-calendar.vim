@@ -10,7 +10,10 @@ g:calendar_config = {
   holidays: {'2026-12-25': 'Christmas'},
   diaries_dict: {
     Notes: {
-      path: '~/notes',
+      path: '~/notes', secret: true
+    },
+    Test: {
+      path: '~/test', secret: true
     },
   },
   active_diary: 'Notes'
