@@ -4,7 +4,8 @@ vim9script
 # This file is sourced AFTER .vimrc
 # -----------------------------------
 set mousehide
-set guioptions+=!Cd
+# set guioptions+=!Cd
+set guioptions+=!d
 set guioptions-=e
 
 # Otherwise it leaks into syntax files if used for code

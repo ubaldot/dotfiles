@@ -13,18 +13,18 @@ vim9script
 set showtabline=2
 set laststatus=2
 
-const DEV_FILETYPES = ['c', 'python', 'cpp', 'latex']
+g:dev_supported_filetypes = ['c', 'python', 'cpp', 'latex', 'vim']
 
 # --- git branch -------------------------------------------------------------
 
 def UpdateGitBranch(buf_enter: bool)
   g:git_branch = ''
 
-  def GitBranchStdout(id: any, msg: string)
+  def GitBranchStdout(_: any, msg: string)
     g:git_branch = nr2char(0xE0A0) .. ' ' .. msg->trim()
   enddef
 
-  def GitBranchStderr(id: any, msg: string)
+  def GitBranchStderr(_: any, _: string)
     g:git_branch = nr2char(0xE0A0) .. ' No repo'
   enddef
 
@@ -56,7 +56,7 @@ augroup END
 # are emitted only when there is something to show.
 def g:StatuslineLsp(): string
   if !exists('*lsp#lsp#ErrorCount')
-      || index(DEV_FILETYPES, &filetype) == -1
+      || index(g:dev_supported_filetypes, &filetype) == -1
     return ''
   endif
   var counts = lsp#lsp#ErrorCount()

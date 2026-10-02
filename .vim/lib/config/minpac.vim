@@ -25,6 +25,7 @@ def PackInit()
   minpac#add('ubaldot/vim-helpme', {'type': 'opt'})
   minpac#add('ubaldot/vim-calendar', {'type': 'opt'})
   minpac#add('ubaldot/vim-replica', {'type': 'opt'})
+  minpac#add('h-east/vim9ls', {'type': 'opt'})
 
   # Start plugins.
   minpac#add('ubaldot/vimspector')

@@ -106,7 +106,9 @@ set nofoldenable
 set belloff=all
 set colorcolumn=80
 set clipboard^=unnamed,unnamedplus
-set termguicolors
+if !has("gui_running")
+    set termguicolors
+endif
 set autoread
 set number
 set nowrap
@@ -372,7 +374,7 @@ const packages_to_load = [
   'vim-outline',
   'fern.vim',
   # 'vim-calendar',
-  # 'minpac',
+  'minpac',
   # 'vim-git-box',
   # 'copilot-chat.vim',
   'vim-helpme',

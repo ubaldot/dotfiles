@@ -1,6 +1,5 @@
 vim9script
 
-const supported_filetypes = ['c', 'cpp', 'python', 'tex']
 
 # clangd env setup
 var clangd_name = 'clangd'
@@ -17,6 +16,12 @@ endif
 
 # ----- LSP servers config ------------------
 
+g:dev_supported_filetypes = ['c', 'cpp', 'python', 'tex', 'vim']
+
+# Vim9 Language Server
+const vim9ls_ext = g:os == "Windows" ? ".cmd" : ""
+const vim9ls_path = $'{g:dotvim}/pack/minpac/opt/vim9ls/bin/vim9ls{vim9ls_ext}'
+
 var lspServers = [
   {
     name: clangd_name,
@@ -29,6 +34,11 @@ var lspServers = [
     name: 'texlab',
     filetype: ['tex'],
     path: 'texlab',
+  },
+  {
+    name: 'vim9ls',
+    filetype: ['vim'],
+    path: vim9ls_path
   },
 ]
 
@@ -85,7 +95,7 @@ var lspOpts = {'showDiagOnStatusLine': true, 'noNewlineInCompletion': true}
 g:lsp_options = lspOpts
 
 def InstallKeymappings()
-  if index(supported_filetypes, &filetype) != -1
+  if index(g:dev_supported_filetypes, &filetype) != -1
     # ---- LSP buffer-local mappings -----
     # nnoremap <buffer> <silent> öd <Cmd>LspDiag prev<cr>
     # nnoremap <buffer> <silent> äd <Cmd>LspDiag next<cr>
